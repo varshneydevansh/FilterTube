@@ -3253,5 +3253,15 @@
   "controls.summary.profileCount.other": "{name} · {count} profile",
   "controls.summary.helpTips": "Mga gabay at tip sa filter",
   "controls.summary.aboutLinks": "Bersyon, mga link, at lisensya",
-  "controls.summary.supportBuild": "Suportahan ang pagbuo"
+  "controls.summary.supportBuild": "Suportahan ang pagbuo",
+  "profiles.popupTitle": "Lumipat ng profile",
+  "profiles.addAdult": "Magdagdag ng profile ng adult",
+  "profiles.manage": "Pamahalaan ang mga profile at PIN",
+  "profiles.chip.parent": "Magulang",
+  "profiles.chip.adult": "Adult",
+  "profiles.chip.kids": "Bata",
+  "profiles.about.parent": "Hawak ang Master PIN at namamahala sa lahat",
+  "profiles.about.kids": "Espasyo ng bata. Magulang ang nagtatakda ng mga panuntunan",
+  "profiles.about.kidsNamed": "Espasyo ng bata. Si {name} ang nagtatakda ng mga panuntunan",
+  "profiles.about.adult": "Sariling mga panuntunan at history"
 }

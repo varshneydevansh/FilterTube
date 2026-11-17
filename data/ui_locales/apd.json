@@ -3277,5 +3277,15 @@
   "controls.summary.profileCount.other": "{name} · {count} ملف شخصي",
   "controls.summary.helpTips": "أدلة ونصائح الفلاتر",
   "controls.summary.aboutLinks": "الإصدار والروابط والتراخيص",
-  "controls.summary.supportBuild": "ادعم التطبيق"
+  "controls.summary.supportBuild": "ادعم التطبيق",
+  "profiles.popupTitle": "غيّر الملف",
+  "profiles.addAdult": "أضيف ملف كبار",
+  "profiles.manage": "إدارة الملفات و PIN",
+  "profiles.chip.parent": "الأهل",
+  "profiles.chip.adult": "كبير",
+  "profiles.chip.kids": "أطفال",
+  "profiles.about.parent": "عنده PIN الرئيسي وبيدير الكل",
+  "profiles.about.kids": "مساحة للأطفال. الأهل بيحددوا القواعد",
+  "profiles.about.kidsNamed": "مساحة للأطفال. {name} بيحدد القواعد",
+  "profiles.about.adult": "قواعده وسجله براهو"
 }

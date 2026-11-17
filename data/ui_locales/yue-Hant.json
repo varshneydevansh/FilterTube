@@ -3251,5 +3251,15 @@
   "controls.summary.profileCount.other": "{name} · {count} 個個人檔案",
   "controls.summary.helpTips": "指南同篩選貼士",
   "controls.summary.aboutLinks": "版本、連結同授權",
-  "controls.summary.supportBuild": "支持開發"
+  "controls.summary.supportBuild": "支持開發",
+  "profiles.popupTitle": "轉資料",
+  "profiles.addAdult": "加成人資料",
+  "profiles.manage": "管理資料同 PIN",
+  "profiles.chip.parent": "家長",
+  "profiles.chip.adult": "成人",
+  "profiles.chip.kids": "兒童",
+  "profiles.about.parent": "揸住主 PIN，管理所有人",
+  "profiles.about.kids": "兒童空間。規則由家長設定",
+  "profiles.about.kidsNamed": "兒童空間。規則由 {name} 設定",
+  "profiles.about.adult": "自己嘅規則同記錄"
 }

@@ -145,3 +145,49 @@ Captures: `controls/android-hub-{1,2,3}.jpg`; `controls/before-controls.jpg`;
 - The tile grid is four columns on a wide window and two on a narrow one (Android phone is two).
 - The Settings tile keeps the extension's own line (backup state): the app's "Language, appearance,
   startup and integrations" names settings the extension page does not have.
+
+---
+
+## 3. Profiles: the profile picker
+
+Android files: `ProfileDropdownPopup.kt`, `ProfilePickerRow.kt`, `ProfilePickerFooter.kt`,
+`ProfileVisuals.kt`, `strings_profiles.xml`.
+
+Captures: `profiles/android-switch-profile.jpg`; `profiles/before-{tab,popup}-switch.jpg`;
+`profiles/after-{tab,popup}-switch.jpg`.
+
+### Differences found (before)
+
+| Area | Android | Extension before |
+| --- | --- | --- |
+| Title | "Switch profile" | A group header "Default (Parent)" |
+| Row | Name + quiet role chip ("Parent"), what the profile is for ("Holds the Master PIN and manages everyone"), a brick "You're here" pill | Name, "Parent profile", a sage "You're here" chip |
+| Only Default | Kriti waves over "Just you so far", body, "Add a Kids profile" | Nothing in the picker (the card was only on the Profiles page) |
+| Actions | "Add an adult profile" (Parent), "Manage profiles and PINs" | None |
+| Popup placement | A sheet inside the window | Anchored to the badge and cut off at the popup's left edge |
+
+### Ported
+
+- `js/ui_components.js`: `profileRoleChip`, `profileAboutLine`, `profilePickerFooter` (the app's
+  ProfilePickerFooter plan: no footer on a Kids profile or during a Self-Control Session; Add an adult
+  profile for the Parent only).
+- Both pickers (`js/popup.js`, `js/tab-view.js`) use them, with the "Switch profile" title; account
+  group headers show only when there are several accounts.
+- The popup's actions open the options page at Profiles & PIN (`?view=sync&flow=create-kids|create-adult|profiles`),
+  where the existing create buttons and their PIN gate run; the options page runs them in place.
+- The popup picker is a sheet across the popup (`#ftProfileDropdownPopup` fixed, 8 px from each side).
+- "You're here" is the brick pill; "PIN" is paper with a line.
+- 10 strings from `strings_profiles.xml` in all 38 locales.
+
+### Removed
+
+- The badge-anchored popup dropdown position (the shift-into-view transform no longer applies in the popup).
+- The "Parent profile" / "Adult profile" / "Kids profile" subtitles in the picker rows (still used in labels elsewhere).
+
+### Still different
+
+- The PIN gate was compared by source only (`PinGateActivity.kt` against the extension's prompt, which
+  already has the app's shake, "That PIN didn't work. Try again." and no mascot): the emulator's only
+  profile has no PIN, and setting one on the shared emulator was out of bounds for this pass.
+- Android's profile picker also shows the Self-Control "pinned" and "unavailable" row lines; the
+  extension disables the other rows during a Self-Control Session with its own tooltip.

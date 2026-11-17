@@ -3253,5 +3253,15 @@
   "controls.summary.profileCount.other": "{name} · {count} Profile",
   "controls.summary.helpTips": "Anleitungen und Filtertipps",
   "controls.summary.aboutLinks": "Version, Links und Lizenzen",
-  "controls.summary.supportBuild": "Die Entwicklung unterstützen"
+  "controls.summary.supportBuild": "Die Entwicklung unterstützen",
+  "profiles.popupTitle": "Profil wechseln",
+  "profiles.addAdult": "Erwachsenenprofil hinzufügen",
+  "profiles.manage": "Profile und PINs verwalten",
+  "profiles.chip.parent": "Eltern",
+  "profiles.chip.adult": "Erwachsen",
+  "profiles.chip.kids": "Kinder",
+  "profiles.about.parent": "Hat die Master-PIN und verwaltet alle",
+  "profiles.about.kids": "Kinderbereich. Ein Elternteil legt die Regeln fest",
+  "profiles.about.kidsNamed": "Kinderbereich. {name} legt die Regeln fest",
+  "profiles.about.adult": "Eigene Regeln und eigener Verlauf"
 }

@@ -3253,5 +3253,15 @@
   "controls.summary.profileCount.other": "{name} · {count} प्रोफाइल",
   "controls.summary.helpTips": "गाइड आ फिल्टर के सुझाव",
   "controls.summary.aboutLinks": "संस्करण, लिंक आ लाइसेंस",
-  "controls.summary.supportBuild": "बिल्ड के सहयोग करीं"
+  "controls.summary.supportBuild": "बिल्ड के सहयोग करीं",
+  "profiles.popupTitle": "प्रोफ़ाइल बदलीं",
+  "profiles.addAdult": "बड़न के प्रोफ़ाइल जोड़ीं",
+  "profiles.manage": "प्रोफ़ाइल आ PIN सँभालीं",
+  "profiles.chip.parent": "माई-बाबू",
+  "profiles.chip.adult": "बड़",
+  "profiles.chip.kids": "लइका",
+  "profiles.about.parent": "मास्टर PIN एकरे पास बा आ ई सभके सँभालेला",
+  "profiles.about.kids": "लइकन के जगह। नियम माई-बाबू तय करेलें",
+  "profiles.about.kidsNamed": "लइकन के जगह। नियम {name} तय करेलें",
+  "profiles.about.adult": "आपन नियम आ इतिहास"
 }

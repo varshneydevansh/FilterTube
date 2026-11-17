@@ -3253,5 +3253,15 @@
   "controls.summary.profileCount.zero": "{name} · {count} پروفائل",
   "controls.summary.profileCount.two": "{name} · {count} پروفائل",
   "controls.summary.profileCount.few": "{name} · {count} پروفائل",
-  "controls.summary.profileCount.many": "{name} · {count} پروفائل"
+  "controls.summary.profileCount.many": "{name} · {count} پروفائل",
+  "profiles.popupTitle": "پروفائل بدلو",
+  "profiles.addAdult": "وڈیاں دی پروفائل جوڑو",
+  "profiles.manage": "پروفائلاں تے PIN سنبھالو",
+  "profiles.chip.parent": "ماپے",
+  "profiles.chip.adult": "وڈا",
+  "profiles.chip.kids": "بچے",
+  "profiles.about.parent": "Master PIN رکھدی اے تے سبھ نوں سنبھالدی اے",
+  "profiles.about.kids": "بچیاں دی جگہ۔ قاعدے ماپے طے کردے نیں",
+  "profiles.about.kidsNamed": "بچیاں دی جگہ۔ قاعدے {name} طے کردا اے",
+  "profiles.about.adult": "اپنے قاعدے تے ہسٹری"
 }

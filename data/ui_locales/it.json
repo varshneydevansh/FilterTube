@@ -3253,5 +3253,15 @@
   "controls.summary.profileCount.other": "{name} · {count} profili",
   "controls.summary.helpTips": "Guide e consigli sui filtri",
   "controls.summary.aboutLinks": "Versione, link e licenze",
-  "controls.summary.supportBuild": "Sostieni lo sviluppo"
+  "controls.summary.supportBuild": "Sostieni lo sviluppo",
+  "profiles.popupTitle": "Cambia profilo",
+  "profiles.addAdult": "Aggiungi un profilo adulto",
+  "profiles.manage": "Gestisci profili e PIN",
+  "profiles.chip.parent": "Genitore",
+  "profiles.chip.adult": "Adulto",
+  "profiles.chip.kids": "Bambini",
+  "profiles.about.parent": "Ha il PIN principale e gestisce tutti",
+  "profiles.about.kids": "Spazio bambini. Un genitore stabilisce le regole",
+  "profiles.about.kidsNamed": "Spazio bambini. {name} stabilisce le regole",
+  "profiles.about.adult": "Regole e cronologia personali"
 }

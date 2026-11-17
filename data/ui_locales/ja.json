@@ -3251,5 +3251,15 @@
   "controls.summary.profileCount.other": "{name} · プロフィール {count} 件",
   "controls.summary.helpTips": "ガイドとフィルターのヒント",
   "controls.summary.aboutLinks": "バージョン、リンク、ライセンス",
-  "controls.summary.supportBuild": "開発を支援"
+  "controls.summary.supportBuild": "開発を支援",
+  "profiles.popupTitle": "プロフィールを切り替え",
+  "profiles.addAdult": "大人プロフィールを追加",
+  "profiles.manage": "プロフィールと PIN を管理",
+  "profiles.chip.parent": "保護者",
+  "profiles.chip.adult": "大人",
+  "profiles.chip.kids": "キッズ",
+  "profiles.about.parent": "マスター PIN を持ち、全員を管理します",
+  "profiles.about.kids": "キッズ用スペース。ルールは保護者が決めます",
+  "profiles.about.kidsNamed": "キッズ用スペース。ルールは {name} が決めます",
+  "profiles.about.adult": "自分のルールと履歴"
 }

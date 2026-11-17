@@ -3251,5 +3251,15 @@
   "controls.summary.profileCount.other": "{name} · àwọn profaili {count}",
   "controls.summary.helpTips": "Àwọn ìtọ́sọ́nà àti ìmọ̀ràn àlẹ̀mọ́",
   "controls.summary.aboutLinks": "Ẹ̀yà, àwọn ọ̀nà asopọ̀ àti àwọn ìwé àṣẹ",
-  "controls.summary.supportBuild": "Ṣàtìlẹ́yìn fún iṣẹ́ náà"
+  "controls.summary.supportBuild": "Ṣàtìlẹ́yìn fún iṣẹ́ náà",
+  "profiles.popupTitle": "Yí profaili padà",
+  "profiles.addAdult": "Fi profaili àgbàlagbà kún un",
+  "profiles.manage": "Ṣàkóso àwọn profaili àti PIN",
+  "profiles.chip.parent": "Òbí",
+  "profiles.chip.adult": "Àgbà",
+  "profiles.chip.kids": "Ọmọdé",
+  "profiles.about.parent": "Ó ní PIN Alákóso, ó sì ń ṣàkóso gbogbo ènìyàn",
+  "profiles.about.kids": "Àyè àwọn ọmọdé. Òbí ló ń ṣètò àwọn òfin",
+  "profiles.about.kidsNamed": "Àyè àwọn ọmọdé. {name} ló ń ṣètò àwọn òfin",
+  "profiles.about.adult": "Àwọn òfin àti ìtàn tirẹ̀"
 }

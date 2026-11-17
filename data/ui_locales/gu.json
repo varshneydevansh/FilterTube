@@ -3253,5 +3253,15 @@
   "controls.summary.profileCount.other": "{name} · {count} પ્રોફાઇલ્સ",
   "controls.summary.helpTips": "માર્ગદર્શિકાઓ અને ફિલ્ટર ટિપ્સ",
   "controls.summary.aboutLinks": "સંસ્કરણ, લિંક અને લાઇસન્સ",
-  "controls.summary.supportBuild": "બિલ્ડને ટેકો આપો"
+  "controls.summary.supportBuild": "બિલ્ડને ટેકો આપો",
+  "profiles.popupTitle": "પ્રોફાઇલ બદલો",
+  "profiles.addAdult": "પુખ્ત પ્રોફાઇલ ઉમેરો",
+  "profiles.manage": "પ્રોફાઇલ અને PIN સંચાલિત કરો",
+  "profiles.chip.parent": "વાલી",
+  "profiles.chip.adult": "પુખ્ત",
+  "profiles.chip.kids": "બાળકો",
+  "profiles.about.parent": "માસ્ટર PIN રાખે છે અને બધાનું સંચાલન કરે છે",
+  "profiles.about.kids": "બાળકોની જગ્યા. નિયમો વાલી નક્કી કરે છે",
+  "profiles.about.kidsNamed": "બાળકોની જગ્યા. નિયમો {name} નક્કી કરે છે",
+  "profiles.about.adult": "પોતાના નિયમો અને ઇતિહાસ"
 }

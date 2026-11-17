@@ -3253,5 +3253,15 @@
   "controls.summary.profileCount.other": "{name} · {count} پروفائلز",
   "controls.summary.helpTips": "رہنما اور فلٹر کے مشورے",
   "controls.summary.aboutLinks": "ورژن، لنکس اور لائسنس",
-  "controls.summary.supportBuild": "اس پروجیکٹ کی مدد کریں"
+  "controls.summary.supportBuild": "اس پروجیکٹ کی مدد کریں",
+  "profiles.popupTitle": "پروفائل بدلیں",
+  "profiles.addAdult": "بالغ پروفائل شامل کریں",
+  "profiles.manage": "پروفائلز اور PIN منظم کریں",
+  "profiles.chip.parent": "والدین",
+  "profiles.chip.adult": "بالغ",
+  "profiles.chip.kids": "بچے",
+  "profiles.about.parent": "ماسٹر PIN رکھتی ہے اور سب کو منظم کرتی ہے",
+  "profiles.about.kids": "بچوں کی جگہ۔ قواعد والدین طے کرتے ہیں",
+  "profiles.about.kidsNamed": "بچوں کی جگہ۔ قواعد {name} طے کرتے ہیں",
+  "profiles.about.adult": "اپنے قواعد اور ہسٹری"
 }

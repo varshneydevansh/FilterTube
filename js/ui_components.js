@@ -1401,6 +1401,73 @@ const UIComponents = (() => {
     // PUBLIC API
     // ============================================================================
 
+    /**
+     * The profile picker's parts (Android ProfileDropdownPopup, ProfilePickerRow, ProfilePickerFooter),
+     * shared by the popup and the options page. t(key, fallback, values) is the page's translator.
+     */
+    function profileRoleChip(role, t) {
+        const chip = document.createElement('span');
+        chip.className = `ft-profile-role-chip is-${role}`;
+        chip.textContent = role === 'parent' ? t('profiles.chip.parent', 'Parent') : role === 'kids' ? t('profiles.chip.kids', 'Kids') : t('profiles.chip.adult', 'Adult');
+        chip.setAttribute('aria-hidden', 'true');
+        return chip;
+    }
+
+    function profileAboutLine(role, t, parentName = '') {
+        if (role === 'parent') return t('profiles.about.parent', 'Holds the Master PIN and manages everyone');
+        if (role === 'kids') return parentName ? t('profiles.about.kidsNamed', 'Kids space. {name} sets the rules', { name: parentName }) : t('profiles.about.kids', 'Kids space. A parent sets the rules');
+        return t('profiles.about.adult', 'Own rules and history');
+    }
+
+    /**
+     * What the picker offers under the rows: Kriti's "Just you so far" card while only Default exists,
+     * Add a Kids profile, Add an adult profile (the Parent only) and Manage profiles and PINs. None on a
+     * Kids profile or during a Self-Control Session. opts: {count, role, selfControl, t, onAddKids,
+     * onAddAdult, onManage, kritiSrc}.
+     */
+    function profilePickerFooter(opts) {
+        const t = opts.t;
+        if (opts.selfControl || opts.role === 'kids') return null;
+        const footer = document.createElement('div');
+        footer.className = 'ft-picker-footer';
+        const make = (tag, className, text) => { const node = document.createElement(tag); node.className = className; if (text) node.textContent = text; return node; };
+        if (opts.count <= 1) {
+            const card = make('div', 'ft-picker-empty');
+            if (opts.kritiSrc) {
+                const kriti = make('img', 'ft-picker-empty__kriti');
+                kriti.src = opts.kritiSrc;
+                kriti.alt = '';
+                kriti.setAttribute('aria-hidden', 'true');
+                card.appendChild(kriti);
+            }
+            card.append(make('h4', 'ft-picker-empty__title', t('profiles.emptyTitle', 'Just you so far')),
+                make('p', 'ft-picker-empty__body', t('profiles.emptyBody', 'Add a Kids profile to give a child their own space, with rules you set.')));
+            const add = make('button', 'btn-primary ft-picker-empty__add', t('profiles.addKids', 'Add a Kids profile'));
+            add.type = 'button';
+            add.addEventListener('click', event => { event.stopPropagation(); opts.onAddKids?.(); });
+            card.appendChild(add);
+            footer.appendChild(card);
+        } else {
+            const kids = make('button', 'ft-picker-pill is-kids', t('profiles.addKids', 'Add a Kids profile'));
+            kids.type = 'button';
+            kids.addEventListener('click', event => { event.stopPropagation(); opts.onAddKids?.(); });
+            footer.appendChild(kids);
+        }
+        if (opts.role === 'parent' && opts.onAddAdult) {
+            const adult = make('button', 'ft-picker-pill is-adult', t('profiles.addAdult', 'Add an adult profile'));
+            adult.type = 'button';
+            adult.addEventListener('click', event => { event.stopPropagation(); opts.onAddAdult(); });
+            footer.appendChild(adult);
+        }
+        if (opts.onManage) {
+            const manage = make('button', 'ft-picker-manage', t('profiles.manage', 'Manage profiles and PINs'));
+            manage.type = 'button';
+            manage.addEventListener('click', event => { event.stopPropagation(); opts.onManage(); });
+            footer.appendChild(manage);
+        }
+        return footer;
+    }
+
     return {
         showUndoBar,
         attachRemovalUndo,
@@ -1413,6 +1480,9 @@ const UIComponents = (() => {
         profileAvatarSticker,
         profileInitial,
         renderProfileAvatar,
+        profileRoleChip,
+        profileAboutLine,
+        profilePickerFooter,
         neutralizePlatformLabel,
         createButton,
         flashButtonSuccess,

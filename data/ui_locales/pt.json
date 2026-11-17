@@ -3253,5 +3253,15 @@
   "controls.summary.trustedDevices.few": "{count} dispositivos confiáveis",
   "controls.summary.profileCount.zero": "{name} · {count} perfis",
   "controls.summary.profileCount.two": "{name} · {count} perfis",
-  "controls.summary.profileCount.few": "{name} · {count} perfis"
+  "controls.summary.profileCount.few": "{name} · {count} perfis",
+  "profiles.popupTitle": "Trocar de perfil",
+  "profiles.addAdult": "Adicionar um perfil adulto",
+  "profiles.manage": "Gerenciar perfis e PINs",
+  "profiles.chip.parent": "Pais",
+  "profiles.chip.adult": "Adulto",
+  "profiles.chip.kids": "Infantil",
+  "profiles.about.parent": "Tem o PIN mestre e gerencia todos",
+  "profiles.about.kids": "Espaço infantil. Um responsável define as regras",
+  "profiles.about.kidsNamed": "Espaço infantil. {name} define as regras",
+  "profiles.about.adult": "Regras e histórico próprios"
 }

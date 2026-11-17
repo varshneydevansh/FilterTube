@@ -3251,5 +3251,15 @@
   "controls.summary.profileCount.one": "{name} · {count} profil",
   "controls.summary.profileCount.two": "{name} · {count} profil",
   "controls.summary.profileCount.few": "{name} · {count} profil",
-  "controls.summary.profileCount.many": "{name} · {count} profil"
+  "controls.summary.profileCount.many": "{name} · {count} profil",
+  "profiles.popupTitle": "Ganti profil",
+  "profiles.addAdult": "Tambahna profil diwasa",
+  "profiles.manage": "Kelola profil lan PIN",
+  "profiles.chip.parent": "Wong tuwa",
+  "profiles.chip.adult": "Diwasa",
+  "profiles.chip.kids": "Bocah",
+  "profiles.about.parent": "Nyekel PIN Master lan ngatur kabeh profil",
+  "profiles.about.kids": "Papan bocah. Wong tuwa sing nemtokake aturane",
+  "profiles.about.kidsNamed": "Papan bocah. {name} sing nemtokake aturane",
+  "profiles.about.adult": "Aturan lan riwayat dhewe"
 }

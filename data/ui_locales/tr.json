@@ -3253,5 +3253,15 @@
   "controls.summary.profileCount.other": "{name} · {count} profil",
   "controls.summary.helpTips": "Kılavuzlar ve filtre ipuçları",
   "controls.summary.aboutLinks": "Sürüm, bağlantılar ve lisanslar",
-  "controls.summary.supportBuild": "Geliştirmeye destek olun"
+  "controls.summary.supportBuild": "Geliştirmeye destek olun",
+  "profiles.popupTitle": "Profil değiştir",
+  "profiles.addAdult": "Yetişkin profili ekle",
+  "profiles.manage": "Profilleri ve PIN'leri yönet",
+  "profiles.chip.parent": "Ebeveyn",
+  "profiles.chip.adult": "Yetişkin",
+  "profiles.chip.kids": "Çocuk",
+  "profiles.about.parent": "Ana PIN'i tutar ve herkesi yönetir",
+  "profiles.about.kids": "Çocuk alanı. Kuralları bir ebeveyn belirler",
+  "profiles.about.kidsNamed": "Çocuk alanı. Kuralları {name} belirler",
+  "profiles.about.adult": "Kendi kuralları ve geçmişi"
 }

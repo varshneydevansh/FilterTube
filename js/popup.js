@@ -2199,9 +2199,13 @@ document.addEventListener('DOMContentLoaded', async () => {
             nameEl.className = 'ft-profile-dropdown-name';
             nameEl.textContent = getProfileName(profilesV4, id);
 
+            // Android ProfilePickerRow: the name with a quiet role chip, then what the profile is for.
+            const role = id === 'default' ? 'parent' : (isChild ? 'kids' : 'adult');
+            const kit = window.UIComponents;
+            if (kit?.profileRoleChip) nameEl.appendChild(kit.profileRoleChip(role, popupUiText));
             const subtitleEl = document.createElement('div');
             subtitleEl.className = 'ft-profile-dropdown-subtitle';
-            subtitleEl.textContent = buildProfileSubtitle(profilesV4, id);
+            subtitleEl.textContent = kit?.profileAboutLine ? kit.profileAboutLine(role, popupUiText) : buildProfileSubtitle(profilesV4, id);
 
             meta.appendChild(nameEl);
             meta.appendChild(subtitleEl);
@@ -2232,8 +2236,14 @@ document.addEventListener('DOMContentLoaded', async () => {
         };
 
         const accountIds = getAccountIds(profilesV4);
+        const pickerTitle = document.createElement('div');
+        pickerTitle.className = 'ft-picker-title';
+        pickerTitle.setAttribute('role', 'presentation');
+        pickerTitle.textContent = popupUiText('profiles.popupTitle', 'Switch profile');
+        ftProfileDropdownPopup.appendChild(pickerTitle);
         accountIds.forEach((accountId, idx) => {
             const header = document.createElement('div');
+            if (accountIds.length < 2) header.hidden = true;
             header.className = 'ft-profile-dropdown-group';
             header.setAttribute('role', 'presentation');
             const groupKey = accountId === 'default' ? 'popup.profile.groupMaster' : 'popup.profile.groupAccount';
@@ -2252,6 +2262,27 @@ document.addEventListener('DOMContentLoaded', async () => {
                 ftProfileDropdownPopup.appendChild(sep);
             }
         });
+
+        // The picker's footer (Android ProfilePickerFooter): adding and managing open the options page,
+        // where the existing create flow and its PIN gate run.
+        const openOptions = query => {
+            try {
+                const api = typeof chrome !== 'undefined' ? chrome : browser;
+                const url = api.runtime.getURL(`html/tab-view.html?view=sync&${query}`);
+                if (api.tabs?.create) api.tabs.create({ url }); else window.open(url, '_blank');
+                window.close?.();
+            } catch (e) { }
+        };
+        const activeRole = current === 'default' ? 'parent' : (getProfileType(profilesV4, current) === 'child' ? 'kids' : 'adult');
+        const mascots = window.FilterTubeMascots;
+        const footer = window.UIComponents?.profilePickerFooter?.({
+            count: Object.keys(profiles).length, role: activeRole, selfControl: popupSelfControlSessionState?.active === true, t: popupUiText,
+            kritiSrc: mascots?.showsCharacters?.(mascots.mode) ? `../assets/images/mascots/${mascots.stillImage('kritiWave')}` : '',
+            onAddKids: () => openOptions('flow=create-kids'),
+            onAddAdult: () => openOptions('flow=create-adult'),
+            onManage: () => openOptions('flow=profiles')
+        });
+        if (footer) ftProfileDropdownPopup.appendChild(footer);
 
         positionProfileDropdown();
     }

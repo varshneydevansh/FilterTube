@@ -3253,5 +3253,15 @@
   "controls.summary.profileCount.other": "{name} · {count} টি প্রোফাইল",
   "controls.summary.helpTips": "নির্দেশিকা ও ফিল্টারের টিপস",
   "controls.summary.aboutLinks": "সংস্করণ, লিংক ও লাইসেন্স",
-  "controls.summary.supportBuild": "নির্মাণে সহায়তা করুন"
+  "controls.summary.supportBuild": "নির্মাণে সহায়তা করুন",
+  "profiles.popupTitle": "প্রোফাইল বদলান",
+  "profiles.addAdult": "প্রাপ্তবয়স্ক প্রোফাইল যোগ করুন",
+  "profiles.manage": "প্রোফাইল ও PIN পরিচালনা",
+  "profiles.chip.parent": "অভিভাবক",
+  "profiles.chip.adult": "প্রাপ্তবয়স্ক",
+  "profiles.chip.kids": "শিশু",
+  "profiles.about.parent": "Master PIN রাখে এবং সবাইকে পরিচালনা করে",
+  "profiles.about.kids": "শিশুদের জায়গা। নিয়ম ঠিক করেন অভিভাবক",
+  "profiles.about.kidsNamed": "শিশুদের জায়গা। নিয়ম ঠিক করেন {name}",
+  "profiles.about.adult": "নিজের নিয়ম ও ইতিহাস"
 }

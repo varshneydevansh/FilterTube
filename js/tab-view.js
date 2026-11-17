@@ -4019,6 +4019,10 @@ function handleNavigationIntent() {
     }
     try {
         const flow = (new URLSearchParams(window.location.search || '').get('flow') || '').toLowerCase();
+        if (['create-kids', 'create-adult', 'profiles'].includes(flow)) {
+            // From the popup's profile picker (Android ProfilePickerFooter).
+            setTimeout(() => window.FilterTubeOpenProfilesFlow?.(flow), 400);
+        }
         if (flow === 'switch-profile' && ftProfileBadgeBtnTab) {
             requestAnimationFrame(() => {
                 ftProfileBadgeBtnTab.focus();
@@ -6940,9 +6944,13 @@ document.addEventListener('DOMContentLoaded', async () => {
             nameEl.className = 'ft-profile-dropdown-name';
             nameEl.textContent = getProfileName(profilesV4, id);
 
+            // Android ProfilePickerRow: the name with a quiet role chip, then what the profile is for.
+            const role = id === 'default' ? 'parent' : (isChild ? 'kids' : 'adult');
+            const kit = window.UIComponents;
+            if (kit?.profileRoleChip) nameEl.appendChild(kit.profileRoleChip(role, tabViewUiText));
             const subtitleEl = document.createElement('div');
             subtitleEl.className = 'ft-profile-dropdown-subtitle';
-            subtitleEl.textContent = buildProfileSubtitle(profilesV4, id);
+            subtitleEl.textContent = kit?.profileAboutLine ? kit.profileAboutLine(role, tabViewUiText) : buildProfileSubtitle(profilesV4, id);
 
             meta.appendChild(nameEl);
             meta.appendChild(subtitleEl);
@@ -6970,8 +6978,14 @@ document.addEventListener('DOMContentLoaded', async () => {
         };
 
         const accountIds = getAccountIds(profilesV4);
+        const pickerTitle = document.createElement('div');
+        pickerTitle.className = 'ft-picker-title';
+        pickerTitle.setAttribute('role', 'presentation');
+        pickerTitle.textContent = tabViewUiText('profiles.popupTitle', 'Switch profile');
+        ftProfileDropdownTab.appendChild(pickerTitle);
         accountIds.forEach((accountId, idx) => {
             const header = document.createElement('div');
+            if (accountIds.length < 2) header.hidden = true;
             header.className = 'ft-profile-dropdown-group';
             header.setAttribute('role', 'presentation');
             setTabViewLocalizedCopy(
@@ -6995,8 +7009,32 @@ document.addEventListener('DOMContentLoaded', async () => {
             }
         });
 
+        // The picker's footer (Android ProfilePickerFooter): the existing create buttons and their gate.
+        const activeRole = current === 'default' ? 'parent' : (getProfileType(profilesV4, current) === 'child' ? 'kids' : 'adult');
+        const mascots = window.FilterTubeMascots;
+        const footer = window.UIComponents?.profilePickerFooter?.({
+            count: Object.keys(safeObject(root.profiles)).length, role: activeRole, selfControl: isSelfControlSessionActive(), t: tabViewUiText,
+            kritiSrc: mascots?.showsCharacters?.(mascots.mode) ? `../assets/images/mascots/${mascots.stillImage('kritiWave')}` : '',
+            onAddKids: () => { closeProfileDropdownTab(); openProfilesFlow('create-kids'); },
+            onAddAdult: ftCreateAccountBtn ? () => { closeProfileDropdownTab(); openProfilesFlow('create-adult'); } : null,
+            onManage: () => { closeProfileDropdownTab(); openProfilesFlow('profiles'); }
+        });
+        if (footer) ftProfileDropdownTab.appendChild(footer);
+
         positionProfileDropdownTab();
     }
+
+    /** Profiles & PIN, and optionally its create flow (the same buttons and gates as the page). */
+    function openProfilesFlow(flow) {
+        if (typeof window.switchView === 'function') window.switchView('sync');
+        requestAnimationFrame(() => {
+            const card = document.getElementById('ftProfilesManager')?.closest('.settings-card') || document.getElementById('ftProfilesManager');
+            card?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            if (flow === 'create-kids' && ftCreateChildBtn && !ftCreateChildBtn.disabled) ftCreateChildBtn.click();
+            if (flow === 'create-adult' && ftCreateAccountBtn && !ftCreateAccountBtn.disabled) ftCreateAccountBtn.click();
+        });
+    }
+    window.FilterTubeOpenProfilesFlow = openProfilesFlow;
 
     function updateAutoBackupPolicyControls() {
         try {
@@ -34686,6 +34724,10 @@ function setupNavigation() {
 
     // Make switchView globally accessible for quick actions
     window.switchView = switchView;
+    // The first page is Controls until a route says otherwise: its title in the chosen language.
+    if (pageTitle && document.getElementById('dashboardView')?.classList.contains('active')) {
+        setTabViewLocalizedCopy(pageTitle, 'textContent', 'controls.pageTitle', 'Controls');
+    }
 }
 
 // ============================================================================

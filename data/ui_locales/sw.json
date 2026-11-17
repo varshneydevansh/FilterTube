@@ -3253,5 +3253,15 @@
   "controls.summary.profileCount.zero": "{name} · Wasifu {count}",
   "controls.summary.profileCount.two": "{name} · Wasifu {count}",
   "controls.summary.profileCount.few": "{name} · Wasifu {count}",
-  "controls.summary.profileCount.many": "{name} · Wasifu {count}"
+  "controls.summary.profileCount.many": "{name} · Wasifu {count}",
+  "profiles.popupTitle": "Badilisha wasifu",
+  "profiles.addAdult": "Ongeza wasifu wa mtu mzima",
+  "profiles.manage": "Simamia wasifu na PIN",
+  "profiles.chip.parent": "Mzazi",
+  "profiles.chip.adult": "Mtu mzima",
+  "profiles.chip.kids": "Watoto",
+  "profiles.about.parent": "Unashikilia PIN Kuu na kusimamia kila mtu",
+  "profiles.about.kids": "Nafasi ya watoto. Mzazi huweka kanuni",
+  "profiles.about.kidsNamed": "Nafasi ya watoto. {name} huweka kanuni",
+  "profiles.about.adult": "Kanuni na historia zake mwenyewe"
 }

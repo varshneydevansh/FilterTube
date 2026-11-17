@@ -3277,5 +3277,15 @@
   "controls.summary.profileCount.other": "{name} · {count} ملف شخصي",
   "controls.summary.helpTips": "أدلة ونصائح للفلاتر",
   "controls.summary.aboutLinks": "الإصدار والروابط والتراخيص",
-  "controls.summary.supportBuild": "ادعم المشروع"
+  "controls.summary.supportBuild": "ادعم المشروع",
+  "profiles.popupTitle": "غيّر البروفايل",
+  "profiles.addAdult": "زيد بروفايل كبار",
+  "profiles.manage": "إدارة البروفايلات والـ PIN",
+  "profiles.chip.parent": "الأهل",
+  "profiles.chip.adult": "كبير",
+  "profiles.chip.kids": "ولاد",
+  "profiles.about.parent": "معه الـ PIN الرئيسي وبيدير الكل",
+  "profiles.about.kids": "مساحة للولاد. الأهل بيحطوا القواعد",
+  "profiles.about.kidsNamed": "مساحة للولاد. {name} بيحط القواعد",
+  "profiles.about.adult": "قواعده وسجله الخاص"
 }

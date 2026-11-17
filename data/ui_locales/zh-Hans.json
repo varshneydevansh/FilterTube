@@ -3251,5 +3251,15 @@
   "controls.summary.profileCount.other": "{name} · {count} 个个人资料",
   "controls.summary.helpTips": "指南和过滤小贴士",
   "controls.summary.aboutLinks": "版本、链接和许可",
-  "controls.summary.supportBuild": "支持开发"
+  "controls.summary.supportBuild": "支持开发",
+  "profiles.popupTitle": "切换资料",
+  "profiles.addAdult": "添加成人资料",
+  "profiles.manage": "管理资料和 PIN",
+  "profiles.chip.parent": "家长",
+  "profiles.chip.adult": "成人",
+  "profiles.chip.kids": "儿童",
+  "profiles.about.parent": "持有主 PIN，管理所有人",
+  "profiles.about.kids": "儿童空间。规则由家长设置",
+  "profiles.about.kidsNamed": "儿童空间。规则由 {name} 设置",
+  "profiles.about.adult": "自己的规则和记录"
 }

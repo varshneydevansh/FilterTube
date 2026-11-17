@@ -3253,5 +3253,15 @@
   "controls.summary.profileCount.other": "{name} · {count} சுயவிவரங்கள்",
   "controls.summary.helpTips": "வழிகாட்டிகளும் வடிகட்டி குறிப்புகளும்",
   "controls.summary.aboutLinks": "பதிப்பு, இணைப்புகள் மற்றும் உரிமங்கள்",
-  "controls.summary.supportBuild": "உருவாக்கத்தை ஆதரிக்கவும்"
+  "controls.summary.supportBuild": "உருவாக்கத்தை ஆதரிக்கவும்",
+  "profiles.popupTitle": "சுயவிவரத்தை மாற்று",
+  "profiles.addAdult": "பெரியவர் சுயவிவரத்தைச் சேர்",
+  "profiles.manage": "சுயவிவரங்களையும் PIN-களையும் நிர்வகி",
+  "profiles.chip.parent": "பெற்றோர்",
+  "profiles.chip.adult": "பெரியவர்",
+  "profiles.chip.kids": "குழந்தைகள்",
+  "profiles.about.parent": "முதன்மை PIN-ஐ வைத்திருந்து அனைவரையும் நிர்வகிக்கும்",
+  "profiles.about.kids": "குழந்தைகளுக்கான இடம். விதிகளைப் பெற்றோர் அமைப்பார்",
+  "profiles.about.kidsNamed": "குழந்தைகளுக்கான இடம். விதிகளை {name} அமைப்பார்",
+  "profiles.about.adult": "சொந்த விதிகளும் வரலாறும்"
 }

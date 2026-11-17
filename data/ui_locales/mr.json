@@ -3253,5 +3253,15 @@
   "controls.summary.profileCount.zero": "{name} · {count} प्रोफाइल",
   "controls.summary.profileCount.two": "{name} · {count} प्रोफाइल",
   "controls.summary.profileCount.few": "{name} · {count} प्रोफाइल",
-  "controls.summary.profileCount.many": "{name} · {count} प्रोफाइल"
+  "controls.summary.profileCount.many": "{name} · {count} प्रोफाइल",
+  "profiles.popupTitle": "प्रोफाइल बदला",
+  "profiles.addAdult": "प्रौढ प्रोफाइल जोडा",
+  "profiles.manage": "प्रोफाइल आणि PIN व्यवस्थापित करा",
+  "profiles.chip.parent": "पालक",
+  "profiles.chip.adult": "प्रौढ",
+  "profiles.chip.kids": "मुले",
+  "profiles.about.parent": "मास्टर PIN याच्याकडे असतो आणि हे सर्वांचे व्यवस्थापन करते",
+  "profiles.about.kids": "मुलांची जागा. नियम पालक ठरवतात",
+  "profiles.about.kidsNamed": "मुलांची जागा. नियम {name} ठरवतात",
+  "profiles.about.adult": "स्वतःचे नियम आणि इतिहास"
 }

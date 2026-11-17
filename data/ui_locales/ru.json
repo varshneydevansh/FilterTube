@@ -3265,5 +3265,15 @@
   "controls.summary.trustedDevices.zero": "{count} доверенного устройства",
   "controls.summary.trustedDevices.two": "{count} доверенного устройства",
   "controls.summary.profileCount.zero": "{name} · {count} профиля",
-  "controls.summary.profileCount.two": "{name} · {count} профиля"
+  "controls.summary.profileCount.two": "{name} · {count} профиля",
+  "profiles.popupTitle": "Сменить профиль",
+  "profiles.addAdult": "Добавить профиль взрослого",
+  "profiles.manage": "Профили и PIN-коды",
+  "profiles.chip.parent": "Родитель",
+  "profiles.chip.adult": "Взрослый",
+  "profiles.chip.kids": "Детский",
+  "profiles.about.parent": "Хранит главный PIN-код и управляет всеми",
+  "profiles.about.kids": "Детское пространство. Правила задаёт родитель",
+  "profiles.about.kidsNamed": "Детское пространство. Правила задаёт {name}",
+  "profiles.about.adult": "Свои правила и история"
 }

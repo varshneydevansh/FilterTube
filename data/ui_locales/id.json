@@ -3251,5 +3251,15 @@
   "controls.summary.profileCount.other": "{name} · {count} profil",
   "controls.summary.helpTips": "Panduan dan tips filter",
   "controls.summary.aboutLinks": "Versi, tautan, dan lisensi",
-  "controls.summary.supportBuild": "Dukung pengembangan"
+  "controls.summary.supportBuild": "Dukung pengembangan",
+  "profiles.popupTitle": "Ganti profil",
+  "profiles.addAdult": "Tambahkan profil dewasa",
+  "profiles.manage": "Kelola profil dan PIN",
+  "profiles.chip.parent": "Orang tua",
+  "profiles.chip.adult": "Dewasa",
+  "profiles.chip.kids": "Anak",
+  "profiles.about.parent": "Memegang PIN Master dan mengelola semua profil",
+  "profiles.about.kids": "Ruang anak. Orang tua yang mengatur aturannya",
+  "profiles.about.kidsNamed": "Ruang anak. {name} yang mengatur aturannya",
+  "profiles.about.adult": "Aturan dan riwayat sendiri"
 }

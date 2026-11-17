@@ -3253,5 +3253,15 @@
   "controls.summary.profileCount.other": "{name} · {count} profils",
   "controls.summary.helpTips": "Guides et conseils sur les filtres",
   "controls.summary.aboutLinks": "Version, liens et licences",
-  "controls.summary.supportBuild": "Soutenir le projet"
+  "controls.summary.supportBuild": "Soutenir le projet",
+  "profiles.popupTitle": "Changer de profil",
+  "profiles.addAdult": "Ajouter un profil adulte",
+  "profiles.manage": "Gérer les profils et les codes PIN",
+  "profiles.chip.parent": "Parent",
+  "profiles.chip.adult": "Adulte",
+  "profiles.chip.kids": "Enfant",
+  "profiles.about.parent": "Détient le code PIN maître et gère tout le monde",
+  "profiles.about.kids": "Espace enfant. Un parent fixe les règles",
+  "profiles.about.kidsNamed": "Espace enfant. {name} fixe les règles",
+  "profiles.about.adult": "Ses propres règles et son historique"
 }

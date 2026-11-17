@@ -3251,5 +3251,15 @@
   "controls.summary.profileCount.other": "{name} · {count} 个个人资料",
   "controls.summary.helpTips": "指南搭筛选小窍门",
   "controls.summary.aboutLinks": "版本、链接搭许可证",
-  "controls.summary.supportBuild": "支持迭个项目"
+  "controls.summary.supportBuild": "支持迭个项目",
+  "profiles.popupTitle": "换资料",
+  "profiles.addAdult": "加一个大人资料",
+  "profiles.manage": "管理资料搭 PIN",
+  "profiles.chip.parent": "家长",
+  "profiles.chip.adult": "大人",
+  "profiles.chip.kids": "小囡",
+  "profiles.about.parent": "拿牢主 PIN，管所有人",
+  "profiles.about.kids": "小囡空间。规则由家长来定",
+  "profiles.about.kidsNamed": "小囡空间。规则由 {name} 来定",
+  "profiles.about.adult": "自家个规则搭记录"
 }

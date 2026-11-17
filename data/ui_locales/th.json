@@ -3251,5 +3251,15 @@
   "controls.summary.profileCount.other": "{name} · {count} โปรไฟล์",
   "controls.summary.helpTips": "คู่มือและเคล็ดลับการกรอง",
   "controls.summary.aboutLinks": "เวอร์ชัน ลิงก์ และใบอนุญาต",
-  "controls.summary.supportBuild": "สนับสนุนการพัฒนา"
+  "controls.summary.supportBuild": "สนับสนุนการพัฒนา",
+  "profiles.popupTitle": "สลับโปรไฟล์",
+  "profiles.addAdult": "เพิ่มโปรไฟล์ผู้ใหญ่",
+  "profiles.manage": "จัดการโปรไฟล์และ PIN",
+  "profiles.chip.parent": "ผู้ปกครอง",
+  "profiles.chip.adult": "ผู้ใหญ่",
+  "profiles.chip.kids": "เด็ก",
+  "profiles.about.parent": "ถือ PIN หลักและจัดการทุกคน",
+  "profiles.about.kids": "พื้นที่เด็ก ผู้ปกครองเป็นผู้ตั้งกฎ",
+  "profiles.about.kidsNamed": "พื้นที่เด็ก {name} เป็นผู้ตั้งกฎ",
+  "profiles.about.adult": "กฎและประวัติของตัวเอง"
 }

@@ -3277,5 +3277,15 @@
   "controls.summary.profileCount.other": "{name} · {count} ملف شخصي",
   "controls.summary.helpTips": "أدلة ونصائح التصفية",
   "controls.summary.aboutLinks": "الإصدار والروابط والتراخيص",
-  "controls.summary.supportBuild": "ادعم المشروع"
+  "controls.summary.supportBuild": "ادعم المشروع",
+  "profiles.popupTitle": "تبديل الملف الشخصي",
+  "profiles.addAdult": "إضافة ملف بالغ",
+  "profiles.manage": "إدارة الملفات ورموز PIN",
+  "profiles.chip.parent": "الوالد",
+  "profiles.chip.adult": "بالغ",
+  "profiles.chip.kids": "أطفال",
+  "profiles.about.parent": "يحمل PIN الرئيسي ويدير الجميع",
+  "profiles.about.kids": "مساحة للأطفال. أحد الوالدين يضع القواعد",
+  "profiles.about.kidsNamed": "مساحة للأطفال. {name} يضع القواعد",
+  "profiles.about.adult": "قواعد وسجل خاصّان به"
 }

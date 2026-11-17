@@ -3253,5 +3253,15 @@
   "controls.summary.profileCount.zero": "{name} · {count} ಪ್ರೊಫೈಲ್‌ಗಳು",
   "controls.summary.profileCount.two": "{name} · {count} ಪ್ರೊಫೈಲ್‌ಗಳು",
   "controls.summary.profileCount.few": "{name} · {count} ಪ್ರೊಫೈಲ್‌ಗಳು",
-  "controls.summary.profileCount.many": "{name} · {count} ಪ್ರೊಫೈಲ್‌ಗಳು"
+  "controls.summary.profileCount.many": "{name} · {count} ಪ್ರೊಫೈಲ್‌ಗಳು",
+  "profiles.popupTitle": "ಪ್ರೊಫೈಲ್ ಬದಲಿಸಿ",
+  "profiles.addAdult": "ವಯಸ್ಕರ ಪ್ರೊಫೈಲ್ ಸೇರಿಸಿ",
+  "profiles.manage": "ಪ್ರೊಫೈಲ್‌ಗಳು ಮತ್ತು PIN ಗಳನ್ನು ನಿರ್ವಹಿಸಿ",
+  "profiles.chip.parent": "ಪೋಷಕರು",
+  "profiles.chip.adult": "ವಯಸ್ಕರು",
+  "profiles.chip.kids": "ಮಕ್ಕಳು",
+  "profiles.about.parent": "Master PIN ಹೊಂದಿದ್ದು ಎಲ್ಲರನ್ನೂ ನಿರ್ವಹಿಸುತ್ತದೆ",
+  "profiles.about.kids": "ಮಕ್ಕಳ ಸ್ಥಳ. ನಿಯಮಗಳನ್ನು ಪೋಷಕರು ಹೊಂದಿಸುತ್ತಾರೆ",
+  "profiles.about.kidsNamed": "ಮಕ್ಕಳ ಸ್ಥಳ. ನಿಯಮಗಳನ್ನು {name} ಹೊಂದಿಸುತ್ತಾರೆ",
+  "profiles.about.adult": "ಸ್ವಂತ ನಿಯಮಗಳು ಮತ್ತು ಇತಿಹಾಸ"
 }

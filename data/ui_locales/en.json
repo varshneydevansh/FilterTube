@@ -3253,5 +3253,15 @@
   "controls.summary.profileCount.zero": "{name} · {count} profiles",
   "controls.summary.profileCount.two": "{name} · {count} profiles",
   "controls.summary.profileCount.few": "{name} · {count} profiles",
-  "controls.summary.profileCount.many": "{name} · {count} profiles"
+  "controls.summary.profileCount.many": "{name} · {count} profiles",
+  "profiles.popupTitle": "Switch profile",
+  "profiles.addAdult": "Add an adult profile",
+  "profiles.manage": "Manage profiles and PINs",
+  "profiles.chip.parent": "Parent",
+  "profiles.chip.adult": "Adult",
+  "profiles.chip.kids": "Kids",
+  "profiles.about.parent": "Holds the Master PIN and manages everyone",
+  "profiles.about.kids": "Kids space. A parent sets the rules",
+  "profiles.about.kidsNamed": "Kids space. {name} sets the rules",
+  "profiles.about.adult": "Own rules and history"
 }

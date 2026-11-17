@@ -437,18 +437,19 @@ body .ft-profile-dropdown .ft-profile-dropdown-item[class*="ft-profile-role--"].
   flex: none;
   padding: 3px 9px;
   border-radius: 999px;
-  border: 1px solid color-mix(in srgb, var(--pk-sage-ink) 28%, transparent);
-  background: var(--pk-sage);
-  color: var(--pk-sage-ink);
+  /* Android ProfilePickerRow: "You're here" is a brick-filled pill; PIN is paper with a line. */
+  border: 1px solid var(--pk-brick-fill);
+  background: var(--pk-brick-fill);
+  color: var(--pk-on-brick-fill);
   font-size: 11px;
   font-weight: 700;
   white-space: nowrap;
 }
 
 .ft-profile-status-chip--pin {
-  border-color: color-mix(in srgb, var(--pk-plum) 28%, transparent);
-  background: var(--pk-lilac);
-  color: var(--pk-plum);
+  border-color: var(--pk-line);
+  background: var(--pk-paper);
+  color: var(--pk-muted);
 }
 
 .help-item.ft-profile-row[class*="ft-profile-role--"] {
@@ -1241,3 +1242,42 @@ body.ft-extension-surface[data-surface="tab-view"] .ft-about-portrait-card img {
 .ft-profile-dropdown:not([hidden]) { transform-origin: top right; animation: pk-popup-grow var(--pk-short) var(--pk-ease-enter) both; }
 @keyframes pk-popup-grow { from { opacity: 0; transform: scale(0.92); } to { opacity: 1; transform: none; } }
 @media (prefers-reduced-motion: reduce) { .ft-profile-dropdown:not([hidden]) { animation-name: pk-dialog-fade; } }
+
+/* ---------------------------------------------------------------------------
+ * The profile picker as the app draws it (ProfileDropdownPopup, ProfilePickerRow,
+ * ProfilePickerFooter): a "Switch profile" title, rows with a quiet role chip and
+ * what the profile is for, Kriti's "Just you so far" card, then the add and
+ * manage actions.
+ * ------------------------------------------------------------------------- */
+.ft-picker-title { padding: 2px 6px 10px; font-family: var(--pk-font-display); font-size: 14px; color: var(--pk-muted); }
+.ft-profile-dropdown { min-width: 300px; max-width: 380px; max-height: 78vh; }
+.ft-profile-dropdown-group[hidden] { display: none; }
+.ft-profile-dropdown-name { display: flex; align-items: center; flex-wrap: wrap; gap: 6px; }
+.ft-profile-role-chip {
+  display: inline-block; padding: 1px 9px 2px; border-radius: 999px; font-size: 11px; font-weight: 600; line-height: 18px;
+  font-family: var(--pk-font-display); color: var(--pk-ink); background: var(--pk-paper); border: 1px solid var(--pk-line);
+}
+.ft-profile-dropdown-subtitle { white-space: normal; line-height: 1.3; }
+.ft-picker-footer { display: flex; flex-direction: column; gap: 8px; margin-top: 10px; }
+.ft-picker-empty {
+  display: flex; flex-direction: column; align-items: center; gap: 4px; padding: 14px 18px 18px; text-align: center;
+  background: var(--pk-sun-wash); border: 1.5px solid color-mix(in srgb, var(--pk-sun-ink) 28%, transparent); border-radius: 20px;
+  box-shadow: 0 3px 0 var(--pk-ledge);
+}
+.ft-picker-empty__kriti { height: 76px; width: auto; }
+.ft-picker-empty__title { margin: 6px 0 0; font-family: var(--pk-font-hand); font-weight: 400; font-size: 18px; color: var(--pk-ink); }
+.ft-picker-empty__body { margin: 0; font-size: 13px; line-height: 1.4; color: var(--pk-muted); }
+.ft-picker-empty__add { width: 100%; margin-top: 12px; }
+.ft-picker-pill {
+  min-height: 46px; border-radius: 999px; font: 600 14px/1 var(--pk-font-display); cursor: pointer;
+  background: var(--pk-paper); border: 1.5px solid var(--pk-line); color: var(--pk-ink);
+}
+.ft-picker-pill.is-kids { background: var(--pk-sun-wash); color: var(--pk-sun-ink); border-color: color-mix(in srgb, var(--pk-sun-ink) 30%, transparent); }
+.ft-picker-pill.is-adult { color: var(--pk-plum); border-color: color-mix(in srgb, var(--pk-plum) 30%, transparent); }
+.ft-picker-manage { min-height: 44px; border: 0; background: none; font: 600 14px/1 var(--pk-font-display); color: var(--pk-brick); cursor: pointer; }
+.ft-picker-pill:focus-visible, .ft-picker-manage:focus-visible { outline: 2px solid var(--pk-brick); outline-offset: 2px; }
+
+/* In the 400 px popup the picker is a sheet across the popup, never cut at its edge. */
+#popupRoot .ft-profile-dropdown, body.ft-popup .ft-profile-dropdown, #ftProfileDropdownPopup {
+  position: fixed; top: 64px; left: 8px; right: 8px; min-width: 0; max-width: none; transform: none !important; max-height: calc(100vh - 76px);
+}

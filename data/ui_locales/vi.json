@@ -3251,5 +3251,15 @@
   "controls.summary.profileCount.other": "{name} · {count} hồ sơ",
   "controls.summary.helpTips": "Hướng dẫn và mẹo lọc",
   "controls.summary.aboutLinks": "Phiên bản, liên kết và giấy phép",
-  "controls.summary.supportBuild": "Ủng hộ bản dựng này"
+  "controls.summary.supportBuild": "Ủng hộ bản dựng này",
+  "profiles.popupTitle": "Chuyển hồ sơ",
+  "profiles.addAdult": "Thêm hồ sơ người lớn",
+  "profiles.manage": "Quản lý hồ sơ và mã PIN",
+  "profiles.chip.parent": "Phụ huynh",
+  "profiles.chip.adult": "Người lớn",
+  "profiles.chip.kids": "Trẻ em",
+  "profiles.about.parent": "Giữ mã PIN chính và quản lý mọi người",
+  "profiles.about.kids": "Không gian trẻ em. Phụ huynh đặt quy tắc",
+  "profiles.about.kidsNamed": "Không gian trẻ em. {name} đặt quy tắc",
+  "profiles.about.adult": "Quy tắc và lịch sử riêng"
 }

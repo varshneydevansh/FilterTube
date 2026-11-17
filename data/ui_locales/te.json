@@ -3253,5 +3253,15 @@
   "controls.summary.profileCount.other": "{name} · {count} ప్రొఫైల్‌లు",
   "controls.summary.helpTips": "గైడ్‌లు, ఫిల్టర్ చిట్కాలు",
   "controls.summary.aboutLinks": "వెర్షన్, లింక్‌లు, లైసెన్స్‌లు",
-  "controls.summary.supportBuild": "అభివృద్ధికి మద్దతివ్వండి"
+  "controls.summary.supportBuild": "అభివృద్ధికి మద్దతివ్వండి",
+  "profiles.popupTitle": "ప్రొఫైల్ మార్చండి",
+  "profiles.addAdult": "పెద్దల ప్రొఫైల్‌ను జోడించండి",
+  "profiles.manage": "ప్రొఫైల్‌లు, PINలను నిర్వహించండి",
+  "profiles.chip.parent": "తల్లిదండ్రులు",
+  "profiles.chip.adult": "పెద్దలు",
+  "profiles.chip.kids": "పిల్లలు",
+  "profiles.about.parent": "మాస్టర్ PINను కలిగి ఉండి అందరినీ నిర్వహిస్తుంది",
+  "profiles.about.kids": "పిల్లల స్థలం. నియమాలను తల్లిదండ్రులు సెట్ చేస్తారు",
+  "profiles.about.kidsNamed": "పిల్లల స్థలం. నియమాలను {name} సెట్ చేస్తారు",
+  "profiles.about.adult": "సొంత నియమాలు, చరిత్ర"
 }

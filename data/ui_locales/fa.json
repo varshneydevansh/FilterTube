@@ -3253,5 +3253,15 @@
   "controls.summary.profileCount.other": "{name} · {count} نمایه",
   "controls.summary.helpTips": "راهنماها و نکته‌های فیلتر",
   "controls.summary.aboutLinks": "نسخه، پیوندها و مجوزها",
-  "controls.summary.supportBuild": "حمایت از ساخت برنامه"
+  "controls.summary.supportBuild": "حمایت از ساخت برنامه",
+  "profiles.popupTitle": "تغییر نمایه",
+  "profiles.addAdult": "افزودن نمایه بزرگسال",
+  "profiles.manage": "مدیریت نمایه‌ها و PINها",
+  "profiles.chip.parent": "والد",
+  "profiles.chip.adult": "بزرگسال",
+  "profiles.chip.kids": "کودک",
+  "profiles.about.parent": "PIN اصلی را دارد و همه را مدیریت می‌کند",
+  "profiles.about.kids": "فضای کودک. والد قوانین را تعیین می‌کند",
+  "profiles.about.kidsNamed": "فضای کودک. {name} قوانین را تعیین می‌کند",
+  "profiles.about.adult": "قوانین و سابقه خودش"
 }

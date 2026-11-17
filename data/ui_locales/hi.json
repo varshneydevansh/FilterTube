@@ -3253,5 +3253,15 @@
   "controls.summary.profileCount.other": "{name} · {count} प्रोफ़ाइलें",
   "controls.summary.helpTips": "गाइड और फ़िल्टर के सुझाव",
   "controls.summary.aboutLinks": "संस्करण, लिंक और लाइसेंस",
-  "controls.summary.supportBuild": "इस प्रोजेक्ट का समर्थन करें"
+  "controls.summary.supportBuild": "इस प्रोजेक्ट का समर्थन करें",
+  "profiles.popupTitle": "प्रोफ़ाइल बदलें",
+  "profiles.addAdult": "वयस्क प्रोफ़ाइल जोड़ें",
+  "profiles.manage": "प्रोफ़ाइल और PIN प्रबंधित करें",
+  "profiles.chip.parent": "अभिभावक",
+  "profiles.chip.adult": "वयस्क",
+  "profiles.chip.kids": "बच्चे",
+  "profiles.about.parent": "मास्टर PIN रखती है और सबको प्रबंधित करती है",
+  "profiles.about.kids": "बच्चों की जगह। नियम अभिभावक तय करते हैं",
+  "profiles.about.kidsNamed": "बच्चों की जगह। नियम {name} तय करते हैं",
+  "profiles.about.adult": "अपने नियम और इतिहास"
 }

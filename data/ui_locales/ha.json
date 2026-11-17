@@ -3253,5 +3253,15 @@
   "controls.summary.profileCount.other": "{name} · bayanan martaba {count}",
   "controls.summary.helpTips": "Jagorori da shawarwarin tacewa",
   "controls.summary.aboutLinks": "Sigar, mahaɗai da lasisi",
-  "controls.summary.supportBuild": "Tallafa wa ginin"
+  "controls.summary.supportBuild": "Tallafa wa ginin",
+  "profiles.popupTitle": "Sauya bayani",
+  "profiles.addAdult": "Ƙara bayanin babba",
+  "profiles.manage": "Sarrafa bayanai da PIN",
+  "profiles.chip.parent": "Iyaye",
+  "profiles.chip.adult": "Babba",
+  "profiles.chip.kids": "Yara",
+  "profiles.about.parent": "Yana riƙe da Babban PIN kuma yana sarrafa kowa",
+  "profiles.about.kids": "Wurin yara. Iyaye ne ke saita dokoki",
+  "profiles.about.kidsNamed": "Wurin yara. {name} ne ke saita dokoki",
+  "profiles.about.adult": "Dokokinsa da tarihinsa"
 }
