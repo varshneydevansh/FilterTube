@@ -3365,5 +3365,8 @@
   "search.channels.studyAll": "在所有学习频道中搜索“{query}”",
   "search.channels.allowedAll": "在所有允许的频道中搜索“{query}”",
   "search.channels.studyOffline": "无法连接你的学习频道。请检查网络后重试。",
-  "search.channels.allowedOffline": "无法连接你允许的频道。请检查网络后重试。"
+  "search.channels.allowedOffline": "无法连接你允许的频道。请检查网络后重试。",
+  "about.why.title": "FilterTube 为什么存在",
+  "about.why.body": "2020 年，一位家长在视频平台的帮助论坛上问了一个简单的问题：怎样按关键词屏蔽视频？得到的回答是：做不到。超过 2,500 位家长说他们也有同样的问题，他们问了好几年，直到帖子被锁定。我也一直在问。后来在 2023 年，一位父亲直接问我能不能做点什么，因为他的孩子哭个不停。我忍不住动手做了它。FilterTube 就从那里开始：为每个家庭提供按关键词和频道的过滤，然后是一个安静的儿童空间，再然后是 Sangeet，让音乐也能保持安静。",
+  "about.why.link": "阅读讨论帖"
 }

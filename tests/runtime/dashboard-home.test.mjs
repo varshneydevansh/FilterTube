@@ -159,3 +159,21 @@ test('during a study session the greeting and the Home and Filters rows say Stud
   // Quiet links and tinted rows keep their height in the fixed-height sidebar column.
   assert.match(read('css/dashboard-home.css'), /\.nav-item\.nav-item--quiet \{ flex-shrink: 0 !important; \}/);
 });
+
+test('About tells why FilterTube exists before Kriti and Uljhan, with the forum thread', () => {
+  const html = read('html/tab-view.html');
+  const why = html.indexOf('<section class="ft-about-why"');
+  assert.ok(why > 0 && why < html.indexOf('<section class="ft-about-duo" data-ft-duo-story'));
+  const block = html.slice(why, html.indexOf('</section>', why));
+  assert.match(block, /href="https:\/\/support\.google\.com\/youtubekids\/thread\/54509605\/how-to-block-videos-by-keyword-or-tag\?hl=en" target="_blank" rel="noopener noreferrer"/);
+  assert.match(block, /More than 2,500 parents said they had the same question/);
+  assert.match(block, /Then in 2023 a parent asked me directly whether I could do something, because his child wouldn't stop crying\./);
+  assert.doesNotMatch(block.replace(/href="[^"]*"/, ''), /YouTube/);
+  for (const name of fs.readdirSync(new URL('../../data/ui_locales/', import.meta.url))) {
+    if (!/^[a-z]{2,3}(-[A-Za-z]+)?\.json$/.test(name) || name === 'targets.json') continue;
+    const catalog = JSON.parse(read(`data/ui_locales/${name}`));
+    for (const key of ['about.why.title', 'about.why.body', 'about.why.link']) assert.ok(catalog[key], `${name} ${key}`);
+    assert.match(catalog['about.why.body'], /Sangeet/, `${name} keeps Sangeet`);
+    assert.match(catalog['about.why.body'], /2023|২০২৩|۲۰۲۳/, `${name} has the revised story`);
+  }
+});

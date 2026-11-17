@@ -3365,5 +3365,8 @@
   "search.channels.studyAll": "모든 공부 채널에서 “{query}” 검색",
   "search.channels.allowedAll": "허용한 모든 채널에서 “{query}” 검색",
   "search.channels.studyOffline": "공부 채널에 연결할 수 없어요. 연결을 확인하고 다시 시도하세요.",
-  "search.channels.allowedOffline": "허용한 채널에 연결할 수 없어요. 연결을 확인하고 다시 시도하세요."
+  "search.channels.allowedOffline": "허용한 채널에 연결할 수 없어요. 연결을 확인하고 다시 시도하세요.",
+  "about.why.title": "FilterTube가 생긴 이유",
+  "about.why.body": "2020년, 한 부모가 동영상 플랫폼의 도움말 포럼에 간단한 질문을 올렸어요. 키워드로 동영상을 차단하려면 어떻게 하나요? 답은 '할 수 없다'였어요. 2,500명이 넘는 부모가 같은 질문이 있다고 했고, 스레드가 잠길 때까지 몇 년 동안 계속 물었어요. 저도 묻고 있었어요. 그러다 2023년, 한 아버지가 아이가 울음을 그치지 않는다며 뭔가 해 줄 수 있느냐고 저에게 직접 물었어요. 만들지 않을 수 없었어요. FilterTube는 거기서 시작했어요. 모든 가족을 위한 단어와 채널 필터, 그다음 차분한 키즈 공간, 그리고 음악도 차분할 수 있도록 Sangeet.",
+  "about.why.link": "스레드 읽기"
 }

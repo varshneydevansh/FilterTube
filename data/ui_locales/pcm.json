@@ -3367,5 +3367,8 @@
   "search.channels.studyAll": "Search all your study channels for “{query}”",
   "search.channels.allowedAll": "Search all your allowed channels for “{query}”",
   "search.channels.studyOffline": "We no fit reach your study channels. Check your connection and try again.",
-  "search.channels.allowedOffline": "We no fit reach your allowed channels. Check your connection and try again."
+  "search.channels.allowedOffline": "We no fit reach your allowed channels. Check your connection and try again.",
+  "about.why.title": "Why FilterTube dey",
+  "about.why.body": "For 2020 one parent ask simple question for the video platform help forum: how I go take block videos by keyword? Dem answer say you no fit. Pass 2,500 parents talk say dem get the same question, and dem keep dey ask for years until dem lock the thread. I dey ask too. Then for 2023 one papa ask me straight whether I fit do something, because im pikin no gree stop to cry. I no fit hold myself, I build am. Na there FilterTube start: filters by word and channel for every family, then one calm Kids space, then Sangeet, so music fit stay calm too.",
+  "about.why.link": "Read the thread"
 }

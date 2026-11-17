@@ -38,6 +38,16 @@ The plan's window, 20:00 to 22:00, was running when these were taken, so the aft
 
 ## About (`after-about-*`)
 
+**Why FilterTube exists** comes first, in the app's approved words:
+
+- The 2020 help-forum question about blocking by keyword, which more than 2,500 parents asked until the thread was locked.
+- The parent in 2023 whose child wouldn't stop crying.
+- Then filters, the Kids space and Sangeet.
+
+"Read the thread" opens the forum thread in a new tab. The UI text never names the platform; only the link's URL does.
+
+**Kriti and Uljhan** follows:
+
 A short "Kriti and Uljhan" section, using the duo sieve's resting frame:
 
 - Kriti is my sister, who looked out for me growing up. She stands for care and protection.

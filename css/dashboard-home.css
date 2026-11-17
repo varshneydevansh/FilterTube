@@ -580,3 +580,29 @@ body.ft-extension-surface #sidebarNav.is-studying .nav-item[data-pk-tint="home"]
   font-weight: 600;
 }
 .ft-home-greeting__mode[hidden] { display: none; }
+
+/* About: why FilterTube exists (the app's about_open_source story), before Kriti and Uljhan. */
+.ft-about-why {
+  display: grid;
+  gap: 12px;
+  margin: 8px 0 16px;
+  padding: 22px 26px;
+  background: var(--pk-paper);
+  border: 1.5px solid transparent;
+  border-image: var(--pk-edge-line) 20 / 18px / 0 round;
+  border-radius: 20px;
+  box-shadow: 2px 3px 0 0 var(--pk-desk);
+}
+.ft-about-why__title { margin: 0; font-family: var(--pk-font-hand); font-weight: 400; font-size: 26px; color: var(--pk-ink); }
+.ft-about-why p { margin: 0; max-width: 68ch; font-size: 16px; line-height: 1.65; color: var(--pk-ink); }
+.ft-about-why__link {
+  justify-self: start;
+  font-family: var(--pk-font-label);
+  font-weight: 700;
+  color: var(--pk-brick);
+  text-decoration: underline;
+  text-decoration-thickness: 1.5px;
+  text-underline-offset: 3px;
+}
+.ft-about-why__link:hover { color: var(--ft-color-brand-primary-hover); }
+.ft-about-why__link:focus-visible { outline: var(--ft-state-focus-width) solid var(--ft-state-focus-ring); outline-offset: var(--ft-state-focus-offset); border-radius: 4px; }

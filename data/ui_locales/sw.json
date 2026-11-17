@@ -3367,5 +3367,8 @@
   "search.channels.studyAll": "Tafuta “{query}” katika chaneli zako zote za kusoma",
   "search.channels.allowedAll": "Tafuta “{query}” katika chaneli zote zinazoruhusiwa",
   "search.channels.studyOffline": "Chaneli zako za kusoma hazikufikiwa. Angalia muunganisho kisha ujaribu tena.",
-  "search.channels.allowedOffline": "Chaneli zinazoruhusiwa hazikufikiwa. Angalia muunganisho kisha ujaribu tena."
+  "search.channels.allowedOffline": "Chaneli zinazoruhusiwa hazikufikiwa. Angalia muunganisho kisha ujaribu tena.",
+  "about.why.title": "Kwa nini FilterTube ipo",
+  "about.why.body": "Mwaka 2020 mzazi mmoja aliuliza swali rahisi kwenye jukwaa la msaada la jukwaa la video: nitazuiaje video kwa neno muhimu? Jibu lilikuwa kwamba huwezi. Wazazi zaidi ya 2,500 walisema walikuwa na swali hilo hilo, na waliendelea kuuliza kwa miaka hadi mjadala ulipofungwa. Mimi pia nilikuwa nikiuliza. Kisha mwaka 2023 baba mmoja aliniuliza moja kwa moja kama ningeweza kufanya kitu, kwa sababu mtoto wake hakuacha kulia. Sikuweza kujizuia kuijenga. FilterTube ilianzia hapo: vichujio kwa neno na chaneli kwa kila familia, kisha nafasi tulivu ya Kids, kisha Sangeet, ili muziki nao ubaki mtulivu.",
+  "about.why.link": "Soma mjadala"
 }

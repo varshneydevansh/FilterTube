@@ -3367,5 +3367,8 @@
   "search.channels.studyAll": "Buscar “{query}” en todos tus canales de estudio",
   "search.channels.allowedAll": "Buscar “{query}” en todos tus canales permitidos",
   "search.channels.studyOffline": "No se pudo llegar a tus canales de estudio. Revisa tu conexión e inténtalo de nuevo.",
-  "search.channels.allowedOffline": "No se pudo llegar a tus canales permitidos. Revisa tu conexión e inténtalo de nuevo."
+  "search.channels.allowedOffline": "No se pudo llegar a tus canales permitidos. Revisa tu conexión e inténtalo de nuevo.",
+  "about.why.title": "Por qué existe FilterTube",
+  "about.why.body": "En 2020, un padre hizo una pregunta sencilla en el foro de ayuda de la plataforma de vídeos: ¿cómo bloqueo vídeos por palabra clave? La respuesta fue que no se puede. Más de 2.500 padres dijeron que tenían la misma pregunta, y siguieron preguntando durante años hasta que se cerró el hilo. Yo también lo preguntaba. Luego, en 2023, un padre me preguntó directamente si podía hacer algo, porque su hijo no paraba de llorar. No pude evitar construirlo. Ahí empezó FilterTube: filtros por palabra y canal para cada familia, luego un espacio Kids tranquilo y después Sangeet, para que la música también pudiera ser tranquila.",
+  "about.why.link": "Leer el hilo"
 }

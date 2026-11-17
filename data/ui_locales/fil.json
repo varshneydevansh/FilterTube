@@ -3367,5 +3367,8 @@
   "search.channels.studyAll": "Hanapin ang “{query}” sa lahat ng iyong study channel",
   "search.channels.allowedAll": "Hanapin ang “{query}” sa lahat ng iyong pinapayagang channel",
   "search.channels.studyOffline": "Hindi maabot ang iyong mga study channel. Tingnan ang koneksyon at subukan ulit.",
-  "search.channels.allowedOffline": "Hindi maabot ang iyong mga pinapayagang channel. Tingnan ang koneksyon at subukan ulit."
+  "search.channels.allowedOffline": "Hindi maabot ang iyong mga pinapayagang channel. Tingnan ang koneksyon at subukan ulit.",
+  "about.why.title": "Bakit may FilterTube",
+  "about.why.body": "Noong 2020, may magulang na nagtanong ng simpleng tanong sa help forum ng video platform: paano ko iba-block ang mga video ayon sa keyword? Ang sagot: hindi puwede. Mahigit 2,500 magulang ang nagsabing pareho ang tanong nila, at patuloy silang nagtanong nang ilang taon hanggang ma-lock ang thread. Nagtatanong din ako. Pagkatapos, noong 2023, may amang direktang nagtanong sa akin kung may magagawa ako, dahil hindi tumitigil sa pag-iyak ang anak niya. Hindi ko napigilang gawin ito. Doon nagsimula ang FilterTube: mga filter ayon sa salita at channel para sa bawat pamilya, pagkatapos ay isang kalmadong Kids space, pagkatapos ay Sangeet, para kalmado rin ang musika.",
+  "about.why.link": "Basahin ang thread"
 }

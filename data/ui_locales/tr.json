@@ -3367,5 +3367,8 @@
   "search.channels.studyAll": "Tüm çalışma kanallarında “{query}” ara",
   "search.channels.allowedAll": "İzin verilen tüm kanallarda “{query}” ara",
   "search.channels.studyOffline": "Çalışma kanallarına ulaşılamadı. Bağlantını kontrol edip tekrar dene.",
-  "search.channels.allowedOffline": "İzin verilen kanallarına ulaşılamadı. Bağlantını kontrol edip tekrar dene."
+  "search.channels.allowedOffline": "İzin verilen kanallarına ulaşılamadı. Bağlantını kontrol edip tekrar dene.",
+  "about.why.title": "FilterTube neden var",
+  "about.why.body": "2020'de bir ebeveyn, video platformunun yardım forumunda basit bir soru sordu: Videoları anahtar kelimeye göre nasıl engellerim? Cevap: engelleyemezsiniz. 2.500'den fazla ebeveyn aynı soruyu sorduğunu söyledi ve konu kilitlenene kadar yıllarca sormaya devam ettiler. Ben de soruyordum. Sonra 2023'te bir baba, çocuğu ağlamayı bırakmadığı için bir şey yapıp yapamayacağımı doğrudan bana sordu. Bunu yapmadan duramadım. FilterTube orada başladı: her aile için kelime ve kanal filtreleri, sonra sakin bir Kids alanı, sonra müzik de sakin kalsın diye Sangeet.",
+  "about.why.link": "Konuyu oku"
 }

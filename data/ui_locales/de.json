@@ -3367,5 +3367,8 @@
   "search.channels.studyAll": "Alle deine Lernkanäle nach „{query}“ durchsuchen",
   "search.channels.allowedAll": "Alle erlaubten Kanäle nach „{query}“ durchsuchen",
   "search.channels.studyOffline": "Deine Lernkanäle sind nicht erreichbar. Prüfe deine Verbindung und versuch es noch einmal.",
-  "search.channels.allowedOffline": "Deine erlaubten Kanäle sind nicht erreichbar. Prüfe deine Verbindung und versuch es noch einmal."
+  "search.channels.allowedOffline": "Deine erlaubten Kanäle sind nicht erreichbar. Prüfe deine Verbindung und versuch es noch einmal.",
+  "about.why.title": "Warum es FilterTube gibt",
+  "about.why.body": "2020 stellte ein Elternteil im Hilfeforum der Videoplattform eine einfache Frage: Wie blockiere ich Videos nach Stichwort? Die Antwort war: gar nicht. Mehr als 2.500 Eltern sagten, sie hätten dieselbe Frage, und sie fragten jahrelang weiter, bis der Thread geschlossen wurde. Ich habe auch gefragt. Dann fragte mich 2023 ein Vater direkt, ob ich etwas tun könne, weil sein Kind nicht aufhörte zu weinen. Ich konnte nicht anders, als es zu bauen. Dort begann FilterTube: Filter nach Wort und Kanal für jede Familie, dann ein ruhiger Kids-Bereich, dann Sangeet, damit auch Musik ruhig bleiben kann.",
+  "about.why.link": "Thread lesen"
 }

@@ -3365,5 +3365,8 @@
   "search.channels.studyAll": "Golèk “{query}” ing kabèh saluran sinaumu",
   "search.channels.allowedAll": "Golèk “{query}” ing kabèh saluran sing diidinaké",
   "search.channels.studyOffline": "Saluran sinaumu ora bisa digayuh. Priksa sambunganmu lan jajal manèh.",
-  "search.channels.allowedOffline": "Saluran sing diidinaké ora bisa digayuh. Priksa sambunganmu lan jajal manèh."
+  "search.channels.allowedOffline": "Saluran sing diidinaké ora bisa digayuh. Priksa sambunganmu lan jajal manèh.",
+  "about.why.title": "Kenapa FilterTube ana",
+  "about.why.body": "Ing taun 2020 ana wong tuwa takon prasaja ing forum pitulung platform video: piye carane mblokir video miturut tembung kunci? Wangsulane: ora bisa. Luwih saka 2.500 wong tuwa ngomong yen dheweke duwe pitakonan sing padha, lan terus takon nganti pirang-pirang taun nganti utase dikunci. Aku uga takon. Banjur ing taun 2023 ana bapak sing takon langsung marang aku apa aku bisa nindakake sawijining bab, amarga anake ora mandheg nangis. Aku ora bisa ngempet kanggo nggawe. FilterTube diwiwiti saka kono: saringan tembung lan kanal kanggo saben kulawarga, banjur papan Kids sing tenang, banjur Sangeet, supaya musik uga tetep tenang.",
+  "about.why.link": "Waca utase"
 }
