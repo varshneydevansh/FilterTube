@@ -222,7 +222,7 @@ lexical and its scope remains tracked JS/JSX/MJS: CJS/Python tooling requires it
 separate release/workflow review and is not silently counted as JavaScript here.
 
 ```text
-current tracked JS/JSX/MJS files: 179
+current tracked JS/JSX/MJS files: 180
 current repo-wide lexical callables: 10780
 current complete per-callable semantic proofs: 0
 current callable behavior-change approval: NO-GO
@@ -340,6 +340,7 @@ runtime behavior changed by inventory refresh: no
 | `js/content/live_chat_filter.js` | Content helper runtime | 10 | helper counted; semantic proof incomplete |
 | `js/content/live_chat_identity.js` | Content helper runtime | 5 | helper counted; semantic proof incomplete |
 | `js/shared/view_count.js` | Content helper runtime | 4 | helper counted; semantic proof incomplete |
+| `js/shared/view_count_isolated.js` | Content helper runtime | 4 | isolated-world copy of view_count.js; helper counted; semantic proof incomplete |
 | `js/state_manager.js` | UI/settings runtime | 180 | UI/settings counted |
 | `js/tab-view.js` | UI/settings runtime | 2201 | UI/settings counted |
 | `js/ui-shell/popup-shell.js` | Generated/quarantined UI | 45 | generated output boundary |
