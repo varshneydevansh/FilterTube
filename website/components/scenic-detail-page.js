@@ -10,6 +10,7 @@ import { Reveal } from "@/components/reveal";
 import { BrowserLogoRail } from "@/components/browser-logo-rail";
 import { ScreenshotCarousel } from "@/components/screenshot-carousel";
 import { AppScreenStack } from "@/components/app-screen-stack";
+import { CapturePending } from "@/components/capture-pending";
 import { HeroVideo } from "@/components/hero-video";
 import { getTonePreset } from "@/components/scenic-tones";
 
@@ -326,7 +327,13 @@ export function ScenicDetailPage({ page, relatedPages, children = null }) {
                 <p className="text-xs font-semibold uppercase tracking-[0.2em] text-[var(--color-muted)]">{rail.label}</p>
                 {rail.status ? <p className="text-xs font-semibold uppercase tracking-[0.2em] text-[var(--color-muted)]">{rail.status}</p> : null}
               </div>
-              <ScreenshotCarousel label={`${rail.label} screenshots`} layout={rail.layout} screenshots={rail.screenshots} />
+              {rail.screenshots.length ? (
+                <ScreenshotCarousel label={`${rail.label} screenshots`} layout={rail.layout} screenshots={rail.screenshots} />
+              ) : (
+                <div className="px-4 md:px-6">
+                  <CapturePending device={rail.device || rail.label} layout="rail" />
+                </div>
+              )}
             </div>
           ))}
         </section>

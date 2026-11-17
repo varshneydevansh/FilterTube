@@ -1,3 +1,4 @@
+import { galleryFor, kidsScreens } from "@/data/screenshots";
 import {
   Compass,
   DeviceMobile,
@@ -428,74 +429,15 @@ export const homeTechnicalFeatures = [
 ];
 
 
-// Real screens from the 3.5.0 apps (phone 1080×2424, tablet 2560×1600, TV 1920×1080).
-export const androidPhoneScreens = [
-  { src: "/apps/screenshots/android/phone-entry.webp", title: "Viewing spaces", alt: "FilterTube Android choose your viewing space page with Main and Kids", caption: "Main and Kids each keep their own rules.", width: 1080, height: 2424 },
-  { src: "/apps/screenshots/android/phone-search.webp", title: "Search", alt: "Android search results for Our Planet with filters and block buttons", caption: "Search with filters; every card can be blocked.", width: 1080, height: 2424 },
-  { src: "/apps/screenshots/android/phone-watch.webp", title: "Watch", alt: "Android Watch page playing Our Planet Forests", caption: "A clean Watch page with your rules applied.", width: 1080, height: 2424 },
-  { src: "/apps/screenshots/android/phone-player-controls.webp", title: "Player", alt: "Android player controls with chapter markers", caption: "Captions, floating player, fullscreen and chapter marks.", width: 1080, height: 2424 },
-  { src: "/apps/screenshots/android/phone-player-settings.webp", title: "Player settings", alt: "Android player settings sheet", caption: "Quality, buffer, loop, autoplay, sleep timer, skip silence and more.", width: 1080, height: 2424 },
-  { src: "/apps/screenshots/android/phone-chapters.webp", title: "Chapters", alt: "Android chapters sheet with search", caption: "Search and jump between chapters.", width: 1080, height: 2424 },
-  { src: "/apps/screenshots/android/phone-channel-miniplayer.webp", title: "Channel + mini player", alt: "Netflix channel page with the floating mini player", caption: "Browse channels while the video keeps playing.", width: 1080, height: 2424 },
-  { src: "/apps/screenshots/android/phone-music-home.webp", title: "Music", alt: "Android Music Home with Quick picks", caption: "Music Home, Explore and Library.", width: 1080, height: 2424 },
-  { src: "/apps/screenshots/android/phone-now-playing.webp", title: "Now playing", alt: "Android Music now playing screen", caption: "Album art, shuffle, repeat, lyrics and video.", width: 1080, height: 2424 },
-  { src: "/apps/screenshots/android/phone-queue.webp", title: "Queue", alt: "Android music queue with drag handles", caption: "Reorder the queue or save it as a playlist.", width: 1080, height: 2424 },
-  { src: "/apps/screenshots/android/phone-you.webp", title: "You", alt: "Android You page with library and history", caption: "Local playlists, Watch later, Notes, offline media and history.", width: 1080, height: 2424 },
-  { src: "/apps/screenshots/android/phone-controls.webp", title: "FilterTube Controls", alt: "Android FilterTube Controls overview", caption: "Every control in one place.", width: 1080, height: 2424 },
-  { src: "/apps/screenshots/android/phone-filters-channels.webp", title: "Channel rules", alt: "Android channel rules with suggestions", caption: "Block or allow channels, with suggestions from what you watched.", width: 1080, height: 2424 },
-  { src: "/apps/screenshots/android/phone-content-controls.webp", title: "Content controls", alt: "Android content controls list", caption: "Hide Shorts, the Home feed, comments, categories and more.", width: 1080, height: 2424 },
-  { src: "/apps/screenshots/android/phone-sync.webp", title: "Accounts & Sync", alt: "Android Accounts and Sync menu", caption: "Connect devices, keep in sync, profiles and PINs.", width: 1080, height: 2424 },
-  { src: "/apps/screenshots/android/phone-sync-pairing.webp", title: "Private P2P pairing", alt: "Android device pairing with code and QR", caption: "Pair with a code or QR. No account, no cloud copy.", width: 1080, height: 2424 },
-  { src: "/apps/screenshots/android/phone-kids-mode.webp", title: "Kids Mode", alt: "Android Kids Mode rules", caption: "Separate YouTube Kids rules from Main.", width: 1080, height: 2424 },
-  { src: "/apps/screenshots/android/phone-self-control.webp", title: "Self-Control", alt: "Android Self-Control session setup", caption: "Lock your rules for a set time.", width: 1080, height: 2424 },
-  { src: "/apps/screenshots/android/phone-settings.webp", title: "Settings", alt: "Android settings list", caption: "Language, theme, launch behavior and integrations.", width: 1080, height: 2424 },
-  { src: "/apps/screenshots/android/phone-integrations.webp", title: "Integrations", alt: "Android SponsorBlock, Return YouTube Dislike and DeArrow toggles", caption: "Optional SponsorBlock, dislikes and community titles.", width: 1080, height: 2424 },
-];
-
-export const androidTabletScreens = [
-  { src: "/apps/screenshots/android/tablet-controls.webp", title: "Controls on tablet", alt: "FilterTube Controls on a tablet", caption: "A wide Controls grid with the signed-in channel.", width: 2560, height: 1600 },
-  { src: "/apps/screenshots/android/tablet-search.webp", title: "Search grid", alt: "Tablet search results grid for Kurzgesagt", caption: "Three-column search results.", width: 2560, height: 1600 },
-  { src: "/apps/screenshots/android/tablet-watch.webp", title: "Two-pane Watch", alt: "Tablet Watch page with recommendations beside the video", caption: "The video and recommendations side by side.", width: 2560, height: 1600 },
-  { src: "/apps/screenshots/android/tablet-music-explore.webp", title: "Music Explore", alt: "Tablet Music Explore with new releases and moods", caption: "New releases, charts, moods and podcasts.", width: 2560, height: 1600 },
-  { src: "/apps/screenshots/android/tablet-block-menu.webp", title: "Block from any card", alt: "Tablet Subscriptions with the FilterTube block menu open", caption: "Block a channel or filter all its videos from any card.", width: 2560, height: 1600 },
-];
-
-export const androidTvScreens = [
-  { src: "/apps/screenshots/android/tv-entry.webp", title: "Viewing spaces", alt: "FilterTube Android TV viewing space choice", caption: "Main and Kids on the big screen.", width: 1920, height: 1080 },
-  { src: "/apps/screenshots/android/tv-home.webp", title: "Home", alt: "Android TV Home with blocked cards counted", caption: "Home with your filters applied.", width: 1920, height: 1080 },
-  { src: "/apps/screenshots/android/tv-search.webp", title: "Search", alt: "Android TV search sheet", caption: "A remote-friendly search sheet.", width: 1920, height: 1080 },
-  { src: "/apps/screenshots/android/tv-search-results.webp", title: "Search results", alt: "Android TV search results for Our Planet", caption: "Results laid out for the remote.", width: 1920, height: 1080 },
-  { src: "/apps/screenshots/android/tv-watch.webp", title: "Watch", alt: "Android TV Watch page playing Our Planet", caption: "Watch with recommendations from the same channel.", width: 1920, height: 1080 },
-  { src: "/apps/screenshots/android/tv-subscriptions.webp", title: "Subscriptions", alt: "Android TV Subscriptions with channel avatars", caption: "Your subscriptions, filtered.", width: 1920, height: 1080 },
-  { src: "/apps/screenshots/android/tv-you.webp", title: "You", alt: "Android TV You page", caption: "History, playlists and your channel.", width: 1920, height: 1080 },
-  { src: "/apps/screenshots/android/tv-controls.webp", title: "FilterTube Controls", alt: "Android TV FilterTube Controls", caption: "Controls from the sofa.", width: 1920, height: 1080 },
-  { src: "/apps/screenshots/android/tv-filters.webp", title: "Filters", alt: "Android TV keyword filters", caption: "Keyword and channel rules with the remote.", width: 1920, height: 1080 },
-  { src: "/apps/screenshots/android/tv-kids.webp", title: "Kids Mode", alt: "Android TV Kids Mode rules", caption: "Kids rules on TV.", width: 1920, height: 1080 },
-  { src: "/apps/screenshots/android/tv-settings.webp", title: "Settings", alt: "Android TV settings", caption: "TV settings and integrations.", width: 1920, height: 1080 },
-  { src: "/apps/screenshots/android/tv-accounts-sync.webp", title: "Accounts & Sync", alt: "Android TV Accounts and Sync", caption: "Pair the TV with your other devices.", width: 1920, height: 1080 },
-];
-
-
-// Real Kids Viewing screens from FilterTube 3.5.0 with a YouTube Kids profile.
-export const kidsPhoneScreens = [
-  { src: "/apps/screenshots/android/phone-kids-home.webp", title: "Kids Home", alt: "FilterTube Kids Viewing home with the child's YouTube Kids profile", caption: "Kids Viewing with the child's own YouTube Kids profile.", width: 1080, height: 2424 },
-  { src: "/apps/screenshots/android/phone-parent-pin.webp", title: "Parent PIN to block", alt: "Parent Controls PIN prompt over Kids Viewing", caption: "Blocking or changing rules always asks the parent PIN.", width: 1080, height: 2424 },
-  { src: "/apps/screenshots/android/phone-kids-search.webp", title: "Kids Search", alt: "Kids search results for dinosaurs", caption: "Search inside YouTube Kids, with your Kids rules applied.", width: 1080, height: 2424 },
-  { src: "/apps/screenshots/android/phone-kids-watch.webp", title: "Kids Watch", alt: "Kids Watch page with Up next", caption: "Up next is checked against parent rules before it plays.", width: 1080, height: 2424 },
-  { src: "/apps/screenshots/android/phone-kids-mode.webp", title: "Kids Mode rules", alt: "FilterTube Kids Mode rules screen", caption: "Separate Kids rules, set by a parent.", width: 1080, height: 2424 },
-];
-
-export const kidsTabletScreens = [
-  { src: "/apps/screenshots/android/tablet-kids-home.webp", title: "Kids Home on tablet", alt: "Kids Viewing grid on a tablet with shows and playlists", caption: "A three-column grid of shows and playlists.", width: 2560, height: 1600 },
-  { src: "/apps/screenshots/android/tablet-kids-search.webp", title: "Kids Search on tablet", alt: "Kids search results list on a tablet", caption: "Search results with room for long titles.", width: 2560, height: 1600 },
-  { src: "/apps/screenshots/android/tablet-kids-watch.webp", title: "Two-pane Kids Watch", alt: "Kids Watch on a tablet with Up next beside the video", caption: "The video and Up next side by side.", width: 2560, height: 1600 },
-];
-
-export const kidsTvScreens = [
-  { src: "/apps/screenshots/android/tv-kids-home.webp", title: "Kids Home on TV", alt: "Kids Viewing on Android TV with Shows and More for you rows", caption: "Kids rows built for the remote.", width: 1920, height: 1080 },
-  { src: "/apps/screenshots/android/tv-kids-search.webp", title: "Kids Search on TV", alt: "Kids search for dinosaurs on Android TV", caption: "Kids search on the big screen.", width: 1920, height: 1080 },
-  { src: "/apps/screenshots/android/tv-kids-watch.webp", title: "Kids video on TV", alt: "A Kids video playing full screen on Android TV", caption: "Full-screen Kids playback.", width: 1920, height: 1080 },
-];
+// Screens come from data/screenshots.js so fresh captures drop in without code changes.
+export const androidPhoneScreens = galleryFor("androidPhone");
+export const androidTabletScreens = galleryFor("androidTablet");
+export const androidTvScreens = galleryFor("androidTv");
+export const iphoneScreens = galleryFor("iphone");
+export const ipadScreens = galleryFor("ipad");
+export const kidsPhoneScreens = kidsScreens.phone;
+export const kidsTabletScreens = kidsScreens.tablet;
+export const kidsTvScreens = kidsScreens.tv;
 
 export const platformOrder = platformSlugs;
 
@@ -804,26 +746,33 @@ export const detailPages = {
     heroScreensLabel: "iOS simulator development build · hover or tap a screen",
     heroScreens: [
       {
-        src: "/apps/screenshots/ios-launcher.png",
+        src: "/apps/screenshots/ios/iphone-launcher.webp",
         title: "Main and Kids",
         alt: "FilterTube iOS launcher with separate Main and Kids viewing choices",
-        width: 1206,
-        height: 2622,
+        width: 1080,
+        height: 2348,
       },
       {
-        src: "/apps/screenshots/ios-controls.png",
+        src: "/apps/screenshots/ios/iphone-controls.webp",
         title: "Native controls",
         alt: "FilterTube iOS controls with filters, profiles, settings and device sync",
-        width: 1206,
-        height: 2622,
+        width: 1080,
+        height: 2348,
       },
       {
-        src: "/apps/screenshots/ios-filters.png",
+        src: "/apps/screenshots/ios/iphone-filters.webp",
         title: "Your filters",
         alt: "FilterTube iOS filter editor with Blocklist and Whitelist choices",
-        width: 1206,
-        height: 2622,
+        width: 1080,
+        height: 2348,
       },
+    ],
+    screenshotsTitle: "A closer look at iPhone and iPad",
+    screenshotsEyebrow: "iPhone and iPad",
+    screenshotsDescription: "Screens from the current iPhone development build. Fresh iPhone and iPad captures from the latest build are on the way. Open any screen for a full-size view.",
+    screenshotRails: [
+      { id: "iphone-screens", label: "iPhone", status: "Install with SideStore", layout: "phone", device: "iPhone", screenshots: iphoneScreens },
+      { id: "ipad-screens", label: "iPad", status: "Install with SideStore", layout: "desktop", device: "iPad", screenshots: ipadScreens },
     ],
     chips: ["Protected now", "Profile switching", "Quick toggles"],
     primaryCta: {
@@ -904,6 +853,13 @@ export const detailPages = {
       src: "/apps/app-store-transparent.png",
       alt: "FilterTube iPad app artwork",
     },
+    screenshotsTitle: "A closer look at iPhone and iPad",
+    screenshotsEyebrow: "iPhone and iPad",
+    screenshotsDescription: "Screens from the current iPhone development build. Fresh iPhone and iPad captures from the latest build are on the way. Open any screen for a full-size view.",
+    screenshotRails: [
+      { id: "ipados-iphone-screens", label: "iPhone", status: "Install with SideStore", layout: "phone", device: "iPhone", screenshots: iphoneScreens },
+      { id: "ipados-ipad-screens", label: "iPad", status: "Install with SideStore", layout: "desktop", device: "iPad", screenshots: ipadScreens },
+    ],
     chips: ["Two-column calm", "Household setup", "Readable dashboards"],
     primaryCta: {
       label: "See the mobile overview",
@@ -1424,7 +1380,7 @@ export const detailPages = {
     ],
     screenshotsTitle: "Kids Viewing on every screen",
     screenshotsEyebrow: "Kids · phone, tablet and TV",
-    screenshotsDescription: "Real Kids Viewing screens from FilterTube 3.5.0 with a YouTube Kids profile. Changing rules from Kids always asks the parent PIN.",
+    screenshotsDescription: "Real Kids Viewing screens from FilterTube 3.5.0 with a Kids profile. Changing rules from Kids always asks the parent PIN.",
     screenshotRails: [
       { id: "kids-phone-screens", label: "Phone", status: "Google Play", layout: "phone", screenshots: kidsPhoneScreens },
       { id: "kids-tablet-screens", label: "Tablet", status: "Google Play", layout: "desktop", screenshots: kidsTabletScreens },
