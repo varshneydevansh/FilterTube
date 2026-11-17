@@ -245,10 +245,14 @@ function InstallGuide() {
                     I want it to be &mdash; but Apple is making things difficult
                     with the developer account, so that will take a while. Until
                     then, SideStore is the best way I&apos;ve found to install it,
-                    and AltStore works too. From everything I&apos;ve read, it&apos;s
-                    safe and legal: it uses Apple&apos;s own free developer
-                    signing with your Apple ID, the same way developers run apps
-                    on their own phones.
+                    and AltStore works too. This isn&apos;t a jailbreak or a
+                    hack: FilterTube comes straight from my official GitHub
+                    releases, and SideStore installs it with Apple&apos;s own
+                    free developer signing, which Apple has offered worldwide
+                    since 2015 &mdash; the same way developers test apps on their
+                    own phones. Nothing on your phone is modified, FilterTube
+                    runs in iOS&apos;s normal sandbox, and you can use a spare
+                    Apple ID if you prefer.
                   </p>
                   <ul className="mt-7 grid gap-3 sm:grid-cols-2">
                     {promises.map((item) => (
@@ -372,6 +376,20 @@ function InstallGuide() {
                   <TextLink href={sideStoreDocsHref}>SideStore&apos;s docs</TextLink>.
                 </p>
               </details>
+
+              <div className="mt-6 rounded-[1.2rem] border border-[color:var(--color-line)] p-5">
+                <p className="font-medium text-[var(--color-ink)]">
+                  Coming to AltStore PAL and the App Store
+                </p>
+                <p className="mt-2 text-sm leading-7 text-[var(--color-muted)]">
+                  Once Apple sorts out the developer account, people in the EU,
+                  Japan and Brazil will be able to install FilterTube with{" "}
+                  <TextLink href="https://altstore.io">AltStore PAL</TextLink>,
+                  with no computer and no weekly refresh, and everyone else
+                  through the App Store. Until then, SideStore works everywhere,
+                  including those regions.
+                </p>
+              </div>
             </Panel>
           </Reveal>
         </div>
