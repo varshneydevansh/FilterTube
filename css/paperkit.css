@@ -879,26 +879,6 @@ img[data-character="uljhan"] {
   background-repeat: no-repeat;
 }
 
-/* Dashboard hero: the pair stands on the profile card's top edge. The card drops to the hero's
- * foot and keeps room above it, so the pose is never clipped. */
-:root:not([data-ft-companion="off"]) #dashboardView .ft-dash-status.has-duo {
-  position: relative;
-  align-self: end;
-  margin-top: 128px;
-}
-
-.pk-hero-duo {
-  position: absolute;
-  inset-inline-end: 18px;
-  bottom: calc(100% - 3px);
-  z-index: 1;
-  line-height: 0;
-}
-
-.ft-mascot--hero .ft-mascot__image { height: 124px; }
-
-.ft-mascot--hero .ft-mascot__figure { transform-origin: 50% 100%; }
-
 .ft-mascot--hero .ft-mascot__figure.is-hopping { animation: pk-hop 520ms var(--pk-ease-enter); }
 
 /* Her hello floats on the reading side of the pose and never moves the layout. */

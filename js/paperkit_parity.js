@@ -273,15 +273,17 @@
                     value = numberIn(summary)[0] ?? null;
                     entry.sub.textContent = t(COPY.contentStatus);
                 } else if (entry.spec.count === 'kids') {
-                    const numbers = numberIn(summary);
-                    value = numbers.length ? numbers[numbers.length - 1] : null;
+                    // The Kids numeral is its rule count, like Filters ("No rules yet" is 0).
+                    value = numberIn(summary).reduce((sum, item) => sum + item, 0);
                     entry.sub.textContent = summary;
                 } else {
                     entry.sub.textContent = summary;
                 }
-                const washed = value !== null && value > 0 && entry.spec.area !== 'neutral';
+                // Study's tile always wears its sage (Android ControlsPaper); the others when they count something.
+                const washed = entry.spec.area === 'study' || (value !== null && value > 0 && entry.spec.area !== 'neutral');
                 entry.tile.classList.toggle('is-washed', washed);
-                rollTo(entry.count, value !== null && value > 0 ? formatCount(value) : '');
+                // The numeral shows 0 too (Android shows "0" on Filters and Kids Mode).
+                rollTo(entry.count, value !== null ? formatCount(value) : '');
                 entry.tile.setAttribute('aria-label', [label, entry.sub.textContent, entry.badge.hidden ? '' : entry.badge.textContent].filter(Boolean).join(', '));
             }
         };

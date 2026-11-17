@@ -476,7 +476,7 @@ body.ft-extension-surface .ft-rule-target-tab.is-active {
 .pk-tile[data-area="filters"] { --pk-tile-wash: var(--pk-rose); --pk-tile-ink: var(--pk-brick); --pk-tile-edge: var(--pk-edge-filters); }
 .pk-tile[data-area="content"] { --pk-tile-wash: var(--pk-sky); --pk-tile-ink: var(--pk-sky-ink); --pk-tile-edge: var(--pk-edge-content); }
 .pk-tile[data-area="kids"] { --pk-tile-wash: var(--pk-sun-wash); --pk-tile-ink: var(--pk-sun-ink); --pk-tile-edge: var(--pk-edge-kids); }
-.pk-tile[data-area="study"] { --pk-tile-ink: var(--pk-sage-ink); --pk-tile-edge: var(--pk-edge-study); }
+.pk-tile[data-area="study"] { --pk-tile-wash: var(--pk-sage); --pk-tile-ink: var(--pk-sage-ink); --pk-tile-edge: var(--pk-edge-study); }
 .pk-tile[data-area="family"] { --pk-tile-ink: var(--pk-plum); --pk-tile-edge: var(--pk-edge-family); }
 .pk-tile.is-washed { background: var(--pk-tile-wash); }
 .pk-tile:hover { background: color-mix(in srgb, var(--pk-tile-wash) 70%, var(--pk-paper)); }
@@ -728,11 +728,6 @@ body.ft-extension-surface .ft-study-status.is-hold { background: var(--pk-sage) 
   margin-top: 0;
 }
 
-:root:not([data-ft-companion="off"]) #dashboardView .ft-dash-hero--hub .ft-dash-status.has-duo {
-  margin-top: 112px;
-  padding-inline-end: 1.15rem;
-}
-
 #dashboardView .ft-dash-hero--hub .ft-dash-status__source {
   grid-column: 1 / -1;
 }
@@ -862,17 +857,21 @@ body.ft-extension-surface[data-surface="tab-view"] .list-item:not(.channel-item)
   border-radius: 16px;
   color: var(--pk-ink);
 }
-.pk-hub-peek__art { height: 56px; width: auto; flex: none; pointer-events: none; user-select: none; }
-.pk-hub-peek__line { margin: 0; flex: 1 1 auto; font-family: var(--pk-font-hand); font-size: 16px; }
+.pk-hub-peek__art { height: 96px; width: auto; flex: none; cursor: pointer; user-select: none; border-radius: 12px; }
+.pk-hub-peek__art:focus-visible { outline: 2px solid var(--pk-brick); outline-offset: 2px; }
+/* Lively: her bubble (a paper speech card with an ink edge); Quiet: a plain brick text action. */
+.pk-hub-peek__line {
+  margin: 0; flex: 0 1 auto; max-width: 320px; padding: 8px 12px 10px; border: 1.5px solid var(--pk-ink); border-radius: 16px 16px 16px 4px;
+  background: var(--pk-paper); color: var(--pk-ink); font-family: var(--pk-font-hand); font-size: 15px; text-align: start; cursor: pointer;
+}
 .pk-hub-peek__action {
   flex: none;
-  min-height: 40px;
-  padding: 0 16px;
-  border: 1.5px solid var(--pk-line);
-  border-radius: 999px;
-  background: var(--pk-paper);
+  min-height: 48px;
+  padding: 0 8px;
+  border: 0;
+  background: none;
   color: var(--pk-brick);
-  font: 600 14px/1 "FilterTube Outfit", "Outfit", system-ui, sans-serif;
+  font: 600 15px/1 "FilterTube Outfit", "Outfit", system-ui, sans-serif;
   cursor: pointer;
 }
 .pk-hub-peek__action:focus-visible { outline: 2px solid var(--pk-brick); outline-offset: 2px; }

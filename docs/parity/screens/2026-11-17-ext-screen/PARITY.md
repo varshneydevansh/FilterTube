@@ -91,3 +91,57 @@ Captures: `study/android-study-{idle,round,last5,break,end,plan}.jpg`, `study/an
   doodle is the extension's seal picture, not the app's drawn rosette.
 - TV/tablet two-pane variants of this screen do not apply to a browser page; the page is a single
   680 px column.
+
+---
+
+## 2. Controls hub and its mascot moment
+
+Android files: `DashboardActivity.kt` (`controlCenterTileText`, tile routes), `ControlCenterModel.kt`,
+`NativeControlsLayout.kt`, `FirstFilterMoment.kt` (`buildHubPeek`), `strings_tv_controls.xml` /
+`strings_controls_v2.xml`.
+
+Captures: `controls/android-hub-{1,2,3}.jpg`; `controls/before-controls.jpg`;
+`controls/after-controls-{lively,quiet}.jpg` (Companion Lively shows Kriti's bubble, Quiet her brick action).
+
+### Differences found (before)
+
+| Area | Android | Extension before |
+| --- | --- | --- |
+| Title | "Controls" | "Dashboard" (page title and sidebar row) |
+| Mascot | Kriti with the logo sieve over the tiles when there are no rules (once a day): bubble in Lively, "Add a first filter" in Quiet; tap opens Filters | A Kriti-and-Uljhan "Hi, I'm Kriti" duo standing on the profile card on every visit; the hub peek used the small peek pose |
+| Filters / Kids numerals | "0" shown | Hidden at 0 |
+| Kids line | "No rules yet" / its counts | "Blocklist · Channels: 0" (the mode is the profile pill's job) |
+| Study tile | Sage wash, "Self-Control is off" | Plain, "Off" |
+| Backup | "Automatic backup is off" | "Auto backup off" |
+| Accounts & Sync | "No saved devices. Pair with a code or QR." / "N trusted devices" | "No devices yet" / "N verified devices" |
+| Profiles & PIN | "Default · 1 profile" | "Profiles: 1" |
+| Help / About / Support | "Guides and filter tips" / "Version, links and licences" / "Support the build" | "Guides and answers" / "Who builds FilterTube" / "Optional support" |
+| Support card | None on Controls (the Support tile opens the support sheet) | A full support promo card under the tiles |
+
+### Ported
+
+- `js/tab-view.js` `controlCenterSummary` uses the app's tile lines (10 strings from
+  `strings_tv_controls.xml` in all 38 locales, plural forms filled); the page title and sidebar row say
+  "Controls".
+- `js/paperkit_parity.js`: numerals show 0; the Kids numeral is its rule count; Study's tile wears its
+  sage wash.
+- `js/mascots.js` hub peek follows `buildHubPeek` (KRITI_LOGO_SIEVE at 96 px, tappable, bubble or action
+  by Companion mode).
+
+### Removed
+
+- The dashboard's "Hi, I'm Kriti" duo (`mountHero`, `.pk-hero-duo`, `.has-duo` spacing).
+- The dashboard support promo card (`section.dashboard-support`); Support stays a tile and its page.
+
+### Still different, and why
+
+- "Sign in" row and the "Not signed in" half of the Accounts tile: the app signs in to the video site
+  itself; the extension uses the browser's own session and has no FilterTube sign-up, so there is nothing
+  to sign in to.
+- "Open video links in FilterTube" card and the "YouTube still opens video links" banner: Android link
+  handling (app links / DomainVerificationManager). An extension already runs inside the site's pages.
+- "Return to Viewing" and "Exit to profiles": the app's viewer and profile launcher; the extension's
+  equivalents are the browser tab itself and the popup's profile switcher.
+- The tile grid is four columns on a wide window and two on a narrow one (Android phone is two).
+- The Settings tile keeps the extension's own line (backup state): the app's "Language, appearance,
+  startup and integrations" names settings the extension page does not have.

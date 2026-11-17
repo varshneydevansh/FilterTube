@@ -430,7 +430,7 @@ test('the new lines are in every interface catalog and never name the site or an
 
 test('the brand moments are mounted, and the gate, the break and the first-run prompt carry their poses', () => {
     const source = fs.readFileSync('js/mascots.js', 'utf8');
-    for (const mount of ['mountHero(doc);', 'mountSidebar(doc);', 'mountAbout(doc);', 'mountSupport(doc);', 'mountNetwork(doc);', 'watchToasts(doc);', 'mountSessionSaved(doc);', 'watchPopupEmptyLists(doc);']) {
+    for (const mount of ['mountHubPeek(doc);', 'mountSidebar(doc);', 'mountAbout(doc);', 'mountSupport(doc);', 'mountNetwork(doc);', 'watchToasts(doc);', 'mountSessionSaved(doc);', 'watchPopupEmptyLists(doc);']) {
         assert.ok(source.includes(mount), mount);
     }
     assert.match(fs.readFileSync('js/tab-view.js', 'utf8'), /new CustomEvent\('filtertube:parent-session-saved', \{ detail: \{ name: normalizeString\(nextProfile\.name\) \} \}\)/);
@@ -438,7 +438,7 @@ test('the brand moments are mounted, and the gate, the break and the first-run p
     assert.match(gate, /offList \? 'kriti_pointing\.webp' : 'kriti_mug_06\.webp'/);
     assert.match(gate, /companionMode = mode === 'lively' \|\| mode === 'off' \? mode : 'quiet';/);
     const study = fs.readFileSync('js/content/study_overlay.js', 'utf8');
-    assert.match(study, /\{ rest: 'kriti_mug_06\.webp', limit: 'kriti_thumbsup\.webp', unavailable: 'uljhan_shrug\.webp' \}\[kind\]/);
+    assert.match(study, /\{ rest: 'kriti_stretch_01\.webp', limit: 'kriti_thumbsup\.webp', unavailable: 'uljhan_shrug\.webp' \}\[kind\]/);
     assert.match(fs.readFileSync('js/content/first_run_prompt.js', 'utf8'), /assets\/images\/mascots\/kriti_wave\.webp/);
     for (const manifest of ['manifest.json', 'manifest.chrome.json', 'manifest.firefox.json', 'manifest.opera.json']) {
         const resources = JSON.parse(fs.readFileSync(manifest, 'utf8')).web_accessible_resources.flatMap(entry => entry.resources || entry);

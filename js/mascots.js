@@ -1452,34 +1452,6 @@
      * once on Lively (420 ms a frame), then the app's idle rhythm. Quiet keeps the last frame still.
      * Her hello shows on hover, focus or click only.
      */
-    function mountHero(doc) {
-        const card = doc.querySelector('.ft-dash-hero .ft-dash-status');
-        if (!card) return;
-        let holder = null;
-        let stop = () => {};
-        let spoken = null;
-        onLocaleChange(() => { if (holder?.isConnected) spoken?.retext(t(DUO_COPY.hello)); });
-        const draw = () => {
-            stop();
-            holder?.remove();
-            holder = null;
-            spoken = null;
-            card.classList.toggle('has-duo', showsCharacters(companionMode));
-            if (!showsCharacters(companionMode)) return;
-            const character = createCharacter({ className: 'ft-mascot--hero', imageName: stillImage('duoSieve'), height: 124, kind: 'event', tail: 'left' });
-            spoken = character;
-            holder = el('div', 'pk-hero-duo');
-            holder.appendChild(character.root);
-            card.appendChild(holder);
-            character.say(t(DUO_COPY.hello));
-            if (companionMode !== 'lively' || prefersReducedMotion()) return;
-            enter(character.picture);
-            stop = playSheet(character.picture, 'duoSieve', { onDone: () => idleLife(character.picture) });
-        };
-        draw();
-        onModeChange(draw);
-    }
-
     /** Kriti peeks over the sidebar footer on every page: present, and out of the way. */
     function mountSidebar(doc) {
         const footer = doc.querySelector('#sidebarNav .sidebar-footer');
@@ -1984,14 +1956,28 @@
             const profileId = state.activeProfileId || 'default';
             if (!(await takeMoment(`hub_peek:${profileId}`, localDay()))) return;
             if (peek?.isConnected) return;
+            // Android FirstFilterMoment.buildHubPeek: Kriti with the logo sieve (KRITI_LOGO_SIEVE), 96 px;
+            // Lively gives her a bubble, Quiet a plain brick action beside her; tapping her adds a first filter.
             peek = el('div', 'pk-hub-peek');
-            const art = image(ASSETS.kritiPeek, 'pk-hub-peek__art', 56);
-            art.setAttribute('aria-hidden', 'true');
-            const words = el('p', 'pk-hub-peek__line', t(FIRST_COPY.emptySieve));
-            const action = el('button', 'pk-hub-peek__action', t(FIRST_COPY.emptySieveAction));
-            action.type = 'button';
-            action.addEventListener('click', () => doc.querySelector('.nav-item[data-tab="filters"]:not(.nav-item--sub)')?.click());
-            peek.append(art, words, action);
+            const openFilters = () => doc.querySelector('.nav-item[data-tab="filters"]:not(.nav-item--sub)')?.click();
+            const art = image(ASSETS.kritiAllow, 'pk-hub-peek__art', 96);
+            art.setAttribute('role', 'button');
+            art.setAttribute('tabindex', '0');
+            art.setAttribute('aria-label', t(FIRST_COPY.emptySieveAction));
+            art.addEventListener('click', openFilters);
+            art.addEventListener('keydown', event => { if (event.key === 'Enter' || event.key === ' ') { event.preventDefault(); openFilters(); } });
+            peek.appendChild(art);
+            if (companionMode === 'lively') {
+                const words = el('button', 'pk-hub-peek__line', t(FIRST_COPY.emptySieve));
+                words.type = 'button';
+                words.addEventListener('click', openFilters);
+                peek.appendChild(words);
+            } else {
+                const action = el('button', 'pk-hub-peek__action', t(FIRST_COPY.emptySieveAction));
+                action.type = 'button';
+                action.addEventListener('click', openFilters);
+                peek.appendChild(action);
+            }
             grid.parentNode.insertBefore(peek, grid);
             if (companionMode === 'lively' && !prefersReducedMotion() && art.animate) {
                 root.setTimeout(() => art.animate([{ transform: 'translateY(0)' }, { transform: 'translateY(-10px)' }, { transform: 'translateY(0)' }],
@@ -2006,7 +1992,6 @@
         mountCompanionSetting(doc);
         mountSoundSetting(doc);
         mountWelcome(doc);
-        mountHero(doc);
         mountHubPeek(doc);
         mountSidebar(doc);
         mountAbout(doc);

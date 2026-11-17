@@ -391,26 +391,6 @@
                 unavailable: [t('study.overlay.unavailableTitle', 'Study pack unavailable'), t('study.overlay.unavailableBody', 'Your study videos can\'t load right now, so nothing plays until this study time ends.')]
             }[kind] || [t('study.overlay.limitTitle', 'Done for today'), ''];
             if (rest && Number.isFinite(Number(state?.until)) && typeof doc.createElementNS === 'function') box.appendChild(breakSun(dark));
-            if (rest) {
-                // Kriti stretches once as the break opens (Android StudyRestActivity, KRITI_STRETCH), then rests.
-                let urls = [];
-                try { urls = companionOff ? [] : STRETCH_FRAMES.map(name => String(runtime.getURL?.(`assets/images/mascots/${name}`) || '')).filter(Boolean); } catch (e) { }
-                if (urls.length === STRETCH_FRAMES.length) {
-                    const kriti = element('img', { height: '132px', width: 'auto', objectFit: 'contain' });
-                    kriti.src = urls[0];
-                    kriti.alt = '';
-                    kriti.setAttribute('aria-hidden', 'true');
-                    kriti.dataset.mascot = 'kriti-stretch';
-                    box.appendChild(kriti);
-                    let reduced = false;
-                    try { reduced = !!win.matchMedia?.('(prefers-reduced-motion: reduce)')?.matches; } catch (e) { }
-                    if (!reduced) {
-                        STRETCH_ORDER.forEach((frame, index) => {
-                            setTimer(() => { if (kriti.isConnected) kriti.src = urls[frame]; }, 120 + index * STRETCH_FRAME_MS);
-                        });
-                    }
-                }
-            }
             box.appendChild(element('div', { fontSize: '28px', fontWeight: '600' }, copy[0]));
             box.appendChild(element('div', { fontSize: '16px', maxWidth: '420px', lineHeight: '1.5' }, copy[1]));
             if (rest && state?.upNext) {
@@ -444,10 +424,10 @@
                     box.appendChild(cost);
                 }
             }
-            // Kriti keeps the break company (her mug), cheers the end of the day, and Uljhan shrugs when the
+            // Kriti stretches as the break opens (Android StudyRestActivity, KRITI_STRETCH), cheers the end of the day, and Uljhan shrugs when the
             // pack can't load. A clock hold has no character. Appended last and drawn first, so the
             // title and body keep their places; the Companion set to Off leaves the words alone.
-            const pose = { rest: 'kriti_mug_06.webp', limit: 'kriti_thumbsup.webp', unavailable: 'uljhan_shrug.webp' }[kind];
+            const pose = { rest: 'kriti_stretch_01.webp', limit: 'kriti_thumbsup.webp', unavailable: 'uljhan_shrug.webp' }[kind];
             let poseUrl = '';
             try {
                 const companion = localizer()?.getCompanion?.() || 'quiet';
@@ -469,6 +449,14 @@
                 }
                 // Idle life with the page's interaction wake (shared with the blocked card).
                 try { localizer()?.idle?.(picture); } catch (e) { }
+                // The stretch plays once (280 ms frames) and rests on its first frame; a still with reduced motion.
+                let reduced = false;
+                try { reduced = !!win.matchMedia?.('(prefers-reduced-motion: reduce)')?.matches; } catch (e) { }
+                if (rest && !reduced) {
+                    STRETCH_ORDER.forEach((frame, index) => setTimer(() => {
+                        try { if (picture.isConnected) picture.src = runtime.getURL(`assets/images/mascots/${STRETCH_FRAMES[frame]}`); } catch (e) { }
+                    }, 120 + index * STRETCH_FRAME_MS));
+                }
             }
             (doc.body || doc.documentElement).appendChild(box);
         }

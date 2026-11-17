@@ -33306,6 +33306,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         return {
             state, main, kids, hidden, devices, contentOn,
             profiles: Object.keys(safeObject(profilesV4Cache?.profiles)).length || 1,
+            activeName: normalizeString(safeObject(profilesV4Cache?.profiles)[normalizeString(activeProfileId) || 'default']?.name),
             mainMode: state.mode === 'whitelist' ? 'whitelist' : 'blocklist',
             kidsMode: state.kids?.mode === 'whitelist' ? 'whitelist' : 'blocklist',
             autoBackup: state.autoBackupEnabled === true,
@@ -33314,6 +33315,14 @@ document.addEventListener('DOMContentLoaded', async () => {
         };
     }
 
+    /** A count line with its plural form (key.one / key.other / key.<category>). */
+    function controlCenterPlural(key, count, fallbackOne, fallbackOther, values = {}) {
+        let category = count === 1 ? 'one' : 'other';
+        try { category = new Intl.PluralRules(document.documentElement.lang || navigator.language || 'en').select(count); } catch (e) { }
+        return tabViewUiText(`${key}.${category}`, count === 1 ? fallbackOne : fallbackOther, { count, ...values });
+    }
+
+    /** The Controls tile lines (Android DashboardActivity.controlCenterTileText). */
     function controlCenterSummary(id, data) {
         const rules = counts => tabViewUiText('controls.summary.rules', 'Channels: {channels} · Keywords: {keywords}',
             { channels: counts.channelCount || 0, keywords: counts.keywordCount || 0 });
@@ -33323,23 +33332,24 @@ document.addEventListener('DOMContentLoaded', async () => {
             case 'content': return tabViewUiText('controls.summary.contentOn', 'Turned on: {count}', { count: data.contentOn });
             case 'timeLimits': return data.selfControl
                 ? tabViewUiText('controls.summary.selfControlLeft', 'Self-Control: {remaining}', { remaining: data.selfControl })
-                : tabViewUiText('family.commandCenter.detail.off', 'Off');
-            case 'backup': return data.autoBackup ? tabViewUiText('controls.summary.autoBackupOn', 'Auto backup on') : tabViewUiText('controls.summary.autoBackupOff', 'Auto backup off');
-            case 'profiles': return tabViewUiText('controls.summary.profiles', 'Profiles: {count}', { count: data.profiles });
-            case 'kids': return tabViewUiText('controls.summary.kids', '{mode} · Channels: {channels}',
-                { mode: controlCenterModeLabel(data.kidsMode), channels: data.kids.channelCount || 0 });
+                : tabViewUiText('controls.summary.selfControlOff', 'Self-Control is off');
+            case 'backup': return data.autoBackup ? tabViewUiText('controls.summary.backupOn', 'Automatic backup is on') : tabViewUiText('controls.summary.backupOff', 'Automatic backup is off');
+            case 'profiles': return data.activeName
+                ? controlCenterPlural('controls.summary.profileCount', data.profiles, '{name} · {count} profile', '{name} · {count} profiles', { name: data.activeName })
+                : tabViewUiText('controls.summary.profiles', 'Profiles: {count}', { count: data.profiles });
+            // Kids reads like Filters (the profile pill names the mode): "No rules yet", or its counts.
+            case 'kids': return (data.kids.channelCount || 0) + (data.kids.keywordCount || 0)
+                ? rules(data.kids) : tabViewUiText('pk.hub.noRules', 'No rules yet');
             case 'settings': return data.selfControl
                 ? tabViewUiText('controls.summary.selfControlLeft', 'Self-Control: {remaining}', { remaining: data.selfControl })
                 : (data.autoBackup ? tabViewUiText('controls.summary.autoBackupOn', 'Auto backup on') : tabViewUiText('controls.summary.autoBackupOff', 'Auto backup off'));
             case 'sync': return data.devices
-                ? (data.devices === 1
-                    ? tabViewUiText('family.commandCenter.trustMap.oneVerifiedDevice', '{count} verified device', { count: 1 })
-                    : tabViewUiText('family.commandCenter.trustMap.manyVerifiedDevices', '{count} verified devices', { count: data.devices }))
-                : tabViewUiText('controls.summary.noDevices', 'No devices yet');
+                ? controlCenterPlural('controls.summary.trustedDevices', data.devices, '{count} trusted device', '{count} trusted devices')
+                : tabViewUiText('controls.summary.noSavedDevices', 'No saved devices. Pair with a code or QR.');
             case 'whatsnew': return data.version ? tabViewUiText('controls.summary.version', 'Version {version}', { version: data.version }) : '';
-            case 'help': return tabViewUiText('controls.summary.help', 'Guides and answers');
-            case 'about': return tabViewUiText('controls.summary.about', 'Who builds FilterTube');
-            case 'donate': return tabViewUiText('controls.summary.support', 'Optional support');
+            case 'help': return tabViewUiText('controls.summary.helpTips', 'Guides and filter tips');
+            case 'about': return tabViewUiText('controls.summary.aboutLinks', 'Version, links and licences');
+            case 'donate': return tabViewUiText('controls.summary.supportBuild', 'Support the build');
             default: return '';
         }
     }
@@ -34639,7 +34649,7 @@ function setupNavigation() {
         // The page title is the section's own nav label, from the same catalog key (it used to stay
         // English outside the first pages, and About kept the previous page's title).
         const titles = {
-            'dashboard': ['navigation.dashboard', 'Dashboard'],
+            'dashboard': ['controls.pageTitle', 'Controls'],
             'filters': ['navigation.filters', 'Filters'],
             'semantic': ['', 'Semantic ML'],
             'kids': ['navigation.kids', 'Kids Mode'],
