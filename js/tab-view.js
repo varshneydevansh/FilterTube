@@ -33162,6 +33162,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             }
             tabStudyLoad = null;
             renderListModeControls();
+            try { if (lastDashboardProfileCardData) renderDashboardProfileCard(lastDashboardProfileCardData); } catch (e) { }
             if (tabStudyTimer) clearTimeout(tabStudyTimer);
             const at = [tabStudyState?.until, tabStudyState?.next?.at].map(Number).filter(value => Number.isFinite(value) && value > Date.now());
             if (at.length) tabStudyTimer = setTimeout(refreshTabStudyState, Math.min(Math.min(...at) - Date.now() + 500, 10 * 60 * 1000));
@@ -33670,12 +33671,22 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (name) name.textContent = root.profiles ? getProfileName(root, activeProfileId) : '';
         if (mode) {
             const kidsSurface = dashboardStatsSurface === 'kids';
+            const ownMode = kidsSurface ? data.kidsMode : data.mainMode;
+            // During a study round or break Main runs on the plan's allow list: say Study, as the pill does.
+            let modeLabel = controlCenterModeLabel(ownMode);
+            try {
+                const effective = window.FilterTubeEffectiveMode?.effectiveModeFor?.(ownMode, tabStudyState, Date.now());
+                if (!kidsSurface && effective?.mode === 'study') modeLabel = tabViewUiText('study.pill.label', 'Study');
+            } catch (e) {
+            }
             mode.textContent = tabViewUiText('controls.header.surfaceMode', '{surface} · {mode}', {
                 surface: kidsSurface ? tabViewUiText('family.commandCenter.surface.kids', 'Kids') : tabViewUiText('family.commandCenter.surface.main', 'Main'),
-                mode: controlCenterModeLabel(kidsSurface ? data.kidsMode : data.mainMode)
+                mode: modeLabel
             });
         }
+        lastDashboardProfileCardData = data;
     }
+    var lastDashboardProfileCardData;
 
     (function installControlCenter() {
         document.getElementById('ftDashSwitchProfile')?.addEventListener('click', () => {
