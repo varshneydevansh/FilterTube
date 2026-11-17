@@ -3288,5 +3288,13 @@
   "sync.notes.trustBody": "信任会记住已批准的关系、目标、范围和已保存更新选项。通过网络获取更新仍需要已配置的服务提供方和本地验证。",
   "sync.step.one": "步骤1",
   "sync.step.two": "步骤2",
-  "sync.step.three": "步骤3"
+  "sync.step.three": "步骤3",
+  "study.handle.start": "学习开始",
+  "study.handle.end": "学习结束",
+  "study.handle.limit": "每日上限",
+  "study.handle.noLimit": "没有上限",
+  "study.handle.value": "{name}，{time}",
+  "study.hoursMinutes": "{hours} 小时 {minutes} 分钟",
+  "study.length.title": "学习时长",
+  "study.length.hint": "拖动可延长或缩短学习时间。开始时间不变。"
 }

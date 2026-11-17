@@ -3288,5 +3288,13 @@
   "sync.notes.trustBody": "Kapercayan ngelingi sesambungan sing disetujoni, tujuan, cakupan lan pilihan nganyari sing disimpen. Njupuk liwat jaringan isih mbutuhake panyedhiya sing dikonfigurasi lan validasi lokal.",
   "sync.step.one": "Langkah 1",
   "sync.step.two": "Langkah 2",
-  "sync.step.three": "Langkah 3"
+  "sync.step.three": "Langkah 3",
+  "study.handle.start": "Sinau diwiwiti",
+  "study.handle.end": "Sinau rampung",
+  "study.handle.limit": "Wates saben dina",
+  "study.handle.noLimit": "Ora ana wates",
+  "study.handle.value": "{name}, {time}",
+  "study.hoursMinutes": "{hours} jam {minutes} menit",
+  "study.length.title": "Suwene sinau",
+  "study.length.hint": "Geret supaya sinau luwih suwe utawa luwih cekak. Wiwité tetep jam sing padha."
 }

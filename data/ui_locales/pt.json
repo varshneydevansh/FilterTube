@@ -3290,5 +3290,13 @@
   "sync.notes.trustBody": "A confiança memoriza a relação aprovada, o destino, o escopo e a opção de atualizações salvas. A busca pela rede ainda exige um provedor configurado e validação local.",
   "sync.step.one": "Etapa 1",
   "sync.step.two": "Etapa 2",
-  "sync.step.three": "Etapa 3"
+  "sync.step.three": "Etapa 3",
+  "study.handle.start": "Início do estudo",
+  "study.handle.end": "Fim do estudo",
+  "study.handle.limit": "Limite diário",
+  "study.handle.noLimit": "Sem limite",
+  "study.handle.value": "{name}, {time}",
+  "study.hoursMinutes": "{hours} h {minutes} min",
+  "study.length.title": "Duração do estudo",
+  "study.length.hint": "Arraste para estudar mais ou menos tempo. Começa no mesmo horário."
 }

@@ -3290,5 +3290,13 @@
   "sync.notes.trustBody": "నమ్మకం ఆమోదించిన సంబంధం, లక్ష్యం, పరిధి, సేవ్ చేసిన అప్‌డేట్‌ల ఎంపికను గుర్తుంచుకుంటుంది. నెట్‌వర్క్ నుంచి పొందడానికి ఇప్పటికీ కాన్ఫిగర్ చేసిన ప్రదాత, స్థానిక ధృవీకరణ అవసరం.",
   "sync.step.one": "దశ 1",
   "sync.step.two": "దశ 2",
-  "sync.step.three": "దశ 3"
+  "sync.step.three": "దశ 3",
+  "study.handle.start": "చదువు మొదలవుతుంది",
+  "study.handle.end": "చదువు ముగుస్తుంది",
+  "study.handle.limit": "రోజువారీ పరిమితి",
+  "study.handle.noLimit": "పరిమితి లేదు",
+  "study.handle.value": "{name}, {time}",
+  "study.hoursMinutes": "{hours} గం {minutes} నిమి",
+  "study.length.title": "చదువు సమయం",
+  "study.length.hint": "చదువును పెంచడానికి లేదా తగ్గించడానికి లాగండి. మొదలయ్యే సమయం అదే ఉంటుంది."
 }

@@ -2190,13 +2190,32 @@
         return row;
     }
 
-    /** The day bar (StudyDayPlannerView): hour ticks, the plan's segments, now, and start/end handles you can drag. */
-    function planBar(plan, focus, breakMode, { editable, onSelect, onDrag } = {}) {
+    function planDrag() { return root.FilterTubeStudyPlanDrag || null; }
+
+    /** "Study starts, 4:00 PM" (study_handle_value) for a handle at a minute; the limit at the day's end is "No limit". */
+    function handleValue(which, minute) {
+        const names = {
+            start: t('study.handle.start', 'Study starts'),
+            end: t('study.handle.end', 'Study ends'),
+            limit: t('study.handle.limit', 'Daily limit')
+        };
+        const time = which === 'limit' && (minute === null || minute >= 1440) ? t('study.handle.noLimit', 'No limit') : clockLabel(minute % 1440);
+        return { name: names[which], time, label: t('study.handle.value', '{name}, {time}', { name: names[which], time }) };
+    }
+
+    /**
+     * The day bar (StudyDayPlannerView): hour ticks, the plan's segments, now, and the START, END and LIMIT
+     * handles. Each handle is a slider: drag it (pointer capture, 15-minute snap, a pill shows the time),
+     * or focus it and use the arrows (15 min), Page Up / Page Down (1 h), Home / End. Escape or a cancelled
+     * pointer puts it back. onLive(draft, which) runs while it moves; onCommit(before, after) once it lands.
+     */
+    function planBar(plan, focus, breakMode, { editable, onSelect, onLive, onCommit } = {}) {
+        const Drag = planDrag();
         const segments = planSegments(plan, focus, { from: 6 * 60, to: 23 * 60 });
         const from = segments[0]?.start ?? 0;
         const to = segments[segments.length - 1]?.end ?? 1440;
         const span = Math.max(1, to - from);
-        const pct = minute => `${(((minute - from) / span) * 100).toFixed(3)}%`;
+        const pct = minute => `${(((Math.max(from, Math.min(to, minute)) - from) / span) * 100).toFixed(3)}%`;
         const wrap = el('div', 'ft-dayplan');
         const track = el('div', 'ft-dayplan__track');
         for (const segment of segments) {
@@ -2215,38 +2234,111 @@
             marker.style.left = pct(minutesNow);
             track.appendChild(marker);
         }
-        const start = minuteOf(plan.start);
-        let end = minuteOf(plan.end);
-        if (start !== null && end !== null) {
-            if (end <= start) end += 1440;
-            for (const [which, at] of [['start', start], ['end', end]]) {
-                const handle = el('span', `ft-dayplan__handle is-${which}`);
-                handle.style.left = pct(at);
-                handle.setAttribute('aria-hidden', 'true');
-                if (editable && onDrag) {
-                    handle.addEventListener('pointerdown', event => {
-                        event.preventDefault();
-                        const box = track.getBoundingClientRect();
-                        let minute = at;
-                        try { handle.setPointerCapture(event.pointerId); } catch (e) { }
-                        handle.classList.add('is-dragging');
-                        const move = ev => {
-                            minute = Math.round((from + ((ev.clientX - box.left) / box.width) * span) / STEP) * STEP;
-                            handle.style.left = pct(Math.max(from, Math.min(to, minute)));
-                        };
-                        const up = () => {
-                            handle.removeEventListener('pointermove', move);
-                            handle.classList.remove('is-dragging');
-                            if (minute !== at) onDrag(which, minute);
-                        };
-                        handle.addEventListener('pointermove', move);
-                        handle.addEventListener('pointerup', up, { once: true });
-                        handle.addEventListener('pointercancel', up, { once: true });
-                    });
-                }
-                track.appendChild(handle);
-            }
+        if (!Drag || minuteOf(plan.start) === null || minuteOf(plan.end) === null) {
+            wrap.append(track);
+            return wrap;
         }
+        const saved = Drag.draftOf(plan);
+        let draft = { ...saved };
+        const handles = {};
+        const spotOf = which => (which === 'limit' ? (draft.limit ?? Drag.NO_LIMIT) : draft[which]);
+        const paint = () => {
+            for (const which of Drag.HANDLES) {
+                const handle = handles[which];
+                const at = spotOf(which);
+                handle.style.left = pct(at);
+                const value = handleValue(which, which === 'limit' ? draft.limit : at);
+                handle.setAttribute('aria-valuenow', String(which === 'limit' ? (draft.limit ?? Drag.NO_LIMIT) : at));
+                handle.setAttribute('aria-valuetext', value.time);
+                handle.setAttribute('aria-label', value.name);
+                handle.querySelector('.ft-dayplan__pill').textContent = value.time;
+                const range = which === 'start' ? [0, draft.end - Drag.MIN_STUDY_MINUTES]
+                    : which === 'end' ? [draft.start + Drag.MIN_STUDY_MINUTES, Drag.LAST_END] : [draft.end, Drag.NO_LIMIT];
+                handle.setAttribute('aria-valuemin', String(range[0]));
+                handle.setAttribute('aria-valuemax', String(range[1]));
+            }
+        };
+        const live = which => { paint(); onLive?.({ ...draft }, which); };
+        const commit = () => {
+            if (draft.start === saved.start && draft.end === saved.end && (draft.limit ?? null) === (saved.limit ?? null)) return;
+            onCommit?.({ ...saved }, { ...draft });
+        };
+        const revert = which => { draft = { ...saved }; live(which); };
+        for (const which of Drag.HANDLES) {
+            const handle = el('span', `ft-dayplan__handle is-${which}`);
+            handle.appendChild(el('span', 'ft-dayplan__pill'));
+            handle.dataset.ftFocusKey = `dayplan-${which}`;
+            if (editable && onCommit) {
+                handle.setAttribute('role', 'slider');
+                handle.setAttribute('aria-orientation', 'horizontal');
+                handle.tabIndex = 0;
+                let keyTimer = null;
+                handle.addEventListener('keydown', event => {
+                    const steps = { ArrowLeft: -15, ArrowDown: -15, ArrowRight: 15, ArrowUp: 15, PageDown: -60, PageUp: 60 };
+                    if (event.key === 'Escape') { revert(which); return; }
+                    if (event.key === 'Home' || event.key === 'End') {
+                        event.preventDefault();
+                        draft = Drag.move(draft, which, event.key === 'Home' ? 0 : Drag.DAY_MINUTES);
+                    } else if (steps[event.key]) {
+                        event.preventDefault();
+                        draft = Drag.step(draft, which, steps[event.key]);
+                    } else return;
+                    handle.classList.add('is-active');
+                    live(which);
+                    // A run of key presses saves once, a moment after the last one.
+                    clearTimeout(keyTimer);
+                    keyTimer = setTimeout(() => { handle.classList.remove('is-active'); commit(); }, 700);
+                });
+                handle.addEventListener('blur', () => handle.classList.remove('is-active'));
+            } else {
+                handle.setAttribute('aria-hidden', 'true');
+            }
+            handles[which] = handle;
+            track.appendChild(handle);
+        }
+        if (draft.limit === null) handles.limit.classList.add('is-unset');
+        if (editable && onCommit) {
+            let justDragged = false;
+            track.addEventListener('click', event => { if (justDragged) { event.stopPropagation(); event.preventDefault(); } }, { capture: true });
+            // Presses anywhere near a handle take it (±26 px, the nearest; LIMIT loses ties), as on the app.
+            track.addEventListener('pointerdown', event => {
+                if (event.button !== 0) return;
+                const box = track.getBoundingClientRect();
+                const at = Drag.minuteAt(event.clientX, box.left, box.width, from, to);
+                const reach = (26 / Math.max(1, box.width)) * span;
+                const which = Drag.nearestHandle(draft, at, reach);
+                if (!which) return;
+                event.preventDefault();
+                const handle = handles[which];
+                try { track.setPointerCapture(event.pointerId); } catch (e) { }
+                handle.classList.add('is-dragging');
+                try { handle.focus({ preventScroll: true }); } catch (e) { }
+                const move = ev => {
+                    const next = Drag.move(draft, which, Drag.minuteAt(ev.clientX, box.left, box.width, from, to));
+                    if (next.start === draft.start && next.end === draft.end && next.limit === draft.limit) return;
+                    draft = next;
+                    live(which);
+                };
+                const finish = cancelled => {
+                    track.removeEventListener('pointermove', move);
+                    track.removeEventListener('pointerup', onUp);
+                    track.removeEventListener('pointercancel', onCancel);
+                    handle.classList.remove('is-dragging');
+                    if (cancelled) revert(which); else commit();
+                };
+                const onUp = () => {
+                    finish(false);
+                    // The press was a drag, not a tap on a segment: the click that follows it is swallowed.
+                    justDragged = true;
+                    setTimeout(() => { justDragged = false; }, 0);
+                };
+                const onCancel = () => finish(true);
+                track.addEventListener('pointermove', move);
+                track.addEventListener('pointerup', onUp);
+                track.addEventListener('pointercancel', onCancel);
+            });
+        }
+        paint();
         const scale = el('div', 'ft-dayplan__scale');
         for (let hour = Math.ceil(from / 180) * 180; hour <= to - 60; hour += 180) {
             const tick = el('span', 'ft-dayplan__hour', clockLabel(hour % 1440).replace(/:00/, ''));
@@ -2304,10 +2396,22 @@
             if (limit !== null && limit < next) changed.limit = hhmm(next);
             planPatch(changed);
         };
+        const Drag = planDrag();
+        // While a handle moves: its time in the detail card ("Study starts, 4:00 PM") and the steppers below
+        // follow it (StudyFocusActivity.onLiveDraft); it saves once, where it lands, with Undo.
+        const liveOutputs = {};
         card.appendChild(planBar(plan, focus, breakMode, {
             editable,
             onSelect: segment => showDetail(segment, false),
-            onDrag: (which, minute) => (which === 'start' ? setStart(Math.max(0, Math.min(1440 - MIN_STUDY - STEP, minute))) : setEnd(Math.min(1440 - STEP, minute)))
+            onLive: (draft, which) => {
+                const value = handleValue(which, which === 'limit' ? draft.limit : draft[which]);
+                const range = `${clockLabel(draft.start)} – ${clockLabel(draft.end % 1440)}${draft.limit !== null ? ` · ${clockLabel(draft.limit)}` : ''}`;
+                detail.replaceChildren(el('strong', 'ft-plan-card__detail-title', value.label), el('span', 'ft-study-muted', range));
+                if (liveOutputs.start) liveOutputs.start.textContent = clockLabel(draft.start);
+                if (liveOutputs.end) liveOutputs.end.textContent = clockLabel(draft.end % 1440);
+                if (liveOutputs.limit) liveOutputs.limit.textContent = draft.limit === null ? t('study.limit.noLimit', 'No limit') : clockLabel(draft.limit);
+            },
+            onCommit: (before, after) => Drag && patch({ plan: Drag.applyToPlan(plan, after) }, { plan: clone(study.plan ?? null) })
         }));
         const runningKind = { STUDY: 'study', BREAK: 'break', LIMIT: 'limit' }[text(object(options.state).state)];
         showDetail(runningKind ? { kind: runningKind } : currentSegment(plan, focus), true);
@@ -2329,12 +2433,15 @@
             days.appendChild(chip);
         });
         card.appendChild(days);
-        card.appendChild(stepperRow(t('study.startLabel', 'Start'), clockLabel(start), { enabled: editable,
+        const startRow = stepperRow(t('study.startLabel', 'Start'), clockLabel(start), { enabled: editable,
             lessOk: start >= STEP, moreOk: start + STEP <= 1440 - MIN_STUDY - STEP,
-            onLess: () => setStart(start - STEP), onMore: () => setStart(start + STEP) }));
-        card.appendChild(stepperRow(t('study.endLabel', 'End'), clockLabel(end % 1440), { enabled: editable,
+            onLess: () => setStart(start - STEP), onMore: () => setStart(start + STEP) });
+        const endRow = stepperRow(t('study.endLabel', 'End'), clockLabel(end % 1440), { enabled: editable,
             lessOk: end - STEP >= start + MIN_STUDY, moreOk: end + STEP <= 1440 - STEP,
-            onLess: () => setEnd(end - STEP), onMore: () => setEnd(end + STEP) }));
+            onLess: () => setEnd(end - STEP), onMore: () => setEnd(end + STEP) });
+        liveOutputs.start = startRow.querySelector('output');
+        liveOutputs.end = endRow.querySelector('output');
+        card.append(startRow, endRow);
 
         card.appendChild(el('span', 'ft-plan-card__label', t('study.planner.duringBreaks', 'During breaks')));
         card.appendChild(choiceRow([['rest', t('study.planner.restScreen', 'Rest screen')], ['normal', t('study.planner.normalVideos', 'Normal videos')]], breakMode,
@@ -2365,7 +2472,7 @@
                 ? t('study.limit.bodyNone', 'Tap + to choose a time. After it, nothing plays until midnight.')
                 : t('study.limit.body', 'Drag the grey limit handle on the plan, or step it here. After the limit, nothing plays until midnight.')));
             const endOfStudy = end % 1440;
-            limitCard.appendChild(stepperRow(t('study.section.limit', 'Daily limit'), limit === null ? t('study.limit.noLimit', 'No limit') : clockLabel(limit), {
+            const limitRow = stepperRow(t('study.section.limit', 'Daily limit'), limit === null ? t('study.limit.noLimit', 'No limit') : clockLabel(limit), {
                 lessOk: limit !== null, moreOk: limit === null || limit + STEP <= 1440 - STEP,
                 onLess: () => {
                     const next = { ...plan };
@@ -2373,7 +2480,9 @@
                     planPatch(next);
                 },
                 onMore: () => planPatch({ ...plan, limit: hhmm(limit === null ? Math.max(endOfStudy, 20 * 60) : limit + STEP) })
-            }));
+            });
+            liveOutputs.limit = limitRow.querySelector('output');
+            limitCard.appendChild(limitRow);
         }
         const limitWrap = el('div', 'ft-home-section');
         limitWrap.append(sectionTitle(t('study.section.limit', 'Daily limit')), limitCard);
@@ -2519,8 +2628,14 @@
     /** The page redraws every second on a break: keyboard focus stays on the same control. */
     function replaceKeepingFocus(host, view) {
         const active = root.document?.activeElement;
+        const focusKey = active && host.contains?.(active) ? active.dataset?.ftFocusKey : '';
         const key = active && host.contains?.(active) && active.tagName === 'BUTTON' ? `${active.className}|${active.textContent}|${active.getAttribute('aria-label') || ''}` : null;
         host.replaceChildren(view);
+        if (focusKey) {
+            // A slider handle or the length slider keeps the keyboard after the page redraws.
+            try { view.querySelector(`[data-ft-focus-key="${focusKey}"]`)?.focus({ preventScroll: true }); } catch (e) { }
+            return;
+        }
         if (!key) return;
         const match = Array.from(view.querySelectorAll('button')).find(node => `${node.className}|${node.textContent}|${node.getAttribute('aria-label') || ''}` === key);
         try { match?.focus({ preventScroll: true }); } catch (e) { }
@@ -2574,6 +2689,16 @@
             return;
         }
         view.appendChild(heroCard(data, local));
+        if (isObject(study.plan) && !ended) {
+            // Study length: today's plan as one slider, right under the hero (owner, 2026-11-17).
+            const lengthCard = el('section', 'ft-home-card ft-length-card');
+            mountLengthSlider(lengthCard, { study, state: { ...state, parentName: data.parentName }, onPatch: async patch => {
+                const result = await send({ action: 'FilterTube_StudyUpdate', patch });
+                if (result?.ok !== false) ctx.refresh();
+                return result;
+            } });
+            view.appendChild(lengthCard);
+        }
         const resume = continueRow(state);
         if (resume) view.appendChild(resume);
         if (state.weekView) view.appendChild(weekCard(state));
@@ -2892,9 +3017,137 @@
         });
     }
 
+    /** "45 min", "2 h", "2 h 30 min" (study_family_hours_minutes). */
+    function lengthLabel(minutes) {
+        if (minutes < 60) return t('study.minutes', '{minutes} min', { minutes });
+        if (minutes % 60 === 0) return t('study.hoursChip', '{hours} h', { hours: minutes / 60 });
+        return t('study.hoursMinutes', '{hours} h {minutes} min', { hours: Math.floor(minutes / 60), minutes: minutes % 60 });
+    }
+
+    /** Whether this person may change the plan here (a parent's plan or lock, or a locked session, may not). */
+    function planEditable(state) {
+        const value = object(state);
+        const study = object(value.study);
+        return value.isChild !== true && !value.setByParentId && !text(object(study.plan).setByParentId)
+            && !text(object(study.lock).setByParentId) && value.lockMode !== 'locked' && !value.lock;
+    }
+
+    /**
+     * Study length (owner, 2026-11-17: "where is the slider to make study longer or shorter?"): today's plan as
+     * one slider. The start stays; dragging moves the end in 15-minute steps (30 min at least, 23:45 at
+     * most) and pushes the daily limit along, as the plan page's END handle does. −/+ step 15 minutes.
+     * It saves once the slider rests, with the same FilterTube_StudyUpdate the plan page sends.
+     *
+     * mountLengthSlider(host, {study, state, compact, onPatch, onSetup, onChange}) -> {refresh, destroy}
+     * - study/state: FilterTube_StudyGetState's `study` (and the whole state); omitted, it asks for them.
+     * - compact: a card-sized version without the hint line.
+     * - onPatch(patch) -> Promise<{ok}>: defaults to FilterTube_StudyUpdate.
+     * - onSetup(): "Set up study" when there is no plan (default: the Study page).
+     * - onChange({start, end, minutes}): after a save.
+     */
+    function mountLengthSlider(host, options = {}) {
+        const Drag = planDrag();
+        let alive = true;
+        let saveTimer = null;
+        const onPatch = options.onPatch || (patch => send({ action: 'FilterTube_StudyUpdate', patch }));
+        const openStudy = options.onSetup || (() => {
+            const nav = root.document?.querySelector?.('.nav-item[data-tab="study"]');
+            if (nav) { nav.click(); return; }
+            try { root.open(runtime()?.runtime?.getURL?.('html/tab-view.html#study') || '#study', '_blank'); } catch (e) { }
+        });
+        function draw(study, state) {
+            if (!alive || !host) return;
+            const box = el('div', `ft-length${options.compact ? ' is-compact' : ''}`);
+            const plan = object(study).plan;
+            const head = el('div', 'ft-length__head');
+            const title = el('span', 'ft-length__title', t('study.length.title', 'Study length'));
+            title.id = `ftLengthTitle${Math.random().toString(36).slice(2, 8)}`;
+            head.appendChild(title);
+            box.appendChild(head);
+            if (!Drag || !isObject(plan) || minuteOf(plan.start) === null) {
+                box.appendChild(button(t('study.setup.title', 'Set up study'), 'btn-secondary ft-length__setup', () => openStudy()));
+                host.replaceChildren(box);
+                return;
+            }
+            let draft = Drag.draftOf(plan);
+            const saved = { ...draft };
+            const editable = planEditable(state ? { ...state, study } : { study });
+            const value = el('strong', 'ft-length__value');
+            const range = el('span', 'ft-length__range');
+            head.append(value);
+            box.appendChild(range);
+            const row = el('div', 'ft-length__row');
+            const less = button('', 'ft-stepper__btn ft-length__step', () => set(Drag.lengthOf(draft) - Drag.SNAP_MINUTES, true));
+            less.appendChild(icon('minus'));
+            less.setAttribute('aria-label', t('study.planner.earlier', '{label}: 15 minutes earlier', { label: t('study.handle.end', 'Study ends') }));
+            const more = button('', 'ft-stepper__btn ft-length__step', () => set(Drag.lengthOf(draft) + Drag.SNAP_MINUTES, true));
+            more.appendChild(icon('plus'));
+            more.setAttribute('aria-label', t('study.planner.later', '{label}: 15 minutes later', { label: t('study.handle.end', 'Study ends') }));
+            const input = el('input', 'ft-length__input');
+            input.type = 'range';
+            input.min = String(Drag.MIN_STUDY_MINUTES);
+            input.max = String(Drag.maxLength(draft));
+            input.step = String(Drag.SNAP_MINUTES);
+            input.setAttribute('aria-labelledby', title.id);
+            input.dataset.ftFocusKey = 'study-length';
+            row.append(less, input, more);
+            box.appendChild(row);
+            if (!options.compact) box.appendChild(el('p', 'ft-length__hint', editable
+                ? t('study.length.hint', 'Drag to make study longer or shorter. It starts at the same time.')
+                : setByLabel(state?.parentName)));
+            const paint = () => {
+                const minutes = Drag.lengthOf(draft);
+                value.textContent = lengthLabel(minutes);
+                range.textContent = timeRange(draft.start, draft.end);
+                input.value = String(minutes);
+                input.setAttribute('aria-valuetext', `${lengthLabel(minutes)}, ${timeRange(draft.start, draft.end)}`);
+                input.style.setProperty('--ft-length-fill', `${(((minutes - Drag.MIN_STUDY_MINUTES) / Math.max(1, Drag.maxLength(draft) - Drag.MIN_STUDY_MINUTES)) * 100).toFixed(2)}%`);
+                less.disabled = !editable || minutes <= Drag.MIN_STUDY_MINUTES;
+                more.disabled = !editable || minutes >= Drag.maxLength(draft);
+            };
+            const save = async () => {
+                if (draft.end === saved.end && draft.limit === saved.limit) return;
+                const before = Drag.applyToPlan(plan, saved);
+                const result = await onPatch({ plan: Drag.applyToPlan(plan, draft) });
+                if (result?.ok === false) {
+                    draft = { ...saved };
+                    paint();
+                    notify(host, errorText(result.error), null);
+                    return;
+                }
+                saved.end = draft.end;
+                saved.limit = draft.limit;
+                notify(host, t('study.planner.saved', 'Saved'), async () => { await onPatch({ plan: before }); refresh(); });
+                options.onChange?.({ start: draft.start, end: draft.end, minutes: Drag.lengthOf(draft) });
+            };
+            const set = (minutes, soon) => {
+                draft = Drag.withLength(draft, minutes);
+                paint();
+                clearTimeout(saveTimer);
+                saveTimer = setTimeout(save, soon ? 500 : 0);
+            };
+            input.disabled = !editable;
+            input.addEventListener('input', () => { draft = Drag.withLength(draft, Number(input.value)); paint(); });
+            // A pointer drag saves where it rests; arrow keys save a moment after the last press.
+            input.addEventListener('change', () => set(Number(input.value), true));
+            paint();
+            host.replaceChildren(box);
+        }
+        async function refresh() {
+            if (options.study) { draw(options.study, options.state || null); return; }
+            const state = await send({ action: 'FilterTube_StudyGetState' });
+            draw(object(state?.study), state);
+        }
+        refresh();
+        return {
+            refresh,
+            destroy() { alive = false; clearTimeout(saveTimer); host?.replaceChildren?.(); }
+        };
+    }
+
     root.FilterTubeStudyUi = Object.freeze({
         t, phaseInfo, planSegments, segmentWords, setByLabel, packLabel, renderStrip, mountStrip,
-        renderPlanPage, renderDashboard, mountDashboard, dayRing, ringState, heroLines, renderParentPlans, searchExplainerCard, askForTime, applyCountryAccent, openSetup
+        renderPlanPage, renderDashboard, mountDashboard, mountLengthSlider, lengthLabel, dayRing, ringState, heroLines, renderParentPlans, searchExplainerCard, askForTime, applyCountryAccent, openSetup
     });
 
     // Popup: the strip takes the banner slot under the header. Options page: the study card.

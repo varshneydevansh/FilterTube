@@ -3288,5 +3288,13 @@
   "sync.notes.trustBody": "Ìgbẹ́kẹ̀lé rántí ìbáṣepọ̀ tí a fọwọ́ sí, ibi àfojúsùn, ààlà àti àṣàyàn ìmúdójúìwọ̀n tí a fi pamọ́. Gbígba lórí nẹ́tíwọ́ọ̀kì ṣì nílò olùpèsè tí a ti ṣètò àti ìmúdájú lórí ẹ̀rọ.",
   "sync.step.one": "Ìgbésẹ̀ 1",
   "sync.step.two": "Ìgbésẹ̀ 2",
-  "sync.step.three": "Ìgbésẹ̀ 3"
+  "sync.step.three": "Ìgbésẹ̀ 3",
+  "study.handle.start": "Ẹ̀kọ́ bẹ̀rẹ̀",
+  "study.handle.end": "Ẹ̀kọ́ parí",
+  "study.handle.limit": "Òpin ojoojúmọ́",
+  "study.handle.noLimit": "Kò sí òpin",
+  "study.handle.value": "{name}, {time}",
+  "study.hoursMinutes": "{hours} wákàtí {minutes} ìṣẹ́jú",
+  "study.length.title": "Gígùn ẹ̀kọ́",
+  "study.length.hint": "Fà á láti mú ẹ̀kọ́ gùn tàbí kúrú sí i. Ó ṣì ń bẹ̀rẹ̀ ní àkókò kan náà."
 }

@@ -3302,5 +3302,13 @@
   "sync.notes.trustBody": "Доверие запоминает одобренную связь, цель, область и выбор сохранённых обновлений. Получение через сеть по-прежнему требует настроенного поставщика и локальной проверки.",
   "sync.step.one": "Шаг 1",
   "sync.step.two": "Шаг 2",
-  "sync.step.three": "Шаг 3"
+  "sync.step.three": "Шаг 3",
+  "study.handle.start": "Начало учёбы",
+  "study.handle.end": "Конец учёбы",
+  "study.handle.limit": "Дневной лимит",
+  "study.handle.noLimit": "Без лимита",
+  "study.handle.value": "{name}, {time}",
+  "study.hoursMinutes": "{hours} ч {minutes} мин",
+  "study.length.title": "Длительность учёбы",
+  "study.length.hint": "Перетащите, чтобы учиться дольше или меньше. Начало остаётся тем же."
 }

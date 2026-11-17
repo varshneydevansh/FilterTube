@@ -3288,5 +3288,13 @@
   "sync.notes.trustBody": "信任会记住批准好个关系、目标、范围搭保存更新选项。通过网络获取更新，还是要有设置好个服务提供方搭本地验证。",
   "sync.step.one": "步骤1",
   "sync.step.two": "步骤2",
-  "sync.step.three": "步骤3"
+  "sync.step.three": "步骤3",
+  "study.handle.start": "学习开始",
+  "study.handle.end": "学习结束",
+  "study.handle.limit": "每日上限",
+  "study.handle.noLimit": "呒没上限",
+  "study.handle.value": "{name}，{time}",
+  "study.hoursMinutes": "{hours} 小时 {minutes} 分钟",
+  "study.length.title": "读书辰光",
+  "study.length.hint": "拖一拖就好读长一点或者短一点。开始辰光勿变。"
 }

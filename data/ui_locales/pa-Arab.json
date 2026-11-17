@@ -3290,5 +3290,13 @@
   "sync.notes.trustBody": "بھروسا منظور کیتا رشتہ، ہدف، دائرہ تے محفوظ اپ ڈیٹاں دی چُون یاد رکھدا اے۔ نیٹ ورک توں حاصل کرن لئی ہن وی ترتیب دتا فراہم کنندہ تے مقامی پڑتال چاہیدی اے۔",
   "sync.step.one": "قدم 1",
   "sync.step.two": "قدم 2",
-  "sync.step.three": "قدم 3"
+  "sync.step.three": "قدم 3",
+  "study.handle.start": "پڑھائی شروع",
+  "study.handle.end": "پڑھائی مُکدی اے",
+  "study.handle.limit": "روزانہ حد",
+  "study.handle.noLimit": "کوئی حد نہیں",
+  "study.handle.value": "{name}، {time}",
+  "study.hoursMinutes": "{hours} گھنٹہ {minutes} منٹ",
+  "study.length.title": "پڑھائی دا ویلا",
+  "study.length.hint": "پڑھائی لمی یا چھوٹی کرن لئی کھچو۔ شروع ہون دا ویلا اوہی رہندا اے۔"
 }

@@ -3290,5 +3290,13 @@
   "sync.notes.trustBody": "Trust remembers the approved relationship, target, scope, and saved-update choice. Network pickup still needs a configured provider and local validation.",
   "sync.step.one": "Step 1",
   "sync.step.two": "Step 2",
-  "sync.step.three": "Step 3"
+  "sync.step.three": "Step 3",
+  "study.handle.start": "Study starts",
+  "study.handle.end": "Study ends",
+  "study.handle.limit": "Daily limit",
+  "study.handle.noLimit": "No limit",
+  "study.handle.value": "{name}, {time}",
+  "study.hoursMinutes": "{hours} h {minutes} min",
+  "study.length.title": "Study length",
+  "study.length.hint": "Drag to make study longer or shorter. It starts at the same time."
 }

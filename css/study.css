@@ -585,8 +585,53 @@ body.ft-extension-surface .ft-study-card[data-study-page],
 .ft-dayplan__seg.is-limit { background: repeating-linear-gradient(45deg, var(--pk-faint) 0 3px, transparent 3px 7px); }
 .ft-dayplan__now { position: absolute; top: -14px; width: 0; height: 0; margin-left: -6px; border: 6px solid transparent; border-top: 9px solid var(--pk-ink); }
 .ft-dayplan__now::after { content: ''; position: absolute; left: -1px; top: 0; width: 2px; height: 46px; background: var(--pk-ink); }
-.ft-dayplan__handle { position: absolute; bottom: -12px; width: 24px; height: 24px; margin-left: -12px; box-sizing: border-box; border-radius: 50%; border: 2px solid var(--pk-ink); background: var(--pk-paper); touch-action: none; cursor: ew-resize; }
-.ft-dayplan__handle.is-dragging { transform: scale(1.15); }
+/* The handles (StudyDayPlannerView): a 2 px line through the bar and a 24 px paper knob on its bottom edge,
+   ink for START and END, muted for LIMIT; the time rides in a pill while it moves or has the keyboard. */
+.ft-dayplan__track { touch-action: none; }
+.ft-dayplan__handle { position: absolute; top: 0; bottom: 0; width: 2px; margin-left: -1px; background: var(--pk-ink); z-index: 2; cursor: ew-resize; outline: none; }
+.ft-dayplan__handle::after { content: ''; position: absolute; left: 50%; bottom: -12px; width: 24px; height: 24px; margin-left: -12px; box-sizing: border-box; border-radius: 50%; border: 2px solid var(--pk-ink); background: var(--pk-paper); transition: transform 140ms ease-out; }
+.ft-dayplan__handle.is-limit { background: var(--pk-muted); }
+.ft-dayplan__handle.is-limit::after { border-color: var(--pk-muted); }
+.ft-dayplan__handle.is-limit.is-unset { background: transparent; }
+.ft-dayplan__handle.is-limit.is-unset::after { border-style: dashed; }
+.ft-dayplan__handle:hover::after { transform: scale(1.1); box-shadow: 0 0 0 4px color-mix(in srgb, var(--pk-ink) 10%, transparent); }
+.ft-dayplan__handle.is-dragging::after { transform: scale(1.15); }
+body.ft-extension-surface .ft-dayplan__handle:focus-visible { outline: none !important; }
+.ft-dayplan__handle:focus-visible::after { outline: 2px solid var(--pk-ink); outline-offset: 2px; }
+.ft-dayplan__pill { position: absolute; left: 50%; top: -34px; transform: translateX(-50%); padding: 3px 10px; border-radius: 13px; background: var(--pk-ink); color: var(--pk-paper); font: 700 13px/1.3 var(--pk-font-display); white-space: nowrap; pointer-events: none; opacity: 0; transition: opacity 120ms linear; }
+.ft-dayplan__handle.is-limit .ft-dayplan__pill { background: var(--pk-muted); }
+.ft-dayplan__handle.is-dragging .ft-dayplan__pill,
+.ft-dayplan__handle.is-active .ft-dayplan__pill,
+.ft-dayplan__handle:focus-visible .ft-dayplan__pill { opacity: 1; }
+.ft-dayplan { padding-top: 40px; }
+
+/* Study length: today's plan as one slider under the hero (and on the Home "Study today" card). */
+.ft-length { display: grid; gap: 6px; }
+.ft-length__head { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; }
+.ft-length__title { font-family: var(--pk-font-hand); font-size: 19px; color: var(--pk-ink); }
+.ft-length__value { font-family: var(--pk-font-hand); font-weight: 400; font-size: 22px; color: var(--pk-sage-ink); font-variant-numeric: tabular-nums; }
+.ft-length__range { color: var(--pk-muted); font-size: 14px; }
+.ft-length__row { display: flex; align-items: center; gap: 10px; margin-top: 4px; }
+.ft-length__hint { margin: 2px 0 0; color: var(--pk-muted); font-size: 13px; }
+.ft-length.is-compact .ft-length__title { font-size: 16px; }
+.ft-length.is-compact .ft-length__value { font-size: 19px; }
+.ft-length__input { --ft-length-fill: 50%; flex: 1; min-width: 0; height: 28px; margin: 0; background: transparent; appearance: none; -webkit-appearance: none; cursor: ew-resize; }
+.ft-length__input:disabled { cursor: not-allowed; opacity: 0.55; }
+.ft-length__input::-webkit-slider-runnable-track { height: 10px; border-radius: 6px; border: 1.5px solid color-mix(in srgb, var(--pk-ink) 30%, transparent);
+  background: linear-gradient(90deg, var(--pk-sage-ink) 0 var(--ft-length-fill), var(--pk-track) var(--ft-length-fill) 100%); }
+.ft-length__input::-moz-range-track { height: 10px; border-radius: 6px; border: 1.5px solid color-mix(in srgb, var(--pk-ink) 30%, transparent); background: var(--pk-track); }
+.ft-length__input::-moz-range-progress { height: 10px; border-radius: 6px; background: var(--pk-sage-ink); }
+.ft-length__input::-webkit-slider-thumb { -webkit-appearance: none; width: 26px; height: 26px; margin-top: -9.5px; border-radius: 50%; border: 2px solid var(--pk-ink); background: var(--pk-paper); box-shadow: 0 2px 0 var(--pk-ledge); transition: transform 140ms ease-out; }
+.ft-length__input::-moz-range-thumb { width: 22px; height: 22px; border-radius: 50%; border: 2px solid var(--pk-ink); background: var(--pk-paper); }
+.ft-length__input:hover:not(:disabled)::-webkit-slider-thumb { transform: scale(1.1); }
+.ft-length__input:active:not(:disabled)::-webkit-slider-thumb { transform: scale(1.15); }
+.ft-length__input:focus-visible { outline: none; }
+.ft-length__input:focus-visible::-webkit-slider-thumb { outline: 2px solid var(--pk-ink); outline-offset: 2px; }
+.ft-length__input:focus-visible::-moz-range-thumb { outline: 2px solid var(--pk-ink); outline-offset: 2px; }
+.ft-length__step { flex: none; }
+@media (prefers-reduced-motion: reduce) {
+  .ft-dayplan__handle::after, .ft-dayplan__pill, .ft-length__input::-webkit-slider-thumb { transition: none; }
+}
 .ft-dayplan__scale { position: relative; height: 22px; margin-top: 16px; }
 .ft-dayplan__hour { position: absolute; transform: translateX(-50%); font-size: 0.72rem; color: var(--pk-muted); white-space: nowrap; }
 

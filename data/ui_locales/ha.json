@@ -3290,5 +3290,13 @@
   "sync.notes.trustBody": "Amana tana tuna alaƙar da aka amince da ita, inda za a aika, iyaka da zaɓin sabuntawar da aka adana. Karɓowa ta hanyar sadarwa har yanzu yana buƙatar mai ba da sabis da aka saita da tabbatarwa a cikin na’ura.",
   "sync.step.one": "Mataki 1",
   "sync.step.two": "Mataki 2",
-  "sync.step.three": "Mataki 3"
+  "sync.step.three": "Mataki 3",
+  "study.handle.start": "Karatu ya fara",
+  "study.handle.end": "Karatu ya ƙare",
+  "study.handle.limit": "Iyakar yau da kullum",
+  "study.handle.noLimit": "Babu iyaka",
+  "study.handle.value": "{name}, {time}",
+  "study.hoursMinutes": "{hours} awa {minutes} min",
+  "study.length.title": "Tsawon karatu",
+  "study.length.hint": "Ja don ƙara ko rage lokacin karatu. Yana farawa a lokaci ɗaya."
 }

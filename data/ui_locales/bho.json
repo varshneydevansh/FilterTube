@@ -3290,5 +3290,13 @@
   "sync.notes.trustBody": "भरोसा मंजूर संबंध, लक्ष्य, दायरा आ सहेजल अपडेट के विकल्प याद राखेला। नेटवर्क से अपडेट पावे खातिर अबहियो कॉन्फ़िगर कइल प्रदाता आ स्थानीय जाँच चाहीं।",
   "sync.step.one": "चरण 1",
   "sync.step.two": "चरण 2",
-  "sync.step.three": "चरण 3"
+  "sync.step.three": "चरण 3",
+  "study.handle.start": "पढ़ाई शुरू",
+  "study.handle.end": "पढ़ाई खतम",
+  "study.handle.limit": "रोज के सीमा",
+  "study.handle.noLimit": "सीमा ना",
+  "study.handle.value": "{name}, {time}",
+  "study.hoursMinutes": "{hours} घंटा {minutes} मिनट",
+  "study.length.title": "पढ़ाई के समय",
+  "study.length.hint": "पढ़ाई लंबा भा छोट करे खातिर खींचीं। सुरू होखे के समय उहे रही।"
 }

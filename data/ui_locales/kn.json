@@ -3290,5 +3290,13 @@
   "sync.notes.trustBody": "ವಿಶ್ವಾಸವು ಅನುಮೋದಿತ ಸಂಬಂಧ, ಗುರಿ, ವ್ಯಾಪ್ತಿ ಮತ್ತು ಉಳಿಸಿದ ನವೀಕರಣಗಳ ಆಯ್ಕೆಯನ್ನು ನೆನಪಿಡುತ್ತದೆ. ನೆಟ್‌ವರ್ಕ್‌ನಿಂದ ಪಡೆಯಲು ಇನ್ನೂ ಕಾನ್ಫಿಗರ್ ಮಾಡಿದ ಪೂರೈಕೆದಾರ ಮತ್ತು ಸ್ಥಳೀಯ ಪರಿಶೀಲನೆ ಬೇಕು.",
   "sync.step.one": "ಹಂತ 1",
   "sync.step.two": "ಹಂತ 2",
-  "sync.step.three": "ಹಂತ 3"
+  "sync.step.three": "ಹಂತ 3",
+  "study.handle.start": "ಅಧ್ಯಯನ ಆರಂಭ",
+  "study.handle.end": "ಅಧ್ಯಯನ ಮುಕ್ತಾಯ",
+  "study.handle.limit": "ದೈನಂದಿನ ಮಿತಿ",
+  "study.handle.noLimit": "ಮಿತಿ ಇಲ್ಲ",
+  "study.handle.value": "{name}, {time}",
+  "study.hoursMinutes": "{hours} ಗಂ {minutes} ನಿಮಿ",
+  "study.length.title": "ಓದಿನ ಅವಧಿ",
+  "study.length.hint": "ಓದನ್ನು ಹೆಚ್ಚಿಸಲು ಅಥವಾ ಕಡಿಮೆ ಮಾಡಲು ಎಳೆಯಿರಿ. ಶುರುವಾಗುವ ಸಮಯ ಅದೇ ಇರುತ್ತದೆ."
 }

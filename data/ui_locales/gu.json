@@ -3290,5 +3290,13 @@
   "sync.notes.trustBody": "વિશ્વાસ મંજૂર સંબંધ, લક્ષ્ય, વ્યાપ અને સાચવેલા અપડેટની પસંદગી યાદ રાખે છે. નેટવર્કથી મેળવવા માટે હજી ગોઠવેલો પ્રદાતા અને સ્થાનિક ચકાસણી જોઈએ.",
   "sync.step.one": "પગલું 1",
   "sync.step.two": "પગલું 2",
-  "sync.step.three": "પગલું 3"
+  "sync.step.three": "પગલું 3",
+  "study.handle.start": "અભ્યાસ શરૂ",
+  "study.handle.end": "અભ્યાસ પૂરો",
+  "study.handle.limit": "દૈનિક મર્યાદા",
+  "study.handle.noLimit": "કોઈ મર્યાદા નથી",
+  "study.handle.value": "{name}, {time}",
+  "study.hoursMinutes": "{hours} કલાક {minutes} મિનિટ",
+  "study.length.title": "અભ્યાસનો સમયગાળો",
+  "study.length.hint": "અભ્યાસ લાંબો કે ટૂંકો કરવા ખેંચો. શરૂ થવાનો સમય એ જ રહે છે."
 }

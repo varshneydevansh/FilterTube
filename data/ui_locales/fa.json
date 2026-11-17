@@ -3290,5 +3290,13 @@
   "sync.notes.trustBody": "اعتماد، رابطهٔ تأییدشده، مقصد، محدوده و انتخاب به‌روزرسانی‌های ذخیره‌شده را به یاد می‌سپارد. دریافت از شبکه همچنان به ارائه‌دهندهٔ پیکربندی‌شده و اعتبارسنجی محلی نیاز دارد.",
   "sync.step.one": "گام 1",
   "sync.step.two": "گام 2",
-  "sync.step.three": "گام 3"
+  "sync.step.three": "گام 3",
+  "study.handle.start": "شروع مطالعه",
+  "study.handle.end": "پایان مطالعه",
+  "study.handle.limit": "محدودیت روزانه",
+  "study.handle.noLimit": "بدون محدودیت",
+  "study.handle.value": "{name}، {time}",
+  "study.hoursMinutes": "{hours} ساعت و {minutes} دقیقه",
+  "study.length.title": "مدت مطالعه",
+  "study.length.hint": "بکشید تا مطالعه بیشتر یا کمتر شود. زمان شروع همان می‌ماند."
 }

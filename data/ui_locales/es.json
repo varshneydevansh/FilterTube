@@ -3290,5 +3290,13 @@
   "sync.notes.trustBody": "La confianza recuerda la relación aprobada, el destino, el alcance y la opción de actualizaciones guardadas. La recogida por la red sigue requiriendo un proveedor configurado y validación local.",
   "sync.step.one": "Paso 1",
   "sync.step.two": "Paso 2",
-  "sync.step.three": "Paso 3"
+  "sync.step.three": "Paso 3",
+  "study.handle.start": "Empieza el estudio",
+  "study.handle.end": "Termina el estudio",
+  "study.handle.limit": "Límite diario",
+  "study.handle.noLimit": "Sin límite",
+  "study.handle.value": "{name}, {time}",
+  "study.hoursMinutes": "{hours} h {minutes} min",
+  "study.length.title": "Duración del estudio",
+  "study.length.hint": "Arrastra para alargar o acortar el estudio. Empieza a la misma hora."
 }

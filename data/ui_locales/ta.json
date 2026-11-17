@@ -3290,5 +3290,13 @@
   "sync.notes.trustBody": "நம்பிக்கை அங்கீகரித்த உறவு, இலக்கு, வரம்பு, சேமித்த புதுப்பிப்புகளின் தேர்வு ஆகியவற்றை நினைவில் வைக்கிறது. பிணையம் வழியாகப் பெறுவதற்கு இன்னும் கட்டமைத்த வழங்குநரும் உள்ளூர் சரிபார்ப்பும் தேவை.",
   "sync.step.one": "படி 1",
   "sync.step.two": "படி 2",
-  "sync.step.three": "படி 3"
+  "sync.step.three": "படி 3",
+  "study.handle.start": "படிப்பு தொடங்கும்",
+  "study.handle.end": "படிப்பு முடியும்",
+  "study.handle.limit": "தினசரி வரம்பு",
+  "study.handle.noLimit": "வரம்பு இல்லை",
+  "study.handle.value": "{name}, {time}",
+  "study.hoursMinutes": "{hours} மணி {minutes} நிமி",
+  "study.length.title": "படிப்பு நேரம்",
+  "study.length.hint": "படிப்பை நீட்டவோ குறைக்கவோ இழுக்கவும். தொடங்கும் நேரம் மாறாது."
 }

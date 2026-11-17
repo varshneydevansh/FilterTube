@@ -3288,5 +3288,13 @@
   "sync.notes.trustBody": "信頼では、承認された関係、対象、範囲、保存した更新の選択を記憶します。ネットワーク経由の取得には、設定済みの提供元とローカルでの検証が引き続き必要です。",
   "sync.step.one": "ステップ1",
   "sync.step.two": "ステップ2",
-  "sync.step.three": "ステップ3"
+  "sync.step.three": "ステップ3",
+  "study.handle.start": "学習開始",
+  "study.handle.end": "学習終了",
+  "study.handle.limit": "1 日の上限",
+  "study.handle.noLimit": "上限なし",
+  "study.handle.value": "{name}、{time}",
+  "study.hoursMinutes": "{hours} 時間 {minutes} 分",
+  "study.length.title": "勉強時間",
+  "study.length.hint": "ドラッグして勉強時間を長く、または短くできます。開始時刻は変わりません。"
 }

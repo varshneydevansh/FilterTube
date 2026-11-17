@@ -3290,5 +3290,13 @@
   "sync.notes.trustBody": "La confiance mémorise la relation approuvée, la cible, le périmètre et le choix des mises à jour enregistrées. Leur récupération sur le réseau nécessite toujours un fournisseur configuré et une validation locale.",
   "sync.step.one": "Étape 1",
   "sync.step.two": "Étape 2",
-  "sync.step.three": "Étape 3"
+  "sync.step.three": "Étape 3",
+  "study.handle.start": "Début de l’étude",
+  "study.handle.end": "Fin de l’étude",
+  "study.handle.limit": "Limite quotidienne",
+  "study.handle.noLimit": "Aucune limite",
+  "study.handle.value": "{name}, {time}",
+  "study.hoursMinutes": "{hours} h {minutes} min",
+  "study.length.title": "Durée d’étude",
+  "study.length.hint": "Faites glisser pour allonger ou raccourcir l’étude. Elle commence à la même heure."
 }

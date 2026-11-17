@@ -3290,5 +3290,13 @@
   "sync.notes.trustBody": "भरोसा स्वीकृत संबंध, लक्ष्य, दायरा और सहेजे गए अपडेट का विकल्प याद रखता है। नेटवर्क से अपडेट पाने के लिए अब भी कॉन्फ़िगर किया गया प्रदाता और स्थानीय सत्यापन चाहिए।",
   "sync.step.one": "चरण 1",
   "sync.step.two": "चरण 2",
-  "sync.step.three": "चरण 3"
+  "sync.step.three": "चरण 3",
+  "study.handle.start": "पढ़ाई शुरू",
+  "study.handle.end": "पढ़ाई खत्म",
+  "study.handle.limit": "रोज़ की सीमा",
+  "study.handle.noLimit": "कोई सीमा नहीं",
+  "study.handle.value": "{name}, {time}",
+  "study.hoursMinutes": "{hours} घं {minutes} मिनट",
+  "study.length.title": "पढ़ाई की अवधि",
+  "study.length.hint": "पढ़ाई लंबी या छोटी करने के लिए खींचें। शुरू होने का समय वही रहता है।"
 }

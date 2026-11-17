@@ -3314,5 +3314,13 @@
   "sync.notes.trustBody": "الثقة بتفتكر العلاقة اللي اتوافق عليها والهدف والنطاق واختيار التحديثات المحفوظة. الجلب عن طريق الشبكة لسه محتاج مزوّد متظبّط وتحقّق محلّي.",
   "sync.step.one": "الخطوة 1",
   "sync.step.two": "الخطوة 2",
-  "sync.step.three": "الخطوة 3"
+  "sync.step.three": "الخطوة 3",
+  "study.handle.start": "بداية الدراسة",
+  "study.handle.end": "نهاية الدراسة",
+  "study.handle.limit": "الحد اليومي",
+  "study.handle.noLimit": "بلا حد",
+  "study.handle.value": "{name}، {time}",
+  "study.hoursMinutes": "{hours} س {minutes} د",
+  "study.length.title": "مدة المذاكرة",
+  "study.length.hint": "اسحب عشان تطوّل المذاكرة أو تقصّرها. بتبدأ في نفس المعاد."
 }

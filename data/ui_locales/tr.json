@@ -3290,5 +3290,13 @@
   "sync.notes.trustBody": "Güven; onaylanan ilişkiyi, hedefi, kapsamı ve kayıtlı güncelleme seçimini hatırlar. Ağdan alma işlemi yine yapılandırılmış bir sağlayıcı ve yerel doğrulama gerektirir.",
   "sync.step.one": "Adım 1",
   "sync.step.two": "Adım 2",
-  "sync.step.three": "Adım 3"
+  "sync.step.three": "Adım 3",
+  "study.handle.start": "Ders başlar",
+  "study.handle.end": "Ders biter",
+  "study.handle.limit": "Günlük sınır",
+  "study.handle.noLimit": "Sınır yok",
+  "study.handle.value": "{name}, {time}",
+  "study.hoursMinutes": "{hours} sa {minutes} dk",
+  "study.length.title": "Çalışma süresi",
+  "study.length.hint": "Çalışmayı uzatmak ya da kısaltmak için sürükleyin. Başlangıç saati aynı kalır."
 }

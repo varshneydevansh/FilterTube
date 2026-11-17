@@ -3290,5 +3290,13 @@
   "sync.notes.trustBody": "Trust dey remember di relationship wey dem approve, di target, scope and saved-update choice. To collect updates through network, you still need provider wey dem configure and local validation.",
   "sync.step.one": "Step 1",
   "sync.step.two": "Step 2",
-  "sync.step.three": "Step 3"
+  "sync.step.three": "Step 3",
+  "study.handle.start": "Study start",
+  "study.handle.end": "Study end",
+  "study.handle.limit": "Daily limit",
+  "study.handle.noLimit": "No limit",
+  "study.handle.value": "{name}, {time}",
+  "study.hoursMinutes": "{hours} h {minutes} min",
+  "study.length.title": "How long you go study",
+  "study.length.hint": "Drag am make study long or short. E go still start for di same time."
 }

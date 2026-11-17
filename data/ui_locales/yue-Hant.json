@@ -3288,5 +3288,13 @@
   "sync.notes.trustBody": "信任會記住已批准嘅關係、目標、範圍同已儲存更新選項。經網絡取件仍然需要已設定嘅服務提供者同本機驗證。",
   "sync.step.one": "步驟1",
   "sync.step.two": "步驟2",
-  "sync.step.three": "步驟3"
+  "sync.step.three": "步驟3",
+  "study.handle.start": "學習開始",
+  "study.handle.end": "學習結束",
+  "study.handle.limit": "每日上限",
+  "study.handle.noLimit": "冇上限",
+  "study.handle.value": "{name}，{time}",
+  "study.hoursMinutes": "{hours} 小時 {minutes} 分鐘",
+  "study.length.title": "溫書時間",
+  "study.length.hint": "拖動就可以溫長啲或者短啲。開始時間唔變。"
 }

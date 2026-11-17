@@ -3290,5 +3290,13 @@
   "sync.notes.trustBody": "আস্থা অনুমোদিত সম্পর্ক, লক্ষ্য, পরিসর ও সংরক্ষিত আপডেটের পছন্দ মনে রাখে। নেটওয়ার্ক থেকে সংগ্রহ করতে এখনও কনফিগার করা প্রদানকারী ও স্থানীয় যাচাই দরকার।",
   "sync.step.one": "ধাপ 1",
   "sync.step.two": "ধাপ 2",
-  "sync.step.three": "ধাপ 3"
+  "sync.step.three": "ধাপ 3",
+  "study.handle.start": "পড়া শুরু",
+  "study.handle.end": "পড়া শেষ",
+  "study.handle.limit": "দৈনিক সীমা",
+  "study.handle.noLimit": "সীমা নেই",
+  "study.handle.value": "{name}, {time}",
+  "study.hoursMinutes": "{hours} ঘণ্টা {minutes} মিনিট",
+  "study.length.title": "পড়ার সময়কাল",
+  "study.length.hint": "পড়া বাড়াতে বা কমাতে টেনে আনুন। শুরুর সময় একই থাকে।"
 }

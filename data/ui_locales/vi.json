@@ -3288,5 +3288,13 @@
   "sync.notes.trustBody": "Sự tin cậy ghi nhớ quan hệ đã được chấp thuận, đích, phạm vi và lựa chọn bản cập nhật đã lưu. Việc lấy qua mạng vẫn cần nhà cung cấp đã được cấu hình và xác thực cục bộ.",
   "sync.step.one": "Bước 1",
   "sync.step.two": "Bước 2",
-  "sync.step.three": "Bước 3"
+  "sync.step.three": "Bước 3",
+  "study.handle.start": "Bắt đầu học",
+  "study.handle.end": "Kết thúc học",
+  "study.handle.limit": "Giới hạn mỗi ngày",
+  "study.handle.noLimit": "Không giới hạn",
+  "study.handle.value": "{name}, {time}",
+  "study.hoursMinutes": "{hours} giờ {minutes} phút",
+  "study.length.title": "Thời lượng học",
+  "study.length.hint": "Kéo để học lâu hơn hoặc ngắn hơn. Giờ bắt đầu vẫn giữ nguyên."
 }

@@ -3288,5 +3288,13 @@
   "sync.notes.trustBody": "ความเชื่อถือจดจำความสัมพันธ์ที่อนุมัติ เป้าหมาย ขอบเขต และตัวเลือกอัปเดตที่บันทึกไว้ การดึงผ่านเครือข่ายยังต้องใช้ผู้ให้บริการที่กำหนดค่าไว้และการตรวจสอบในเครื่อง",
   "sync.step.one": "ขั้นตอน 1",
   "sync.step.two": "ขั้นตอน 2",
-  "sync.step.three": "ขั้นตอน 3"
+  "sync.step.three": "ขั้นตอน 3",
+  "study.handle.start": "เริ่มเรียน",
+  "study.handle.end": "จบการเรียน",
+  "study.handle.limit": "ขีดจำกัดรายวัน",
+  "study.handle.noLimit": "ไม่มีขีดจำกัด",
+  "study.handle.value": "{name}, {time}",
+  "study.hoursMinutes": "{hours} ชม. {minutes} นาที",
+  "study.length.title": "ระยะเวลาเรียน",
+  "study.length.hint": "ลากเพื่อเรียนนานขึ้นหรือสั้นลง เวลาเริ่มยังเหมือนเดิม"
 }

@@ -3288,5 +3288,13 @@
   "sync.notes.trustBody": "Kepercayaan mengingat hubungan yang disetujui, tujuan, cakupan, dan pilihan pembaruan tersimpan. Pengambilan melalui jaringan tetap memerlukan penyedia yang dikonfigurasi dan validasi lokal.",
   "sync.step.one": "Langkah 1",
   "sync.step.two": "Langkah 2",
-  "sync.step.three": "Langkah 3"
+  "sync.step.three": "Langkah 3",
+  "study.handle.start": "Belajar dimulai",
+  "study.handle.end": "Belajar selesai",
+  "study.handle.limit": "Batas harian",
+  "study.handle.noLimit": "Tanpa batas",
+  "study.handle.value": "{name}, {time}",
+  "study.hoursMinutes": "{hours} jam {minutes} mnt",
+  "study.length.title": "Lama belajar",
+  "study.length.hint": "Geser untuk memperpanjang atau mempersingkat belajar. Waktu mulainya tetap."
 }

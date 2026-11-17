@@ -3290,5 +3290,13 @@
   "sync.notes.trustBody": "Uaminifu hukumbuka uhusiano ulioidhinishwa, lengwa, upeo na chaguo la masasisho yaliyohifadhiwa. Kuchukua kupitia mtandao bado kunahitaji mtoa huduma aliyesanidiwa na uthibitishaji wa ndani.",
   "sync.step.one": "Hatua 1",
   "sync.step.two": "Hatua 2",
-  "sync.step.three": "Hatua 3"
+  "sync.step.three": "Hatua 3",
+  "study.handle.start": "Kusoma kunaanza",
+  "study.handle.end": "Kusoma kunaisha",
+  "study.handle.limit": "Kikomo cha kila siku",
+  "study.handle.noLimit": "Hakuna kikomo",
+  "study.handle.value": "{name}, {time}",
+  "study.hoursMinutes": "Saa {hours} dak {minutes}",
+  "study.length.title": "Muda wa kusoma",
+  "study.length.hint": "Buruta ili kusoma muda mrefu au mfupi zaidi. Inaanza saa ileile."
 }

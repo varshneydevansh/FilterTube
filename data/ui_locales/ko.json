@@ -3288,5 +3288,13 @@
   "sync.notes.trustBody": "신뢰는 승인된 관계, 대상, 범위와 저장된 업데이트 선택을 기억합니다. 네트워크에서 업데이트를 가져오려면 여전히 설정된 제공자와 로컬 검증이 필요합니다.",
   "sync.step.one": "단계 1",
   "sync.step.two": "단계 2",
-  "sync.step.three": "단계 3"
+  "sync.step.three": "단계 3",
+  "study.handle.start": "공부 시작",
+  "study.handle.end": "공부 끝",
+  "study.handle.limit": "하루 한도",
+  "study.handle.noLimit": "한도 없음",
+  "study.handle.value": "{name}, {time}",
+  "study.hoursMinutes": "{hours}시간 {minutes}분",
+  "study.length.title": "공부 시간",
+  "study.length.hint": "끌어서 공부 시간을 늘리거나 줄이세요. 시작 시간은 그대로예요."
 }

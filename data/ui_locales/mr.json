@@ -3290,5 +3290,13 @@
   "sync.notes.trustBody": "विश्वास मंजूर संबंध, लक्ष्य, व्याप्ती आणि जतन केलेल्या अपडेटची निवड लक्षात ठेवतो. नेटवर्कमधून मिळवण्यासाठी अजूनही कॉन्फिगर केलेला पुरवठादार आणि स्थानिक पडताळणी आवश्यक आहे.",
   "sync.step.one": "टप्पा 1",
   "sync.step.two": "टप्पा 2",
-  "sync.step.three": "टप्पा 3"
+  "sync.step.three": "टप्पा 3",
+  "study.handle.start": "अभ्यास सुरू",
+  "study.handle.end": "अभ्यास संपतो",
+  "study.handle.limit": "दैनिक मर्यादा",
+  "study.handle.noLimit": "मर्यादा नाही",
+  "study.handle.value": "{name}, {time}",
+  "study.hoursMinutes": "{hours} तास {minutes} मि",
+  "study.length.title": "अभ्यासाचा कालावधी",
+  "study.length.hint": "अभ्यास वाढवण्यासाठी किंवा कमी करण्यासाठी ओढा. सुरुवातीची वेळ तीच राहते."
 }

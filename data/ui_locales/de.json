@@ -3290,5 +3290,13 @@
   "sync.notes.trustBody": "Vertrauen speichert die genehmigte Beziehung, das Ziel, den Umfang und die Auswahl für gespeicherte Aktualisierungen. Der Abruf über das Netzwerk erfordert weiterhin einen eingerichteten Anbieter und eine lokale Prüfung.",
   "sync.step.one": "Schritt 1",
   "sync.step.two": "Schritt 2",
-  "sync.step.three": "Schritt 3"
+  "sync.step.three": "Schritt 3",
+  "study.handle.start": "Lernen beginnt",
+  "study.handle.end": "Lernen endet",
+  "study.handle.limit": "Tageslimit",
+  "study.handle.noLimit": "Kein Limit",
+  "study.handle.value": "{name}, {time}",
+  "study.hoursMinutes": "{hours} Std. {minutes} Min.",
+  "study.length.title": "Lernzeit",
+  "study.length.hint": "Ziehen, um länger oder kürzer zu lernen. Der Beginn bleibt gleich."
 }

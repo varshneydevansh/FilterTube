@@ -3290,5 +3290,13 @@
   "sync.notes.trustBody": "እምነት የተፈቀደውን ግንኙነት፣ ዒላማ፣ ወሰን እና የተቀመጡ ዝማኔዎች ምርጫ ያስታውሳል። ከአውታረ መረብ ዝማኔ ለማምጣት አሁንም የተዋቀረ አቅራቢ እና በመሣሪያው ላይ ማረጋገጥ ያስፈልጋሉ።",
   "sync.step.one": "ደረጃ 1",
   "sync.step.two": "ደረጃ 2",
-  "sync.step.three": "ደረጃ 3"
+  "sync.step.three": "ደረጃ 3",
+  "study.handle.start": "ጥናት ይጀምራል",
+  "study.handle.end": "ጥናት ያበቃል",
+  "study.handle.limit": "የዕለት ገደብ",
+  "study.handle.noLimit": "ገደብ የለም",
+  "study.handle.value": "{name}፣ {time}",
+  "study.hoursMinutes": "{hours} ሰዓት {minutes} ደቂቃ",
+  "study.length.title": "የጥናት ርዝመት",
+  "study.length.hint": "ጥናቱን ለማራዘም ወይም ለማሳጠር ይጎትቱ። የሚጀምርበት ሰዓት አይቀየርም።"
 }
