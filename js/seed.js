@@ -16,6 +16,18 @@
     }
     window.filterTubeSeedHasRun = true;
 
+    // Firefox injects seed with a script tag (bridge_injection.js): the search suggestions filter comes
+    // in beside it from the same folder. Chromium and Opera load it from the manifest, before seed.
+    try {
+        const seedSrc = document.currentScript && document.currentScript.src;
+        if (!window.FilterTubeSearchSuggestions && seedSrc && /\/js\/seed\.js(?:\?.*)?$/.test(seedSrc)) {
+            const tag = document.createElement('script');
+            tag.src = seedSrc.replace(/\/js\/seed\.js(?:\?.*)?$/, '/js/shared/search_suggestions_filter.js');
+            (document.head || document.documentElement).appendChild(tag);
+        }
+    } catch (e) {
+    }
+
     // Global flags and state
     window.ftSeedInitialized = false;
     
@@ -1956,6 +1968,26 @@
         return new Response(stream, { status: response.status, statusText: response.statusText, headers });
     }
 
+    /** The suggestion response with blocked (or, in allow mode, unallowed) suggestions taken out. */
+    function filterSuggestionResponse(response, suggestions) {
+        try {
+            if (!response || !response.ok || !cachedSettings || cachedSettings.enabled === false) return response;
+            const kids = /(^|\.)youtubekids\.com$/i.test(String(document.location?.hostname || ''));
+            const rules = suggestions.compile(cachedSettings, { kids });
+            if (!suggestions.hasWork(rules)) return response;
+            return response.clone().text().then(raw => {
+                const filtered = suggestions.filterResponseText(raw, cachedSettings, { rules });
+                if (filtered === raw) return response;
+                const headers = new Headers(response.headers);
+                headers.delete('content-length');
+                headers.delete('content-encoding');
+                return new Response(filtered, { status: response.status, statusText: response.statusText, headers });
+            }).catch(() => response);
+        } catch (e) {
+            return response;
+        }
+    }
+
     function setupFetchInterception() {
         const fetchEndpoints = [
             '/youtubei/v1/search',
@@ -1980,6 +2012,12 @@
         window.fetch = function(resource, init) {
             const url = resource instanceof Request ? resource.url : resource;
             const urlStr = typeof url === 'string' ? url : String(url || '');
+
+            // The search box's suggestions (JSONP text) under the active rules (search_suggestions_filter.js).
+            const suggestions = window.FilterTubeSearchSuggestions;
+            if (suggestions && suggestions.isSuggestionUrl(urlStr)) {
+                return originalFetch.apply(this, arguments).then(response => filterSuggestionResponse(response, suggestions));
+            }
 
             if (!fetchEndpoints.some(endpoint => urlStr.includes(endpoint))) {
                 return originalFetch.apply(this, arguments);

@@ -34,7 +34,7 @@ const releaseFixStatusDoc = fs.readFileSync(
 const expectedFamilyTotals = new Map([
   ['Build/sync scripts', { files: 8, count: 111 }],
   ['Hot page/background runtime', { files: 16, count: 4110 }],
-  ['Content helper runtime', { files: 36, count: 1235 }],
+  ['Content helper runtime', { files: 37, count: 1269 }],
   ['UI/settings runtime', { files: 38, count: 4359 }],
   ['Generated/quarantined UI', { files: 6, count: 153 }],
   ['Vendor bundles', { files: 3, count: 279 }],
@@ -254,8 +254,8 @@ test('audit meta index docs carry the method proof gap blocker', () => {
 
 test('all-callable index accounts for every tracked JS JSX and MJS source file', () => {
   const files = trackedJsFiles();
-  assert.equal(files.length, 167);
-  assert.match(indexDoc, /current tracked JS\/JSX\/MJS files: 167/);
+  assert.equal(files.length, 168);
+  assert.match(indexDoc, /current tracked JS\/JSX\/MJS files: 168/);
 
   for (const file of files) {
     docRow(file);

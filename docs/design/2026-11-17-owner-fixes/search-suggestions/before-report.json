@@ -1,0 +1,62 @@
+{
+ "blocklist": {
+  "typed": "sad s",
+  "shown": [
+   "sad song",
+   "sad songs hindi",
+   "sad song 😭",
+   "sad song punjabi",
+   "sad song bhojpuri",
+   "sad songs tamil",
+   "sad song bangla",
+   "sad shayari",
+   "sad status",
+   "sad song new",
+   "sad song gana",
+   "sad songs telugu",
+   "sad song odia",
+   "sad song gane"
+  ],
+  "filterLoaded": "undefined"
+ },
+ "allowlist": {
+  "typed": "sat m",
+  "shown": [
+   "sat mari sajna ne punjabi song",
+   "sat math",
+   "sat mat chhodo parvati",
+   "sat me jayate full movie",
+   "sat maths full course",
+   "sat maths questions",
+   "sat mar palawan",
+   "sat meaning",
+   "sat ma",
+   "sat mata",
+   "sat mari",
+   "sat masala recipe in tamil",
+   "sat mehendi",
+   "sat mehndi design"
+  ],
+  "filterLoaded": "undefined"
+ },
+ "allowlist-prefix": {
+  "typed": "alg",
+  "shown": [
+   "algebra by aditya ranjan",
+   "algebra",
+   "algo trading",
+   "alga alga rup me mai pawan singh song",
+   "algebraic structures in discrete mathematics",
+   "algebraic identities for class 9",
+   "algebraic expressions class 8",
+   "algebra formulas",
+   "algebra by gagan pratap",
+   "algebra by abhinay sharma",
+   "algebraic expressions class 7",
+   "algoja",
+   "algoja tejaji",
+   "algebra one shot"
+  ],
+  "filterLoaded": "undefined"
+ }
+}

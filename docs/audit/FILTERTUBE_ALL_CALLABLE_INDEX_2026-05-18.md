@@ -222,7 +222,7 @@ lexical and its scope remains tracked JS/JSX/MJS: CJS/Python tooling requires it
 separate release/workflow review and is not silently counted as JavaScript here.
 
 ```text
-current tracked JS/JSX/MJS files: 167
+current tracked JS/JSX/MJS files: 168
 current repo-wide lexical callables: 10662
 current complete per-callable semantic proofs: 0
 current callable behavior-change approval: NO-GO
@@ -248,6 +248,7 @@ runtime behavior changed by inventory refresh: no
 | `js/shared/study_model.js` | Content helper runtime | 53 | helper counted; semantic proof incomplete |
 | `js/shared/study_packs.js` | Content helper runtime | 30 | helper counted; semantic proof incomplete |
 | `js/shared/study_setup.js` | Content helper runtime | 69 | helper counted; semantic proof incomplete |
+| `js/shared/search_suggestions_filter.js` | Content helper runtime | 34 | helper counted; semantic proof incomplete |
 | `js/shared/study_engine.js` | Content helper runtime | 57 | helper counted; semantic proof incomplete |
 | `js/content/study_overlay.js` | Content helper runtime | 32 | helper counted; semantic proof incomplete |
 | `js/study_background.js` | Hot page/background runtime | 57 | helper counted; semantic proof incomplete |
