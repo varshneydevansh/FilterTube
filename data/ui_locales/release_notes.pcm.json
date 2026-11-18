@@ -14,7 +14,9 @@
       "Privacy: Accounts & Sync dey explain wetin the sync relay fit see and wetin e no fit see, and e go ask before the first internet sync; dem no dey send your device name again when you ring another device; DeArrow thumbnails na separate option wey start as off; account cookies dey go only to the video service own sites; and release builds dey keep debug logs comot from system log.",
       "Tablets and TVs dey match phone: Filters, Search and Ask a parent dey use full width for tablets, and TVs get crayon icons for the rail, Study for big screen and About this TV card with Full and Light modes.",
       "To support FilterTube still free and na your choice: support sheet na friendly note, e no be gate.",
-      "Fixes: PIN checks no dey freeze screen again, to load more for Study no dey make page flash again, mascots no go ever cut for middle of motion, plenty English labels wey remain don translate now, and Sangeet load errors no dey mention the video service again."
+      "Fixes: PIN checks no dey freeze screen again, to load more for Study no dey make page flash again, mascots no go ever cut for middle of motion, plenty English labels wey remain don translate now, and Sangeet load errors no dey mention the video service again.",
+      "For the browser extension, Controls dey open for new Home wey get today numbers, Study today and Wetin Uljhan try today, wey dey talk which content control hide each thing and carry you go straight to im switch. The support line don move go top bar, the popup background dey show through frosted panels, and one FilterTube apps row dey for Android and iPhone.",
+      "Extension fixes: view-count filter dey work again for Chrome and Opera, search suggestions dey follow your rules for every mode, allowed-only Home no dey load forever again, live chat and comments dey follow all your rules, and new Block am quietly setting wey parent fit lock dey show plain \"This video no dey available\" screen instead of FilterTube own."
     ]
   },
   "3.6.1": {

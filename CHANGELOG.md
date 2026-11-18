@@ -2,7 +2,162 @@
 
 ## Unreleased
 
-No additional changes recorded after the 3.5.0 release.
+No additional changes recorded after the 3.6.2 release.
+
+## Version 3.6.2 — Kriti And Uljhan, Study, Ask A Parent And A New Home
+
+Prepared November 18, 2026. Extension changes since v3.5.0, released together
+with the FilterTube 3.6.2 apps. The extension skips 3.6.0 and 3.6.1, which were
+app-only releases, so its version matches the apps again. Most of this release
+brings the extension in line with what the Android app already does.
+
+What was checked: the automated test lanes, headless Chromium captures of the
+popup and the options page in light and dark, and walkthroughs of Ask a parent,
+live chat, the comment note, "Skip this video" and a Kids learning round on the
+live video site in Chromium with the unpacked extension, signed out. Not yet
+checked: Firefox and Opera by hand, a signed-in account, and the store builds.
+The new translations have not had a native review.
+
+### Dashboard and popup
+
+- **A new Home.** The dashboard (now called **Controls**, as in the apps) opens
+  on Home: a time-of-day hello with what was kept out today, your profile card,
+  the day's numbers, Study today, What Uljhan tried today, quick actions and the
+  FilterTube apps cards. Everything sits on one grid, and the sidebar fills the
+  window height with a coloured row and a live count for each area.
+- **Support line in the top bar.** The Ko-fi ask moved from the bottom of Home to
+  a small pill in the top bar. It wraps on narrow windows and is hidden on the
+  Support page, which carries the same ask. "Donate" is now called "Support".
+- **A less washed-out popup.** The popup's background shows through frosted
+  panels instead of a heavy white layer, and every line still meets WCAG AA
+  contrast in light and dark. The master switch clearly shows on or off, the
+  content controls list scrolls all the way down, and the Blocklist pill is
+  readable.
+- **FilterTube apps row.** The popup's Google Play link became a row with two
+  buttons: Android (Google Play) and "Now on iPhone" (the SideStore guide at
+  filtertube.in/ios). The dashboard's app cards have pictures of each platform.
+- **The paper look.** The options page and popup use the apps' crayon paper
+  design: paper cards, crayon icons, the apps' fonts shipped inside the
+  extension (no Google Fonts request any more), a true navy dark mode, rolling
+  numbers, and toasts at the bottom centre.
+- **Content Controls groups have their colours back**, and each switch can now
+  be opened directly from other pages.
+- **A welcome on first install**: three short pages explaining what FilterTube
+  does, that one block hides a thing everywhere, and that it stays free.
+
+### What Uljhan tried today
+
+- **A hidden log.** Home lists the last 30 things FilterTube hid, kept on this
+  device only.
+- **Allow and Change.** Allow lets one video through as an exact exception. For
+  something hidden by a content control, the row now names that control
+  (Clips, Duration, Upload date, Category, Language, View count, Auto playlists
+  and so on), and **Change** opens Content Controls (or Kids), scrolls to that
+  switch and highlights it once.
+
+### Kriti and Uljhan
+
+- **Two companions.** Kriti and Uljhan appear with a reason on every page the
+  extension owns: empty lists, loading, offline and back online, saved backups,
+  empty searches, locked profiles, the first filter, removals, and syncs that
+  land. A **Companion** setting chooses Lively, Quiet (the default) or Off, and
+  nothing moves when the system asks for reduced motion.
+- **Time-saved medal.** At 1, 10 and 100 hours of time saved, Kriti shows a
+  medal on Home, once each.
+- **Optional sounds**, off by default, with Gentle and Playful levels. Nothing
+  plays over a video or while the page is hidden.
+- **The sieve animation fix.** The looping sieve on Home and About was re-cut
+  from a new sheet, so Kriti is no longer clipped or shaking from frame to
+  frame, and About no longer shows the still picture stacked above the loop.
+- **About** now starts with why FilterTube exists, before introducing the two.
+
+### Study
+
+- **Study mode, as in the apps.** Pick ready-made packs for exams, school
+  classes and skills (175 packs, about 2,000 channels across 29 countries), set
+  a day plan, and during a round FilterTube shows only the plan's channels and
+  topics on top of your block list. Rest breaks hide the feed, with a countdown
+  and what comes next.
+- **The Study page.** A Day Ring, a step-by-step setup, a length slider for
+  today's plan (also on Home), Skip break with Undo, "Skip this video", the
+  end-of-session seal, and a page colour that follows the moment.
+- **Study holds its rules.** Changes that would loosen a running session or a
+  parent's plan are refused with an explanation. A moved clock holds a lock
+  instead of ending it. The popup and the header say Study while it runs.
+- **Search during Study and allowed-only mode** also searches your own allowed
+  or plan channels and shows their videos first.
+- **Private windows and uninstalling.** The Study page says when private windows
+  aren't covered and names the browser policies families can use. Removing the
+  extension now opens filtertube.in/uninstalled.
+
+### Ask a parent and Family
+
+- **Ask a parent.** On a blocked video or channel, a child can ask to watch it
+  or to allow the channel. A parent answers in Requests (with a fresh PIN),
+  with Allow once or Always allow this channel. Answers and requests travel in
+  the same signed format the apps use, and the toolbar badge counts waiting
+  requests. No notification permission is needed.
+- **Ask for time** during Study: 10, 20 or 30 minutes, from the popup.
+- **Parent mode.** Managing a Kids profile shows a framed session with a bar
+  saying whose space it is, a sync badge for a child on another device, and one
+  way out.
+- **A child's device that stopped reporting** is shown to the parent after
+  three days.
+
+### Filtering fixes
+
+- **View-count filtering works again on Chrome and Opera.** A loading mix-up
+  meant the page-scan part of "minimum views" silently did nothing there.
+- **Search suggestions follow your rules** in every mode, including allowed-only,
+  Study and Kids. On Chrome and Opera the dropdown safety net had also not been
+  running; it now does.
+- **Allowed-only Home no longer loads forever.** Home is built from your allowed
+  channels and words, and a feed where everything is hidden stops asking for
+  more after three tries.
+- **Allowed channels' Shorts show in allowed-only mode** once their channel is
+  known.
+- **Live chat** messages are checked against all your channel and keyword rules.
+- **Comments.** Blocking a commenter leaves "Comments from X hidden · Undo" in
+  place. In allowed-only mode only allowed commenters or words show.
+- **Closer to the apps.** Channels not yet known, collaborations still loading,
+  channel names, "Filter all", paused rules and Kids words are decided the same
+  way as in the Android app. The page scan no longer ignores accents, so it
+  agrees with the data-level filter.
+- **Quiet blocking (new, off by default).** A parent-locked setting that replaces
+  the branded block screen with a plain "This video isn't available" screen and
+  a Go back button, so children aren't upset by the block message.
+
+### Filters, profiles and sync
+
+- **Filters lists** use the apps' row layout, with Undo after a removal and one
+  filter button beside search for date and sort.
+- **Profiles** get crayon avatars, a "Switch profile" sheet, a role on every row
+  and a PIN prompt that shakes on a wrong PIN instead of closing.
+- **Connect a device** reads like the app's page, and FilterTube asks once
+  before the first internet sync uses the relay, saying what the relay can see.
+- **Sync fixes.** A parent's Study plan now reaches a child over Internet
+  Pickup, a parent's update waits until a Self-Control session ends instead of
+  being undone by it, a Kids profile accepts Nearby rules only after the
+  parent's PIN, and a merged keyword no longer appears twice.
+
+### Kids
+
+- Kids words, allowed videos and followed channels work as in the app, and
+  during Study the Kids site follows only Kids learning packs.
+- The "Kids Filters" header card is gone.
+
+### Wording and languages
+
+- FilterTube uses its own words for the site's labels: Clips, Following, Saved,
+  Popular, Auto playlist and Sangeet, in every language. The Help page says
+  Controls, not Dashboard.
+- Every new line is in all 38 interface languages, and the 3.6.x release notes
+  are translated too. These translations have not had a native review.
+
+### Website
+
+- The website at filtertube.in was refreshed with new screenshots, an iPhone
+  guide and Kriti and Uljhan; it is not part of the extension package.
 
 ## Version 3.5.0 — Android TV, YouTube Kids Profiles, Playlist Sync And Filtering Fixes
 

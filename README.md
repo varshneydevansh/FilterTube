@@ -171,7 +171,7 @@ An unmanaged browser/device owner can disable or uninstall the extension. No per
 
 This repository contains the **extension runtime and website**. Native apps have their own implementations and release checks; a successful extension test or build is not proof of native parity.
 
-![Extension source version](https://img.shields.io/badge/version-3.5.0-blue.svg)
+![Extension source version](https://img.shields.io/badge/version-3.6.2-blue.svg)
 
 ```bash
 npm install

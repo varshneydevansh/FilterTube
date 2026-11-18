@@ -1,6 +1,6 @@
 {
   "name": "filtertube",
-  "version": "3.5.0",
+  "version": "3.6.2",
   "description": "Restore peace of mind to your digital video experience.",
   "main": "js/background.js",
   "scripts": {
