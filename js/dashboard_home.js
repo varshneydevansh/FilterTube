@@ -311,7 +311,7 @@
         root.addEventListener('filtertube-ui-locale-changed', render);
         root.setInterval(render, 5 * 60 * 1000);
         const duo = doc.getElementById('ftHomeDuo');
-        const mount = () => root.FilterTubeMascots?.mountLoop?.(duo, 'duoSieveLoop', { height: 150, className: 'ft-home-duo' });
+        const mount = () => root.FilterTubeMascots?.mountLoop?.(duo, 'duoSieveLoop', { height: 168, className: 'ft-home-duo' });
         if (duo && !mount()) root.setTimeout(mount, 400);
     }
 

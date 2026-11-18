@@ -492,4 +492,4 @@ html[data-theme="dark"] .ft-mascot-tally {
 .ft-mascot--medal .ft-mascot__image { height: 72px; }
 
 /* About: the v3 sieve loop takes the place of the static picture. */
-.ft-about-duo__loop .pk-loop__art { height: 180px; }
+.ft-about-duo__loop .pk-loop__art { height: 196px; } /* 176px wide in the 180px column */

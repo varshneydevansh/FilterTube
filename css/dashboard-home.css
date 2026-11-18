@@ -175,7 +175,7 @@ body.ft-extension-surface #sidebarNav .nav-item.nav-item--quiet[aria-current="pa
   color: var(--pk-muted);
 }
 .ft-home-greeting__duo { width: 180px; display: flex; justify-content: center; align-self: end; }
-.ft-home-greeting__duo .pk-loop__art { height: 150px; }
+.ft-home-greeting__duo .pk-loop__art { height: 168px; } /* duo frames are 0.9:1 with a transparent margin: 151px wide */
 :root[data-theme] body.ft-extension-surface #dashboardView[data-ft-home] .ft-home .ft-dash-status {
   margin: 0;
   padding: 12px 14px;

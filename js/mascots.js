@@ -2665,7 +2665,7 @@
         const host = doc.querySelector('#aboutView .ft-about-duo__art');
         const picture = host?.querySelector('.ft-about-duo__picture');
         if (!host || !picture) return;
-        const loop = mountLoop(host, 'duoSieveLoop', { height: 180, className: 'ft-about-duo__loop' });
+        const loop = mountLoop(host, 'duoSieveLoop', { height: 196, className: 'ft-about-duo__loop' });
         const sync = () => { picture.hidden = !!loop && showsCharacters(companionMode); };
         sync();
         onModeChange(sync);
