@@ -9,6 +9,7 @@ import {
 } from "@phosphor-icons/react/ssr";
 
 import { BrowserLogoRail } from "@/components/browser-logo-rail";
+import { CommunityTools } from "@/components/community-tools";
 import { DeviceStrip } from "@/components/device-strip";
 import { HeroShowcase } from "@/components/hero-showcase";
 import { HeroVideo } from "@/components/hero-video";
@@ -639,6 +640,8 @@ export default function HomePage() {
           </div>
         </div>
       </section>
+
+      <CommunityTools />
 
       <section id="platforms" className="px-4 py-20 md:px-6 md:py-28 lg:py-32">
         <div className="mx-auto max-w-[1400px]">

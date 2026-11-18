@@ -1044,7 +1044,7 @@ export const detailPages = {
           "The native Watch player includes quality, buffering, loop, autoplay, sleep timer, silence handling, volume, and playback-speed controls in the development build.",
           "Use fullscreen or floating playback, navigate chapters, and adjust captions and appearance. Transcript controls help you follow along with the video where text is available.",
           "Playback queues and local history/resume keep the viewing flow connected. Available controls depend on the video and installed release.",
-          "Optional integrations include sponsor-segment skipping, estimated dislikes and community titles. These contact their respective services when enabled.",
+          "Optional community tools, all off until you turn them on: sponsor-segment skipping (SponsorBlock), community titles and thumbnails (DeArrow), dislike estimates (RYD) and synced lyrics (LRCLIB). Each contacts its own service only when enabled.",
         ],
       },
       {
