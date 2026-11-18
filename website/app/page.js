@@ -17,7 +17,7 @@ import { HowItWorks } from "@/components/how-it-works";
 import { MeetMascots } from "@/components/meet-mascots";
 import { ActionLink, Panel, SectionHeading } from "@/components/marketing-ui";
 import { Reveal } from "@/components/reveal";
-import { P2PAnatomy } from "@/components/p2p-anatomy";
+import { P2PSyncExplainer } from "@/components/p2p-sync-video";
 import {
   appDemoVideoHref,
   androidPlayStoreHref,
@@ -350,17 +350,26 @@ function QuickGuideSection() {
                     Your devices. In sync.
                   </h3>
                 </div>
-                <p className="max-w-[52ch] text-base leading-8 text-[var(--color-muted)]">
-                  Share settings, filter rules and notes between devices you verify. No FilterTube
-                  sign-up, and no servers keep your data: it goes straight from one device to the other.
-                </p>
+                <div className="max-w-[52ch] text-base leading-8 text-[var(--color-muted)]">
+                  <p>
+                    Your phone and your child&apos;s phone, tablet or TV talk straight to each other.
+                    What passes between them is locked, so only those devices can open it. No
+                    FilterTube sign-up, and no servers keep your data.
+                  </p>
+                  <p className="mt-3 text-[var(--color-ink)]">
+                    We don&apos;t run a server that reads your family&apos;s settings. We couldn&apos;t
+                    afford one, and we don&apos;t want one.
+                  </p>
+                </div>
               </div>
-              <P2PAnatomy className="mx-auto mt-8 max-w-[1040px] md:mt-10" />
+              <div className="mx-auto mt-8 max-w-[1040px] md:mt-10">
+                <P2PSyncExplainer />
+              </div>
               <dl className="mt-10 grid gap-x-8 gap-y-5 text-sm leading-7 md:grid-cols-2 xl:grid-cols-4">
                 {[
-                  ["Pair and verify", "Use a short code or the QR, then check that both screens show the same safety phrase."],
+                  ["Pair and verify", "Use a short code or the QR, then check that both screens show the same safety words."],
                   ["You choose", "Pick the profile and what to share. The other device reviews it first, and only approved parents can change a child’s protected settings."],
-                  ["Encrypted, direct", "A relay can help your devices find each other across networks, but it can’t read what you sync."],
+                  ["Locked, direct", "A relay can help your devices find each other across networks. It only passes locked data it can’t open."],
                   ["Auto-sync, in testing", "Verified devices can keep each other up to date. Changes wait on the device while you’re offline."],
                 ].map(([term, detail]) => (
                   <div className="border-t border-[color:var(--color-line)] pt-4" key={term}>

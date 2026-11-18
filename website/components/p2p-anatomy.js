@@ -9,38 +9,39 @@ import { p2pAnatomyGeometry as G, p2pAnatomySvg } from "@/components/p2p-anatomy
 
 // Each step is true to how FilterTube device sync works (docs/app/TECHNICAL_RUNTIME.md, Nanah):
 // a 4-character code or QR, a safety phrase compared on both screens, a chosen profile scope,
-// an encrypted direct connection, and auto-sync that is still in testing.
-const STEPS = [
+// an encrypted direct connection, and auto-sync that is still in testing. The home page video
+// (components/p2p-sync-video.js) shows the same five steps; picking a step there lights it here.
+export const STEPS = [
   {
     label: "Pair",
     readout: "code K7QM · same on both",
-    caption: "Pair with a short code or scan the QR. Nothing is trusted just because it’s nearby.",
+    caption: "Pair with a short code or by scanning the QR. A device nearby is never trusted on its own.",
   },
   {
     label: "Verify",
-    readout: "safety phrase · matches",
-    caption: "Both screens show the same safety phrase. Compare it before you continue, so you know it’s really your device.",
+    readout: "safety words · they match",
+    caption: "Both screens show the same safety words. Check they match, so you know it’s really your child’s device.",
   },
   {
     label: "Choose",
     readout: "2 of 3 chosen · settings, rules",
-    caption: "Choose what to share: a profile’s settings, filter rules or notes. The other device reviews it before anything changes.",
+    caption: "Pick what to share: settings, filter words or notes. The other device looks it over before anything changes.",
   },
   {
     label: "Send",
-    readout: "encrypted · device to device",
-    caption: "It travels encrypted, straight from one device to the other. A relay may help them find each other, but it can’t read what you send, and no FilterTube server keeps your data.",
+    readout: "locked · device to device",
+    caption: "It goes straight from one device to the other, locked so only those two can open it. The small mast is a relay: it can help the devices find each other, and it only passes locked data it can’t open. No FilterTube server keeps your data.",
   },
   {
     label: "Stay in sync",
     readout: "auto-sync · in testing",
-    caption: "Auto-sync is in testing: verified devices can keep each other up to date. Direct sync needs FilterTube open on both devices.",
+    caption: "Auto-sync is still in testing: once both devices are verified, later changes can follow. To sync directly, FilterTube needs to be open on both devices.",
   },
 ];
 
 const CHOSEN = [0, 1]; // settings and rules; notes stays in the tray
 
-export function P2PAnatomy({ className = "" }) {
+export function P2PAnatomy({ className = "", activeStep = null }) {
   const id = useId().replace(/[^a-zA-Z0-9_-]/g, "");
   const rootRef = useRef(null);
   const artRef = useRef(null);
@@ -111,6 +112,13 @@ export function P2PAnatomy({ className = "" }) {
   }, [step]);
 
   const choose = (index) => { setStep(index); setTouring(false); };
+
+  // A step picked under the video shows here too.
+  useEffect(() => {
+    if (activeStep === null || activeStep === undefined) return;
+    setStep(activeStep);
+    setTouring(false);
+  }, [activeStep]);
   const current = STEPS[step];
 
   return (
@@ -127,7 +135,7 @@ export function P2PAnatomy({ className = "" }) {
       <div className="p2pa-card iso" data-theme="light">
         <div className="p2pa-top">
           <span className="p2pa-fig">Fig. 1</span>
-          <span className="p2pa-title" id={`${id}-title`}>Private device sync, taken apart</span>
+          <span className="p2pa-title" id={`${id}-title`}>Inside private device sync</span>
         </div>
         {/* Static art generated at build time by tools/p2p-anatomy/build.mjs (no user content). */}
         <div className="p2pa-art" dangerouslySetInnerHTML={{ __html: p2pAnatomySvg }} ref={artRef} />
