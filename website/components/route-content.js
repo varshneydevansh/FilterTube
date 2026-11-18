@@ -28,6 +28,7 @@ export const docsHref =
 
 export const githubHref = "https://github.com/varshneydevansh/FilterTube";
 export const redditHref = "https://www.reddit.com/r/FilterTubeApp/";
+export const instagramHref = "https://www.instagram.com/filtertube.in/";
 export const downloadsHref = "/downloads";
 export const androidPlayStoreHref =
   "https://play.google.com/store/apps/details?id=com.filtertube.app";
@@ -113,6 +114,7 @@ export const footerLinks = {
   ],
   resources: [
     { label: "Reddit community", href: redditHref, external: true },
+    { label: "Instagram", href: instagramHref, external: true },
     { label: "Documentation", href: docsHref, external: true },
     { label: "GitHub", href: githubHref, external: true },
     {
