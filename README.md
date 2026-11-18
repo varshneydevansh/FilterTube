@@ -3,165 +3,178 @@
   <h1>FilterTube</h1>
   <p>Calmer viewing. Your devices. Your rules.</p>
 
-[![Latest release](https://img.shields.io/github/v/release/varshneydevansh/FilterTube)](https://github.com/varshneydevansh/FilterTube/releases/latest)
-[![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
+[![Latest release](https://img.shields.io/github/v/release/varshneydevansh/FilterTube)](https://github.com/varshneydevansh/FilterTube/releases/latest) [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE) [![Ask DeepWiki](https://deepwiki.com/badge.svg)](https://deepwiki.com/varshneydevansh/FilterTube) ![Lines of Code](https://img.shields.io/badge/total%20lines-1027.4k-brightgreen.svg) ![JavaScript LoC](https://img.shields.io/badge/javascript-156.0k%20lines-yellow.svg) ![Top Language](https://img.shields.io/github/languages/top/varshneydevansh/FilterTube?color=f1e05a) ![Repo Size](https://img.shields.io/github/repo-size/varshneydevansh/FilterTube?color=orange)
 
-[Get Android app](https://play.google.com/store/apps/details?id=com.filtertube.app) · [Get browser extension](https://filtertube.in/downloads) · [Explore the website](https://filtertube.in)
+[Get the Android app](https://play.google.com/store/apps/details?id=com.filtertube.app) · [Get it on iPhone and iPad](https://filtertube.in/ios) · [Get the browser extension](https://filtertube.in/downloads) · [Explore the website](https://filtertube.in)
 </div>
 
-FilterTube puts **you** in charge of what you watch. This repository is the **browser extension**, and the same rules power full **FilterTube apps for Android phones, tablets and Android TV** (iPhone and iPad are in development). Block channels or words, allow only what you choose, give every family member their own profile, and keep your devices in sync **privately, device to device**.
+FilterTube puts **you** in charge of what you watch. Block channels or words, or allow only what you choose. Give every family member their own profile, plan focused study time, and keep your devices in sync **privately, device to device**, with no FilterTube account.
 
-### What the apps include
+This repository is the **FilterTube browser extension**, released under the [MIT License](LICENSE). The same rules also run in the **FilterTube apps** for Android phones and tablets, Android TV, and iPhone and iPad.
 
-- **A complete viewing app, not just a filter.** Home, Search, Watch, channels, Subscriptions, You, History, playlists, Watch later and Shorts, plus a separate **Kids** space. Chapters, a floating mini player, picture-in-picture, background play, a sleep timer, captions and quality controls.
-- **Music, with its own space.** Music Home, Explore, charts, moods, artists, albums and library, with a reorderable queue, shuffle, repeat and lyrics.
-- **Your rules everywhere.** Block or allow channels and keywords (Korean, Japanese and Chinese keywords match inside sentences), filter by category, language, duration, upload date and minimum views, hide Shorts, comments and distractions, and block any channel straight from a video card.
-- **Family controls.** Profiles with PINs, a stricter Kids mode, parent-managed daily time limits, and Self-Control sessions that lock your rules for a set time.
-- **Private peer-to-peer device sync (Nanah).** Pair two devices with a code or QR, compare the safety phrase, and choose what to share: rules, settings and video Notes. Updates travel **directly and encrypted between your devices**. No FilterTube account and no cloud copy of your rules.
-- **Android TV, new in 3.5.0.** Remote-first Home, Search, Subscriptions, You and Watch, with profiles, PINs, Kids controls and filters on the big screen.
-- **Optional integrations.** SponsorBlock segment skipping, Return YouTube Dislike counts and DeArrow community titles, each off until you turn it on.
-- **Video Notes and your own media.** Timestamped Notes per video, and a player for the videos and music already on your device.
-- **Offline downloads in the direct build.** The direct APK on [GitHub releases](https://github.com/varshneydevansh/FilterTube/releases/latest) can save videos for offline viewing (encrypted copies that expire after 30 days). The Google Play builds do not download videos.
+## Meet Kriti and Uljhan
 
-**Free, with no paywall.** Every feature is available to everyone. If FilterTube helps you, you can support it in whatever way feels right to you, monthly, one-time or any amount you choose. Supporting never unlocks features. [Ways to support](#community-and-support).
+<table>
+  <tr>
+    <td width="150" align="center"><img src="website/public/mascots/kriti-wave.webp" width="120" alt="Kriti waving"></td>
+    <td><strong>Kriti</strong> is the creator's sister. She stands for the care and protection she gave him growing up, and FilterTube passes that care on, so you can look after yourself and the people you love.</td>
+  </tr>
+  <tr>
+    <td width="150" align="center"><img src="website/public/mascots/uljhan-hop.webp" width="100" alt="Uljhan hopping"></td>
+    <td><strong>Uljhan</strong> means a tangle. He's the clutter we'd rather not see: not something to hate, just not what you want in your feed. Kriti clears it gently, and Uljhan hops off happily.</td>
+  </tr>
+</table>
+
+They keep you company in the apps and the extension: while pages load, when a list is empty, when you're offline, during Study breaks and when something is kept out. Choose Lively, Quiet or Off in Settings › Companion; nothing moves when your system asks for reduced motion.
+
+## What FilterTube does
+
+- **Your rules everywhere.** Block or allow channels and keywords (Korean, Japanese and Chinese keywords match inside sentences). Filter by category, language, duration, upload date and minimum views. Hide Clips, comments, Home feeds and other distractions, and block a channel straight from any video card.
+- **What Uljhan tried today.** Home lists what FilterTube kept out today, on this device only. Allow one video as an exception, or jump straight to the content control that hid it.
+- **Study.** Ready-made packs for exams, school classes and skills in 29 countries, a day plan with rounds and real breaks, and a Day Ring that fills as you study. During a round, only your plan's channels and topics show, and Search looks in your plan's channels first.
+- **Kids.** A separate Kids space with its own rules, Kids learning packs by age during Study, and a parent PIN for every change.
+- **Family.** Profiles with PINs and crayon avatars, parent-managed time limits, Self-Control sessions that lock your rules for a set time, and **Ask a parent**: a child can ask to watch a blocked video or allow a channel, and a parent answers with Allow once or Always allow.
+- **Private P2P sync (Nanah).** Pair two devices with a code or QR, compare the safety phrase, then choose what to share: rules, settings, Study plans and video Notes. Updates travel directly and encrypted between your devices. No FilterTube account and no cloud copy of your rules.
+- **FilterTube's own words.** Clips, Following, Saved, Popular, Auto playlists, and **Sangeet** for music, in all 38 interface languages.
+
+In the apps there is also a complete viewer: Home, Search, Watch, channels, Following, You, history, playlists and Saved, with chapters, a floating mini player, picture-in-picture, background play, a sleep timer, captions and quality controls. **Sangeet** has its own Home, Explore, moods, podcasts and a player with lyrics and a reorderable queue. Optional SponsorBlock, dislike counts and DeArrow titles stay off until you turn them on.
+
+**Free, with no paywall.** Every feature is available to everyone. If FilterTube helps you, you can support it in whatever way feels right, monthly, once or any amount. Supporting never unlocks features. [Ways to support](#community-and-support).
 
 ## Get FilterTube
 
 | Platform | Availability | Install or learn more |
 | --- | --- | --- |
-| **Android phone and tablet** | Full custom Main and Kids app on Google Play. No invitation or email needed. | [Google Play](https://play.google.com/store/apps/details?id=com.filtertube.app) · [Android overview](https://filtertube.in/android) |
-| **Android TV / Google TV** | New in 3.5.0, on the same Google Play listing as the phone app (TV release subject to Play review). A TV APK is attached to every GitHub release. Fire TV support is planned. | [Android TV](https://filtertube.in/android-tv) · [Latest release](https://github.com/varshneydevansh/FilterTube/releases/latest) |
-| **Direct Android build** | GitHub-only phone/tablet and TV APKs with offline video saving and in-app update checks. Installs beside the Play app. | [Latest release](https://github.com/varshneydevansh/FilterTube/releases/latest) |
+| **Android phone and tablet** | The full Main and Kids app on Google Play. No invitation or email needed. | [Google Play](https://play.google.com/store/apps/details?id=com.filtertube.app) · [Android overview](https://filtertube.in/android) |
+| **Android TV / Google TV** | On the same Google Play listing as the phone app. A TV APK is attached to every GitHub release. | [Android TV](https://filtertube.in/android-tv) · [Latest release](https://github.com/varshneydevansh/FilterTube/releases/latest) |
+| **iPhone and iPad** | Install with SideStore (recommended) or AltStore. | [iPhone and iPad guide](https://filtertube.in/ios) |
+| **Direct Android build** | GitHub-only phone/tablet and TV APKs with offline video saving (encrypted copies that expire after 30 days) and in-app update checks. Installs beside the Play app. The Google Play builds do not download videos. | [Latest release](https://github.com/varshneydevansh/FilterTube/releases/latest) |
 | **Browser extension** | Chrome, Firefox and Edge listings; other desktop browsers use the matching store or the manual package. | [Chrome](https://chromewebstore.google.com/detail/filtertube/cjmdggnnpmpchholgnkfokibidbbnfgc) · [Firefox](https://addons.mozilla.org/en-US/firefox/addon/filtertube/) · [Edge](https://microsoftedge.microsoft.com/addons/detail/filtertube/lgeflbmplcmljnhffmoghkoccflhlbem) |
-| **iPhone and iPad** | In development; public TestFlight/App Store access is not available yet. | [iOS status](https://filtertube.in/ios) |
 
 [Latest GitHub release and assets](https://github.com/varshneydevansh/FilterTube/releases/latest) · [All releases](https://github.com/varshneydevansh/FilterTube/releases)
 
-## The apps
+### Get the iOS app
+
+FilterTube runs on iPhone and iPad today. Apple is having trouble on their end with the developer account, so the App Store version will take a while. Until then:
+
+1. Open the step-by-step guide at **[filtertube.in/ios](https://filtertube.in/ios)**.
+2. Install **SideStore** (recommended) or **AltStore**. SideStore signs the app with your own Apple ID, using Apple's free developer signing.
+3. Add FilterTube in SideStore, and refresh it there every 7 days. Your settings are kept.
+
+Free, no ads, nothing locked, no FilterTube sign-up.
+
+## Screenshots
 
 <table>
-  <tr><th>Watch</th><th>Music</th><th>Controls</th><th>Private P2P pairing</th></tr>
+  <tr><th>iPhone: Home</th><th>iPhone: Study</th><th>Android: Study session</th><th>Android: Sangeet</th></tr>
   <tr>
-    <td><img src="website/public/apps/screenshots/android/phone-watch.webp" width="190" alt="FilterTube Android Watch page"></td>
-    <td><img src="website/public/apps/screenshots/android/phone-now-playing.webp" width="190" alt="FilterTube Android Music now playing"></td>
-    <td><img src="website/public/apps/screenshots/android/phone-controls.webp" width="190" alt="FilterTube Android Controls overview"></td>
-    <td><img src="website/public/apps/screenshots/android/phone-sync-pairing.webp" width="190" alt="FilterTube Android device pairing with code and QR"></td>
+    <td><img src="website/public/apps/screenshots/ios/iphone-home.webp" width="190" alt="FilterTube on iPhone: Home with the Main viewing space and its filters"></td>
+    <td><img src="website/public/apps/screenshots/ios/iphone-study.webp" width="190" alt="FilterTube on iPhone: a study plan with the exam channels you chose switched on"></td>
+    <td><img src="website/public/apps/screenshots/android/phone-study-session.webp" width="190" alt="FilterTube Study and focus on an Android phone: round 1 of 2 with 25 minutes left"></td>
+    <td><img src="website/public/apps/screenshots/android/phone-sangeet.webp" width="190" alt="Sangeet now playing on an Android phone with album art and playback controls"></td>
   </tr>
 </table>
 
 <table>
-  <tr><th>Tablet</th><th>Android TV</th></tr>
+  <tr><th>Android: Home during Study</th><th>Android: Controls</th><th>Android: private P2P pairing</th><th>Kids on iPhone</th></tr>
   <tr>
-    <td><img src="website/public/apps/screenshots/android/tablet-watch.webp" width="400" alt="FilterTube tablet two-pane Watch page"></td>
-    <td><img src="website/public/apps/screenshots/android/tv-watch.webp" width="400" alt="FilterTube Android TV Watch page"></td>
+    <td><img src="website/public/apps/screenshots/android/phone-home.webp" width="190" alt="FilterTube Home on an Android phone during a study round, with engineering subject chips and a lecture feed"></td>
+    <td><img src="website/public/apps/screenshots/android/phone-controls.webp" width="190" alt="FilterTube Controls overview on an Android phone"></td>
+    <td><img src="website/public/apps/screenshots/android/phone-sync-pairing.webp" width="190" alt="Android device pairing with a code and QR"></td>
+    <td><img src="website/public/apps/screenshots/ios/iphone-kids.webp" width="190" alt="FilterTube Kids Viewing home on iPhone"></td>
   </tr>
 </table>
-
-*Real screens from FilterTube 3.5.0. See every phone, tablet and TV screen on [filtertube.in/android](https://filtertube.in/android).*
-
-<details>
-<summary><strong>Browser extension screenshots</strong></summary>
-
-The extension adds a popup, dashboard and device controls to supported existing pages. These current-source previews can be newer than the installed store version.
 
 <table>
-  <tr><th>Dashboard</th><th>Accounts &amp; Sync</th></tr>
+  <tr><th>iPad: Watch</th><th>Android TV: Home</th></tr>
   <tr>
-    <td><img src="website/public/apps/screenshots/extension-dashboard.png" width="400" alt="FilterTube browser extension dashboard preview"></td>
-    <td><img src="website/public/apps/screenshots/extension-accounts-sync.png" width="400" alt="FilterTube browser extension device selection and profile controls preview"></td>
+    <td><img src="website/public/apps/screenshots/ios/ipad-watch.webp" width="400" alt="FilterTube on iPad in landscape: an education video playing with a soft colour glow behind it, Up next and Recommended beside it"></td>
+    <td><img src="website/public/apps/screenshots/android/tv-home.webp" width="400" alt="Android TV Home with blocked cards counted"></td>
+  </tr>
+  <tr><th>iPad: Kids</th><th>Android TV: Kids</th></tr>
+  <tr>
+    <td><img src="website/public/apps/screenshots/ios/ipad-kids.webp" width="400" alt="FilterTube Kids Viewing on iPad with a grid of shows and playlists"></td>
+    <td><img src="website/public/apps/screenshots/android/tv-kids-watch.webp" width="400" alt="A dinosaur cartoon playing full screen in Kids Viewing on Android TV"></td>
   </tr>
 </table>
 
-</details>
+*Real screens from the latest builds. See every phone, tablet, iPad and TV screen on [filtertube.in](https://filtertube.in).*
 
-<details>
-<summary><strong>iPhone development previews</strong></summary>
-
-Existing simulator UI captures: viewing-space selection and filter controls. Public iPhone/iPad installation is not available yet; these images do not establish current playback, complete feature parity or release readiness.
+### Browser extension
 
 <table>
-  <tr><th>Viewing spaces</th><th>Filter controls</th></tr>
+  <tr><th>Controls: Home</th><th>Popup</th></tr>
   <tr>
-    <td><img src="website/public/apps/screenshots/ios-launcher.png" width="220" alt="iPhone simulator development preview of Main and Kids viewing-space selection"></td>
-    <td><img src="website/public/apps/screenshots/ios-filters.png" width="220" alt="iPhone simulator development preview of empty keyword filters"></td>
+    <td><img src="docs/design/ext-dashboard-polish-2026-11-18/after/dashboard-home-1440-light-full.webp" width="560" alt="FilterTube extension Home: greeting, profile card, today's numbers, Study today, What Uljhan tried today and the FilterTube apps"></td>
+    <td valign="top"><img src="docs/design/ext-dashboard-polish-2026-11-18/after/popup-light.webp" width="260" alt="FilterTube extension popup: master switch, hidden count with Kriti, keyword list and the FilterTube apps row"></td>
   </tr>
 </table>
-
-</details>
 
 ## Easy parent controls
 
-A child can have their **own profile and switching PIN** without gaining permission to change parent-managed settings. Parents keep their own account and use **Edit Rules** to manage the intended child, rather than sharing the parent PIN.
+A child can have their **own profile and switching PIN** without gaining permission to change parent-managed settings. Parents keep their own profile and manage the child's rules in a framed parent session, rather than sharing the parent PIN. **Quiet blocking** (off by default, parent-locked) shows a plain "This video isn't available" screen instead of FilterTube's block screen, so children aren't upset by it.
 
-From the parent's own computer, pair and verify the child's device, then review the exact source and receiving child profile. Choose **Send update** for an approved one-time policy change, or explicitly turn on **Auto-sync** for that verified parent connection. Only supported, approved scopes can apply; the child's PIN does not grant settings, trust or profile-administration rights.
+From the parent's own device, pair and verify the child's device, then review the exact source and receiving child profile. Send a one-time update, or turn on **Auto-sync** for that verified parent connection. Study plans and locks a parent sets travel the same way, and the parent sees when a child's device stops reporting. The child's PIN never grants settings, trust or profile-administration rights.
 
-Auto-sync is a choice, not a consequence of trusting a device. Direct delivery needs both endpoints open and connected; offline changes wait for a verified reconnect. Parent accounts need their own protection too. [Step-by-step parent setup and current scope limits](docs/NANAH_USER_GUIDE.md#parents-update-the-intended-child-profile).
+Auto-sync is a choice, not a consequence of trusting a device. [Step-by-step parent setup and current scope limits](docs/NANAH_USER_GUIDE.md#parents-update-the-intended-child-profile).
 
-## Features
+## Features in the extension
 
-This is a current capability guide, not a claim that every store package or platform has identical support. See the [extension inventory](docs/audit/EXTENSION_FEATURE_INVENTORY_2026-10-25.md) and [post-release change record](docs/audit/POST_885AA49_CHANGELOG_2026-10-25.md) for source and verification boundaries.
+This is a current capability guide, not a claim that every store package or platform has identical support. See the [changelog](CHANGELOG.md) and the [3.6.2 release record](docs/RELEASE_3_6_2_2026-11-18.md).
 
 | What you control | Capabilities |
 | --- | --- |
-| **Channels and keywords** | Blocklist or Whitelist, blocked/allowed exceptions, channel IDs, `@handles` and supported URLs, phrases, supported comment-keyword matching and Exact matching. Rule matching reuses compiled indexes. |
-| **Main and Kids** | Separate rule spaces and modes; optional compatible use of Kids rules on Main. A Kids rule space is distinct from a protected child profile. |
-| **Video filters** | Supported duration, upload-date, uppercase-title, minimum-view and category filters. Experimental video-language filtering depends on available metadata, not speech recognition. |
-| **Less distraction** | Hide Shorts, comments, Home feeds, recommendations, live chat, Mixes, playlist panels, end screens and other supported surfaces. The extension has 32 content switches across seven groups. |
-| **Playback** | Advert filtering and guarded content-only playback work. The extension retains the native desktop player; the Android app has its own player and quality/audio/caption controls. Compatibility still needs maintenance. |
-| **Quick actions** | Extension popup, dashboard statistics and settings, optional hover Quick Block and a separate three-dot menu action. Supported collaboration cards can expose multiple creators. |
-| **Family profiles** | Default/Master, independent accounts and parent-owned protected profiles, with separate rules and viewing access. Parents edit child rules through **Edit Rules**; a child PIN does not unlock parent controls. |
-| **Protected time** | Per-profile daily allowances, remaining-time feedback and parent-reviewed extra-time requests. Extension Self-Control and Hard Timer Whitelist are separate reviewed countdowns with no in-app cancellation once started. Daily budgets are per installation, not pooled across devices. |
-| **Video Notes** | Profile + video storage, timestamps and conflict-aware edits. Extension Notes support admitted Main Watch pages; native development has its own implementation. Music/Kids/Shorts parity is not implied. |
-| **Devices** | Code/QR pairing, safety-phrase verification, one-time profile copies, authorized full-account migration, approved parent updates and opt-in personal settings/rules/Notes Auto-sync. See the connection limits below. |
-| **Imports and backups** | Preview CSV, TXT, JSON, BlockTube and supported HTTPS rule lists; review reports and refreshed lists, or import subscribed channels into the whitelist. Plain/encrypted manual and automatic local FilterTube backups and reviewed BlockTube-compatible export have different scopes. Private extension Notes are excluded from ordinary backups. |
-| **Everyday preferences** | Light/dark appearance, 38 bundled extension interface languages, update preferences and a reviewed preference reset. Reset preserves rules, modes, restrictions, Notes, PINs, time limits and verified-device permissions. |
+| **Channels and keywords** | Blocklist or Whitelist (allow only selected), with blocked exceptions under a Whitelist. Channel IDs, `@handles` and supported URLs, phrases, comment-keyword matching and Exact matching. Undo after a removal. |
+| **Main and Kids** | Separate rule spaces and modes; Kids words, allowed videos and followed channels work as in the apps. |
+| **Video filters** | Duration, upload date, uppercase titles, minimum views and category. Experimental video-language filtering depends on available metadata, not speech recognition. |
+| **Less distraction** | Hide Clips, comments, Home feeds, recommendations, live chat, Auto playlists, playlist panels, end screens and more, from the Content Controls switches. Search suggestions follow your rules in every mode. |
+| **Home and the hidden log** | A Home with today's numbers, Study today, What Uljhan tried today (the last 30 hides, on this device only) and quick actions. |
+| **Study** | Packs, a day plan with rounds and breaks, a length slider, Skip break with Undo, "Skip this video", rules that hold while a session runs, and a clock guard so moving the clock doesn't end a lock. |
+| **Family profiles** | Parent, adult and Kids profiles with PINs, crayon avatars, Ask a parent with signed answers, a framed parent session, and Quiet blocking. |
+| **Protected time** | Per-profile daily allowances and Self-Control sessions that can't be cancelled once started. Daily budgets are per installation, not pooled across devices. |
+| **Video Notes** | Private, timestamped Notes per profile and video. |
+| **Devices** | Code/QR pairing, safety-phrase verification, one-time profile copies, full-account moves, approved parent updates and opt-in personal Auto-sync. FilterTube asks once before the first internet sync uses the relay. |
+| **Imports and backups** | CSV, TXT, JSON, BlockTube and HTTPS rule lists; import followed channels into the Whitelist; plain and encrypted backups; BlockTube-compatible export. |
+| **Everyday preferences** | Light and dark, 38 interface languages, Kriti and Uljhan (Lively, Quiet or Off), optional sounds (Off by default) and a reviewed preference reset. |
 
-Local semantic/ML filtering remains **research**, not an active released filtering engine. Interface translations are separate from video-language filtering.
+Local semantic/ML filtering remains **research**, not an active filtering engine. Interface translations are separate from video-language filtering.
 
 ## Nanah Device Trust & Sync
 
 **Connect → verify → choose what to share.** No central FilterTube account is required.
 
-1. Open **Accounts & Sync** on both supported devices. Add with a code or QR.
+1. Open **Accounts & Sync** on both devices. Add with a code or QR.
 2. Compare and confirm the **same safety phrase** before saving trust.
-3. Review the local profile, receiving profile/device and selected update.
-4. Send once, or explicitly enable the permitted Auto-sync link.
+3. Review the local profile, receiving profile or device and the selected update.
+4. Send once, or explicitly turn on Auto-sync for that link.
 
 | Connection | What it permits |
 | --- | --- |
-| **Your own profiles** | A one-time copy, or a separately approved personal Auto-sync link. Both devices approve the exact profile mapping and choose **Settings and filter rules**, **Saved video notes**, or both. |
-| **Parent → child** | Approved signed policy updates to the chosen protected profile. Parent Auto-sync uses existing approved scopes and receiver permissions; it does not grant the child permission to edit protected settings. |
-| **Nearby devices** | Optional helper-assisted discovery. Being visible or on the same Wi-Fi never establishes trust. |
+| **Your own profiles** | A one-time copy, or a separately approved personal Auto-sync link. Both devices approve the exact profile mapping and choose what is shared. |
+| **Parent → child** | Approved, signed policy updates to the chosen protected profile, including Study plans and locks. A Kids profile accepts Nearby rules only after the parent's PIN. |
+| **Nearby devices** | Optional discovery. Being visible or on the same Wi-Fi never establishes trust. |
 
-**Auto-sync is opt-in. Direct sync needs both Accounts & Sync pages open and connected.** Offline changes wait locally and resume after a verified connection is re-established. Simply going online does not pair saved devices or wake a closed browser. Settings conflicts require review; Notes preserve edit/delete conflicts. Turning Auto-sync off stops its local queued delivery, not data already applied elsewhere.
+**Auto-sync is opt-in. Direct sync needs both Accounts & Sync pages open and connected.** Offline changes wait locally and resume after a verified reconnect. Signaling and STUN services help devices connect; FilterTube explains what the relay can see before the first internet sync. Optional **Home Pickup** and **Internet Pickup** are separate delivery choices for parent updates, not a central readable profile vault.
 
-PINs, profile ownership and device permissions stay local. Parent policy updates do not currently cover every child preference toggle or child Notes; personal Auto-sync cannot bypass those restrictions.
-
-Signaling and STUN services help devices establish a connection. No TURN relay is configured in the current extension transport, so restrictive networks can prevent a direct connection. Optional **Home Pickup** uses a configured trusted service that can see signed rule contents; **Internet Pickup** holds encrypted signed envelopes for approved parent updates. These are separate delivery choices, not a central readable profile vault. Queued, received and applied are different states.
-
-New Auto-sync is implemented in the extension candidate; Android development has related adoption work. Installed two-profile pairing/offline reconnect, physical-network behavior and extension↔app interoperability still need acceptance. Older app/TV clients are not assumed compatible.
-
-[Start with the Nanah user guide](docs/NANAH_USER_GUIDE.md) · [Auto-sync contract and scope](docs/design/device-sync/AUTO-SYNC-2026-10-24.md) · [Profiles and PINs](docs/PROFILES_PIN_MODEL.md) · [QA and remaining gates](docs/NANAH_MANAGED_LINK_QA.md)
+[Nanah user guide](docs/NANAH_USER_GUIDE.md) · [Auto-sync contract and scope](docs/design/device-sync/AUTO-SYNC-2026-10-24.md) · [Profiles and PINs](docs/PROFILES_PIN_MODEL.md) · [QA and remaining gates](docs/NANAH_MANAGED_LINK_QA.md)
 
 ## Start with one rule
 
-1. Install the app or extension and choose the intended profile.
-2. Add a channel using its `@handle`, channel ID or supported URL, or add a keyword.
-3. Choose Blocklist to hide matches, or Whitelist to allow only your chosen rules. In the extension, refresh the page to check the result.
-4. Add Kids rules, family profiles, viewing limits or device sharing when needed.
-
-For a protected profile, use the owning parent's **Edit Rules** action and lock the parent/admin session afterward. Protect parent accounts too: a child switching PIN cannot secure an unprotected parent account.
+1. Install the app or extension and choose the profile.
+2. Add a channel by its `@handle`, channel ID or URL, or add a keyword.
+3. Choose Blocklist to hide matches, or Whitelist to allow only your chosen rules.
+4. Add Kids rules, family profiles, a Study plan, time limits or device sharing when you need them.
 
 <details>
 <summary><strong>Privacy and filtering limits</strong></summary>
 
-**Local-first runtime.** Extension rules and settings stay in browser storage. The extension does not run a FilterTube account service, extension analytics, or ad-tracking profile. YouTube and YouTube Kids pages still load their normal services, and weak identity targets may use bounded YouTube resolver requests. Device-sync services can observe connection metadata; Home/Internet Pickup have the distinct data boundaries described above.
+**Local-first runtime.** Extension rules and settings stay in browser storage, and so does the hidden log. The extension does not run a FilterTube account service, extension analytics, or ad-tracking profile, and its fonts ship inside it. YouTube and YouTube Kids pages still load their normal services, and weak identity targets may use bounded YouTube resolver requests. Device-sync services can see connection metadata; Home and Internet Pickup have their own data boundaries described above. Removing the extension opens filtertube.in/uninstalled.
 
 **JSON-First Channel Identity.** JSON-backed surfaces can be filtered before paint when YouTube exposes the needed fields. Menu actions use proven local identity where available; weak targets may still use a resolver. Identity comes from intercepted data, learned maps and DOM evidence; bounded fallback resolvers remain for weak watch, Shorts, Kids, playlist, and menu targets. Some route-specific surfaces still need DOM enrichment or a bounded background resolver. Current audit work is tightening no-rule, route, lifecycle, and resolver budgets.
 
 Shorts blocking is fastest when FilterTube already has a stable `videoId -> UC...` mapping. Some Shorts surfaces still expose only `/shorts/VIDEO_ID` at first; the video id is treated as a join key until a stronger owner source is available. FilterTube may use a bounded watch/Shorts resolver. That path is slower, route-specific, and still needs the same source-confidence and side-effect proof as the rest of the identity waterfall.
 
-An unmanaged browser/device owner can disable or uninstall the extension. No permanent advert-filtering immunity, universal layout coverage, trusted clock or pooled cross-device time budget is promised. Private Notes and Auto-sync enrollment/queue state are not ordinary backup payloads.
+An unmanaged browser or device owner can disable or uninstall the extension, and private windows are covered only where the browser allows it (the Study page names the policies families can use). No universal layout coverage or pooled cross-device time budget is promised.
 
 [Privacy policy](https://filtertube.in/privacy) · [Channel identity details](docs/PROACTIVE_CHANNEL_IDENTITY.md) · [Architecture](docs/ARCHITECTURE.md)
 
@@ -169,7 +182,7 @@ An unmanaged browser/device owner can disable or uninstall the extension. No per
 
 ## Development and documentation
 
-This repository contains the **extension runtime and website**. Native apps have their own implementations and release checks; a successful extension test or build is not proof of native parity.
+This repository contains the **extension runtime and the website**. The apps have their own implementations and release checks; a passing extension test or build is not proof that the apps match.
 
 ![Extension source version](https://img.shields.io/badge/version-3.6.2-blue.svg)
 
@@ -177,21 +190,22 @@ This repository contains the **extension runtime and website**. Native apps have
 npm install
 npm run build:chrome       # Package in dist/chrome
 npm run build:firefox      # Package in dist/firefox
-npm run build             # All supported browser packages
+npm run build              # All supported browser packages
+npm test                   # Smoke test lane
 ```
 
-Load `dist/chrome` as an unpacked extension in Chrome/Edge/Brave, or load `dist/firefox/manifest.json` through Firefox's temporary-addon tooling. Development manifest selectors are `npm run dev:chrome` and `npm run dev:firefox`; they change the root `manifest.json`. Build scripts update the source-version badge; release publication remains a separate reviewed action.
+Load `dist/chrome` as an unpacked extension in Chrome, Edge or Brave, or load `dist/firefox/manifest.json` through Firefox's temporary add-on tooling. `npm run dev:chrome` and `npm run dev:firefox` switch the root `manifest.json`. Every build refreshes the version and line-count badges in this README; publishing a release stays a separate, reviewed step.
 
-For the website, run `npm install` then `npm run dev` from `website/`. For native apps and Android debugging, use the [app release/runtime workflow](docs/APP_RELEASE_AND_RUNTIME_SYNC_WORKFLOW.md) and [Android distribution guide](docs/ANDROID_PUBLIC_DISTRIBUTION.md).
+For the website, run `npm install` then `npm run dev` from `website/`. For app releases, see the [app release and runtime sync workflow](docs/APP_RELEASE_AND_RUNTIME_SYNC_WORKFLOW.md) and the [Android distribution guide](docs/ANDROID_PUBLIC_DISTRIBUTION.md).
 
 - [Developer guide](docs/DEVELOPER_GUIDE.md) · [Architecture](docs/ARCHITECTURE.md) · [Technical reference](docs/TECHNICAL.md)
-- [Imports and subscribed channels](docs/SUBSCRIBED_CHANNELS_IMPORT.md) · [Kids integration](docs/YOUTUBE_KIDS_INTEGRATION.md)
-- [Changelog](CHANGELOG.md) · [Current change audit](docs/audit/POST_885AA49_CHANGELOG_2026-10-25.md) · [Sync concerns](docs/NANAH_POST_IMPLEMENTATION_CONCERNS_TRACKER.md)
+- [Imports and followed channels](docs/SUBSCRIBED_CHANNELS_IMPORT.md) · [Kids integration](docs/YOUTUBE_KIDS_INTEGRATION.md)
+- [Changelog](CHANGELOG.md) · [Android → extension port ledger](docs/parity/PORT_LEDGER.md) · [Sync concerns](docs/NANAH_POST_IMPLEMENTATION_CONCERNS_TRACKER.md)
 
 ## Community and support
 
 [Report an issue](https://github.com/varshneydevansh/FilterTube/issues) · [Reddit: r/FilterTubeApp](https://www.reddit.com/r/FilterTubeApp/) · [Support development](https://ko-fi.com/filtertube)
 
-FilterTube grew from a [parent's request for clearer Kids filtering](https://support.google.com/youtubekids/thread/54509605/how-to-block-videos-by-keyword-or-tag?hl=en). It is for families, students and anyone who wants more control over what they watch.
+FilterTube grew from a [help-forum question about blocking videos by keyword](https://support.google.com/youtubekids/thread/54509605/how-to-block-videos-by-keyword-or-tag?hl=en) that 2,500 parents asked before the thread was locked. It is for families, students and anyone who wants more control over what they watch.
 
-Released under the [MIT License](LICENSE). Detailed release history lives in [CHANGELOG.md](CHANGELOG.md).
+The browser extension in this repository is released under the [MIT License](LICENSE). Detailed release history lives in [CHANGELOG.md](CHANGELOG.md).

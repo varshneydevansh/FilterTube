@@ -877,8 +877,8 @@ async function updateReadmeBadges(version) {
 
         // Update version badge
         readme = readme.replace(
-            /!\[Version\]\(https:\/\/img\.shields\.io\/badge\/version-[^)]+\)/,
-            `![Version](https://img.shields.io/badge/version-${version}-blue.svg)`
+            /!\[(Version|Extension source version)\]\(https:\/\/img\.shields\.io\/badge\/version-[^)]+\)/,
+            (_match, alt) => `![${alt}](https://img.shields.io/badge/version-${version}-blue.svg)`
         );
 
         // Update total lines badge
