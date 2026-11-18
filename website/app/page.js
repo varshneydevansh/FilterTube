@@ -10,12 +10,13 @@ import {
 
 import { BrowserLogoRail } from "@/components/browser-logo-rail";
 import { DeviceStrip } from "@/components/device-strip";
+import { HeroShowcase } from "@/components/hero-showcase";
 import { HeroVideo } from "@/components/hero-video";
 import { HowItWorks } from "@/components/how-it-works";
 import { MeetMascots } from "@/components/meet-mascots";
 import { ActionLink, Panel, SectionHeading } from "@/components/marketing-ui";
 import { Reveal } from "@/components/reveal";
-import { P2PSyncExplainer } from "@/components/p2p-sync-explainer";
+import { P2PAnatomy } from "@/components/p2p-anatomy";
 import {
   appDemoVideoHref,
   androidPlayStoreHref,
@@ -272,91 +273,39 @@ function QuickGuideSection() {
           />
         </Reveal>
 
-        <div className="mt-12 grid gap-5 lg:grid-cols-[minmax(0,0.92fr)_minmax(0,1.08fr)]">
-          <Reveal>
-            <Panel innerClassName="h-full p-6 md:p-7">
-              <p className="text-[0.72rem] uppercase tracking-[0.22em] text-[var(--color-muted)]">
-                Get started
-              </p>
-              <div className="mt-7 grid gap-4">
-                {[
-                  [
-                    "1",
-                    "Install and open FilterTube",
-                    "Install the Android app from Google Play or add the extension to your browser.",
-                  ],
-                  [
-                    "2",
-                    "Block one thing",
-                    "Choose your profile, add one channel or keyword, then open Main or Kids. In the extension, refresh the page to check the result.",
-                  ],
-                  [
-                    "3",
-                    "Add only what you need",
-                    "Add family profiles, viewing limits, allow-only rules, imports or device sharing when you need them. You can adjust the rules at any time.",
-                  ],
-                ].map(([number, title, body]) => (
-                  <div
-                    className="grid gap-4 rounded-[1.4rem] border border-[color:var(--color-line)] bg-[color:var(--color-tile)] p-4 sm:grid-cols-[auto_minmax(0,1fr)]"
-                    key={number}
-                  >
-                    <span className="flex h-10 w-10 items-center justify-center rounded-full bg-[var(--color-accent)] font-mono text-sm font-bold text-[#fff8f1]">
-                      {number}
-                    </span>
-                    <div>
-                      <h3 className="font-display text-2xl tracking-[-0.045em] text-[var(--color-ink)]">
-                        {title}
-                      </h3>
-                      <p className="mt-2 text-sm leading-7 text-[var(--color-muted)]">
-                        {body}
-                      </p>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </Panel>
-          </Reveal>
-
-          <Reveal delay={100}>
-            <Panel innerClassName="relative h-full overflow-hidden p-6 md:p-7">
-              <div className="absolute inset-0 bg-[radial-gradient(circle_at_18%_16%,rgba(171,68,56,0.12),transparent_28%),radial-gradient(circle_at_84%_22%,rgba(158,190,177,0.18),transparent_28%)]" />
-              <div id="device-sync" className="relative z-10">
-                <p className="text-[0.72rem] uppercase tracking-[0.22em] text-[var(--color-muted)]">
-                  P2P · Peer-to-peer sync
-                </p>
-                <h3 className="mt-4 max-w-[16ch] font-display text-4xl tracking-[-0.06em] text-[var(--color-ink)]">
-                  Your devices. In sync.
+        <ol className="mt-12 grid gap-4 md:grid-cols-3">
+          {[
+            [
+              "1",
+              "Install and open FilterTube",
+              "Install the Android app from Google Play or add the extension to your browser.",
+            ],
+            [
+              "2",
+              "Block one thing",
+              "Choose your profile, add one channel or keyword, then open Main or Kids. In the extension, refresh the page to check the result.",
+            ],
+            [
+              "3",
+              "Add only what you need",
+              "Add family profiles, viewing limits, Whitelist rules, imports or device sharing when you need them. You can adjust the rules at any time.",
+            ],
+          ].map(([number, title, body]) => (
+            <li className="ft-shell flex h-full flex-col rounded-[1.6rem] border border-[color:var(--color-line)] p-2" key={number}>
+              <div className="ft-inset flex h-full flex-col rounded-[1.2rem] bg-[var(--color-surface)] p-5 md:p-6">
+                <span className="flex h-10 w-10 items-center justify-center rounded-full bg-[var(--color-accent)] font-mono text-sm font-bold text-[#fff8f1]">
+                  {number}
+                </span>
+                <h3 className="mt-5 font-display text-2xl tracking-[-0.045em] text-[var(--color-ink)]">
+                  {title}
                 </h3>
-                <p className="mt-4 max-w-[62ch] text-sm leading-7 text-[var(--color-muted)]">
-                  Share settings, filter rules and notes between devices you
-                  verify. Encrypted P2P, without a central FilterTube account
-                  storing your readable data.
+                <p className="mt-2 text-sm leading-7 text-[var(--color-muted)]">
+                  {body}
                 </p>
-                <P2PSyncExplainer />
-                <details className="ft-disclosure mt-7 rounded-[1.4rem] border border-[color:var(--color-line)] bg-[color:var(--color-soft-panel)]">
-                  <summary className="cursor-pointer px-5 py-4 font-semibold text-[var(--color-ink)]">
-                    How device syncing works
-                  </summary>
-                  <div className="space-y-4 px-5 pb-5 text-sm leading-7 text-[var(--color-muted)]">
-                    <p><strong>Connect safely.</strong> Use a code or QR and compare
-                      the safety phrase. Nearby devices are not automatically trusted.</p>
-                    <p><strong>You choose.</strong> Select a profile and updates.
-                      Both devices approve personal links; only approved parents
-                      can change a child's protected settings.</p>
-                    <p><strong>Auto-sync is optional and in testing.</strong> Supported
-                      settings, rules and notes wait locally while disconnected.
-                      Direct sync needs FilterTube open and connected on both devices.</p>
-                    <p><strong>Across networks.</strong> Connection helpers and
-                      encrypted relays can help your devices reach each other.
-                      Optional Home Pickup and Internet Pickup separately deliver
-                      approved parent updates. Queued, received and applied are
-                      different states; background delivery is not guaranteed.</p>
-                  </div>
-                </details>
               </div>
-            </Panel>
-          </Reveal>
-        </div>
+            </li>
+          ))}
+        </ol>
         <details className="ft-disclosure ft-shell mt-6 rounded-[1.5rem] border border-[color:var(--color-line)]">
           <summary className="cursor-pointer px-6 py-5 font-semibold text-[var(--color-ink)]">
             If filtering misses something
@@ -387,6 +336,52 @@ function QuickGuideSection() {
             </p>
           </div>
         </details>
+
+        <Reveal>
+          <Panel className="mt-16 md:mt-20" innerClassName="p-5 md:p-8 lg:p-10">
+            <div id="device-sync">
+              <div className="grid gap-5 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)] lg:items-end lg:gap-12">
+                <div>
+                  <p className="text-[0.72rem] uppercase tracking-[0.22em] text-[var(--color-muted)]">
+                    P2P · Peer-to-peer sync
+                  </p>
+                  <h3 className="mt-4 max-w-[14ch] font-display text-4xl tracking-[-0.06em] text-[var(--color-ink)] md:text-5xl">
+                    Your devices. In sync.
+                  </h3>
+                </div>
+                <p className="max-w-[52ch] text-base leading-8 text-[var(--color-muted)]">
+                  Share settings, filter rules and notes between devices you verify. No FilterTube
+                  sign-up, and no servers keep your data: it goes straight from one device to the other.
+                </p>
+              </div>
+              <P2PAnatomy className="mx-auto mt-8 max-w-[1040px] md:mt-10" />
+              <dl className="mt-10 grid gap-x-8 gap-y-5 text-sm leading-7 md:grid-cols-2 xl:grid-cols-4">
+                {[
+                  ["Pair and verify", "Use a short code or the QR, then check that both screens show the same safety phrase."],
+                  ["You choose", "Pick the profile and what to share. The other device reviews it first, and only approved parents can change a child’s protected settings."],
+                  ["Encrypted, direct", "A relay can help your devices find each other across networks, but it can’t read what you sync."],
+                  ["Auto-sync, in testing", "Verified devices can keep each other up to date. Changes wait on the device while you’re offline."],
+                ].map(([term, detail]) => (
+                  <div className="border-t border-[color:var(--color-line)] pt-4" key={term}>
+                    <dt className="font-semibold text-[var(--color-ink)]">{term}</dt>
+                    <dd className="mt-1 text-[var(--color-muted)]">{detail}</dd>
+                  </div>
+                ))}
+              </dl>
+              <details className="ft-disclosure mt-8 rounded-[1.2rem] border border-[color:var(--color-line)] bg-[color:var(--color-soft-panel)]">
+                <summary className="cursor-pointer px-5 py-4 font-semibold text-[var(--color-ink)]">
+                  More on syncing across networks
+                </summary>
+                <div className="space-y-4 px-5 pb-5 text-sm leading-7 text-[var(--color-muted)]">
+                  <p>Nearby devices are never trusted automatically. Both devices approve personal links.</p>
+                  <p>Direct sync needs FilterTube open and connected on both devices. Optional Home Pickup and
+                    Internet Pickup separately deliver approved parent updates. Queued, received and applied are
+                    different states, and background delivery is not guaranteed.</p>
+                </div>
+              </details>
+            </div>
+          </Panel>
+        </Reveal>
       </div>
     </section>
   );
@@ -401,71 +396,78 @@ export default function HomePage() {
         <div className="absolute inset-x-0 bottom-0 h-28 bg-[linear-gradient(180deg,transparent,rgba(11,14,18,0.08))]" />
 
         <div className="relative z-10 mx-auto max-w-[1400px]">
-          <Reveal className="mx-auto flex min-h-[calc(100dvh-7rem)] w-full max-w-[1180px] flex-col justify-between pb-4 pt-6 text-center md:pb-6 md:pt-10">
-            <div className="flex flex-1 flex-col items-center justify-center">
-              <div className="mx-auto inline-flex min-h-11 items-center gap-3 rounded-full border border-white/30 bg-[rgba(13,18,27,0.2)] px-4 py-2 text-sm font-medium text-[#fffaf4] shadow-[inset_0_1px_0_rgba(255,255,255,0.18)] backdrop-blur-xl">
-                <span className="rounded-full bg-white px-3 py-1 text-xs font-semibold uppercase tracking-[0.18em] text-[#1f2430]">
-                  Live now
-                </span>
-                <span className="text-pretty">
-                  Desktop extensions and the Android app are live. Find
-                  FilterTube on Google Play.
-                </span>
-              </div>
+          <Reveal className="mx-auto flex min-h-[calc(100dvh-7rem)] w-full flex-col justify-between pb-4 pt-4 md:pb-6 md:pt-8">
+            <div className="grid flex-1 items-center gap-12 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.04fr)] lg:gap-10 xl:gap-16">
+              <div className="flex flex-col items-center text-center lg:items-start lg:text-left">
+                <div className="inline-flex min-h-11 items-center gap-3 rounded-full border border-white/30 bg-[rgba(13,18,27,0.2)] px-4 py-2 text-sm font-medium text-[#fffaf4] shadow-[inset_0_1px_0_rgba(255,255,255,0.18)] backdrop-blur-xl">
+                  <span className="shrink-0 rounded-full bg-white px-3 py-1 text-xs font-semibold uppercase tracking-[0.18em] text-[#1f2430]">
+                    Live now
+                  </span>
+                  <span className="text-pretty">
+                    Desktop extensions and the Android app are live. Find
+                    FilterTube on Google Play.
+                  </span>
+                </div>
 
-              <div className="mx-auto mt-10 max-w-[1180px]">
-                <p className="text-balance font-display text-[clamp(3rem,6.8vw,5.8rem)] font-medium tracking-[-0.09em] text-[#fffdf8] drop-shadow-[0_16px_36px_rgba(0,0,0,0.3)]">
-                  Calmer, ad-free viewing
+                <div className="mt-9">
+                  <p className="text-balance font-display text-[clamp(2.7rem,6.8vw,5.8rem)] font-medium tracking-[-0.09em] text-[#fffdf8] drop-shadow-[0_16px_36px_rgba(0,0,0,0.3)] lg:text-[clamp(3rem,4.3vw,4.4rem)]">
+                    Calmer, <span className="whitespace-nowrap">ad-free</span> viewing
+                  </p>
+                  <h1 className="mt-3 text-balance font-editorial text-[clamp(4.2rem,11vw,9.1rem)] leading-[0.88] text-[#fffdf8] drop-shadow-[0_18px_40px_rgba(0,0,0,0.3)] lg:text-[clamp(5rem,7.4vw,7.6rem)]">
+                    Your feed, your rules
+                  </h1>
+                </div>
+
+                <p className="ft-hero-support-copy relative mt-7 max-w-[760px] text-pretty rounded-[1.6rem] px-6 py-4 text-[16px] font-medium leading-7 md:px-8 md:text-[18px] md:leading-8 lg:max-w-[36rem] lg:px-6">
+                  <span className="font-semibold text-white">
+                    Block what you don&apos;t want—or allow only what you trust.
+                  </span>{" "}
+                  Control{" "}
+                  <span className="ft-hero-support-emphasis">
+                    channels, keywords, Shorts, comments, categories, languages,
+                    and more.
+                  </span>
                 </p>
-                <h1 className="mt-3 text-balance font-editorial text-[clamp(5rem,11vw,9.1rem)] leading-[0.88] text-[#fffdf8] drop-shadow-[0_18px_40px_rgba(0,0,0,0.3)]">
-                  Your feed, your rules
-                </h1>
+
+                <div className="mt-9 flex flex-col items-center gap-4 sm:flex-row lg:items-start">
+                  <a
+                    className="group inline-flex min-h-11 items-center gap-3 overflow-visible whitespace-nowrap rounded-full bg-white px-6 py-3 text-sm font-semibold text-[#20242f] shadow-[0_20px_40px_-30px_rgba(14,16,24,0.45)] transition duration-700 ease-[cubic-bezier(0.32,0.72,0,1)] hover:-translate-y-0.5 active:translate-y-px active:scale-[0.98]"
+                    href={demoVideoHref}
+                    rel="noreferrer"
+                    target="_blank"
+                  >
+                    <span className="flex h-8 w-8 items-center justify-center rounded-full bg-[#20242f] text-white shadow-[inset_0_1px_0_rgba(255,255,255,0.16)]">
+                      <Play aria-hidden="true" size={14} weight="fill" />
+                    </span>
+                    <span className="pr-0.5 leading-[1.05]">
+                      Watch the quick demo
+                    </span>
+                  </a>
+                  <a
+                    className="group inline-flex min-h-11 items-center gap-3 overflow-visible whitespace-nowrap rounded-full border border-white/40 bg-[rgba(14,20,30,0.38)] px-6 py-3 text-sm font-semibold text-white shadow-[inset_0_1px_0_rgba(255,255,255,0.26),0_18px_44px_-26px_rgba(4,8,14,0.72)] backdrop-blur-2xl transition duration-700 ease-[cubic-bezier(0.32,0.72,0,1)] hover:-translate-y-0.5 hover:border-white/55 hover:bg-[rgba(14,20,30,0.52)] active:translate-y-px active:scale-[0.98]"
+                    href={appDemoVideoHref}
+                    rel="noreferrer"
+                    target="_blank"
+                  >
+                    <span className="flex h-8 w-8 items-center justify-center rounded-full bg-white/16 text-white shadow-[inset_0_1px_0_rgba(255,255,255,0.16)]">
+                      <DeviceMobile aria-hidden="true" size={15} weight="light" />
+                    </span>
+                    Watch app demo
+                  </a>
+                </div>
               </div>
 
-              <p className="ft-hero-support-copy relative mx-auto mt-7 max-w-[760px] text-pretty rounded-[1.6rem] px-6 py-4 text-[16px] font-medium leading-7 md:px-8 md:text-[18px] md:leading-8">
-                <span className="font-semibold text-white">
-                  Block what you don&apos;t want—or allow only what you trust.
-                </span>{" "}
-                Control{" "}
-                <span className="ft-hero-support-emphasis">
-                  channels, keywords, Shorts, comments, categories, languages,
-                  and more.
-                </span>
-              </p>
-
-              <div className="mt-10 flex flex-col items-center justify-center gap-4 sm:flex-row">
-                <a
-                  className="group inline-flex min-h-11 items-center gap-3 overflow-visible whitespace-nowrap rounded-full bg-white px-6 py-3 text-sm font-semibold text-[#20242f] shadow-[0_20px_40px_-30px_rgba(14,16,24,0.45)] transition duration-700 ease-[cubic-bezier(0.32,0.72,0,1)] hover:-translate-y-0.5 active:translate-y-px active:scale-[0.98]"
-                  href={demoVideoHref}
-                  rel="noreferrer"
-                  target="_blank"
-                >
-                  <span className="flex h-8 w-8 items-center justify-center rounded-full bg-[#20242f] text-white shadow-[inset_0_1px_0_rgba(255,255,255,0.16)]">
-                    <Play aria-hidden="true" size={14} weight="fill" />
-                  </span>
-                  <span className="pr-0.5 leading-[1.05]">
-                    Watch the quick demo
-                  </span>
-                </a>
-                <a
-                  className="group inline-flex min-h-11 items-center gap-3 overflow-visible whitespace-nowrap rounded-full border border-white/40 bg-[rgba(14,20,30,0.38)] px-6 py-3 text-sm font-semibold text-white shadow-[inset_0_1px_0_rgba(255,255,255,0.26),0_18px_44px_-26px_rgba(4,8,14,0.72)] backdrop-blur-2xl transition duration-700 ease-[cubic-bezier(0.32,0.72,0,1)] hover:-translate-y-0.5 hover:border-white/55 hover:bg-[rgba(14,20,30,0.52)] active:translate-y-px active:scale-[0.98]"
-                  href={appDemoVideoHref}
-                  rel="noreferrer"
-                  target="_blank"
-                >
-                  <span className="flex h-8 w-8 items-center justify-center rounded-full bg-white/16 text-white shadow-[inset_0_1px_0_rgba(255,255,255,0.16)]">
-                    <DeviceMobile aria-hidden="true" size={15} weight="light" />
-                  </span>
-                  Watch app demo
-                </a>
+              <div className="mx-auto w-full max-w-[42rem] lg:max-w-none">
+                <HeroShowcase />
+                <p className="ft-hero-status mx-auto mt-8 max-w-[34rem] rounded-2xl px-5 py-3 text-center text-sm font-medium leading-6 text-white md:px-6">
+                  Home during a study round on Android, iPhone and iPad. Your
+                  devices and profiles stay in sync through verified, encrypted
+                  peer-to-peer sharing.
+                </p>
               </div>
-              <p className="ft-hero-status mt-5 max-w-[720px] rounded-2xl px-5 py-3 text-sm font-medium leading-6 text-white md:px-6">
-                Your devices. Your profiles. Verified, encrypted peer-to-peer
-                sharing keeps you in control of what moves between them.
-              </p>
             </div>
 
-            <div className="mx-auto w-full max-w-[1080px] pt-14 md:pt-20 lg:pt-24">
+            <div className="mx-auto w-full max-w-[1080px] pt-14 md:pt-16 lg:pt-16">
               <BrowserLogoRail muted />
               <div className="mx-auto mt-6 flex max-w-[920px] flex-wrap items-center justify-center gap-3 text-sm text-white/88">
                 <span className="rounded-full border border-white/24 bg-[rgba(255,255,255,0.08)] px-4 py-2 text-[#fffaf4] shadow-[inset_0_1px_0_rgba(255,255,255,0.16)] backdrop-blur-xl">
@@ -478,7 +480,7 @@ export default function HomePage() {
                   Hide Shorts
                 </span>
                 <a href="#how-it-works" className="rounded-full border border-white/24 bg-[rgba(255,255,255,0.08)] px-4 py-2 text-[#fffaf4] shadow-[inset_0_1px_0_rgba(255,255,255,0.16)] backdrop-blur-xl underline decoration-white/50 underline-offset-4">
-                  Allow list and Study mode
+                  Whitelist and Study mode
                 </a>
                 <span className="rounded-full border border-white/24 bg-[rgba(255,255,255,0.08)] px-4 py-2 text-[#fffaf4] shadow-[inset_0_1px_0_rgba(255,255,255,0.16)] backdrop-blur-xl">
                   PIN locked profiles
@@ -568,7 +570,7 @@ export default function HomePage() {
                       Kids + Shorts
                     </p>
                     <p className="mt-3 text-sm leading-7 text-[var(--color-muted)]">
-                      Use whitelist mode for trusted channels only, or hide
+                      Use Whitelist mode for trusted channels only, or hide
                       Shorts when scrolling is the main problem.
                     </p>
                   </div>
@@ -600,7 +602,7 @@ export default function HomePage() {
             <SectionHeading
               eyebrow="Controls"
               title="The main controls are simple: block, allow, hide, or protect."
-              description="Most people can start with a blocklist. Families can add profiles, PINs, whitelist mode, and device updates as the setup grows."
+              description="Most people can start with a Blocklist. Families can add profiles, PINs, Whitelist mode, and device updates as the setup grows."
             />
           </Reveal>
           <div className="mt-12 grid auto-rows-fr gap-5 xl:grid-cols-12">

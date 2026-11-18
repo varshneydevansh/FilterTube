@@ -12,6 +12,7 @@ import {
 } from "@/components/site-shell-data";
 import { githubHref, instagramHref, redditHref } from "@/components/route-content";
 import { ThemeToggle } from "@/components/theme-toggle";
+import { poses } from "@/data/mascots";
 
 function NavLink({
   href,
@@ -83,6 +84,15 @@ export function SiteHeader() {
                 Calm your feed
               </p>
             </div>
+            {/* Kriti waves from the header: care for your feed, on every page. */}
+            <img
+              alt=""
+              className="ft-header-kriti hidden xl:block"
+              decoding="async"
+              height={poses.kritiWave.height}
+              src={poses.kritiWave.src}
+              width={poses.kritiWave.width}
+            />
           </Link>
 
           <nav className="pointer-events-auto hidden items-center gap-8 md:flex">
