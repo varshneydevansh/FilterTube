@@ -840,29 +840,36 @@ export default function HomePage() {
                   <p className="text-[0.72rem] uppercase tracking-[0.22em] text-[var(--color-muted)]">
                     Get started
                   </p>
-                  <h2 className="mt-5 max-w-[12ch] font-display text-4xl tracking-[-0.06em] text-[var(--color-ink)] md:text-6xl md:leading-[0.98]">
-                    Start on Android or in your browser.
+                  <h2 className="mt-5 max-w-[14ch] font-display text-4xl tracking-[-0.06em] text-[var(--color-ink)] md:text-6xl md:leading-[0.98]">
+                    Start on Android, iPhone or in your browser.
                   </h2>
                   <p className="mt-5 max-w-[58ch] text-base leading-8 text-[var(--color-muted)]">
                     Choose where you want to watch, add a channel or keyword,
                     and make the experience your own. Android phone and tablet
-                    installs are public—no invitation or email needed.
+                    installs are public, the iPhone app installs directly, and
+                    there is no FilterTube sign-up.
                   </p>
-                  <div className="mt-8 flex flex-col gap-3 sm:flex-row">
+                  <div className="mt-8 flex flex-col flex-wrap gap-3 sm:flex-row">
                     <ActionLink external href={androidPlayStoreHref}>
                       Get Android app
+                    </ActionLink>
+                    <ActionLink href="/ios#install" variant="secondary">
+                      Install on iPhone
                     </ActionLink>
                     <ActionLink href="/downloads" variant="secondary">
                       Get extension
                     </ActionLink>
                   </div>
+                  <p className="mt-5 max-w-[58ch] rounded-[1.2rem] border border-[color:var(--color-line)] bg-[color:var(--color-soft-panel)] px-4 py-3 text-sm leading-7 text-[var(--color-muted)]">
+                    <span className="font-semibold text-[var(--color-ink)]">iPhone and iPad: </span>
+                    trouble on Apple&apos;s side is delaying the App Store version. Until then, install
+                    FilterTube with SideStore (recommended) or AltStore. The{" "}
+                    <Link className="underline underline-offset-4" href="/ios#install">
+                      iPhone guide
+                    </Link>{" "}
+                    walks you through it.
+                  </p>
                   <div className="mt-4 flex flex-wrap gap-3">
-                    <Link
-                      className="inline-flex min-h-11 items-center text-sm underline underline-offset-4"
-                      href="/ios"
-                    >
-                      iPhone and iPad status
-                    </Link>
                     <a
                       className="inline-flex min-h-11 items-center text-sm underline underline-offset-4"
                       href={docsHref}
