@@ -285,6 +285,7 @@
         const body = doc.getElementById('ftHomeStudyBody');
         if (!body) return null;
         let slider = null;
+        let setupArt = null;
         let busy = false;
         const openStudy = () => openNav('.nav-item[data-nav-id="timeLimits"]');
         const button = (label, className, onClick) => {
@@ -300,10 +301,18 @@
             slider = null;
             body.replaceChildren();
             if (view.kind === 'setup') {
-                body.append(
+                // Kriti reads beside the words (kept across redraws, so she doesn't re-enter every minute).
+                const setup = el('div', 'ft-home-study__setup');
+                const words = el('div', 'ft-home-study__words');
+                words.append(
                     el('p', 'ft-home-study__lead', t('home.study.noPlanTitle', 'No study plan yet')),
-                    el('p', 'ft-home-study__line', t('home.study.noPlanBody', 'Choose what you study and when. While you study, FilterTube shows only that.')),
-                    button(t('study.setup.title', 'Set up study'), 'btn-primary ft-home-study__go', openStudy));
+                    el('p', 'ft-home-study__line', t('home.study.noPlanBody', 'Choose what you study and when. While you study, FilterTube shows only that.')));
+                setup.appendChild(words);
+                const Mascots = root.FilterTubeMascots;
+                if (!Mascots?.showsCharacters?.(Mascots?.mode)) setupArt = null;
+                else if (!setupArt) setupArt = Mascots.moment?.('reading', { height: 96 }) || null;
+                if (setupArt) setup.appendChild(setupArt);
+                body.append(setup, button(t('study.setup.title', 'Set up study'), 'btn-primary ft-home-study__go', openStudy));
                 return;
             }
             const big = el('p', 'ft-home-study__big');
