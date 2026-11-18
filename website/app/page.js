@@ -367,7 +367,7 @@ function QuickGuideSection() {
               </div>
               <dl className="mt-10 grid gap-x-8 gap-y-5 text-sm leading-7 md:grid-cols-2 xl:grid-cols-4">
                 {[
-                  ["Pair and verify", "Use a short code or the QR, then check that both screens show the same safety words."],
+                  ["Pair and verify", "Use a short code or the QR, then check that both screens show the same safety phrase."],
                   ["You choose", "Pick the profile and what to share. The other device reviews it first, and only approved parents can change a child’s protected settings."],
                   ["Locked, direct", "A relay can help your devices find each other across networks. It only passes locked data it can’t open."],
                   ["Auto-sync, opt-in", "Verified devices can keep each other up to date. Changes wait on the device while you’re offline."],

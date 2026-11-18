@@ -1,7 +1,7 @@
 //! A silent explainer of FilterTube device sync for parents, in the same five steps as the home
-//! page's Anatomy figure: Pair, Verify, Choose, Send, Stay in sync. Two drawn devices (a parent's
+//! page's Look inside diagrams: Pair, Verify, Choose, Send, Stay in sync. Two drawn devices (a parent's
 //! phone and a child's tablet) talk straight to each other. Facts follow docs/app/TECHNICAL_RUNTIME.md
-//! (Nanah): a 4-character code or QR, safety words compared on both screens, a chosen share,
+//! (Nanah): a 4-character code or QR, safety phrase compared on both screens, a chosen share,
 //! an encrypted direct connection, and opt-in auto-sync. Kriti closes it.
 use fframes::{AudioMap, Color, Duration, FFramesContext, Frame, Svgr, Transform, Video, include_media_dir};
 
@@ -24,7 +24,7 @@ pub const STARTS: [f32; 6] = [0.0, 4.0, 8.0, 12.0, 16.5, 20.5];
 const STEPS: [&str; 5] = ["1  Pair", "2  Verify", "3  Choose", "4  Send", "5  Stay in sync"];
 const CAPTIONS: [[&str; 2]; 6] = [
     ["Pair with a short code or QR.", "Your phone and your child\u{2019}s device, nothing else."],
-    ["Check both show the same safety words.", "Then you know it\u{2019}s really their device."],
+    ["Check both show the same safety phrase.", "Then you know it\u{2019}s really their device."],
     ["Choose what to share.", "Filter words and Kids rules, for example."],
     ["It goes straight to their device, locked.", "No FilterTube server keeps a copy."],
     ["Later changes stay in sync.", "Turn on Auto-sync to keep them matched."],
@@ -235,7 +235,7 @@ impl Video for SyncVideo {
             )
         };
 
-        // 2 · Verify: the same three safety words on both screens, then a tick on each.
+        // 2 · Verify: the same safety phrase on both screens, then a tick on each.
         let verify = {
             let o = w[1];
             let l = local(1, t);
@@ -249,8 +249,8 @@ impl Video for SyncVideo {
             let ok = ease_out(1.9, 2.4, l);
             fframes::svgr!(
                 <g opacity={o}>
-                    {centered(pcx, sy + 50.0, "Safety words", 15.0, MUTED, 1.0)}
-                    {centered(tcx, ry + 50.0, "Safety words", 15.0, MUTED, 1.0)}
+                    {centered(pcx, sy + 50.0, "Safety phrase", 15.0, MUTED, 1.0)}
+                    {centered(tcx, ry + 50.0, "Safety phrase", 15.0, MUTED, 1.0)}
                     {items}
                     {check(pcx, sy + 258.0, 17.0, ok)}
                     {check(tcx, ry + 258.0, 17.0, ok)}
