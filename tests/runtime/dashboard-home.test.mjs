@@ -231,3 +231,59 @@ test('About tells why FilterTube exists before Kriti and Uljhan, with the forum 
     assert.match(catalog['about.why.body'], /2023|২০২৩|۲۰۲۳/, `${name} has the revised story`);
   }
 });
+
+test('a control row names its control and Change goes to that switch', () => {
+  const Home = home();
+  // Every control the log can name has a pill and a row to land on.
+  for (const control of Log.CONTROLS) assert.ok(Home.CONTROL_COPY[control], control);
+  assert.deepEqual([...Home.reasonCopy({ reason: 'control', control: 'clips' })], ['home.tried.controlName.clips', 'Clips']);
+  assert.deepEqual([...Home.reasonCopy({ reason: 'control', control: 'mixes' })], ['home.tried.controlName.mixes', 'Auto playlists']);
+  assert.deepEqual([...Home.reasonCopy({ reason: 'control', control: 'views' })], ['home.tried.controlName.views', 'View count']);
+  assert.deepEqual([...Home.reasonCopy({ reason: 'control', control: '' })], ['home.tried.control', 'Content control'], 'an old entry');
+  assert.deepEqual([...Home.reasonCopy({ reason: 'keyword', control: 'clips' })], ['home.tried.keyword', 'Matched a blocked word']);
+  const plain = value => ({ ...value });
+  assert.deepEqual(plain(Home.controlDestination('duration', 'main')), { nav: '.nav-item[data-nav-id="content"]', scope: '#filtersView', control: 'duration' });
+  assert.deepEqual(plain(Home.controlDestination('duration', 'kids', true)), { nav: '.nav-item[data-tab="kids"]', scope: '#kidsView', control: 'duration' });
+  assert.deepEqual(plain(Home.controlDestination('clips', 'kids', false)), { nav: '.nav-item[data-nav-id="content"]', scope: '#filtersView', control: 'clips' }, 'Kids has no such switch');
+  assert.deepEqual(plain(Home.controlDestination('', 'main')), { nav: '.nav-item[data-nav-id="content"]', scope: '#filtersView', control: '' }, 'unknown: just the page');
+  assert.equal(Home.controlDestination('<script>', 'main').control, '');
+  const source = read('js/dashboard_home.js');
+  assert.match(source, /t\('home\.tried\.changeControl', 'Change \{control\} setting', \{ control: reasonText \}\)/);
+  assert.match(source, /prefers-reduced-motion: reduce/);
+  assert.match(read('css/dashboard-home.css'), /@media \(prefers-reduced-motion: reduce\) \{\n  body\.ft-extension-surface \.toggle-row\.ft-control-spotlight::after \{ animation: none; opacity: 1; \}/);
+});
+
+test('every control the log names has a row on the Content Controls page (data-ft-control)', () => {
+  const box = { window: {} };
+  vm.createContext(box);
+  vm.runInContext(read('js/content_controls_catalog.js'), box);
+  const fromCatalog = box.window.FilterTubeContentControlsCatalog.getAllControls().filter(item => item.control);
+  assert.deepEqual(Object.fromEntries(fromCatalog.map(item => [item.key, item.control])), {
+    hideShorts: 'clips', hideHomeFeed: 'homeFeed', hideComments: 'comments', hidePlayables: 'playables',
+    hidePlaylistCards: 'playlistCards', hideMembersOnly: 'membersOnly', hideMixPlaylists: 'mixes'
+  });
+  const tabView = read('js/tab-view.js');
+  assert.match(tabView, /if \(control\.control\) row\.setAttribute\('data-ft-control', control\.control\);/);
+  const rows = [...tabView.matchAll(/(?:setAttribute\('data-ft-control', '|data-ft-control=")(\w+)/g)].map(match => match[1]);
+  for (const control of ['duration', 'uploadDate', 'category', 'language', 'views']) assert.ok(rows.includes(control), control);
+  const covered = new Set([...rows, ...fromCatalog.map(item => item.control)]);
+  for (const control of Log.CONTROLS) assert.ok(covered.has(control), `${control} has a row`);
+});
+
+test('the control names are in every catalog, translated, with the placeholder kept', () => {
+  const english = JSON.parse(read('data/ui_locales/en.json'));
+  const keys = Object.keys(english).filter(key => key.startsWith('home.tried.controlName.') || key === 'home.tried.changeControl');
+  assert.equal(keys.length, 13);
+  for (const name of fs.readdirSync(new URL('../../data/ui_locales/', import.meta.url))) {
+    if (!/^[a-z]{2,3}(-[A-Za-z]+)?\.json$/.test(name) || name === 'targets.json' || name === 'en.json') continue;
+    const catalog = JSON.parse(read(`data/ui_locales/${name}`));
+    for (const key of keys) {
+      assert.ok(catalog[key], `${name} ${key}`);
+      assert.doesNotMatch(catalog[key], /YouTube/, `${name} ${key}`);
+    }
+    assert.match(catalog['home.tried.changeControl'], /\{control\}/, name);
+    const copied = keys.filter(key => catalog[key] === english[key]).length;
+    // Nigerian Pidgin keeps these nouns in English, as the rest of its catalog does.
+    if (name !== 'pcm.json') assert.ok(copied <= 4, `${name}: ${copied} names left in English`);
+  }
+});
