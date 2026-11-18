@@ -218,7 +218,7 @@ export const homeUserVoices = [
   },
   {
     source: "Parent demo comment",
-    title: "Allow-only setups matter for study computers.",
+    title: "Whitelist setups matter for study computers.",
     body: "A parent said FilterTube solved nearly everything for a child’s study PC and asked for stronger protection around turning filtering off.",
     href: "https://www.youtube.com/watch?v=dmLUu3lm7dE&t=26s",
   },
@@ -228,7 +228,7 @@ export const systemSteps = [
   {
     title: "Add rules",
     description:
-      "Choose words, channels, videos, comments, Shorts, or whitelist rules from the dashboard.",
+      "Choose words, channels, videos, comments, Shorts, or Whitelist rules from the dashboard.",
     icon: Compass,
   },
   {
@@ -341,9 +341,9 @@ export const homeTechnicalFeatures = [
     detail: "Files add rules only; they do not change PINs or profiles.",
   },
   {
-    title: "Subscribed-channel whitelist",
+    title: "Subscribed-channel Whitelist",
     description:
-      "Import channels from the signed-in viewing account into the current profile whitelist, then choose whether to only store them or turn whitelist mode on.",
+      "Import channels from the signed-in viewing account into the current profile’s Whitelist, then choose whether to only store them or turn Whitelist mode on.",
     detail: "Useful when a child should only see channels already subscribed.",
   },
   {
@@ -565,7 +565,7 @@ export const detailPages = {
         points: [
           "Block unwanted channels, keywords or videos, or use Whitelist for approved content. Keep Blocked and Allowed rules with exceptions; editing a list does not switch your viewing mode.",
           "Paste a channel handle, ID or supported URL. Use Exact for precise keywords, filter supported comments, and choose creators on supported collaboration cards.",
-          "Import subscribed channels into the current profile's whitelist, then choose whether to enable Whitelist mode. Main and Kids retain separate rule spaces and modes.",
+          "Import subscribed channels into the current profile's Whitelist, then choose whether to enable Whitelist mode. Main and Kids retain separate rule spaces and modes.",
           "Narrow videos by length, upload date, uppercase titles and—in newer releases—minimum views. Search and sort saved rules separately by when they were added.",
           "Choose from 15 video categories or 32 experimental Main video-language options using available metadata. Language filtering is not speech recognition and is not exposed for Kids; missing metadata can limit any content decision.",
         ],
@@ -695,7 +695,7 @@ export const detailPages = {
       {
         label: "Quick actions",
         value: "4",
-        detail: "Hide Shorts, hide comments, whitelist mode, Kids mode.",
+        detail: "Hide Shorts, hide comments, Whitelist mode, Kids mode.",
       },
       {
         label: "Primary habit",
@@ -1344,7 +1344,7 @@ export const detailPages = {
     titleDisplay: "children watch",
     description:
       "Block channels and words you do not want in Kids—or choose Whitelist to allow only the channels you approve. Give each child their own rules and viewing limits, with changes managed by their parent.",
-    chips: ["Channel + keyword filters", "Allow-only viewing", "Parent-managed profiles"],
+    chips: ["Channel + keyword filters", "Whitelist viewing", "Parent-managed profiles"],
     primaryCta: { label: "Get the Android app", href: androidPlayStoreHref, external: true },
     secondaryCta: { label: "Get the browser extension", href: downloadsHref, external: false },
     previewLabel: "A simple starting point",
@@ -1464,7 +1464,7 @@ export const detailPages = {
     milestoneIntro:
       "FilterTube already works today through explicit rules. A future local intelligence layer would extend that system without changing the privacy posture.",
     milestones: [
-      "Current release: keyword, channel, Shorts, comments, whitelist, and profile controls already work in FilterTube today on desktop browsers.",
+      "Current release: keyword, channel, Shorts, comments, Whitelist, and profile controls already work in FilterTube today on desktop browsers.",
       "Research track: local semantic matching and suggestion support could extend those rules without sending user behavior to the cloud.",
       "Later-stage exploration: thumbnail analysis only belongs in the roadmap until a local, explainable implementation is real.",
     ],

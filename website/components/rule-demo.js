@@ -22,17 +22,17 @@ const builtFromTrusted = [
 
 const modes = {
   block: {
-    label: "Block list",
+    label: "Blocklist",
     pose: "uljhanShrug",
     title: "Hide what you name, everywhere.",
     body: "Add a word, a channel, Shorts, comments or a whole category. FilterTube hides it on Home, in search, under the player and in Kids, and keeps everything else.",
     names: ["Words", "Channels", "Shorts", "Comments", "Categories"],
   },
   allow: {
-    label: "Allow list",
+    label: "Whitelist",
     pose: "kritiPoint",
-    title: "Show only what you trust.",
-    body: "Choose your channels and topics, and only they show. FilterTube also builds your feed from them, so the page is never empty. Some people call this a whitelist.",
+    title: "Only what you allow shows up.",
+    body: "Choose your channels and topics, and only they show. FilterTube also builds your feed from them, so the page is never empty.",
     names: ["Your channels", "Your topics", "A feed built from them"],
   },
 };
@@ -44,7 +44,7 @@ function rowsFor(mode) {
   const kept = feed.filter((item) => trusted.has(item.channel));
   const out = feed
     .filter((item) => !trusted.has(item.channel))
-    .map((item) => ({ ...item, hidden: true, reason: "not on your allow list" }));
+    .map((item) => ({ ...item, hidden: true, reason: "not on your Whitelist" }));
   return [...kept, ...builtFromTrusted, ...out];
 }
 
@@ -59,7 +59,7 @@ export function RuleDemo() {
   return (
     <div className="ft-rule-demo grid gap-6 lg:grid-cols-[minmax(0,1.05fr)_minmax(0,0.95fr)] lg:gap-10">
       <div>
-        <div aria-label="Kind of rule" className="ft-segmented" role="radiogroup">
+        <div aria-label="Mode" className="ft-segmented" role="radiogroup">
           {Object.entries(modes).map(([key, value]) => (
             <button
               aria-checked={mode === key}
@@ -75,7 +75,7 @@ export function RuleDemo() {
           ))}
         </div>
 
-        <ul aria-label={`Example feed with a ${copy.label.toLowerCase()}`} className="ft-feed mt-5" id={panelId}>
+        <ul aria-label={`Example feed in ${copy.label} mode`} className="ft-feed mt-5" id={panelId}>
           {rows.map((row) => (
             <li className="ft-feed-row" data-added={row.added || undefined} data-hidden={row.hidden || undefined} data-short={row.short || undefined} key={row.id}>
               <span aria-hidden="true" className="ft-feed-thumb" data-tint={row.tint} />

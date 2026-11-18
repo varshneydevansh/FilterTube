@@ -98,7 +98,7 @@ export const capabilityTiles = [
     label: "Context-aware rules",
     title: "Filtering goes beyond simple word lists.",
     description:
-      "Whole-word matching, channel identity normalization, whitelist mode, and content-based rules keep FilterTube useful even when the platform's data structures shift.",
+      "Whole-word matching, channel identity normalization, Whitelist mode, and content-based rules keep FilterTube useful even when the platform's data structures shift.",
     points: [
       "Handles, UC IDs, and custom channel URLs are normalized behind the scenes.",
       "Category filters and clickbait detection extend the rule system beyond static phrases.",
@@ -124,7 +124,7 @@ export const pipelineSteps = [
   {
     title: "Filter",
     description:
-      "Apply blocklist or whitelist rules, content controls, and profile-specific logic to the dataset.",
+      "Apply Blocklist or Whitelist rules, content controls, and profile-specific logic to the dataset.",
     icon: EyeSlash,
   },
   {

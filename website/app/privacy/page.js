@@ -19,7 +19,7 @@ const summaryCards = [
     label: "Rules and history",
     value: "Not uploaded to FilterTube",
     detail:
-      "Your blocklists, whitelists, keywords, PIN state, watch history, and search history are not uploaded into a FilterTube account or dashboard.",
+      "Your Blocklist and Whitelist rules, keywords, PIN state, watch history, and search history are not uploaded into a FilterTube account or dashboard.",
   },
   {
     label: "Nanah sync",
@@ -72,14 +72,14 @@ const noProductCollection = [
   "Your Google password, service login token, private account credential, or payment details",
   "Your complete video watch history or search history",
   "Your general browsing history outside supported FilterTube surfaces",
-  "Your FilterTube blocklist, whitelist, keywords, profile settings, PIN state, Kids/Main viewing choice, theme, or route controls as something we can view online",
+  "Your FilterTube Blocklist, Whitelist, keywords, profile settings, PIN state, Kids/Main viewing choice, theme, or route controls as something we can view online",
   "Contacts, photos, camera stream, microphone recordings, precise location, or phone contacts",
   "Advertising identifiers, ad-targeting profiles, data broker profiles, or cross-site tracking identifiers",
   "Children's personal information for a FilterTube account, advertising profile, or recommendation model",
 ];
 
 const localData = [
-  "Blocked channels, allowed channels, keywords, whitelist entries, blocklist entries, Shorts rules, comments controls, route rules, and watch-page controls",
+  "Blocked channels, allowed channels, keywords, Whitelist entries, Blocklist entries, Shorts rules, comments controls, route rules, and watch-page controls",
   "Profiles, profile type, PIN protection state, selected viewing space, Kids/Main preferences, theme preference, and native control preferences",
   "Local counters or status information used to show what FilterTube filtered or which profile is active",
   "Optional backup, export, and import files that you create and manage yourself",
@@ -290,7 +290,7 @@ const faq = [
       "No. Search terms are handled by Google on its video services. FilterTube does not create a FilterTube search-history account or analytics profile.",
   },
   {
-    question: "Where are my blocklists, keywords, and profiles stored?",
+    question: "Where are my Blocklist and Whitelist rules, keywords, and profiles stored?",
     answer:
       "They are stored locally in the app or extension installation, unless you explicitly export them or start a Nanah sync.",
   },
