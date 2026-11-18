@@ -22,7 +22,7 @@ export const poses = {
 // Horizontal strips: `frames` cells of frameWidth x height, played with CSS steps().
 export const motions = {
   sieve: {
-    src: "/mascots/duo-sieve-v3.webp", frames: 12, frameWidth: 235, height: 260, fps: 7, still: 5,
+    src: "/mascots/duo-sieve-v3.webp", frames: 12, frameWidth: 252, height: 280, fps: 7, still: 5,
     alt: "Kriti holds the red FilterTube funnel. Uljhan hops in, wriggles through, and hops out the other side.",
   },
   medal: {

@@ -138,7 +138,7 @@ export function HowItWorks() {
           </Reveal>
           <Reveal>
             <figure className="ft-paper ft-paper-ruled mx-auto w-full max-w-[26rem] rounded-[2rem] px-6 pb-5 pt-6">
-              <MascotSprite className="mx-auto w-[min(15rem,70%)]" motion="sieve" />
+              <MascotSprite className="mx-auto w-[min(16.5rem,76%)]" motion="sieve" />
               <figcaption className="mt-3 text-center font-editorial text-xl leading-snug text-[#5d4a40]">
                 Kriti holds the funnel. Uljhan hops through and out of your feed, no hard feelings.
               </figcaption>

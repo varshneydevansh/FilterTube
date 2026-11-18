@@ -119,7 +119,9 @@ def save_poses(frames, names, height, out_dir, quality=80):
 def main(lib, out):
     os.makedirs(out, exist_ok=True)
     g = os.path.join(lib, "sheets", "generic")
-    save_strip(split_grid(os.path.join(g, "duo_sieve_loop_v3_redfunnel_sheet.png"), 2, 6), 260, os.path.join(out, "duo-sieve-v3.webp"))
+    # duo-sieve-v3.webp is not cut here any more: a fixed 2x6 grid sliced Kriti's hair bun and let her
+    # jitter. It comes from mascot-tools/duo_sieve_fix (ink assigned per Kriti, row two scaled to row one,
+    # frames registered on her shorts, padded 0.9:1 canvas), 12 frames of 252x280.
     save_strip(split_grid(os.path.join(g, "duo_milestone_medal_sheet.png"), 1, 6), 240, os.path.join(out, "duo-medal.webp"))
     untangle_dir = os.path.join(lib, "frames", "duo_offline_untangle")
     untangle = [Image.open(os.path.join(untangle_dir, f)).convert("RGBA") for f in sorted(os.listdir(untangle_dir)) if f.endswith(".png")]
