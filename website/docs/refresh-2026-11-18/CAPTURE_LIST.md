@@ -35,12 +35,14 @@ Six screens on each of five devices, from the latest builds. Every screen the si
 2. In `website/data/screenshots.js`, point the device's slot at the file, set the real `width` and `height`, and set `current: true`. Write a short `alt` that says what's on screen, without naming the video site.
 3. The home device strip, the platform galleries and the iPad placeholder update on their own. Run `npm run build` to check.
 
-## Status (updated 2026-11-18)
+## Status (updated 2026-11-18, extras refresh)
+
+Fresh captures from the latest builds (Android 3.6.2 debug on Pixel_9a-class and Pixel_Tablet emulators, TV debug on a 1080p TV emulator, iOS feature/ios-parity on an iPhone simulator). Phone Sangeet shots are the owner's own Pixel captures.
 
 | Device | Done | Still open |
 |---|---|---|
-| iPhone | Home, Study, Watch, Kids, Controls, Sangeet | None |
-| iPad | Home (Study session running), Study plan, Watch, Kids, Controls, Sangeet (2420 x 1668 landscape) | None |
-| Android phone | Study, Watch, Controls, Sangeet | Home and Kids: the owner is capturing these on a real phone |
-| Android tablet | Home, Study, Watch, Controls, Sangeet | Kids is from 3.5.0 |
-| Android TV | Controls, Kids Home | Home, Watch, Sangeet and Study home. TV has no Study feature (only Self-Control), the emulator's Home is a personal signed-in feed, the player renders black and Sangeet stays on "Preparing audio". Capture these on a real TV. |
+| iPhone | Home, Study, Watch, Kids, Controls, Sangeet, plus extras: viewing spaces, keyword filters, search, player, player settings, You, Sangeet moods, Sangeet search, channel rules, content controls, Accounts & Sync, settings, integrations, Kids Mode, study session, session done | Chapters and channel page (the sample lecture has no chapters; the channel page was not captured), Study break screen (needs a timed break), Sangeet Home and queue (the Home feed shows explicit items) |
+| iPad | Home, Study, Watch, Kids, Controls, Sangeet | None |
+| Android phone | Study, Watch, Controls, Sangeet (owner Pixel), extras: viewing spaces, search, player, player settings, chapters, channel + mini player, Sangeet Explore, moods, podcasts, focus, playlist, queue (owner Pixel), You, channel rules, content controls, Accounts & Sync, pairing, Kids Mode, Self-Control, settings, integrations | Home and Kids Home (owner is capturing on a real phone); Kids screens (home, parent PIN, search, watch, rules) |
+| Android tablet | Home, Study, Watch, Controls, Sangeet, Sangeet Explore, search grid, block menu | Kids home, search and two-pane watch |
+| Android TV | Controls, Home, Kids Home, viewing spaces, search, search results, You, filters, Kids Mode, settings, Accounts & Sync, Kids search, Kids watch | Watch (the ambient glow did not render on the emulator, so the old capture stays), Subscriptions (the feed is a personal one with gaming items) |
