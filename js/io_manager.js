@@ -1153,6 +1153,8 @@
                     ...kids,
                     mode: kids.mode === 'whitelist' ? 'whitelist' : 'blocklist',
                     strictMode: kids.strictMode !== false,
+                    // Kids' own Quiet blocking: a real boolean when present (absent reads as off).
+                    ...(Object.prototype.hasOwnProperty.call(kids, 'quietBlocking') ? { quietBlocking: kids.quietBlocking === true } : {}),
                     blockedChannels: safeArray(kids.blockedChannels)
                         .map(entry => sanitizeChannelEntry(entry, { source: entry?.source || source }))
                         .filter(Boolean),

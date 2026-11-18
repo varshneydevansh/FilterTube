@@ -4796,6 +4796,11 @@ async function getCompiledSettings(sender = null, profileType = null, forceRefre
             compiledSettings.disableAutoplay = boolFromV4('disableAutoplay', items.disableAutoplay || false);
             compiledSettings.skipBlockedAutoplay = boolFromV4('skipBlockedAutoplay', items.skipBlockedAutoplay || false);
             compiledSettings.quietBlocking = boolFromV4('quietBlocking', items.quietBlocking || false);
+            // The Kids space has its own Quiet blocking (profile.kids.quietBlocking, off by default);
+            // Main's setting never quiets the Kids site, and the Kids one never quiets Main.
+            if (shouldUseKidsProfile) {
+                compiledSettings.quietBlocking = activeKids.quietBlocking === true;
+            }
             compiledSettings.alwaysUseOriginalAudio = boolFromV4('alwaysUseOriginalAudio', items.alwaysUseOriginalAudio || false);
             compiledSettings.disableAnnotations = boolFromV4('disableAnnotations', items.disableAnnotations || false);
             compiledSettings.hideTopHeader = boolFromV4('hideTopHeader', items.hideTopHeader || false);

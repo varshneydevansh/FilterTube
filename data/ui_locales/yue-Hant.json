@@ -1075,6 +1075,7 @@
   "tabView.kidsSync.title": "啟用後，呢個個人檔案中模式相符嘅 Kids 規則亦會套用到主站。Kids blocklist 只會同步到 Main blocklist；Kids whitelist 只會同步到 Main whitelist。",
   "tabView.kidsSync.heading": "喺主站套用相符嘅 Kids 規則",
   "tabView.kidsSync.hint": "同步項目會喺你的主清單顯示「來自 Kids」標籤。模式唔相符時，規則唔會反轉。",
+  "tabView.kidsQuietBlocking.hint": "喺 Kids 隱藏已封鎖嘅影片，唔顯示原因",
   "dashboard.importReport.completeTitle": "匯入完成",
   "dashboard.importReport.reviewedRulesSaved": "已儲存已審閱的規則。",
   "dashboard.importReport.completionSummary": "{complete} 個頻道列已完成 · {incomplete} 個正在背景完成 · {attention} 個需要處理",

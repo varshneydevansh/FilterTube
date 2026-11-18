@@ -1075,6 +1075,7 @@
   "tabView.kidsSync.title": "Ikiwashwa, sheria za Watoto za hali inayolingana pia hutumika kwenye Kuu kwa wasifu huu. Orodha ya kuzuia ya Watoto husawazishwa kwenye orodha ya kuzuia ya Kuu pekee; orodha ya kuruhusu ya Watoto husawazishwa kwenye orodha ya kuruhusu ya Kuu pekee.",
   "tabView.kidsSync.heading": "Tumia sheria zinazolingana za Watoto kwenye Kuu",
   "tabView.kidsSync.hint": "Vipengee vilivyosawazishwa vitaonekana kwenye orodha yako kuu vikiwa na beji ya “Kutoka Kids”. Hali zisizolingana hazibadili sheria kinyume.",
+  "tabView.kidsQuietBlocking.hint": "Ficha video zilizozuiwa kwenye Kids bila kuonyesha sababu",
   "dashboard.importReport.completeTitle": "Uingizaji umekamilika",
   "dashboard.importReport.reviewedRulesSaved": "Sheria zilizokaguliwa zimehifadhiwa.",
   "dashboard.importReport.completionSummary": "Safu za chaneli {complete} zimekamilika · {incomplete} zinakamilishwa chinichini · {attention} zinahitaji uangalizi",

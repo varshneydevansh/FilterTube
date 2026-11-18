@@ -1075,6 +1075,7 @@
   "tabView.kidsSync.title": "Nígbà tí a bá tàn án, àwọn òfin Kids tí ipò wọn bá mu tún máa ń ṣiṣẹ́ lórí Àkọ́kọ́ fún profaili yìí. Àkójọ ìdènà Kids máa ń bá àkójọ ìdènà Àkọ́kọ́ nìkan mu; àkójọ ìfàyègba Kids máa ń bá àkójọ ìfàyègba Àkọ́kọ́ nìkan mu.",
   "tabView.kidsSync.heading": "Lo àwọn òfin Kids tó bá mu lórí Àkọ́kọ́",
   "tabView.kidsSync.hint": "Àwọn ohun tí a mú bá ara wọn mu yóò ní àmì “Láti Kids” nínú àkójọ àkọ́kọ́ rẹ. Àwọn ipò tí kò bá mu kì í yí òfin padà sí òdì.",
+  "tabView.kidsQuietBlocking.hint": "Fi àwọn fídíò tí a dí pamọ́ lórí Kids láìsọ ìdí",
   "dashboard.importReport.completeTitle": "Gbigbe wọlé ti parí",
   "dashboard.importReport.reviewedRulesSaved": "A ti fi àwọn òfin tí a ṣàyẹ̀wò pamọ́.",
   "dashboard.importReport.completionSummary": "Àwọn ìlà ikanni {complete} ti parí · {incomplete} ń parí ní ẹ̀yìn · {attention} nílò àfiyèsí",

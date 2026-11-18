@@ -1075,6 +1075,7 @@
   "tabView.kidsSync.title": "চালু থাকলে, মিলে যাওয়া মোডের Kids নিয়ম এই প্রোফাইলের মূল-এও প্রয়োগ হয়। Kids ব্লকলিস্ট শুধু মূল ব্লকলিস্টে সিঙ্ক হয়; Kids হোয়াইটলিস্ট শুধু মূল হোয়াইটলিস্টে।",
   "tabView.kidsSync.heading": "মিলে যাওয়া Kids নিয়ম মূল-এ প্রয়োগ করুন",
   "tabView.kidsSync.hint": "সিঙ্ক করা আইটেম আপনার প্রধান তালিকায় “Kids থেকে” ব্যাজসহ দেখা যাবে। আলাদা মোড নিয়ম উল্টে দেয় না।",
+  "tabView.kidsQuietBlocking.hint": "Kids-এ ব্লক করা ভিডিও কারণ না দেখিয়ে লুকিয়ে রাখুন",
   "dashboard.importReport.completeTitle": "আমদানি সম্পূর্ণ হয়েছে",
   "dashboard.importReport.reviewedRulesSaved": "পর্যালোচনা করা নিয়মগুলো সংরক্ষিত হয়েছে।",
   "dashboard.importReport.completionSummary": "{complete}টি চ্যানেল সারি সম্পূর্ণ · {incomplete}টি ব্যাকগ্রাউন্ডে সম্পূর্ণ হচ্ছে · {attention}টিতে মনোযোগ দরকার",

@@ -1075,6 +1075,7 @@
   "tabView.kidsSync.title": "启用后，此个人资料的 Kids 规则也会按相同模式应用于主站。Kids 屏蔽名单仅同步到主站屏蔽名单；Kids 许可名单仅同步到主站许可名单。",
   "tabView.kidsSync.heading": "在主站上应用匹配的 Kids 规则",
   "tabView.kidsSync.hint": "同步的项目会在主列表中显示“来自 Kids”标记。模式不匹配时不会反转规则。",
+  "tabView.kidsQuietBlocking.hint": "在 Kids 上隐藏已屏蔽的视频，不显示原因",
   "dashboard.importReport.completeTitle": "导入完成",
   "dashboard.importReport.reviewedRulesSaved": "已保存审核后的规则。",
   "dashboard.importReport.completionSummary": "{complete} 个频道条目已完成 · {incomplete} 个正在后台完成 · {attention} 个需要处理",

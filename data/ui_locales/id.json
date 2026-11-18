@@ -1075,6 +1075,7 @@
   "tabView.kidsSync.title": "Jika diaktifkan, aturan Kids dengan mode yang sama juga berlaku di Utama untuk profil ini. Daftar blokir Kids hanya disinkronkan ke daftar blokir Utama; daftar izin Kids hanya disinkronkan ke daftar izin Utama.",
   "tabView.kidsSync.heading": "Terapkan aturan Kids yang cocok di Utama",
   "tabView.kidsSync.hint": "Item yang disinkronkan tampil di daftar utama dengan lencana “Dari Kids”. Mode yang berbeda tidak membalik aturan.",
+  "tabView.kidsQuietBlocking.hint": "Sembunyikan video yang diblokir di Kids tanpa menampilkan alasannya",
   "dashboard.importReport.completeTitle": "Impor Selesai",
   "dashboard.importReport.reviewedRulesSaved": "Aturan yang ditinjau telah disimpan.",
   "dashboard.importReport.completionSummary": "{complete} baris kanal selesai · {incomplete} sedang diselesaikan di latar belakang · {attention} perlu perhatian",

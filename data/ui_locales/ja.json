@@ -1075,6 +1075,7 @@
   "tabView.kidsSync.title": "有効にすると、このプロフィールの Kids ルールのうち同じモードのものがメインにも適用されます。Kids のブロックリストはメインのブロックリストにのみ同期され、Kids の許可リストはメインの許可リストにのみ同期されます。",
   "tabView.kidsSync.heading": "メインに同じモードの Kids ルールを適用",
   "tabView.kidsSync.hint": "同期した項目にはメインリストで「Kids から」バッジが表示されます。モードが異なってもルールは反転しません。",
+  "tabView.kidsQuietBlocking.hint": "Kids でブロックした動画を、理由を表示せずに隠します",
   "dashboard.importReport.completeTitle": "インポート完了",
   "dashboard.importReport.reviewedRulesSaved": "確認したルールを保存しました。",
   "dashboard.importReport.completionSummary": "チャンネル行 {complete} 件完了 · {incomplete} 件をバックグラウンドで処理中 · {attention} 件に対応が必要",

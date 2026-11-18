@@ -39,7 +39,8 @@
         settings: [...booleanSettings, 'contentFilters', 'categoryFilters', 'languageFilters'],
         // layered: true (written only when on) keeps the block list applying under the allow list.
         main: ['mode', 'layered', 'channels', 'keywords', 'whitelistChannels', 'whitelistKeywords', 'videoIds', 'allowedVideoIds'],
-        kids: ['mode', 'layered', 'strictMode', 'blockedChannels', 'blockedKeywords', 'whitelistChannels', 'whitelistKeywords', 'videoIds', 'contentFilters', 'categoryFilters']
+        // quietBlocking (Kids' own Quiet blocking) is also written only when on, like layered.
+        kids: ['mode', 'layered', 'strictMode', 'quietBlocking', 'blockedChannels', 'blockedKeywords', 'whitelistChannels', 'whitelistKeywords', 'videoIds', 'contentFilters', 'categoryFilters']
     };
     const contentGroups = {
         views: ['enabled', 'minViews'],
@@ -206,7 +207,7 @@
                 else if (section === 'settings') {
                     requireValue(typeof item === 'boolean');
                 } else if (key === 'mode') requireValue(item === 'whitelist' || item === 'blocklist');
-                else if (key === 'strictMode' || key === 'layered') requireValue(typeof item === 'boolean');
+                else if (key === 'strictMode' || key === 'layered' || key === 'quietBlocking') requireValue(typeof item === 'boolean');
                 else validateList(item, key);
             }
         }
@@ -270,7 +271,7 @@
                 const value = own(source, key) ? source[key] : alias && own(source, alias) ? source[alias] : legacy;
                 if (value === undefined) continue;
                 // Written only when on, like the apps, so a peer that never used layered rules sees no change.
-                if (key === 'layered' && value !== true) continue;
+                if ((key === 'layered' || (section === 'kids' && key === 'quietBlocking')) && value !== true) continue;
                 if (key === 'contentFilters') {
                     result[section].contentFilters = selectedContentFilters(value);
                 } else if (key === 'categoryFilters' || key === 'languageFilters') {

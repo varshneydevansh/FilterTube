@@ -1075,6 +1075,7 @@
   "tabView.kidsSync.title": "Khi bật, các quy tắc Kids có cùng chế độ cũng áp dụng trên Chính cho hồ sơ này. Danh sách chặn Kids chỉ đồng bộ với danh sách chặn chính; danh sách cho phép Kids chỉ đồng bộ với danh sách cho phép chính.",
   "tabView.kidsSync.heading": "Áp dụng quy tắc Kids tương ứng trên Chính",
   "tabView.kidsSync.hint": "Các mục được đồng bộ sẽ có nhãn “Từ Kids” trong danh sách chính. Khác chế độ không làm đảo ngược quy tắc.",
+  "tabView.kidsQuietBlocking.hint": "Ẩn video bị chặn trên Kids mà không cho biết lý do",
   "dashboard.importReport.completeTitle": "Đã nhập xong",
   "dashboard.importReport.reviewedRulesSaved": "Đã lưu các quy tắc được xem xét.",
   "dashboard.importReport.completionSummary": "Đã hoàn tất {complete} hàng kênh · {incomplete} đang hoàn tất trong nền · {attention} cần chú ý",

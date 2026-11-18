@@ -1075,6 +1075,7 @@
   "tabView.kidsSync.title": "Etkinleştirildiğinde, eşleşen moddaki Çocuk kuralları bu profil için Ana alanda da uygulanır. Çocuk engelleme listesi yalnızca Ana engelleme listesine, Çocuk beyaz listesi yalnızca Ana beyaz listesine eşitlenir.",
   "tabView.kidsSync.heading": "Eşleşen Çocuk kurallarını Ana alanda uygula",
   "tabView.kidsSync.hint": "Eşitlenen öğeler ana listenizde “Kids'ten” rozetiyle görünür. Farklı modlar kuralları tersine çevirmez.",
+  "tabView.kidsQuietBlocking.hint": "Kids'te engellenen videoları nedenini göstermeden gizle",
   "dashboard.importReport.completeTitle": "İçe aktarma tamamlandı",
   "dashboard.importReport.reviewedRulesSaved": "İncelenen kurallar kaydedildi.",
   "dashboard.importReport.completionSummary": "{complete} kanal satırı tamamlandı · {incomplete} arka planda tamamlanıyor · {attention} ilgi gerekiyor",

@@ -1075,6 +1075,7 @@
   "tabView.kidsSync.title": "ሲበራ፣ ተዛማጅ ሁነታ ያላቸው የKids ደንቦች ለዚህ መገለጫ በዋና ላይም ይተገበራሉ። የKids ማገጃ ዝርዝር ወደ ዋና ማገጃ ዝርዝር ብቻ፣ የKids ፈቃድ ዝርዝር ወደ ዋና ፈቃድ ዝርዝር ብቻ ይመሳሰላል።",
   "tabView.kidsSync.heading": "ተዛማጅ የKids ደንቦችን በዋና ላይ ተግብር",
   "tabView.kidsSync.hint": "የተመሳሰሉ ንጥሎች በዋናው ዝርዝርዎ ውስጥ «ከKids» የሚል ምልክት ይታያቸዋል። የማይዛመዱ ሁነታዎች ሕጎችን አይገለብጡም።",
+  "tabView.kidsQuietBlocking.hint": "በKids ላይ የታገዱ ቪዲዮዎችን ምክንያቱን ሳያሳዩ ደብቅ",
   "dashboard.importReport.completeTitle": "ማስመጣት ተጠናቋል",
   "dashboard.importReport.reviewedRulesSaved": "የተገመገሙ ሕጎች ተቀምጠዋል።",
   "dashboard.importReport.completionSummary": "{complete} የቻናል ረድፎች ተጠናቀዋል · {incomplete} በጀርባ ላይ እየተጠናቀቁ ነው · {attention} እርምጃ ይፈልጋሉ",

@@ -1075,6 +1075,7 @@
   "tabView.kidsSync.title": "Yen diuripake, aturan Kids sing mode-ne cocog kanggo profil iki uga ditrapake ing Utama. Blocklist Kids mung diselarasake menyang blocklist Utama; whitelist Kids mung menyang whitelist Utama.",
   "tabView.kidsSync.heading": "Terapake aturan Kids sing cocog ing Utama",
   "tabView.kidsSync.hint": "Item sing diselarasake katon ing dhaptar utama nganggo tandha “Saka Kids”. Mode sing ora cocog ora mbalikke aturan.",
+  "tabView.kidsQuietBlocking.hint": "Ndhelikake video sing diblokir ing Kids tanpa nuduhake alesane",
   "dashboard.importReport.completeTitle": "Impor rampung",
   "dashboard.importReport.reviewedRulesSaved": "Aturan sing wis ditinjau disimpen.",
   "dashboard.importReport.completionSummary": "Baris saluran {complete} rampung · {incomplete} lagi dirampungake ing latar mburi · {attention} mbutuhake kawigaten",

@@ -1075,6 +1075,7 @@
   "tabView.kidsSync.title": "Al activarse, las reglas de Kids con el mismo modo también se aplican en Principal para este perfil. La lista de bloqueo de Kids solo se sincroniza con la lista de bloqueo de Principal; la lista de permitidos de Kids solo con la de Principal.",
   "tabView.kidsSync.heading": "Aplicar las reglas coincidentes de Kids en Principal",
   "tabView.kidsSync.hint": "Los elementos sincronizados aparecen en tu lista principal con una etiqueta «De Kids». Los modos distintos no invierten las reglas.",
+  "tabView.kidsQuietBlocking.hint": "Ocultar los vídeos bloqueados en Kids sin mostrar el motivo",
   "dashboard.importReport.completeTitle": "Importación completada",
   "dashboard.importReport.reviewedRulesSaved": "Se guardaron las reglas revisadas.",
   "dashboard.importReport.completionSummary": "{complete} filas de canales completadas · {incomplete} completándose en segundo plano · {attention} requieren atención",

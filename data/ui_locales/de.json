@@ -1075,6 +1075,7 @@
   "tabView.kidsSync.title": "Wenn diese Option aktiviert ist, gelten Kids-Regeln mit demselben Modus für dieses Profil auch im Hauptbereich. Die Kids-Sperrliste wird nur mit der Haupt-Sperrliste synchronisiert, die Kids-Zulassungsliste nur mit der Haupt-Zulassungsliste.",
   "tabView.kidsSync.heading": "Passende Kids-Regeln im Hauptbereich anwenden",
   "tabView.kidsSync.hint": "Synchronisierte Einträge erscheinen in deiner Hauptliste mit dem Hinweis „Aus Kids“. Unterschiedliche Modi kehren Regeln nicht um.",
+  "tabView.kidsQuietBlocking.hint": "Gesperrte Videos in Kids ausblenden, ohne den Grund zu zeigen",
   "dashboard.importReport.completeTitle": "Import abgeschlossen",
   "dashboard.importReport.reviewedRulesSaved": "Die geprüften Regeln wurden gespeichert.",
   "dashboard.importReport.completionSummary": "{complete} Kanalzeilen abgeschlossen · {incomplete} werden im Hintergrund bearbeitet · {attention} benötigen Aufmerksamkeit",

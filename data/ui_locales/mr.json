@@ -1075,6 +1075,7 @@
   "tabView.kidsSync.title": "सक्षम केल्यावर, जुळणाऱ्या मोडचे मुलांसाठी नियम या प्रोफाइलसाठी मुख्य विभागातही लागू होतात. मुलांसाठी ब्लॉकलिस्ट फक्त मुख्य ब्लॉकलिस्टमध्ये सिंक होते; मुलांसाठी व्हाइटलिस्ट फक्त मुख्य व्हाइटलिस्टमध्ये सिंक होते.",
   "tabView.kidsSync.heading": "जुळणारे मुलांसाठी नियम मुख्य विभागात लागू करा",
   "tabView.kidsSync.hint": "सिंक केलेले आयटम तुमच्या मुख्य यादीत “Kids मधून” बॅजसह दिसतात. वेगवेगळे मोड नियम उलटवत नाहीत.",
+  "tabView.kidsQuietBlocking.hint": "Kids वर ब्लॉक केलेले व्हिडिओ कारण न दाखवता लपवा",
   "dashboard.importReport.completeTitle": "इंपोर्ट पूर्ण झाले",
   "dashboard.importReport.reviewedRulesSaved": "तपासलेले नियम जतन केले.",
   "dashboard.importReport.completionSummary": "{complete} चॅनल नोंदी पूर्ण · {incomplete} पार्श्वभूमीत पूर्ण होत आहेत · {attention} कडे लक्ष देणे आवश्यक",

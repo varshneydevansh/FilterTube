@@ -1075,6 +1075,7 @@
   "tabView.kidsSync.title": "Kapag naka-enable, inilalapat din ang mga rule ng Kids na tugma ang mode sa Main para sa profile na ito. Sa Main blocklist lang nagsi-sync ang Kids blocklist; sa Main whitelist lang nagsi-sync ang Kids whitelist.",
   "tabView.kidsSync.heading": "Ilapat ang mga tugmang rule ng Kids sa Main",
   "tabView.kidsSync.hint": "Lalabas ang mga naka-sync na item sa pangunahing listahan mo na may badge na \"Mula sa Kids\". Hindi binabaligtad ng hindi tugmang mga mode ang mga patakaran.",
+  "tabView.kidsQuietBlocking.hint": "Itago ang mga naka-block na video sa Kids nang hindi ipinapakita kung bakit",
   "dashboard.importReport.completeTitle": "Kumpleto ang pag-import",
   "dashboard.importReport.reviewedRulesSaved": "Na-save ang mga sinuring patakaran.",
   "dashboard.importReport.completionSummary": "Kumpleto ang {complete} channel row · kinukumpleto pa sa background ang {incomplete} · nangangailangan ng aksyon ang {attention}",

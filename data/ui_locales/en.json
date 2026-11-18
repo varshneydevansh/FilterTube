@@ -1082,6 +1082,7 @@
   "tabView.kidsSync.title": "When enabled, matching-mode Kids rules are also applied on Main for this profile. Kids blocklist syncs only into Main blocklist; Kids whitelist syncs only into Main whitelist.",
   "tabView.kidsSync.heading": "Apply matching Kids rules on Main",
   "tabView.kidsSync.hint": "Synced items show in your main list with a \"From Kids\" badge. Mismatched modes do not invert rules.",
+  "tabView.kidsQuietBlocking.hint": "Hide blocked videos in Kids without showing why",
   "dashboard.importReport.completeTitle": "Import Complete",
   "dashboard.importReport.reviewedRulesSaved": "The reviewed rules were saved.",
   "dashboard.importReport.completionSummary": "{complete} channel rows complete · {incomplete} completing in background · {attention} need attention",

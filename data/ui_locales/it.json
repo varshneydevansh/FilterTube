@@ -1075,6 +1075,7 @@
   "tabView.kidsSync.title": "Se attive, le regole di Kids con modalità corrispondente vengono applicate anche su Principale per questo profilo. La blocklist di Kids si sincronizza solo con la blocklist di Principale; la whitelist di Kids solo con la whitelist di Principale.",
   "tabView.kidsSync.heading": "Applica su Principale le regole Kids corrispondenti",
   "tabView.kidsSync.hint": "Gli elementi sincronizzati appaiono nell'elenco principale con il badge “Da Kids”. Le modalità non corrispondenti non invertono le regole.",
+  "tabView.kidsQuietBlocking.hint": "Nascondi i video bloccati su Kids senza mostrare il motivo",
   "dashboard.importReport.completeTitle": "Importazione completata",
   "dashboard.importReport.reviewedRulesSaved": "Le regole esaminate sono state salvate.",
   "dashboard.importReport.completionSummary": "{complete} righe dei canali completate · {incomplete} in completamento in background · {attention} richiedono attenzione",

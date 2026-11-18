@@ -1075,6 +1075,7 @@
   "tabView.kidsSync.title": "启用后，此个人资料中模式相符的 Kids 规则也会应用到主站。Kids blocklist 只同步到 Main blocklist；Kids whitelist 只同步到 Main whitelist。",
   "tabView.kidsSync.heading": "在主站上应用相符的 Kids 规则",
   "tabView.kidsSync.hint": "同步项目会在主列表中显示“来自 Kids”标记。模式不匹配时不会反转规则。",
+  "tabView.kidsQuietBlocking.hint": "拿 Kids 浪向屏蔽个视频藏脱，勿讲原因",
   "dashboard.importReport.completeTitle": "导入完成",
   "dashboard.importReport.reviewedRulesSaved": "已保存审核过的规则。",
   "dashboard.importReport.completionSummary": "{complete} 个频道行已完成 · {incomplete} 个正在后台完成 · {attention} 个需要处理",

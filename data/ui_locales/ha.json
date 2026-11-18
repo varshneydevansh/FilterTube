@@ -1075,6 +1075,7 @@
   "tabView.kidsSync.title": "Idan an kunna, dokokin Kids masu yanayi iri ɗaya za su yi aiki a Babba ma a wannan bayanin martaba. Blocklist na Kids yana daidaituwa da Blocklist na Babba kaɗai; Whitelist na Kids kuma yana daidaituwa da Whitelist na Babba kaɗai.",
   "tabView.kidsSync.heading": "Aiwatar da dokokin Kids masu dacewa a Babba",
   "tabView.kidsSync.hint": "Abubuwan da aka daidaita za su bayyana a babban jerinka da alamar “Daga Kids”. Bambancin yanayi ba ya juya dokoki.",
+  "tabView.kidsQuietBlocking.hint": "Ɓoye bidiyoyin da aka toshe a Kids ba tare da nuna dalili ba",
   "dashboard.importReport.completeTitle": "An kammala shigo da bayanai",
   "dashboard.importReport.reviewedRulesSaved": "An adana dokokin da aka duba.",
   "dashboard.importReport.completionSummary": "An kammala layukan tashoshi {complete} · {incomplete} na kammalawa a baya · {attention} na buƙatar kulawa",

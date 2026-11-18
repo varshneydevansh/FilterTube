@@ -1075,6 +1075,7 @@
   "tabView.kidsSync.title": "چالو ہون تے، ملدے موڈ والے بچے اصول ایس پروفائل لئی مرکزی تے وی لاگو ہوندے نیں۔ بچے روک فہرست صرف مرکزی روک فہرست وچ سنک ہوندی اے؛ بچے اجازت فہرست صرف مرکزی اجازت فہرست وچ سنک ہوندی اے۔",
   "tabView.kidsSync.heading": "ملدے بچے اصول مرکزی تے لاگو کرو",
   "tabView.kidsSync.hint": "سنک ہوئیاں چیزاں تہاڈی مین لسٹ وچ “Kids توں” بیج نال وکھن گیاں۔ وکھرے موڈ اصولاں نوں الٹا نہیں کردے۔",
+  "tabView.kidsQuietBlocking.hint": "Kids اُتے روکیاں ویڈیوز وجہ دسے بغیر لُکاؤ",
   "dashboard.importReport.completeTitle": "درآمد مکمل ہو گیا",
   "dashboard.importReport.reviewedRulesSaved": "جائزہ کیتے اصول محفوظ ہو گئے۔",
   "dashboard.importReport.completionSummary": "{complete} چینل قطاراں مکمل · {incomplete} پچھوکڑ وچ مکمل ہو رہیاں نیں · {attention} ول دھیان دی لوڑ اے",

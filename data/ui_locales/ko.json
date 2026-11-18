@@ -1075,6 +1075,7 @@
   "tabView.kidsSync.title": "사용 설정하면 모드가 일치하는 키즈 규칙이 이 프로필의 메인에도 적용됩니다. 키즈 차단 목록은 메인 차단 목록에만, 키즈 허용 목록은 메인 허용 목록에만 동기화됩니다.",
   "tabView.kidsSync.heading": "일치하는 키즈 규칙을 메인에 적용",
   "tabView.kidsSync.hint": "동기화된 항목은 기본 목록에 “Kids에서” 배지가 표시됩니다. 모드가 일치하지 않아도 규칙이 반전되지는 않습니다.",
+  "tabView.kidsQuietBlocking.hint": "Kids에서 차단한 동영상을 이유를 보여 주지 않고 숨깁니다",
   "dashboard.importReport.completeTitle": "가져오기 완료",
   "dashboard.importReport.reviewedRulesSaved": "검토한 규칙을 저장했습니다.",
   "dashboard.importReport.completionSummary": "채널 행 {complete}개 완료 · {incomplete}개 백그라운드에서 완료 중 · {attention}개 확인 필요",

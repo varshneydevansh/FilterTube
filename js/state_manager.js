@@ -120,6 +120,8 @@ const StateManager = (() => {
             whitelistKeywords: [],
             mode: 'blocklist',
             strictMode: true,
+            // Quiet blocking for the Kids space only (off unless a parent turns it on there).
+            quietBlocking: false,
             videoIds: [],
             subscriptions: [],
             contentFilters: {
@@ -432,6 +434,7 @@ const StateManager = (() => {
                 whitelistKeywords: kidsFromV4.whitelistKeywords || [],
                 mode: kidsFromV4.mode === 'whitelist' ? 'whitelist' : 'blocklist',
                 strictMode: kidsFromV4.strictMode !== false,
+                quietBlocking: kidsFromV4.quietBlocking === true,
                 videoIds: kidsFromV4.videoIds || [],
                 subscriptions: kidsFromV4.subscriptions || [],
                 contentFilters: (kidsFromV4.contentFilters && typeof kidsFromV4.contentFilters === 'object')
@@ -498,6 +501,7 @@ const StateManager = (() => {
                 whitelistKeywords: profilesV3.kids.whitelistKeywords || profilesV3.kids.whitelistedKeywords || [],
                 mode: profilesV3.kids.mode === 'whitelist' ? 'whitelist' : 'blocklist',
                 strictMode: profilesV3.kids.strictMode !== false,
+                quietBlocking: profilesV3.kids.quietBlocking === true,
                 videoIds: profilesV3.kids.videoIds || [],
                 subscriptions: profilesV3.kids.subscriptions || [],
                 contentFilters: (profilesV3.kids.contentFilters && typeof profilesV3.kids.contentFilters === 'object')
@@ -651,6 +655,7 @@ const StateManager = (() => {
                 whitelistKeywords: [],
                 mode: 'blocklist',
                 strictMode: true,
+                quietBlocking: false,
                 videoIds: [],
                 subscriptions: [],
                 contentFilters: {
@@ -2685,6 +2690,29 @@ const StateManager = (() => {
         scheduleAutoBackup('content_filters_updated');
     }
 
+    /**
+     * Quiet blocking for the Kids space (profile.kids.quietBlocking): the Kids site's blocked covers
+     * drop the brand and the reason, as Main's settings.quietBlocking does on Main. Parent-locked like
+     * every Kids control: a locked UI (child, PIN-locked profile, Self-Control) reloads and changes nothing.
+     */
+    async function updateKidsQuietBlocking(value) {
+        await ensureLoaded();
+
+        if (isUiLocked()) {
+            await loadSettings();
+            return;
+        }
+
+        const kids = getKidsState();
+        kids.quietBlocking = value === true;
+        state.kids = { ...kids };
+
+        await persistKidsProfiles({ quietBlocking: state.kids.quietBlocking });
+        await requestRefresh('kids');
+        notifyListeners('kidsQuietBlockingUpdated', { quietBlocking: state.kids.quietBlocking });
+        scheduleAutoBackup('kids_quiet_blocking_updated');
+    }
+
     async function updateKidsContentFilters(nextContentFilters) {
         await ensureLoaded();
 
@@ -3073,6 +3101,7 @@ const StateManager = (() => {
         updateSetting,
         updateContentFilters,
         updateKidsContentFilters,
+        updateKidsQuietBlocking,
         updateCategoryFilters,
         updateLanguageFilters,
         updateKidsCategoryFilters,

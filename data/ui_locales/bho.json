@@ -1075,6 +1075,7 @@
   "tabView.kidsSync.title": "चालू कइला पर, मिलत मोड वाला Kids नियम एह प्रोफाइल खातिर मुख्य पर भी लागू होला। Kids ब्लॉकलिस्ट खाली मुख्य ब्लॉकलिस्ट में सिंक होला; Kids व्हाइटलिस्ट खाली मुख्य व्हाइटलिस्ट में।",
   "tabView.kidsSync.heading": "मिलत Kids नियम मुख्य पर लागू करीं",
   "tabView.kidsSync.hint": "सिंक भइल चीज मुख्य सूची में “Kids से” बैज के साथ देखाई। मोड ना मिले त नियम उलटत नइखे।",
+  "tabView.kidsQuietBlocking.hint": "Kids पर रोकल वीडियो के बिना कारण बतवले छिपाईं",
   "dashboard.importReport.completeTitle": "इम्पोर्ट पूरा",
   "dashboard.importReport.reviewedRulesSaved": "जाँचल नियम सहेज लिहल गइल।",
   "dashboard.importReport.completionSummary": "{complete} चैनल पंक्ति पूरा भइल · {incomplete} पृष्ठभूमि में पूरा हो रहल बा · {attention} ध्यान चाहीं",

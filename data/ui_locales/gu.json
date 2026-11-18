@@ -1075,6 +1075,7 @@
   "tabView.kidsSync.title": "ચાલુ હોય ત્યારે, આ પ્રોફાઇલ માટે મોડ મેળ ખાતા Kids નિયમો મુખ્ય પર પણ લાગુ થાય છે. Kids blocklist ફક્ત Main blocklist સાથે સિંક થાય છે; Kids whitelist ફક્ત Main whitelist સાથે સિંક થાય છે.",
   "tabView.kidsSync.heading": "મેળ ખાતા Kids નિયમો મુખ્ય પર લાગુ કરો",
   "tabView.kidsSync.hint": "સિંક થયેલી વસ્તુઓ તમારી મુખ્ય સૂચિમાં “Kidsમાંથી” બૅજ સાથે દેખાશે. મોડ ન મળે તો નિયમો ઊલટા થતા નથી.",
+  "tabView.kidsQuietBlocking.hint": "Kids પર બ્લૉક કરેલા વિડિયો કારણ બતાવ્યા વગર છુપાવો",
   "dashboard.importReport.completeTitle": "આયાત પૂર્ણ",
   "dashboard.importReport.reviewedRulesSaved": "સમીક્ષા કરેલા નિયમો સાચવાયા.",
   "dashboard.importReport.completionSummary": "{complete} ચેનલ પંક્તિઓ પૂર્ણ · {incomplete} પૃષ્ઠભૂમિમાં પૂર્ણ થઈ રહી છે · {attention} ધ્યાન માંગે છે",

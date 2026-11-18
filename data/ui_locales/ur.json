@@ -1075,6 +1075,7 @@
   "tabView.kidsSync.title": "فعال ہونے پر، اس پروفائل کے لیے مماثل موڈ والے Kids قواعد مرکزی پر بھی لاگو ہوتے ہیں۔ Kids کی مسدود فہرست صرف مرکزی مسدود فہرست میں ہم آہنگ ہوتی ہے؛ Kids کی اجازت یافتہ فہرست صرف مرکزی اجازت یافتہ فہرست میں۔",
   "tabView.kidsSync.heading": "مماثل Kids قواعد مرکزی پر لاگو کریں",
   "tabView.kidsSync.hint": "ہم آہنگ کیے گئے آئٹمز آپ کی مرکزی فہرست میں “Kids سے” بیج کے ساتھ دکھائی دیتے ہیں۔ مختلف موڈ اصولوں کو الٹتے نہیں۔",
+  "tabView.kidsQuietBlocking.hint": "Kids پر بلاک کی گئی ویڈیوز وجہ بتائے بغیر چھپائیں",
   "dashboard.importReport.completeTitle": "درآمد مکمل ہو گئی",
   "dashboard.importReport.reviewedRulesSaved": "جائزہ شدہ اصول محفوظ ہو گئے۔",
   "dashboard.importReport.completionSummary": "{complete} چینل قطاریں مکمل · {incomplete} پس منظر میں مکمل ہو رہی ہیں · {attention} پر توجہ درکار ہے",

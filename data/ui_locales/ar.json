@@ -1075,6 +1075,7 @@
   "tabView.kidsSync.title": "عند التفعيل، تُطبّق أيضاً قواعد Kids ذات الوضع المطابق على الرئيسي لهذا الملف. تُزامَن قائمة الحظر في Kids مع قائمة الحظر في الرئيسي فقط؛ وتُزامَن قائمة السماح في Kids مع قائمة السماح في الرئيسي فقط.",
   "tabView.kidsSync.heading": "تطبيق قواعد Kids المطابقة على الرئيسي",
   "tabView.kidsSync.hint": "تظهر العناصر المتزامنة في قائمتك الرئيسية مع شارة «من Kids». لا تؤدي الأوضاع غير المتطابقة إلى عكس القواعد.",
+  "tabView.kidsQuietBlocking.hint": "إخفاء الفيديوهات المحظورة على Kids دون إظهار السبب",
   "dashboard.importReport.completeTitle": "اكتمل الاستيراد",
   "dashboard.importReport.reviewedRulesSaved": "تم حفظ القواعد التي تمت مراجعتها.",
   "dashboard.importReport.completionSummary": "اكتملت {complete} من صفوف القنوات · يجري إكمال {incomplete} في الخلفية · يحتاج {attention} إلى الانتباه",

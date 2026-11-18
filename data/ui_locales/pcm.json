@@ -1075,6 +1075,7 @@
   "tabView.kidsSync.title": "When e dey on, Kids rules wey match the mode go also work for Main for dis profile. Kids blocklist dey sync only enter Main blocklist; Kids whitelist dey sync only enter Main whitelist.",
   "tabView.kidsSync.heading": "Apply matching Kids rules for Main",
   "tabView.kidsSync.hint": "Things wey sync go show for your main list with “From Kids” badge. Different modes no dey turn rules upside down.",
+  "tabView.kidsQuietBlocking.hint": "Hide di videos wey you block for Kids without showing why",
   "dashboard.importReport.completeTitle": "Import don complete",
   "dashboard.importReport.reviewedRulesSaved": "We don save the rules wey dem review.",
   "dashboard.importReport.completionSummary": "{complete} channel rows don finish · {incomplete} dey finish for background · {attention} need attention",

@@ -1075,6 +1075,7 @@
   "tabView.kidsSync.title": "اگر فعال باشد، قوانین Kids با حالت منطبق نیز برای این نمایه در اصلی اعمال می‌شوند. Kids blocklist فقط با Main blocklist همگام می‌شود؛ Kids whitelist فقط با Main whitelist همگام می‌شود.",
   "tabView.kidsSync.heading": "اعمال قوانین منطبق Kids در اصلی",
   "tabView.kidsSync.hint": "موارد همگام‌شده با نشان «از Kids» در فهرست اصلی شما دیده می‌شوند. حالت‌های نامنطبق قوانین را معکوس نمی‌کنند.",
+  "tabView.kidsQuietBlocking.hint": "ویدیوهای مسدودشده در Kids را بدون نشان دادن دلیل پنهان کن",
   "dashboard.importReport.completeTitle": "وارد کردن کامل شد",
   "dashboard.importReport.reviewedRulesSaved": "قوانین بررسی‌شده ذخیره شدند.",
   "dashboard.importReport.completionSummary": "{complete} ردیف کانال کامل شد · {incomplete} در پس‌زمینه تکمیل می‌شود · {attention} نیاز به رسیدگی دارد",

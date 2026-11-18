@@ -2952,6 +2952,45 @@ function initializeKidsTabs() {
     kidsMainSyncRow.appendChild(kidsMainSyncToggle);
     kidsVideoFiltersRows.appendChild(kidsMainSyncRow);
 
+    // Quiet blocking for the Kids space only (profile.kids.quietBlocking). Main's Quiet blocking lives in
+    // Content Controls; each space reads its own. Saved by updateCheckboxes' Kids-setting binding below.
+    const kidsQuietRow = document.createElement('div');
+    kidsQuietRow.className = 'toggle-row';
+    kidsQuietRow.setAttribute('data-ft-control-row', 'true');
+    kidsQuietRow.setAttribute('data-ft-search', 'quiet blocking hide blocked videos without showing why not available');
+
+    const kidsQuietInfo = document.createElement('div');
+    kidsQuietInfo.className = 'toggle-info';
+
+    const kidsQuietTitle = document.createElement('div');
+    kidsQuietTitle.className = 'toggle-title';
+    setTabViewLocalizedCopy(kidsQuietTitle, 'textContent', 'controls.title.quietBlocking', 'Quiet blocking');
+
+    const kidsQuietHint = document.createElement('div');
+    kidsQuietHint.className = 'import-export-hint';
+    setTabViewLocalizedCopy(kidsQuietHint, 'textContent', 'tabView.kidsQuietBlocking.hint', 'Hide blocked videos in Kids without showing why');
+
+    kidsQuietInfo.appendChild(kidsQuietTitle);
+    kidsQuietInfo.appendChild(kidsQuietHint);
+
+    const kidsQuietToggle = document.createElement('label');
+    kidsQuietToggle.className = 'switch';
+
+    const kidsQuietCheckbox = document.createElement('input');
+    kidsQuietCheckbox.type = 'checkbox';
+    kidsQuietCheckbox.id = 'kidsSetting_quietBlocking';
+    kidsQuietCheckbox.setAttribute('data-ft-kids-setting', 'quietBlocking');
+
+    const kidsQuietSlider = document.createElement('span');
+    kidsQuietSlider.className = 'slider round';
+
+    kidsQuietToggle.appendChild(kidsQuietCheckbox);
+    kidsQuietToggle.appendChild(kidsQuietSlider);
+
+    kidsQuietRow.appendChild(kidsQuietInfo);
+    kidsQuietRow.appendChild(kidsQuietToggle);
+    kidsVideoFiltersRows.appendChild(kidsQuietRow);
+
     const kidsDurationRow = document.createElement('div');
     kidsDurationRow.className = 'toggle-row';
     kidsDurationRow.setAttribute('data-ft-control-row', 'true');
@@ -4378,6 +4417,8 @@ document.addEventListener('DOMContentLoaded', async () => {
         : [];
 
     const allSettingCheckboxes = document.querySelectorAll('input[type="checkbox"][data-ft-setting]');
+    // Kids-space settings stored on profile.kids (Kids Quiet blocking), not on profile.settings.
+    const kidsSettingCheckboxes = document.querySelectorAll('input[type="checkbox"][data-ft-kids-setting]');
 
     const themeToggle = document.getElementById('themeToggle');
 
@@ -9757,6 +9798,12 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (syncKidsToMainToggle) {
             syncKidsToMainToggle.disabled = isChild;
             syncKidsToMainToggle.title = isChild ? childTitle : '';
+        }
+        const kidsQuietBlockingToggle = document.getElementById('kidsSetting_quietBlocking');
+        if (kidsQuietBlockingToggle) {
+            // A child never turns its own cover quiet or loud; isUiLocked also holds for PIN/Self-Control.
+            kidsQuietBlockingToggle.disabled = isChild || isUiLocked();
+            kidsQuietBlockingToggle.title = isChild ? childTitle : '';
         }
     }
 
@@ -33421,6 +33468,13 @@ document.addEventListener('DOMContentLoaded', async () => {
             el.checked = !!surfaceState[key];
             el.disabled = locked;
         });
+        kidsSettingCheckboxes.forEach(el => {
+            const key = el.getAttribute('data-ft-kids-setting');
+            if (!key) return;
+            const kids = (kidsManagedState || baseState)?.kids || {};
+            el.checked = kids[key] === true;
+            el.disabled = locked;
+        });
 
         syncSubscriptionsImportControls();
         updateChildProfileCapabilityControls();
@@ -34673,6 +34727,31 @@ document.addEventListener('DOMContentLoaded', async () => {
                 return;
             }
             await StateManager.updateSetting(key, el.checked);
+        });
+    });
+
+    // Kids-space settings (profile.kids.*): the same lock and protected-profile editing as the
+    // Kids controls around them.
+    kidsSettingCheckboxes.forEach(el => {
+        el.addEventListener('change', async () => {
+            if (isUiLocked() || el.disabled) {
+                updateCheckboxes();
+                return;
+            }
+            const key = el.getAttribute('data-ft-kids-setting');
+            if (key !== 'quietBlocking') return;
+            const value = el.checked === true;
+            if (window.__filtertubeIsManagedChildEditFor?.('kids') === true) {
+                const saved = await window.__filtertubeSaveManagedChildSurface?.('kids', async (target) => {
+                    target.quietBlocking = value;
+                    return true;
+                });
+                if (saved) UIComponents.showToast('Protected profile Kids setting saved', 'success');
+                updateCheckboxes();
+                return;
+            }
+            await StateManager.updateKidsQuietBlocking(value);
+            updateCheckboxes();
         });
     });
 

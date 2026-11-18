@@ -1075,6 +1075,7 @@
   "tabView.kidsSync.title": "चालू होने पर, इस प्रोफ़ाइल के मेल खाते मोड वाले Kids नियम मुख्य पर भी लागू होंगे। Kids ब्लॉकलिस्ट केवल मुख्य ब्लॉकलिस्ट में सिंक होती है; Kids व्हाइटलिस्ट केवल मुख्य व्हाइटलिस्ट में सिंक होती है।",
   "tabView.kidsSync.heading": "मुख्य पर मेल खाते Kids नियम लागू करें",
   "tabView.kidsSync.hint": "सिंक किए गए आइटम आपकी मुख्य सूची में “Kids से” बैज के साथ दिखते हैं। अलग-अलग मोड नियमों को उलटते नहीं हैं।",
+  "tabView.kidsQuietBlocking.hint": "Kids पर ब्लॉक किए गए वीडियो बिना वजह बताए छिपाएँ",
   "dashboard.importReport.completeTitle": "इंपोर्ट पूरा हुआ",
   "dashboard.importReport.reviewedRulesSaved": "समीक्षा किए गए नियम सेव हो गए।",
   "dashboard.importReport.completionSummary": "{complete} चैनल पंक्तियाँ पूरी · {incomplete} बैकग्राउंड में पूरी हो रही हैं · {attention} पर ध्यान देना है",
