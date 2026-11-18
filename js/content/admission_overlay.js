@@ -483,6 +483,27 @@
         } catch (e) {}
     }
 
+    // A player overlay (dom_fallback marks it data-filtertube-admission-contained) fills only its
+    // player; every redraw keeps it there, including the late ones after the locale or Companion
+    // setting loads. Other covers (embeds, channel pages) fill the window.
+    function admissionOverlayFrame(overlay) {
+        let contained = false;
+        try { contained = overlay?.getAttribute?.('data-filtertube-admission-contained') === 'true'; } catch (e) {}
+        return contained
+            ? { position: 'absolute', inset: '0', width: '100%', height: '100%' }
+            : { position: 'fixed', inset: '0', width: '100vw', height: '100vh' };
+    }
+
+    // After the extension reloads or updates, this tab's old copy of the script keeps running with
+    // an invalidated runtime, and runtime.getURL throws. A throw mid-render used to leave a blank
+    // window-sized cover with no card on it.
+    function extensionUrl(path) {
+        try {
+            const getURL = runtimeAPI?.runtime?.getURL;
+            return typeof getURL === 'function' ? (getURL.call(runtimeAPI.runtime, path) || '') : '';
+        } catch (e) { return ''; }
+    }
+
     function admissionOverlayStyle(element, styles) {
         if (styles && typeof styles.font === 'string' && styles.font.includes('FilterTube Delius')) loadAdmissionHand();
         try { if (element?.style) Object.assign(element.style, styles); } catch (e) {}
@@ -564,7 +585,7 @@
         const dark = channelPage ? admissionOverlayUsesDarkTheme() : true;
         const ink = dark ? '#e8e8e8' : '#1f1f1f';
         admissionOverlayStyle(overlay, {
-            position: 'fixed', inset: '0', zIndex: '2147483647', width: '100vw', height: '100vh',
+            ...admissionOverlayFrame(overlay), zIndex: '2147483647',
             boxSizing: 'border-box', display: 'flex', alignItems: 'center', justifyContent: 'center',
             padding: 'clamp(16px, 4vw, 56px)', overflow: 'hidden', isolation: 'isolate',
             pointerEvents: 'auto', userSelect: 'none', whiteSpace: 'normal',
@@ -695,7 +716,7 @@
         const rtl = localeDirection === 'rtl';
 
         admissionOverlayStyle(overlay, {
-            position: 'fixed', inset: '0', zIndex: '2147483647', width: '100vw', height: '100vh',
+            ...admissionOverlayFrame(overlay), zIndex: '2147483647',
             boxSizing: 'border-box', display: 'flex', alignItems: 'center', justifyContent: 'center',
             padding: 'clamp(16px, 4vw, 56px)', overflow: 'hidden', isolation: 'isolate',
             pointerEvents: 'auto', userSelect: 'text', whiteSpace: 'normal',
@@ -740,7 +761,9 @@
                 background: '#ab4438', padding: '5px', boxSizing: 'border-box', objectFit: 'contain',
                 boxShadow: '0 8px 18px rgba(105,35,29,.2)'
             });
-            brandMark.src = runtimeAPI?.runtime?.getURL?.('icons/icon-48.png') || '';
+            // No URL (orphaned script copy): leave the plain brand-colour tile, not a broken image.
+            const brandMarkUrl = extensionUrl('icons/icon-48.png');
+            if (brandMarkUrl) brandMark.src = brandMarkUrl;
             brandMark.alt = '';
             brandName = document.createElement('span');
             admissionOverlayStyle(brandName, { color: blocked || darkTheme ? '#f3f6fa' : '#1b1a18', font: '400 18px/1 "FilterTube Delius", "Outfit", sans-serif', letterSpacing: '0' });

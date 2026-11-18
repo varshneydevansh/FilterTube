@@ -1295,8 +1295,13 @@ function setLocalizedAdmissionOverlayMessage(overlay, state, message) {
     const renderMessage = localized => {
         const quiet = isQuietBlockingEnabled();
         if (typeof localizer?.render === 'function') {
-            localizer.render(overlay, state, localized, { quiet });
-            Object.assign(overlay.style, { position: 'absolute', width: '100%', height: '100%' });
+            // Contained in the player before the first draw, and kept there even if a draw throws.
+            overlay.setAttribute?.('data-filtertube-admission-contained', 'true');
+            try {
+                localizer.render(overlay, state, localized, { quiet });
+            } finally {
+                Object.assign(overlay.style, { position: 'absolute', width: '100%', height: '100%' });
+            }
         } else {
             const text = quiet ? '' : localized;
             if (overlay.textContent !== text) overlay.textContent = text;
@@ -2997,8 +3002,12 @@ function setCurrentWatchCategoryOverlay(state, message) {
     const overlayMessage = message || (state === 'blocked' ? 'Blocked by Category Filter' : 'Checking category…');
     const quiet = isQuietBlockingEnabled();
     if (window.FilterTubeAdmissionOverlay) {
-        window.FilterTubeAdmissionOverlay.render(overlay, normalizedState, overlayMessage, { quiet });
-        Object.assign(overlay.style, { position: 'absolute', width: '100%', height: '100%' });
+        overlay.setAttribute('data-filtertube-admission-contained', 'true');
+        try {
+            window.FilterTubeAdmissionOverlay.render(overlay, normalizedState, overlayMessage, { quiet });
+        } finally {
+            Object.assign(overlay.style, { position: 'absolute', width: '100%', height: '100%' });
+        }
     } else overlay.textContent = quiet ? '' : overlayMessage;
     return true;
 }

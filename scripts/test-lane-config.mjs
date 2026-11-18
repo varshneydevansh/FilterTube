@@ -662,6 +662,7 @@ export const LANES = Object.freeze({
       'tests/runtime/quick-block-block-menu-affordance-boundary-current-behavior.test.mjs',
       'tests/runtime/collab-multi-select-menu-regression.test.mjs',
       'tests/runtime/keyword-match-reason-user-word.test.mjs',
+      'tests/runtime/admission-overlay-orphaned-context.test.mjs',
       'tests/runtime/dom-state-virtual-attributes-current-behavior.test.mjs',
       'tests/runtime/empty-install-performance-current-behavior.test.mjs',
       'tests/runtime/runtime-diagnostic-logging-policy-matrix-current-behavior.test.mjs',

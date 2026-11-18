@@ -251,7 +251,8 @@
 
     function markComplete() {
         dismissed = true;
-        api.runtime.sendMessage({ action: 'FilterTube_FirstRunComplete' });
+        // After an extension reload this copy's runtime is gone; the prompt must still close.
+        try { api.runtime.sendMessage({ action: 'FilterTube_FirstRunComplete' }); } catch (e) {}
     }
 
     function init() {
