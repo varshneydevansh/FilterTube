@@ -778,6 +778,9 @@ function renderFilterTubeMenuEntries({ dropdown, newMenuList, oldMenuList, chann
     if (channelInfo.isCollaboration && channelInfo.allCollaborators && channelInfo.allCollaborators.length >= 2) {
         const collaborators = channelInfo.allCollaborators;
         const collaboratorCount = Math.min(collaborators.length, 6);
+        // Three or more collaborators: a row tap selects that channel, and the group row turns into
+        // "Done • Block N Selected" (the design before 03620e61 dropped it). Two keep one-tap rows.
+        const isMultiStep = collaboratorCount >= 3;
         const groupId = generateCollaborationGroupId();
         const hasIdentifier = (c) => Boolean(c?.handle || c?.id || c?.customUrl);
         const anyMissingIdentifiers = collaborators.some(c => !hasIdentifier(c));
@@ -791,24 +794,27 @@ function renderFilterTubeMenuEntries({ dropdown, newMenuList, oldMenuList, chann
 
                 injectIntoNewMenu(containers.newMenuList, collaborator, videoCard, {
                     collaborationWith: otherChannels,
-                    collaborationGroupId: groupId
+                    collaborationGroupId: groupId,
+                    isMultiStep
                 }, {
                     disabled: !hasIdentifier(collaborator),
                     displayName: hasIdentifier(collaborator) ? collaborator.name : filterTubeCollaboratorResolvingLabel(collaborator.name)
                 });
             }
 
-            injectIntoNewMenu(containers.newMenuList, {
+            const blockAllMenuItem = injectIntoNewMenu(containers.newMenuList, {
                 name: filterTubeCollaboratorGroupLabel(collaboratorCount),
                 isBlockAllOption: true,
                 allCollaborators: collaborators.slice(0, collaboratorCount),
-                collaborationGroupId: groupId
+                collaborationGroupId: groupId,
+                isMultiStep
             }, videoCard, null, {
                 disabled: anyMissingIdentifiers,
                 displayName: anyMissingIdentifiers
                     ? filterTubeContentMenuText('content.menu.allCollaboratorsResolving', 'All Collaborators (resolving…)')
                     : filterTubeCollaboratorGroupLabel(collaboratorCount)
             });
+            if (isMultiStep) setupMultiStepMenu(dropdown, groupId, collaborators.slice(0, collaboratorCount), blockAllMenuItem);
         } else if (containers.oldMenuList) {
             for (let i = 0; i < collaboratorCount; i++) {
                 const collaborator = collaborators[i];
@@ -818,24 +824,27 @@ function renderFilterTubeMenuEntries({ dropdown, newMenuList, oldMenuList, chann
 
                 injectIntoOldMenu(containers.oldMenuList, collaborator, videoCard, {
                     collaborationWith: otherChannels,
-                    collaborationGroupId: groupId
+                    collaborationGroupId: groupId,
+                    isMultiStep
                 }, {
                     disabled: !hasIdentifier(collaborator),
                     displayName: hasIdentifier(collaborator) ? collaborator.name : filterTubeCollaboratorResolvingLabel(collaborator.name)
                 });
             }
 
-            injectIntoOldMenu(containers.oldMenuList, {
+            const blockAllMenuItem = injectIntoOldMenu(containers.oldMenuList, {
                 name: filterTubeCollaboratorGroupLabel(collaboratorCount),
                 isBlockAllOption: true,
                 allCollaborators: collaborators.slice(0, collaboratorCount),
-                collaborationGroupId: groupId
+                collaborationGroupId: groupId,
+                isMultiStep
             }, videoCard, null, {
                 disabled: anyMissingIdentifiers,
                 displayName: anyMissingIdentifiers
                     ? filterTubeContentMenuText('content.menu.allCollaboratorsResolving', 'All Collaborators (resolving…)')
                     : filterTubeCollaboratorGroupLabel(collaboratorCount)
             });
+            if (isMultiStep) setupMultiStepMenu(dropdown, groupId, collaborators.slice(0, collaboratorCount), blockAllMenuItem);
         }
         injectStudySkipMenuItem(dropdown, videoCard, channelInfo);
         forceDropdownResize(dropdown);
@@ -3100,7 +3109,8 @@ function refreshMultiStepSelections(groupId) {
     collaboratorItems.forEach(item => {
         const key = item.getAttribute('data-collab-key');
         if (!key) return;
-        if (item.classList.contains('filtertube-blocked') || item.classList.contains('filtertube-collab-selected')) {
+        // A channel that is already blocked is not a pick: "Block N Selected" counts only new ones.
+        if (!item.classList.contains('filtertube-blocked') && item.classList.contains('filtertube-collab-selected')) {
             state.selected.add(key);
             item.classList.add('filtertube-collab-selected');
         } else {
