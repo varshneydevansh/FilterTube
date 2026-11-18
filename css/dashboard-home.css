@@ -132,8 +132,7 @@ body.ft-extension-surface #sidebarNav .nav-item.nav-item--quiet[aria-current="pa
 }
 
 .ft-home-card,
-#dashboardView[data-ft-home] .ft-home-greeting,
-#dashboardView[data-ft-home] .ft-home-support {
+#dashboardView[data-ft-home] .ft-home-greeting {
   background: var(--pk-paper);
   border: 1.5px solid transparent;
   border-image: var(--pk-edge-line) 20 / 18px / 0 round;
@@ -593,19 +592,6 @@ body.ft-extension-surface #sidebarNav .nav-item.nav-item--quiet[aria-current="pa
   :root[data-theme] body.ft-extension-surface #dashboardView[data-ft-home] .ft-home .ft-home-apps .dashboard-app-card:is(:hover, :active) .ft-app-art { transform: none; }
 }
 
-/* 7. Support strip */
-:root[data-theme] body.ft-extension-surface #dashboardView[data-ft-home] .ft-home .ft-home-support {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 16px;
-  padding: 16px 22px;
-  border-image-source: var(--pk-edge-filters);
-  background: color-mix(in srgb, var(--pk-rose) 60%, var(--pk-paper));
-}
-.ft-home-support__line { margin: 0; font-family: var(--pk-font-hand); font-size: 18px; line-height: 1.4; color: var(--pk-ink); }
-.ft-home-support__kofi { flex: none; text-decoration: none; }
-
 /* The Support page's price line, and the support sheet's (js/mascots.js mountSupport). */
 .ft-support-price,
 .pk-support__price { margin: 10px 0 0; font-weight: 600; color: var(--pk-ink); line-height: 1.5; }
@@ -663,7 +649,6 @@ body.ft-extension-surface #sidebarNav .nav-item.nav-item--quiet[aria-current="pa
   :root[data-theme] body.ft-extension-surface #dashboardView[data-ft-home] .ft-home .ft-home-actions .quick-actions-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   :root[data-theme] body.ft-extension-surface #dashboardView[data-ft-home] .ft-home .ft-home-greeting { grid-template-columns: minmax(0, 1fr); }
   .ft-home-greeting__duo { display: none; }
-  :root[data-theme] body.ft-extension-surface #dashboardView[data-ft-home] .ft-home .ft-home-support { flex-direction: column; align-items: flex-start; }
   .ft-about-duo { grid-template-columns: minmax(0, 1fr); }
 }
 @media (prefers-reduced-motion: reduce) {
@@ -779,3 +764,96 @@ body.ft-extension-surface #sidebarNav.is-studying .nav-item[data-pk-tint="home"]
 }
 .ft-about-why__link:hover { color: var(--ft-color-brand-primary-hover); }
 .ft-about-why__link:focus-visible { outline: var(--ft-state-focus-width) solid var(--ft-state-focus-ring); outline-offset: var(--ft-state-focus-offset); border-radius: 4px; }
+
+/* ---------------------------------------------------------------------------
+ * Owner polish, 2026-11-18: support line in the top bar, a full-height sidebar
+ * whose rows don't cut words, and one column grid for every Home section.
+ * ------------------------------------------------------------------------- */
+
+body.ft-extension-surface[data-surface="tab-view"] {
+  /* The view's own inset (tab-view.css .view-container): the top bar uses it too, so its edges and
+     the cards' edges line up on every page. */
+  --ft-view-inset: clamp(0.95rem, 1.4vw, 1.1rem);
+  /* One gutter for every Home grid: the stats, the pair, quick actions and the app cards share columns. */
+  --ft-home-gutter: 20px;
+}
+
+/* 1. The top bar: the page title, the support line centred, then the controls. */
+:root[data-theme] body.ft-extension-surface[data-surface="tab-view"] .main-content { container: ft-main / inline-size; }
+:root[data-theme] body.ft-extension-surface[data-surface="tab-view"] .top-bar {
+  margin-inline: var(--ft-view-inset);
+  column-gap: 16px;
+}
+:root[data-theme] body.ft-extension-surface[data-surface="tab-view"] .top-bar #pageTitle { flex: 0 0 auto; max-width: 45%; }
+:root[data-theme] body.ft-extension-surface[data-surface="tab-view"] .top-bar .actions { margin-inline-start: 0; }
+
+:root[data-theme] body.ft-extension-surface[data-surface="tab-view"] .ft-topbar-support {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex: 0 1 auto;
+  min-width: 0;
+  margin: 0;
+  padding: 4px 4px 4px 16px;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--pk-rose) 55%, var(--pk-paper));
+  border: 1.5px solid color-mix(in srgb, var(--pk-brick) 18%, transparent);
+  box-shadow: none;
+}
+.ft-topbar-support .ft-home-support__line {
+  flex: 1 1 auto;
+  min-width: 0;
+  margin: 0;
+  font-family: var(--pk-font-hand);
+  font-size: 16px;
+  line-height: 1.25;
+  color: var(--pk-ink);
+  text-wrap: balance;
+}
+:root[data-theme] body.ft-extension-surface[data-surface="tab-view"] .ft-topbar-support .ft-home-support__kofi {
+  flex: none;
+  min-height: 32px !important;
+  height: auto !important;
+  padding: 0 14px !important;
+  border-radius: 999px !important;
+  font-size: 13px !important;
+  line-height: 32px !important;
+  white-space: nowrap;
+  text-decoration: none;
+}
+/* The Support page carries the same ask in full. */
+body.ft-extension-surface[data-active-view="donate"] .ft-topbar-support { display: none !important; }
+
+/* Not enough room for one line beside the title and controls: the line wraps to two inside the pill.
+   Narrower still: the pill takes its own row under the title, centred, never over the controls. */
+@container ft-main (max-width: 1240px) {
+  .ft-topbar-support .ft-home-support__line { font-size: 15px; }
+}
+@container ft-main (max-width: 900px) {
+  :root[data-theme] body.ft-extension-surface[data-surface="tab-view"] .top-bar { flex-wrap: wrap; row-gap: 10px; }
+  :root[data-theme] body.ft-extension-surface[data-surface="tab-view"] .ft-topbar-support {
+    order: 10;
+    flex: 1 1 100%;
+    justify-content: center;
+  }
+  :root[data-theme] body.ft-extension-surface[data-surface="tab-view"] .ft-topbar-support .ft-home-support__line { flex: 0 1 auto; text-align: center; }
+}
+/* Phones and narrow windows: the top bar is a grid (serene-shell.css); the pill is its last row. */
+@media (max-width: 768px) {
+  :root[data-theme] body.ft-extension-surface[data-surface="tab-view"] .top-bar {
+    grid-template-areas: "toggle title actions" "support support support";
+  }
+  :root[data-theme] body.ft-extension-surface[data-surface="tab-view"] .ft-topbar-support { grid-area: support; }
+}
+@media (max-width: 640px) {
+  body.ft-extension-surface[data-surface="tab-view"] { --ft-view-inset: 0.72rem; }
+  :root[data-theme] body.ft-extension-surface[data-surface="tab-view"] .top-bar {
+    grid-template-areas: "toggle title" "actions actions" "support support";
+  }
+  :root[data-theme] body.ft-extension-surface[data-surface="tab-view"] .ft-topbar-support {
+    padding: 8px 8px 8px 14px;
+    border-radius: 18px;
+    justify-content: space-between;
+  }
+  .ft-topbar-support .ft-home-support__line { text-align: start; }
+}
