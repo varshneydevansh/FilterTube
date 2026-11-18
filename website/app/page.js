@@ -460,8 +460,8 @@ export default function HomePage() {
               <div className="mx-auto w-full max-w-[42rem] lg:max-w-none">
                 <HeroShowcase />
                 <p className="ft-hero-status mx-auto mt-8 max-w-[34rem] rounded-2xl px-5 py-3 text-center text-sm font-medium leading-6 text-white md:px-6">
-                  Home during a study round on Android, iPhone and iPad. Your
-                  devices and profiles stay in sync through verified, encrypted
+                  A study plan on iPad and Sangeet on Android. Your devices and
+                  profiles stay in sync through verified, encrypted
                   peer-to-peer sharing.
                 </p>
               </div>

@@ -3,16 +3,13 @@ import Image from "next/image";
 import { poses } from "@/data/mascots";
 import { devices } from "@/data/screenshots";
 
-// The hero's device composition: real captures from data/screenshots.js (owned by the capture
+// The hero keeps two devices: the Study plan on a tablet behind, Sangeet on the live Android phone in front; the rest live in
+// the screenshots and Study sections. Real captures from data/screenshots.js (owned by the capture
 // pass), so fresh screens flow in without touching this file. Kriti stands with the devices;
 // Uljhan hops off the edge of the iPad, cleared from the feed with no hard feelings.
-const extra = (deviceId, file) => devices[deviceId]?.extras?.find((screen) => screen.src.endsWith(`/${file}.webp`));
-
 const shots = [
-  { key: "ipad", kind: "tablet", screen: devices.ipad?.captures?.home, label: "iPad" },
-  { key: "study", kind: "phone", screen: extra("androidPhone", "phone-study-session"), label: "Android phone, study session" },
-  { key: "android", kind: "phone", screen: devices.androidPhone?.captures?.home, label: "Android phone" },
-  { key: "iphone", kind: "phone", screen: devices.iphone?.captures?.home, label: "iPhone" },
+  { key: "ipad", kind: "tablet", screen: devices.ipad?.captures?.study, label: "iPad, Study plan" },
+  { key: "android", kind: "phone", screen: devices.androidPhone?.captures?.sangeet, label: "Android phone, Sangeet" },
 ];
 
 function Device({ shot, index }) {
@@ -25,7 +22,7 @@ function Device({ shot, index }) {
           alt={screen.alt}
           height={screen.height}
           priority={key === "android" || key === "ipad"}
-          sizes={kind === "tablet" ? "(min-width: 1024px) 34vw, 70vw" : "(min-width: 1024px) 12vw, 26vw"}
+          sizes={kind === "tablet" ? "(min-width: 1024px) 38vw, 78vw" : "(min-width: 1024px) 15vw, 32vw"}
           src={screen.src}
           width={screen.width}
         />
@@ -52,7 +49,7 @@ function Pose({ pose, slot, describe = false }) {
 
 export function HeroShowcase() {
   return (
-    <div aria-label="FilterTube on iPad, Android phones and iPhone during a study round" className="ft-hero-showcase" role="group">
+    <div aria-label="FilterTube Study plan on an iPad and Sangeet on an Android phone" className="ft-hero-showcase" role="group">
       <span aria-hidden="true" className="ft-hero-ground" />
       {shots.map((shot, index) => <Device index={index} key={shot.key} shot={shot} />)}
       <Pose describe pose="kritiWave" slot="kriti" />

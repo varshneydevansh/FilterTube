@@ -953,12 +953,10 @@ html[data-theme="dark"] .ft-seal { border-color: #f0a497; }
 .ft-hero-device[data-kind="phone"] .ft-hero-device-screen { border-radius: 2.9cqw; }
 .ft-hero-device[data-kind="tablet"] .ft-hero-device-screen { border-radius: 1.6cqw; }
 .ft-hero-device img { display: block; width: 100%; height: auto; }
-.ft-hero-device[data-slot="ipad"] { left: 12%; top: 3%; width: 72%; }
-.ft-hero-device[data-slot="study"] { right: 19%; bottom: 5%; width: 20%; }
-.ft-hero-device[data-slot="android"] { left: 0; bottom: 0; width: 24.5%; }
-.ft-hero-device[data-slot="iphone"] { right: 0; bottom: 0; width: 22.5%; }
+.ft-hero-device[data-slot="ipad"] { left: 0; top: 6%; width: 80%; }
+.ft-hero-device[data-slot="android"] { right: 2%; bottom: 0; width: 29%; }
 .ft-hero-mascot { position: absolute; height: auto; pointer-events: none; user-select: none; filter: drop-shadow(0 1.2cqw 1.4cqw rgba(8, 14, 22, 0.28)); }
-.ft-hero-mascot[data-slot="kriti"] { left: 27%; bottom: 0; width: 17%; }
+.ft-hero-mascot[data-slot="kriti"] { left: 6%; bottom: 0; width: 16%; }
 .ft-hero-mascot[data-slot="uljhan"] { right: 3%; top: -4%; width: 12%; transform: rotate(8deg); }
 
 @media (prefers-reduced-motion: no-preference) {
