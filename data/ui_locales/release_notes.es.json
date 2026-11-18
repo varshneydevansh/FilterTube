@@ -1,4 +1,55 @@
 {
+  "3.6.2": {
+    "headline": "Conoce a Kriti y Uljhan, un planificador de Estudio renovado y Pedir a un padre",
+    "summary": "FilterTube 3.6.2 estrena un aspecto propio, con Kriti y Uljhan, iconos de crayón, dibujos y sonidos opcionales. Estudio se reconstruye en torno a un planificador diario con paquetes listos para 29 países, los niños pueden pedir a un padre un vídeo o un canal, y el reproductor, los perfiles, las tabletas y los televisores reciben un rediseño más tranquilo con avisos de privacidad más claros.",
+    "bannerSummary": "Kriti y Uljhan, un planificador de Estudio renovado, Pedir a un padre y un reproductor más tranquilo.",
+    "ctaLabel": "Ver novedades",
+    "highlights": [
+      "Estudio se ha reconstruido: un inicio de Estudio de papel con un Anillo del día de crayón, un planificador diario, una configuración que explica cada opción y paquetes listos para exámenes y cursos escolares en 29 países. Los feeds siguen la rama que eliges, así que GATE Civil se mantiene en Civil, y la búsqueda durante el estudio solo busca en los canales de tu plan.",
+      "Pedir a un padre: cuando algo está bloqueado, un niño puede pedir ver ese vídeo o permitir ese canal, y un padre responde. El modo padre abre una sesión de padre enmarcada dentro de un perfil infantil con una única salida clara, y Aprendizaje infantil por edad llena el espacio infantil con lecciones elegidas por edad durante el estudio.",
+      "Un aspecto nuevo: Kriti y Uljhan te acompañan mientras cargan las páginas, cuando las listas están vacías, cuando no tienes conexión o cuando algo está bloqueado. FilterTube tiene sus propios iconos de crayón, dibujos, avatares dibujados, iconos de app de Kriti, Uljhan y el dúo para elegir, y sonidos opcionales que puedes poner en Desactivado, Suave o Juguetón.",
+      "Un reproductor más tranquilo: pósteres a sangre en los teléfonos, una nueva página de lista de reproducción y una nueva hoja de cuenta, el brillo de la página de reproducción llega hasta debajo de la barra de estado, Uljhan trae más contenido al desplazarte, deslizar para actualizar y un único aviso claro cuando la conexión es lenta o no hay conexión.",
+      "Los perfiles se han rediseñado con avatares de crayón, un selector que muestra quién es padre y quién es niño, y una forma protegida de añadir un perfil.",
+      "FilterTube usa sus propias palabras en todas partes: Clips, Siguiendo, Guardado y Sangeet para la música, en todos los idiomas.",
+      "Privacidad: Cuentas y sincronización explica lo que el relé de sincronización puede y no puede ver y pregunta antes de la primera sincronización por internet, el nombre de tu dispositivo ya no se envía al hacer sonar otro dispositivo, las miniaturas de DeArrow son una opción aparte que empieza desactivada, las cookies de la cuenta solo van a los sitios propios del servicio de vídeo y las versiones de lanzamiento mantienen los registros de depuración fuera del registro del sistema.",
+      "Las tabletas y los televisores se igualan con el teléfono: Filtros, Búsqueda y Pedir a un padre usan todo el ancho en las tabletas, y los televisores reciben los iconos de crayón en la barra lateral, Estudio en la pantalla grande y una tarjeta Acerca de este televisor con los modos Completo y Ligero.",
+      "Apoyar a FilterTube sigue siendo gratuito y opcional: la hoja de apoyo es una nota amable, nunca una barrera.",
+      "Correcciones: las comprobaciones de PIN ya no congelan la pantalla, cargar más en Estudio ya no hace parpadear la página, las mascotas nunca se cortan a mitad de movimiento, muchas etiquetas que seguían en inglés ya están traducidas y los errores de carga de Sangeet ya no nombran el servicio de vídeo."
+    ]
+  },
+  "3.6.1": {
+    "headline": "Horizontal que se ajusta a cada pantalla, controles de reproducción más estables y filtrado más estricto",
+    "summary": "FilterTube 3.6.1 dimensiona cada página horizontal a partir de la ventana, así que los teléfonos de lado, las tabletas y los televisores muestran un vídeo a toda altura y un panel a la derecha. Los subtítulos, la transcripción y los menús de las tarjetas funcionan como se espera, y un canal que filtras se oculta en todas partes.",
+    "bannerSummary": "Horizontal ajustado a cada pantalla, correcciones en subtítulos y transcripción, y filtrado más estricto.",
+    "ctaLabel": "Ver novedades",
+    "highlights": [
+      "La vista horizontal se calcula a partir de tu pantalla: en un teléfono de lado, una tableta o un televisor, la página de reproducción muestra un vídeo 16:9 a toda altura con A continuación al lado, la búsqueda se sitúa arriba en la barra lateral y nada queda recortado por el hueco de la cámara.",
+      "La música en horizontal muestra el mismo A continuación que en vertical, el tocadiscos gira a 33⅓ rpm según la velocidad de reproducción y A continuación empieza en la canción que suena.",
+      "Los subtítulos se desactivan cuando eliges Desactivado, la traducción automática funciona en el vídeo que se reproduce y, si el reproductor aún no puede aplicar una opción, te lo dice en lugar de fallar en silencio.",
+      "Al tocar una línea de la transcripción, esta sigue abierta y avanzando, como la letra de una canción, y el brillo de la página de reproducción se extiende por toda la página en horizontal.",
+      "Un canal de tu lista de filtros oculta todo lo suyo, sin importar cómo se añadió. Bloquear desde un comentario oculta los comentarios y vídeos de ese canal, se ocultan los mixes generados a partir de un canal bloqueado y el chat en directo sigue tus reglas.",
+      "En el modo Permitir solo lo seleccionado, los comentarios muestran solo a comentaristas permitidos o palabras permitidas.",
+      "Los menús de las tarjetas siguen funcionando tras un cambio de filtro, el orden de canal elegido se mantiene al actualizar y la imagen de la página de reproducción permanece tras un cambio de filtro mientras te desplazas.",
+      "Una guía paso a paso ayuda a configurar los enlaces de YouTube para que se abran en FilterTube, y las tabletas muestran los perfiles Principal e Infantil uno al lado del otro."
+    ]
+  },
+  "3.6.0": {
+    "headline": "Un nuevo reproductor de música, páginas más rápidas y enlaces de YouTube que se abren en FilterTube",
+    "summary": "FilterTube 3.6.0 rediseña Música en torno a la portada de cada canción, carga mucho más rápido las páginas de Música, Inicio y álbumes, abre los enlaces de YouTube de otras apps en el reproductor protegido y hace que el bloqueo con PIN sea predecible. Los teléfonos, las tabletas y los televisores reciben las mismas mejoras.",
+    "bannerSummary": "Nuevo reproductor y colores de música, carga más rápida, enlaces de YouTube en FilterTube y un bloqueo con PIN más claro.",
+    "ctaLabel": "Ver novedades",
+    "highlights": [
+      "Música toma el color de lo que escuchas: cada página de Música, el minirreproductor y la barra inferior adoptan los colores de la portada, cambian con suavidad entre canciones y álbumes, y vuelven a la normalidad al salir de Música.",
+      "Un reproductor de música rediseñado: un único anillo de búsqueda alrededor de una portada que gira, una tarjeta de letra que sube desde abajo, un visualizador ligero que se mueve con el ritmo y las emisoras en directo marcadas como LIVE.",
+      "Letras sincronizadas reales de YouTube Music y, después, los subtítulos propios de la canción en tu idioma, con LRCLIB como extra opcional por el que se te pregunta una vez. Las letras y las transcripciones mantienen la línea actual centrada hasta el final.",
+      "Carga mucho más rápida: las canciones de Música usan el canal que YouTube Music ya indica, las tarjetas en pantalla se comprueban primero y las comprobaciones de canales se espacian para que YouTube deje de rechazarlas. Las canciones de álbumes y listas ya no esperan minutos.",
+      "Música reproduce solo el audio hasta que muestras el vídeo, así que las canciones empiezan antes y usan muchos menos datos. Saltar desde la pantalla de bloqueo y pasar a la siguiente canción ahora se reproducen al instante.",
+      "Los enlaces de YouTube de apps de chat y otras apps pueden abrirse en el reproductor protegido de FilterTube. Un aviso único y una comprobación en Configuración ayudan a los padres a activarlo.",
+      "El bloqueo con PIN es predecible: los perfiles siguen desbloqueados mientras se usan y se bloquean cuando FilterTube se cierra, el teléfono se reinicia o cambias de perfil. Los padres pueden elegir en su lugar bloquear tras un tiempo de ausencia.",
+      "La página de reproducción brilla con los colores del vídeo que suena, desde la barra de estado hasta las hojas y A continuación; la transcripción se acopla bajo el reproductor; los chips coinciden con su página; y las colas de mix siguen cargando.",
+      "Android TV y tabletas: colores de Música y el nuevo reproductor en el televisor con búsqueda desde el mando, un visualizador más ligero para los dispositivos de TV, paneles de la página de reproducción con los colores del vídeo, y correcciones en la vista de dos paneles y portadas de álbum más grandes en las tabletas."
+    ]
+  },
   "3.4.1": {
     "headline": "38 idiomas de interfaz y comprobaciones de reproducción más seguras",
     "summary": "FilterTube 3.4.1 añade 38 idiomas de interfaz incluidos y mejora las comprobaciones de vídeos en YouTube y reproductores integrados compatibles. También corrige el inicio del panel y la coincidencia de palabras clave de comentarios guardadas. Se corrigieron las entradas duplicadas en coreano y bengalí rechazadas por Mozilla. La compilación comprueba claves JSON duplicadas antes de empaquetar.",

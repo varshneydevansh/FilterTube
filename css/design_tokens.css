@@ -14,7 +14,7 @@
      ========================================= */
 
   /* Backgrounds */
-  --ft-color-bg-base: #f6f2eb;
+  --ft-color-bg-base: #f7f5f1;
   --ft-color-bg-surface: rgba(255, 255, 255, 0.84);
   --ft-color-bg-panel: rgba(255, 255, 255, 0.68);
   --ft-color-bg-kids: rgba(239, 248, 248, 0.8);
@@ -26,6 +26,18 @@
   --ft-color-glass: rgba(255, 255, 255, 0.12);
   --ft-color-glass-strong: rgba(255, 255, 255, 0.16);
   --ft-color-inset-line: rgba(255, 255, 255, 0.92);
+
+  /* Interaction states (css/paperkit-states.css): one wash, one edge, one ring, one press for every
+     control on the extension's pages. The --pk-* colours they mix come from paperkit.css. */
+  --ft-state-hover-wash: color-mix(in srgb, var(--pk-ink, #1b1a18) 5%, transparent);
+  --ft-state-press-wash: color-mix(in srgb, var(--pk-ink, #1b1a18) 10%, transparent);
+  --ft-state-hover-edge: var(--pk-brick, #a93e31);
+  --ft-state-hover-ink: var(--pk-brick, #a93e31);
+  --ft-state-focus-ring: var(--pk-ink, #1b1a18);
+  --ft-state-focus-width: 2px;
+  --ft-state-focus-offset: 2px;
+  --ft-state-press-shift: translateY(1px);
+  --ft-state-duration: 140ms;
 
   /* Text */
   --ft-color-text-primary: #1b1a18;

@@ -256,6 +256,279 @@
         return { round, rest };
     }
 
+    /** How long Undo stays after Skip break (Android StudyBreakSkip.UNDO_MILLIS). */
+    const SKIP_UNDO_MS = 5000;
+
+    /**
+     * What Skip break does (Android StudyBreakSkip.preview): the break starting at `breakStart` joins the
+     * round after it, which then runs from the break's start ("+5 min to round 3", "Round 3 is now 55
+     * min"). The last break of a session has no round after it: the round before runs on through it.
+     * {breakStart, breakEnd, addedMinutes, round, roundMinutes}, or null when that break isn't there.
+     */
+    function breakSkipPreview(segments, breakStart) {
+        const list = Array.isArray(segments) ? segments : [];
+        const index = list.findIndex(item => item && item.kind === BREAK && item.start === breakStart);
+        if (index < 0) return null;
+        const pause = list[index];
+        const minutes = ms => Math.max(1, Math.floor((ms + 30 * 1000) / MINUTE));
+        const added = minutes(pause.end - pause.start);
+        const next = list[index + 1];
+        if (next && next.kind === STUDY) {
+            return { breakStart: pause.start, breakEnd: pause.end, addedMinutes: added, round: next.round, roundMinutes: minutes(next.end - pause.start) };
+        }
+        const before = list[index - 1];
+        if (!before || before.kind !== STUDY) return null;
+        return { breakStart: pause.start, breakEnd: pause.end, addedMinutes: added, round: before.round, roundMinutes: minutes(pause.end - before.start) };
+    }
+
+    // ---- The Day Ring (Android StudyRingModel.of, boundaries, currentBreak) --------------------------
+    // A session's rounds and breaks bent into a circle; fractions run 0..1 clockwise from 12 o'clock.
+
+    /** {arcs: [{kind: DONE|LIVE|TODO, start, end, round}], beads, breaks: [[from, to]], tick, studiedMinutes, plannedMinutes, rounds}. */
+    function dayRing(segments, now) {
+        const list = array(segments);
+        if (!list.length) return { arcs: [], beads: [], breaks: [], tick: null, studiedMinutes: 0, plannedMinutes: 0, rounds: 0 };
+        const start = list[0].start;
+        const end = list[list.length - 1].end;
+        const span = end - start;
+        if (!(span > 0)) return { arcs: [], beads: [], breaks: [], tick: null, studiedMinutes: 0, plannedMinutes: 0, rounds: 0 };
+        const f = t => Math.min(1, Math.max(0, (t - start) / span));
+        const arcs = [];
+        const beads = [];
+        const breaks = [];
+        let studied = 0;
+        let planned = 0;
+        for (const segment of list) {
+            if (segment.kind === BREAK) {
+                beads.push(f((segment.start + segment.end) / 2));
+                breaks.push([f(segment.start), f(segment.end)]);
+                continue;
+            }
+            planned += segment.end - segment.start;
+            if (!Number.isFinite(now) || now <= segment.start) arcs.push({ kind: 'TODO', start: f(segment.start), end: f(segment.end), round: segment.round });
+            else if (now >= segment.end) {
+                arcs.push({ kind: 'DONE', start: f(segment.start), end: f(segment.end), round: segment.round });
+                studied += segment.end - segment.start;
+            } else {
+                // The round running now: done up to now, the rest still to fill.
+                arcs.push({ kind: 'DONE', start: f(segment.start), end: f(now), round: segment.round });
+                arcs.push({ kind: 'LIVE', start: f(now), end: f(segment.end), round: segment.round });
+                studied += now - segment.start;
+            }
+        }
+        const tick = Number.isFinite(now) && now >= start && now < end ? f(now) : null;
+        return { arcs, beads, breaks, tick, studiedMinutes: roundMinutes(studied), plannedMinutes: roundMinutes(planned),
+            rounds: list.filter(segment => segment.kind === STUDY).length };
+    }
+
+    /** Where one segment meets the next, for the 5° gaps: not the join between a round's done and live parts. */
+    function ringBoundaries(ring) {
+        const arcs = array(ring?.arcs);
+        const joins = new Set();
+        for (let i = 0; i + 1 < arcs.length; i += 1) if (arcs[i].round === arcs[i + 1].round && arcs[i].end === arcs[i + 1].start) joins.add(arcs[i].end);
+        const edges = [...arcs.flatMap(arc => [arc.start, arc.end]), ...array(ring?.breaks).flat()].map(edge => (edge >= 1 ? 0 : edge));
+        return [...new Set(edges.filter(edge => !joins.has(edge)))].sort((a, b) => a - b);
+    }
+
+    /** The break running now (the tick lies inside it), as its index, or null. */
+    function currentBreak(ring) {
+        if (!Number.isFinite(ring?.tick)) return null;
+        const index = array(ring.breaks).findIndex(([from, to]) => ring.tick >= from && ring.tick < to);
+        return index >= 0 ? index : null;
+    }
+
+    // ---- Page colour by state (Android StudyStateTheme, Study v3 §1) --------------------------------
+    // The page takes the colour of the moment; cards stay paper and only their edge takes the state.
+
+    const PAGE_STATES = Object.freeze(['IDLE', 'ROUND', 'LAST_FIVE', 'BREAK', 'END']);
+    /** The light band behind the header before a session, and every night band: 280 px. */
+    const PAGE_BAND_PX = 280;
+    /** The last five minutes of a round get their own (deeper) wash. */
+    const PAGE_LAST_FIVE_MS = 5 * MINUTE;
+    /** Page colours cross-fade over this long. */
+    const PAGE_CROSSFADE_MS = 450;
+    // BrandPalette tones (0xRRGGBB), light and night, and the washes only Study uses.
+    const TONES = Object.freeze({
+        light: { canvas: 0xF6F2EB, desk: 0xECE4D9, paper: 0xFFFCF6, line: 0xDCD1C2, sage: 0xEDF4E7, sageDeep: 0x28623F,
+            sunWash: 0xFBEDC8, sunInk: 0x5A3A07, sun: 0xEDB12E, rose: 0xFAE8E6 },
+        night: { canvas: 0x0F141B, desk: 0x0B0F14, paper: 0x151C24, line: 0x2A3440, sage: 0x1E2E26, sageDeep: 0x5E9C7D,
+            sunWash: 0x3D3220, sunInk: 0xF6D58A, sun: 0xEDB12E, rose: 0x3A2422 }
+    });
+    const SAGE_DEEP_WASH = 0xDFECD5;
+    const SAGE_LOW = 0xF2F1E8;
+    const SUN_LOW = 0xFDF5E4;
+    const PAPER_SUN = 0xFFF9EC;
+    const PANEL_LOW = 0xF1EBE2;
+    const PAPER_EVENING = 0xFBF6EE;
+    const SUN_SOFT = 0xE3B062;
+    const NIGHT_IDLE_BAND = 0x16211F;
+    const NIGHT_SAGE_DEEP_BAND = 0x24392D;
+    const EDGE_ALPHA = 0.22;
+
+    /** Linear mix of two colours (0xRRGGBB), t of the way from a to b. */
+    function mixColor(a, b, t) {
+        const ch = (c, shift) => (c >> shift) & 0xFF;
+        const lerp = shift => Math.min(255, Math.max(0, Math.trunc(ch(a, shift) + (ch(b, shift) - ch(a, shift)) * t)));
+        return (lerp(16) << 16) | (lerp(8) << 8) | lerp(0);
+    }
+
+    /** The page state: roundEndsAt in a round, onBreak on a break, ended while the end card shows. */
+    function pageState(roundEndsAt, onBreak, ended, now) {
+        if (ended) return 'END';
+        if (onBreak) return 'BREAK';
+        if (Number.isFinite(roundEndsAt)) {
+            const left = roundEndsAt - now;
+            return left >= 1 && left <= PAGE_LAST_FIVE_MS ? 'LAST_FIVE' : 'ROUND';
+        }
+        return 'IDLE';
+    }
+
+    /** After 7 pm (and before 5 am) the light page steps down to panel. */
+    function pageEvening(hour) { return hour >= 19 || hour < 5; }
+
+    /** {top, bottom, fadePx (0: over the whole page), card, cardEdge, sun} for one state. */
+    function pagePalette(state, night, evening) {
+        const t = night ? TONES.night : TONES.light;
+        const make = (top, bottom, fadePx, card, cardEdge, sun) => ({ top, bottom, fadePx, card, cardEdge, sun });
+        if (night) {
+            const band = { IDLE: NIGHT_IDLE_BAND, ROUND: t.sage, END: t.sage, LAST_FIVE: NIGHT_SAGE_DEEP_BAND, BREAK: t.sunWash }[state] ?? NIGHT_IDLE_BAND;
+            return make(band, t.canvas, PAGE_BAND_PX, t.paper, t.line, SUN_SOFT);
+        }
+        const sun = evening ? SUN_SOFT : t.sun;
+        const edge = (ink, over) => mixColor(over, ink, EDGE_ALPHA);
+        switch (state) {
+            case 'ROUND': return make(t.sage, SAGE_LOW, 0, t.paper, edge(t.sageDeep, t.paper), sun);
+            case 'LAST_FIVE': return make(SAGE_DEEP_WASH, SAGE_LOW, 0, t.paper, edge(t.sageDeep, t.paper), sun);
+            case 'BREAK': return make(t.sunWash, SUN_LOW, 0, PAPER_SUN, edge(t.sunInk, PAPER_SUN), sun);
+            case 'END': return make(t.sage, t.sage, 0, t.paper, t.line, sun);
+            default: return evening ? make(t.desk, PANEL_LOW, 0, PAPER_EVENING, t.line, sun) : make(t.sage, t.canvas, PAGE_BAND_PX, t.paper, t.line, sun);
+        }
+    }
+
+    // ---- "Up next after the break" (Android StudyHomeFeed.chips, StudyPageRules.subjectOf) ---------
+
+    /** The study Home's subject chips: the branch's chips, else the pack's ({label, words}). */
+    function studySubjects(study, catalog) {
+        const value = object(study);
+        const out = [];
+        const seen = new Set();
+        for (const id of array(value.activePackIds)) {
+            const pack = array(object(catalog).packs).find(item => item.id === id);
+            if (!pack) continue;
+            const variant = packVariant(pack, object(object(value.packEdits)[id]).variant);
+            const labels = array(variant?.chips).length ? variant.chips : array(pack.chips);
+            for (const label of labels.map(text).filter(Boolean)) {
+                const key = label.toLowerCase();
+                if (seen.has(key)) continue;
+                seen.add(key);
+                // Android's words are the label and its search query without the exam name: the label again.
+                out.push({ label, words: [label] });
+            }
+        }
+        return out;
+    }
+
+    /** The first subject a title names (a whole-word match, case-insensitive), or null. */
+    function subjectOf(title, subjects) {
+        const value = text(title);
+        if (!value) return null;
+        for (const subject of array(subjects)) {
+            if (topicPatterns(subject.words).some(rx => rx.test(value))) return subject.label;
+        }
+        return null;
+    }
+
+    // ---- Session ends: the end card (Android StudySessionEnds, StudyRingModel.seal, StudyClock.withSkips) --
+
+    /** An end card older than this isn't news any more: it's dropped unseen. */
+    const SESSION_END_STALE_MS = 18 * 60 * MINUTE;
+    /** Within this of its end, a session that left the clock counts as ended (the alarm wakes late). */
+    const SESSION_CLOSE_SLACK_MS = MINUTE;
+    /** Sessions shorter than this (a mistaken start) get no card. */
+    const SESSION_MIN_STUDIED_MINUTES = 1;
+
+    /** Skipped breaks (their start times) fold into the round before, which runs on to the next round's end. */
+    function withSkips(segments, skippedBreaks) {
+        const skipped = new Set(array(skippedBreaks));
+        if (!skipped.size) return array(segments).slice();
+        const list = array(segments);
+        const out = [];
+        for (let i = 0; i < list.length; i += 1) {
+            const segment = list[i];
+            const last = out[out.length - 1];
+            if (segment.kind === BREAK && skipped.has(segment.start) && last && last.kind === STUDY) {
+                const next = list[i + 1] && list[i + 1].kind === STUDY ? list[i + 1] : null;
+                out[out.length - 1] = { ...last, end: next ? next.end : segment.end, round: next ? next.round : last.round };
+                if (next) i += 1;
+                continue;
+            }
+            out.push(segment);
+        }
+        return out;
+    }
+
+    /** Whole minutes, rounded to the nearest (a 39.6-minute round reads 40). */
+    function roundMinutes(ms) { return Math.floor((ms + 30 * 1000) / MINUTE); }
+
+    /**
+     * The end seal (Android StudyRingModel.seal): the segments clipped to what really happened (a Gentle
+     * end can stop early), trailing breaks dropped. {studiedMinutes, rounds, perRound: [{round, minutes}]}.
+     */
+    function sessionSeal(segments, endedAt) {
+        const clipped = [];
+        for (const segment of array(segments)) {
+            const end = Math.min(segment.end, endedAt);
+            if (end > segment.start) clipped.push({ ...segment, end });
+        }
+        while (clipped.length && clipped[clipped.length - 1].kind === BREAK) clipped.pop();
+        const rounds = clipped.filter(segment => segment.kind === STUDY);
+        const studied = rounds.reduce((sum, segment) => sum + (segment.end - segment.start), 0);
+        const studiedMinutes = roundMinutes(studied);
+        // The rounds with the minutes each one held, out of the rounded total.
+        const perRound = rounds.map(segment => ({ round: segment.round,
+            minutes: studied > 0 ? Math.round(((segment.end - segment.start) / studied) * studiedMinutes) : 0 }))
+            .filter(item => item.minutes > 0);
+        return { studiedMinutes, rounds: rounds.length, perRound };
+    }
+
+    /**
+     * Android StudySessionEnds.step: the open session for `clock` at `now`, and a session that just ended.
+     * open: {start, end, planEnd, roundMinutes, breakMinutes, skipped: [breakStart]}; returns [open, ended],
+     * ended = {start, endedAt, studiedMinutes, rounds, perRound}.
+     */
+    function sessionEndStep(open, clock, focus, skippedBreaks, now) {
+        const value = object(clock);
+        const { round, rest } = focusMinutes(focus);
+        const studying = (value.state === STUDY || value.state === BREAK) && Number.isFinite(value.sessionStart) && Number.isFinite(value.sessionEnd);
+        const skipped = array(skippedBreaks).filter(Number.isFinite);
+        if (studying) {
+            if (open && open.start === value.sessionStart) {
+                return [{ ...open, end: value.sessionEnd, planEnd: Math.max(open.planEnd, value.sessionEnd),
+                    roundMinutes: round, breakMinutes: rest, skipped: [...new Set([...array(open.skipped), ...skipped])] }, null];
+            }
+            // A new session: the previous one (if any) ended where this one began, at the latest.
+            const started = { start: value.sessionStart, end: value.sessionEnd, planEnd: value.sessionEnd, roundMinutes: round, breakMinutes: rest, skipped };
+            return [started, open ? closeSession(open, Math.min(open.end, value.sessionStart)) : null];
+        }
+        if (!open) return [null, null];
+        // A clock hold keeps the lock on; time a parent gave pauses study. Neither ends it before its time.
+        if (now < open.end - SESSION_CLOSE_SLACK_MS) return [open, null];
+        return [null, closeSession(open, Math.min(open.end, now))];
+    }
+
+    function closeSession(open, endedAt) {
+        const segments = withSkips(splitRounds(open.start, open.planEnd, { roundMinutes: open.roundMinutes, breakMinutes: open.breakMinutes }), open.skipped);
+        const seal = sessionSeal(segments, endedAt);
+        if (seal.studiedMinutes < SESSION_MIN_STUDIED_MINUTES) return null;
+        return { start: open.start, endedAt, ...seal };
+    }
+
+    /** The end waiting for its card, or null (none, or too old to be news). */
+    function pendingSessionEnd(ended, now) {
+        if (!ended || !Number.isFinite(ended.endedAt)) return null;
+        return now - ended.endedAt > SESSION_END_STALE_MS ? null : ended;
+    }
+
     /** The study and break segments of one occurrence; the last round is clamped to the end. */
     function splitRounds(start, end, focus) {
         const { round, rest } = focusMinutes(focus);
@@ -336,12 +609,18 @@
         const covering = occurrences.filter(occurrence => occurrence.start <= now && now < occurrence.end);
         const current = covering.find(occurrence => occurrence.setByParentId) || covering[0];
         if (current) {
-            const segments = splitRounds(current.start, current.end, input.focus);
+            // A skipped break folds into study (Android StudyClock.withSkips): its rules and its time are study's.
+            const raw = splitRounds(current.start, current.end, input.focus);
+            const skips = array(input.skippedBreaks).filter(Number.isFinite);
+            const segments = skips.length ? withSkips(raw, skips) : raw;
             const segment = segments.find(item => item.start <= now && now < item.end) || segments[segments.length - 1];
+            const rawNow = raw.find(item => item.start <= now && now < item.end);
+            const skippedBreak = rawNow && rawNow.kind === BREAK && segment.kind === STUDY && skips.includes(rawNow.start)
+                ? { start: rawNow.start, end: rawNow.end } : null;
             return {
                 state: segment.kind, round: segment.round, rounds: segment.rounds, until: segment.end,
                 sessionStart: current.start, sessionEnd: current.end, source: current.source,
-                setByParentId: current.setByParentId || null, segments
+                setByParentId: current.setByParentId || null, segments, skippedBreak
             };
         }
         const limited = occurrences.find(occurrence => occurrence.limitAt !== null
@@ -355,7 +634,8 @@
      * The study state at `now`:
      *   {state, round, rounds, until, sessionStart, sessionEnd, source, breakMode, segments,
      *    next: {state, at} | null, breakNoticeAt}
-     * Input: {plan, focus, breakMode, now, session?, endedUntil?, limitReached?, parentLock?, clockHold?}.
+     * Input: {plan, focus, breakMode, now, session?, endedUntil?, limitReached?, parentLock?, clockHold?,
+     *         skippedBreaks?: [breakStart]} (skipped breaks fold into study, Android StudyClock.withSkips).
      */
     function studyClock(input = {}) {
         const now = toMs(input.now);
@@ -375,7 +655,9 @@
         }
         const breakMode = text(input.breakMode) === 'normal' ? 'normal' : 'rest';
         const result = { round: null, rounds: null, sessionStart: null, sessionEnd: null, source: null, setByParentId: null,
-            clockHold: false, segments: [], ...current, breakMode, next };
+            clockHold: false, segments: [], skippedBreak: null, ...current, breakMode, next };
+        // Within a skipped break's own time the round runs on; the UI still says the break was skipped.
+        result.breakSkipped = !!result.skippedBreak;
         result.breakNoticeAt = result.state === STUDY && next && next.state === BREAK ? Math.max(now, next.at - BREAK_NOTICE_MS) : null;
         result.studying = result.state === STUDY || result.state === BREAK;
         return result;
@@ -490,10 +772,98 @@
         });
     }
 
+    /**
+     * Every term a plan's search may name: each topic and all it covers, single words included
+     * ("cement" under "building materials"). Search suggestions use it in the page (topicsForQuery
+     * without the catalog); capped so a big plan stays cheap to match.
+     */
+    function planSearchTerms(topics) {
+        return distinctTopics(array(topics).flatMap(topic => topicTerms(topic))).slice(0, MAX_PLAN_SEARCH_TERMS);
+    }
+    const MAX_PLAN_SEARCH_TERMS = 600;
+
+    /**
+     * Each pack's channels (UC ids) and topics on a study surface (studySurface rows carry
+     * managedListId "study:<pack>"), with every term the topics cover: what a search during a round
+     * also asks (Android StudySearchGroup). Channels without an id are left out.
+     */
+    function channelSearchGroups(surface) {
+        const data = object(surface);
+        const groups = new Map();
+        const groupOf = tag => {
+            if (!groups.has(tag)) groups.set(tag, { packId: tag.slice(TAG_PREFIX.length), channels: [], topics: [] });
+            return groups.get(tag);
+        };
+        for (const row of array(data.whitelistChannels)) {
+            const tag = text(object(row).managedListId);
+            const id = text(object(row).id);
+            if (tag.startsWith(TAG_PREFIX) && /^UC[\w-]{10,}$/.test(id) && !groupOf(tag).channels.includes(id)) groupOf(tag).channels.push(id);
+        }
+        for (const row of array(data.whitelistKeywords)) {
+            const value = object(row);
+            const tag = text(value.managedListId);
+            if (tag.startsWith(TAG_PREFIX) && value.source === TOPIC_SOURCE && text(value.word)) groupOf(tag).topics.push(text(value.word));
+        }
+        return [...groups.values()].filter(group => group.channels.length)
+            .map(group => ({ ...group, terms: planSearchTerms(group.topics) }));
+    }
+
     /** A couple of example searches for the first pack of the plan ({packId, variantId}). */
     function exampleSearches(groups) {
         const first = array(groups).find(isObject);
         return first ? suggest(SUGGESTION_KINDS.SEARCH_EXAMPLES, suggestionSeed(first.packId, first.variantId)) : [];
+    }
+
+    // Android StudyTopicLabel: known acronyms stay upper case in a topic label.
+    const TOPIC_ACRONYMS = new Set([
+        'gate', 'cse', 'ece', 'eee', 'dbms', 'os', 'dsa', 'oop', 'oops', 'sql', 'ai', 'ml', 'nlp', 'cn', 'toc', 'coa',
+        'upsc', 'ssc', 'neet', 'jee', 'cat', 'gre', 'gmat', 'ielts', 'toefl', 'sat', 'act', 'cbse', 'icse', 'ncert',
+        'html', 'css', 'api', 'dp', 'bfs', 'dfs', 'gk', 'ca', 'cs', 'it', 'ias', 'ips', 'pcm', 'pcb', 'mba', 'llb',
+        'clat', 'nda', 'cds', 'ibps', 'rbi', 'sbi', 'ugc', 'net', 'csir', 'mcat', 'lsat', 'bba', 'bca', 'mca', 'ib', 'igcse', 'ap'
+    ]);
+
+    /**
+     * A topic as a label (Android StudyTopicLabel.of): sentence case, but known acronyms stay upper case
+     * ("dbms" -> "DBMS", "gate cse" -> "GATE CSE", "algorithms and dsa" -> "Algorithms and DSA").
+     */
+    function topicLabel(topic, locale) {
+        const value = String(topic ?? '');
+        const words = value.trim().split(/\s+/).filter(Boolean);
+        if (!words.length) return value;
+        const lang = text(locale) || undefined;
+        const lower = word => { try { return word.toLocaleLowerCase(lang); } catch (e) { return word.toLowerCase(); } };
+        const upper = word => { try { return word.toLocaleUpperCase(lang); } catch (e) { return word.toUpperCase(); } };
+        return words.map((word, index) => {
+            const bare = lower(word).replace(/^[,.()&]+|[,.()&]+$/g, '');
+            if (TOPIC_ACRONYMS.has(bare)) return upper(word);
+            if (index === 0) { const [first, ...rest] = [...word]; return upper(first) + rest.join(''); }
+            return word;
+        }).join(' ');
+    }
+
+    /**
+     * "How search works while studying" (Android StudySearchExplainer.content): how many plan channels
+     * study search looks in, two subjects (topics with words of their own; exam names and short words
+     * never) and two example searches from the first pack. {channels, topics, examples}.
+     */
+    function searchExplainer(study, catalog) {
+        const value = object(study);
+        const layers = activePackLayers(value, catalog);
+        const keys = new Set();
+        for (const layer of layers) {
+            for (const channel of layer.channels) {
+                const id = channelIdentity(channel);
+                const key = id.id || id.handle;
+                if (key) keys.add(key);
+            }
+        }
+        const all = distinctTopics(layers.flatMap(layer => layer.keywords)).filter(topic => wordKey(topic).length > 3);
+        const topics = all.filter(topic => suggest(SUGGESTION_KINDS.TOPIC_SYNONYMS, topic).length).slice(0, 2);
+        const first = layers[0];
+        const variantId = first ? text(packVariant(packFor(value, catalog, first.id), object(object(value.packEdits)[first.id]).variant)?.id) || null : null;
+        let examples = first ? exampleSearches([{ packId: first.id, variantId }]) : [];
+        if (!examples.length && first) examples = first.keywords.filter(topic => wordKey(topic).length > 3);
+        return { channels: keys.size, topics, examples: examples.slice(0, 2) };
     }
 
     /**
@@ -860,7 +1230,10 @@
 
     /** Fail closed: the master switch can't turn study off, and comments are off while studying. */
     function studySettings(settings) {
-        return { ...clone(object(settings)), enabled: true, syncKidsToMain: false, hideComments: true };
+        // Trending and the search page's own shelves ("People also watched", "For you") are off while
+        // study holds the rules (review E-08): they would only fill with what the plan hides.
+        return { ...clone(object(settings)), enabled: true, syncKidsToMain: false, hideComments: true,
+            hideExploreTrending: true, hideSearchShelves: true };
     }
 
     /** "study" during a round, "rest" for a rest break, the limit or a clock hold, else "normal". */
@@ -868,7 +1241,8 @@
         const value = object(clock);
         if (value.clockHold === true || value.state === LIMIT) return 'rest';
         if (value.state === STUDY) return 'study';
-        if (value.state === BREAK && value.breakMode !== 'normal' && value.breakSkipped !== true) return 'rest';
+        // A skipped break is not a BREAK any more: the clock folds it into the round (withSkips).
+        if (value.state === BREAK && value.breakMode !== 'normal') return 'rest';
         return 'normal';
     }
 
@@ -984,7 +1358,10 @@
         SELF_LOCK_MAX_MINUTES, PARENT_LOCK_MAX_MINUTES, STUDY_SOURCE, TOPIC_SOURCE,
         parseTime, localDateKey, splitRounds, planOccurrences, studyClock, studyRulesApply, studyPhase,
         SUGGESTION_KINDS, suggest, suggestionSeed, studyTopics, studyAllowPhrases, topicTerms, topicPatterns,
-        topicsForQuery, exampleSearches,
+        topicsForQuery, planSearchTerms, channelSearchGroups, exampleSearches, searchExplainer, topicLabel, breakSkipPreview, SKIP_UNDO_MS,
+        dayRing, ringBoundaries, currentBreak,
+        PAGE_STATES, PAGE_BAND_PX, PAGE_LAST_FIVE_MS, PAGE_CROSSFADE_MS, pageState, pageEvening, pagePalette, mixColor,
+        studySubjects, subjectOf, withSkips, sessionSeal, sessionEndStep, pendingSessionEnd, SESSION_END_STALE_MS, SESSION_CLOSE_SLACK_MS,
         packVariant, packLayer, activePackLayers, stampPackCopies, studyEffectiveProfile,
         BRANCH_SOURCE, KIDS_KINDS, KIDS_SPACE, AMBIGUOUS_BRANCH_WORDS,
         packChannelsFor, packTopicsFor, hasSeparateBranches, branchTopics, otherBranchTopics,

@@ -240,6 +240,13 @@ html[data-theme="dark"] .ft-mascot-tally {
     height: 48px;
 }
 
+/* The card's resting company (popupTallyPose): the duo and her evening sheet are wider than tall;
+ * peeking low, she sits on the card's bottom edge. */
+.ft-mascot--popup.is-resting .ft-mascot__figure { display: block; line-height: 0; }
+.ft-mascot--popup-shoo .ft-mascot__image,
+.ft-mascot--popup-sieve .ft-mascot__image { height: 46px; }
+.ft-mascot--popup-waiting .ft-mascot__image { height: 40px; margin-bottom: -0.3rem; }
+
 .ft-mascot--popup .ft-mascot__line {
     position: absolute;
     z-index: 40;
@@ -411,3 +418,78 @@ html[data-theme="dark"] .ft-mascot-tally {
         opacity: 0;
     }
 }
+
+/* ---- A looping sheet on a page card (FilterTubeMascots.mountLoop) ----------------------------------- */
+
+.pk-loop {
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+    line-height: 0;
+    pointer-events: none;
+}
+
+.pk-loop[hidden] { display: none; }
+
+.pk-loop__art {
+    display: block;
+    width: auto;
+    max-width: 100%;
+    object-fit: contain;
+    transform-origin: 50% 100%;
+}
+
+/* A fetch-more footer (Uljhan alone): he hops up from below its edge, so the footer clips him. */
+.pk-moment[data-ft-scene="fetch"] { overflow: hidden; }
+
+/* ---- Kriti's locked sign (FilterTubeMascots.lockedSign): the time written on her blank sign ------------ */
+
+.pk-locked-sign {
+    position: relative;
+    flex: none;
+    line-height: 0;
+    pointer-events: none;
+}
+
+.pk-locked-sign__art {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+}
+
+.pk-locked-sign__words {
+    position: absolute;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    color: var(--ft-mascot-ink, #2a241f);
+    text-align: center;
+    white-space: nowrap;
+    line-height: 1.12;
+}
+
+.pk-locked-sign__words[hidden] { display: none; }
+.pk-locked-sign__label { font-weight: 400; }
+.pk-locked-sign__time { font-weight: 700; }
+
+/* On a toast: the sign sits beside the words, a little taller than a pose (Android LOCKED_SIGN_DP). */
+.ft-toast.has-sign { align-items: center; }
+.ft-toast .pk-toast-sign { border-radius: 12px; background: var(--ft-mascot-paper, #fff7e6); }
+
+/* Above a study refusal ("Locked until ..."): the sign leads the card. */
+.ft-study-loosen .ft-study-loosen__sign { align-self: center; margin-bottom: 2px; }
+
+/* ---- Second 2026-11-18 batch ------------------------------------------------------------------------ */
+
+/* A sync landed: the duo high-fives on the toast, a little taller than a pose. */
+.ft-toast .pk-toast-art--duo { height: 48px; }
+
+/* Time-saved milestone: Kriti's medal and Uljhan's cheer on the Home "Time saved" card. */
+.stat-card[data-stat="saved"] { position: relative; }
+.pk-medal { display: flex; justify-content: center; margin-top: 6px; }
+.ft-mascot--medal .ft-mascot__image { height: 72px; }
+
+/* About: the v3 sieve loop takes the place of the static picture. */
+.ft-about-duo__loop .pk-loop__art { height: 196px; } /* 176px wide in the 180px column */

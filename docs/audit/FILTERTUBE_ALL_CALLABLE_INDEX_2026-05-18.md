@@ -222,8 +222,8 @@ lexical and its scope remains tracked JS/JSX/MJS: CJS/Python tooling requires it
 separate release/workflow review and is not silently counted as JavaScript here.
 
 ```text
-current tracked JS/JSX/MJS files: 152
-current repo-wide lexical callables: 10554
+current tracked JS/JSX/MJS files: 180
+current repo-wide lexical callables: 10780
 current complete per-callable semantic proofs: 0
 current callable behavior-change approval: NO-GO
 runtime behavior changed by inventory refresh: no
@@ -237,7 +237,7 @@ runtime behavior changed by inventory refresh: no
 | UI/settings runtime | 33 | 4117 |
 | Generated/quarantined UI | 6 | 153 |
 | Vendor bundles | 3 | 279 |
-| Audit/test lane scripts | 25 | 517 |
+| Audit/test lane scripts | 29 | 602 |
 | Website routes/components/config | 31 | 149 |
 
 | File | Family | Lexical callables | Audit status |
@@ -246,14 +246,26 @@ runtime behavior changed by inventory refresh: no
 | `js/shared/kids_youtube_profiles.js` | Content helper runtime | 50 | helper counted; semantic proof incomplete |
 | `js/shared/local_playlists.js` | Content helper runtime | 40 | helper counted; semantic proof incomplete |
 | `js/shared/study_model.js` | Content helper runtime | 53 | helper counted; semantic proof incomplete |
-| `js/shared/study_packs.js` | Content helper runtime | 23 | helper counted; semantic proof incomplete |
+| `js/shared/study_packs.js` | Content helper runtime | 30 | helper counted; semantic proof incomplete |
+| `js/shared/study_setup.js` | Content helper runtime | 69 | helper counted; semantic proof incomplete |
+| `js/shared/search_suggestions_filter.js` | Content helper runtime | 43 | helper counted; semantic proof incomplete |
+| `js/shared/paced_fetch.js` | Content helper runtime | 6 | helper counted; semantic proof incomplete |
+| `js/content/search_suggestions_dom.js` | Content helper runtime | 11 | helper counted; semantic proof incomplete |
+| `js/shared/study_plan_drag.js` | Content helper runtime | 17 | helper counted; semantic proof incomplete |
+| `js/shared/hidden_log.js` | Content helper runtime | 10 | helper counted; semantic proof incomplete |
+| `js/shared/effective_mode.js` | Content helper runtime | 8 | helper counted; semantic proof incomplete |
+| `js/shared/channel_search.js` | Content helper runtime | 28 | helper counted; semantic proof incomplete |
+| `js/content/channel_search_shelf.js` | Content helper runtime | 24 | helper counted; semantic proof incomplete |
+| `js/shared/allowlist_feed.js` | Content helper runtime | 36 | helper counted; semantic proof incomplete |
+| `js/shared/feed_guard.js` | Content helper runtime | 25 | helper counted; semantic proof incomplete |
+| `js/content/allowlist_feed_view.js` | Content helper runtime | 49 | helper counted; semantic proof incomplete |
 | `js/shared/study_engine.js` | Content helper runtime | 57 | helper counted; semantic proof incomplete |
 | `js/content/study_overlay.js` | Content helper runtime | 32 | helper counted; semantic proof incomplete |
 | `js/study_background.js` | Hot page/background runtime | 57 | helper counted; semantic proof incomplete |
 | `js/shared/study_clock_guard.js` | Content helper runtime | 13 | helper counted; semantic proof incomplete |
 | `js/shared/saved_video_notes.js` | Content helper runtime | 20 | helper counted; semantic proof incomplete |
 | `js/video_notes_background.js` | Hot page/background runtime | 18 | helper counted; semantic proof incomplete |
-| `js/study_ui.js` | UI/settings runtime | 82 | UI/settings counted; semantic proof incomplete |
+| `js/study_ui.js` | UI/settings runtime | 103 | UI/settings counted; semantic proof incomplete |
 | `js/video_notes_editor.js` | UI/settings runtime | 25 | helper counted; semantic proof incomplete |
 | `js/kids_youtube_profiles_background.js` | Hot page/background runtime | 24 | helper counted; semantic proof incomplete |
 | `js/local_playlists_store.js` | Hot page/background runtime | 7 | helper counted; semantic proof incomplete |
@@ -301,7 +313,11 @@ runtime behavior changed by inventory refresh: no
 | `js/layout.js` | Generated/quarantined UI | 52 | quarantined/generated boundary |
 | `js/managed_admin_authority.js` | UI/settings runtime | 18 | UI/settings counted |
 | `js/managed_parent_command_center.js` | UI/settings runtime | 78 | UI/settings counted |
+| `js/parent_mode.js` | UI/settings runtime | 17 | UI/settings counted; semantic proof incomplete |
+| `js/doodles.js` | UI/settings runtime | 9 | UI/settings counted; semantic proof incomplete |
 | `js/mascots.js` | UI/settings runtime | 83 | UI/settings counted; semantic proof incomplete |
+| `js/paperkit_parity.js` | UI/settings runtime | 27 | UI/settings counted; semantic proof incomplete |
+| `js/dashboard_home.js` | UI/settings runtime | 48 | UI/settings counted; semantic proof incomplete |
 | `js/nanah_managed_live_policy.js` | UI/settings runtime | 125 | UI/settings counted |
 | `js/nanah_managed_local_network_client.js` | UI/settings runtime | 48 | UI/settings counted; semantic proof incomplete |
 | `js/nanah_managed_mailbox_client.js` | UI/settings runtime | 37 | UI/settings counted; semantic proof incomplete |
@@ -318,7 +334,13 @@ runtime behavior changed by inventory refresh: no
 | `js/shared/content_playback_resolver.js` | Content helper runtime | 25 | helper counted; semantic proof incomplete |
 | `js/shared/content_playback_source.js` | Content helper runtime | 18 | helper counted; semantic proof incomplete |
 | `js/shared/identity.js` | Content helper runtime | 110 | helper counted |
+| `js/shared/ask_parent.js` | Content helper runtime | 41 | helper counted; semantic proof incomplete |
+| `js/ask_parent_background.js` | Hot page/background runtime | 44 | helper counted; semantic proof incomplete |
+| `js/shared/live_chat_filter.js` | Content helper runtime | 8 | helper counted; semantic proof incomplete |
+| `js/content/live_chat_filter.js` | Content helper runtime | 10 | helper counted; semantic proof incomplete |
+| `js/content/live_chat_identity.js` | Content helper runtime | 5 | helper counted; semantic proof incomplete |
 | `js/shared/view_count.js` | Content helper runtime | 4 | helper counted; semantic proof incomplete |
+| `js/shared/view_count_isolated.js` | Content helper runtime | 4 | isolated-world copy of view_count.js; helper counted; semantic proof incomplete |
 | `js/state_manager.js` | UI/settings runtime | 180 | UI/settings counted |
 | `js/tab-view.js` | UI/settings runtime | 2201 | UI/settings counted |
 | `js/ui-shell/popup-shell.js` | Generated/quarantined UI | 45 | generated output boundary |
@@ -331,8 +353,10 @@ runtime behavior changed by inventory refresh: no
 | `js/vendor/nanah.bundle.js` | Vendor bundles | 107 | vendor API/provenance boundary |
 | `js/vendor/qrcode.bundle.js` | Vendor bundles | 172 | vendor API/provenance boundary |
 | `scripts/audit-proof-drift.mjs` | Audit/test lane scripts | 19 | audit lane counted |
+| `scripts/build-crayon-edges.mjs` | Build/sync scripts | 12 | build/website counted |
 | `scripts/build-extension-ui.mjs` | Build/sync scripts | 2 | build/website counted |
 | `scripts/build-nanah-vendor.mjs` | Build/sync scripts | 4 | build/website counted |
+| `scripts/export-crayon-icons.mjs` | Build/sync scripts | 6 | build/website counted |
 | `scripts/build-qr-scanner-vendor.mjs` | Build/sync scripts | 0 | build provenance counted; semantic proof incomplete |
 | `scripts/build-study-packs.mjs` | Build/sync scripts | 15 | build provenance counted; semantic proof incomplete |
 | `scripts/check-release-note-locales.mjs` | Audit/test lane scripts | 4 | workflow/evidence tooling counted; semantic proof incomplete |
@@ -357,6 +381,10 @@ runtime behavior changed by inventory refresh: no
 | `scripts/sync-native-runtime.mjs` | Build/sync scripts | 1 | build/website counted |
 | `scripts/test-lane-config.mjs` | Audit/test lane scripts | 0 | audit lane counted |
 | `scripts/test-lane-file-rules.mjs` | Audit/test lane scripts | 0 | audit lane counted |
+| `tools/parity/derive-file-map.mjs` | Audit/test lane scripts | 14 | audit lane counted |
+| `tools/parity/ledger.mjs` | Audit/test lane scripts | 32 | audit lane counted |
+| `tools/parity/ledger.test.mjs` | Audit/test lane scripts | 2 | audit lane counted |
+| `tools/parity/lib.mjs` | Audit/test lane scripts | 37 | audit lane counted |
 | `scripts/update-family-device-evidence-log.mjs` | Audit/test lane scripts | 23 | workflow/evidence tooling counted; semantic proof incomplete |
 | `scripts/validate-family-device-evidence.mjs` | Audit/test lane scripts | 24 | workflow/evidence tooling counted; semantic proof incomplete |
 | `scripts/verify-managed-app-policy-contract.mjs` | Audit/test lane scripts | 14 | workflow/evidence tooling counted; semantic proof incomplete |

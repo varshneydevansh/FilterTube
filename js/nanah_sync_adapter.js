@@ -1066,7 +1066,10 @@
             return validationResult('wrong_source_profile', { ackState: 'rejected' });
         }
         const scope = normalizeManagedPolicyScope(root.scope);
-        if (!scope || (!safeArray(trustedLink.allowedScopes).includes(scope) && !safeArray(safeObject(trustedLink.policy).allowedScopes).includes(scope))) {
+        const mailboxAllowedScopes = [...safeArray(trustedLink.allowedScopes), ...safeArray(safeObject(trustedLink.policy).allowedScopes)];
+        // Study scopes never join allowedScopes: they ride on time_limits, as in validateManagedPolicyEnvelope.
+        if (!scope || !(MANAGED_STUDY_SCOPES.includes(scope)
+            ? managedStudyScopeAllowed(mailboxAllowedScopes) : mailboxAllowedScopes.includes(scope))) {
             return validationResult('scope_not_allowed', { ackState: 'rejected' });
         }
         if (root.sourcePublicKeyId !== trustedLink.sourcePublicKeyId) {
@@ -1900,6 +1903,28 @@
         return true;
     }
 
+    /** Whether a Self-Control session runs on this device (context.selfControlActive, else the background). */
+    async function selfControlSessionActive(context) {
+        if (typeof context?.selfControlActive === 'function') {
+            try { return (await context.selfControlActive()) === true; } catch (error) { return false; }
+        }
+        const api = global.chrome?.runtime?.sendMessage ? global.chrome : (global.browser?.runtime?.sendMessage ? global.browser : null);
+        if (!api) return false;
+        return new Promise(resolve => {
+            const timer = setTimeout(() => resolve(false), 1500);
+            const done = response => { clearTimeout(timer); resolve(response?.active === true); };
+            try {
+                const pending = api.runtime.sendMessage({ action: 'FilterTube_GetSelfControlSession' }, response => {
+                    if (api.runtime.lastError) { done(null); return; }
+                    done(response);
+                });
+                if (pending && typeof pending.then === 'function') pending.then(done, () => done(null));
+            } catch (error) {
+                done(null);
+            }
+        });
+    }
+
     async function applyManagedPolicyEnvelope(envelope, context = {}) {
         const root = safeObject(envelope);
         const verifiedPublicKey = stableManagedNanahJson(getManagedNanahSourcePublicKeyJwk(context?.trustedLink));
@@ -1924,6 +1949,21 @@
             };
             await recordManagedPolicyDecisionHistory(root, result, context);
             return result;
+        }
+
+        // A Self-Control session on this device holds every profile as it is (Android
+        // AppPreferences.commitProfiles refuses while one runs). A parent's update, a study lock
+        // included, waits: it isn't written (the session would revert it) and isn't acknowledged, so
+        // it is picked up again after the session ends.
+        if (await selfControlSessionActive(context)) {
+            return validationResult('self_control_active', {
+                ackState: 'pending',
+                deferred: true,
+                scope: validation.scope,
+                profileId: validation.targetProfileId,
+                revision: validation.revision,
+                policyHash: validation.policyHash
+            });
         }
 
         const io = await getIO();
@@ -2068,7 +2108,7 @@
         const result = await applyManagedPolicyEnvelope(mailboxDecision.envelope, context);
         return {
             ...result,
-            ackState: result.accepted === true ? 'delivered' : (mailboxDecision.ackState || 'rejected'),
+            ackState: result.accepted === true ? 'delivered' : (result.ackState || mailboxDecision.ackState || 'rejected'),
             mailboxItemId: mailboxDecision.mailboxItemId
         };
     }

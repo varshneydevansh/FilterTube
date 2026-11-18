@@ -164,6 +164,74 @@ const UIComponents = (() => {
     }
 
     /**
+     * Android's crayon ring (ProfileAvatarDrawable + StudyPaper.crayon): one closed circle, inset by one
+     * stroke width, cut into ~5 px pieces whose corners are pushed sideways by up to 0.55 px
+     * (DiscretePathEffect) and then rounded (CornerPathEffect). The jitter is seeded, so the same size
+     * always draws the same ring, as Skia's fixed seed does. Pure: returns an SVG path in a
+     * `size` x `size` box.
+     */
+    function crayonRingPath(size, { strokeWidth = 1.6, segment = 5, deviation = 0.55, seed = 0 } = {}) {
+        const box = Math.max(8, Number(size) || 36);
+        const width = Math.max(0.5, Number(strokeWidth) || 1.6);
+        const radius = box / 2 - width;
+        const centre = box / 2;
+        const count = Math.max(12, Math.round((2 * Math.PI * radius) / Math.max(1, segment)));
+        let state = (Number(seed) >>> 0) ^ 0x9E3779B9;
+        const random = () => {
+            state = (state + 0x6D2B79F5) >>> 0;
+            let t = state;
+            t = Math.imul(t ^ (t >>> 15), t | 1);
+            t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
+            return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+        };
+        const points = [];
+        for (let index = 0; index < count; index++) {
+            const angle = -Math.PI / 2 + (index / count) * Math.PI * 2;
+            const r = radius + (random() * 2 - 1) * deviation;
+            points.push([centre + Math.cos(angle) * r, centre + Math.sin(angle) * r]);
+        }
+        const fixed = value => Number(value.toFixed(2));
+        const mid = (a, b) => [(a[0] + b[0]) / 2, (a[1] + b[1]) / 2];
+        // Rounded corners: each vertex becomes the control point between the midpoints around it.
+        const start = mid(points[count - 1], points[0]);
+        let d = `M${fixed(start[0])} ${fixed(start[1])}`;
+        for (let index = 0; index < count; index++) {
+            const corner = points[index];
+            const end = mid(corner, points[(index + 1) % count]);
+            d += `Q${fixed(corner[0])} ${fixed(corner[1])} ${fixed(end[0])} ${fixed(end[1])}`;
+        }
+        return `${d}Z`;
+    }
+
+    /** Ring stroke widths in px, as the app draws them: Adult and Kids 1.6 dp; Parent's inset uses 1.4 dp. */
+    function avatarRingWidth(role) {
+        return role === 'parent' ? 1.4 : 1.6;
+    }
+
+    function drawAvatarRing(host, doc, role, px) {
+        if (role === 'parent') {
+            // Parent: the app's two scribbled loops (doodle_scribble_circle), tinted with the ink, 2% inset.
+            const loops = doc.createElement('span');
+            loops.className = 'ft-avatar__ring ft-avatar__ring--scribble';
+            const url = `url("${doodleUrl('scribble_circle')}")`;
+            loops.style.webkitMaskImage = url;
+            loops.style.maskImage = url;
+            host.appendChild(loops);
+            return;
+        }
+        const ns = 'http://www.w3.org/2000/svg';
+        const ring = doc.createElementNS(ns, 'svg');
+        ring.setAttribute('class', 'ft-avatar__ring');
+        ring.setAttribute('viewBox', `0 0 ${px} ${px}`);
+        ring.setAttribute('focusable', 'false');
+        const path = doc.createElementNS(ns, 'path');
+        path.setAttribute('d', crayonRingPath(px, { strokeWidth: avatarRingWidth(role) }));
+        path.setAttribute('stroke-width', String(avatarRingWidth(role)));
+        ring.appendChild(path);
+        host.appendChild(ring);
+    }
+
+    /**
      * Fills `host` with a profile avatar: {id, name, type, avatar, size}. Decorative: the caller's
      * text (name and role word) carries the meaning, so the drawing is hidden from screen readers.
      */
@@ -182,16 +250,7 @@ const UIComponents = (() => {
         host.dataset.ftAvatar = doodle ? doodle.value : 'initial';
         host.setAttribute('aria-hidden', 'true');
 
-        const ns = 'http://www.w3.org/2000/svg';
-        const ring = doc.createElementNS(ns, 'svg');
-        ring.setAttribute('class', 'ft-avatar__ring');
-        ring.setAttribute('viewBox', '0 0 40 40');
-        ring.setAttribute('focusable', 'false');
-        const rings = role === 'parent'
-            ? '<circle cx="20" cy="20" r="17.2" /><circle class="ft-avatar__ring-second" cx="20.6" cy="19.5" r="18.4" />'
-            : '<circle cx="20" cy="20" r="17.6" />';
-        ring.innerHTML = rings;
-        host.appendChild(ring);
+        drawAvatarRing(host, doc, role, px);
 
         if (doodle) {
             const art = doc.createElement('span');
@@ -1209,11 +1268,269 @@ const UIComponents = (() => {
         }, duration);
     }
 
+
+    // ============================================================================
+    // UNDO BAR (the app's PaperUndoBar + FilterRemovalUndo)
+    // ============================================================================
+    // A paper bar rises at the foot after a rule is removed: "Removed “x”." and Undo, with a brick
+    // line draining over 5 s (paused while hovered or focused). A second removal crossfades the text
+    // and restarts the line; Undo puts the batch back, plays the undo swish (optional sound) and says
+    // "Put back." to screen readers.
+    const UNDO_HOLD_MS = 5000;
+    let undoBar = null;
+
+    function pluralText(key, fallbackOne, fallbackOther, count) {
+        let locale = 'en';
+        try { locale = window.FilterTubeUiLocalization?.locale || document.documentElement.lang || 'en'; } catch (e) { }
+        let category = 'other';
+        try { category = new Intl.PluralRules(locale).select(count); } catch (e) { }
+        let formatted = String(count);
+        try { formatted = new Intl.NumberFormat(locale).format(count); } catch (e) { }
+        for (const candidate of [category, 'other']) {
+            try {
+                const text = window.FilterTubeUiLocalization?.text?.(`${key}.${candidate}`, { count: formatted });
+                if (typeof text === 'string' && text.trim() && text !== `${key}.${candidate}`) return text;
+            } catch (e) { }
+        }
+        return (category === 'one' ? fallbackOne : fallbackOther).replace('{count}', formatted);
+    }
+
+    function closeUndoBar(bar, immediate = false) {
+        if (!bar) return;
+        clearTimeout(bar.__ftTimer);
+        if (undoBar === bar) undoBar = null;
+        bar.classList.remove('is-shown');
+        bar.classList.add('is-leaving');
+        setTimeout(() => bar.remove(), immediate ? 0 : 200);
+    }
+
+    function showUndoBar({ message, actionLabel, onUndo, holdMs = UNDO_HOLD_MS } = {}) {
+        let bar = undoBar && undoBar.isConnected ? undoBar : null;
+        if (!bar) {
+            bar = document.createElement('div');
+            bar.className = 'pk-undo-bar';
+            bar.setAttribute('role', 'status');
+            bar.setAttribute('aria-live', 'polite');
+            const text = document.createElement('span');
+            text.className = 'pk-undo-bar__text';
+            const action = document.createElement('button');
+            action.type = 'button';
+            action.className = 'pk-undo-bar__action';
+            const drain = document.createElement('span');
+            drain.className = 'pk-undo-bar__drain';
+            drain.setAttribute('aria-hidden', 'true');
+            bar.append(text, action, drain);
+            const pause = paused => {
+                bar.classList.toggle('is-paused', paused);
+                clearTimeout(bar.__ftTimer);
+                if (paused) {
+                    bar.__ftRemaining = Math.max(400, bar.__ftDeadline - Date.now());
+                } else {
+                    bar.__ftDeadline = Date.now() + (bar.__ftRemaining || holdMs);
+                    bar.__ftTimer = setTimeout(() => closeUndoBar(bar), bar.__ftRemaining || holdMs);
+                }
+            };
+            bar.addEventListener('mouseenter', () => pause(true));
+            bar.addEventListener('mouseleave', () => pause(false));
+            bar.addEventListener('focusin', () => pause(true));
+            bar.addEventListener('focusout', () => pause(false));
+            action.addEventListener('click', async () => {
+                const handler = bar.__ftOnUndo;
+                bar.__ftOnUndo = null;
+                if (typeof handler !== 'function') return;
+                clearTimeout(bar.__ftTimer);
+                action.disabled = true;
+                let ok = false;
+                try { ok = (await handler()) !== false; } catch (e) { ok = false; }
+                if (ok) {
+                    try { window.FilterTubeMascots?.playSound?.('undo'); } catch (e) { }
+                    text.textContent = localizedComponentText('filters.undo.putBack', 'Put back.');
+                    action.hidden = true;
+                    bar.classList.add('is-done');
+                    setTimeout(() => closeUndoBar(bar), 1400);
+                } else {
+                    closeUndoBar(bar);
+                }
+            });
+            document.body.appendChild(bar);
+            undoBar = bar;
+            requestAnimationFrame(() => bar.classList.add('is-shown'));
+        } else {
+            bar.classList.remove('is-swapping');
+            void bar.offsetWidth;
+            bar.classList.add('is-swapping');
+        }
+        const text = bar.querySelector('.pk-undo-bar__text');
+        const action = bar.querySelector('.pk-undo-bar__action');
+        text.textContent = message || '';
+        action.textContent = actionLabel || localizedComponentText('filters.undo.action', 'Undo');
+        // A plain paper toast (Android StudyFocusActivity.paperToast) has no action, only the drain.
+        action.hidden = typeof onUndo !== 'function';
+        action.disabled = false;
+        bar.classList.remove('is-done');
+        bar.__ftOnUndo = onUndo;
+        bar.__ftRemaining = holdMs;
+        bar.style.setProperty('--pk-undo-hold', `${holdMs}ms`);
+        const drain = bar.querySelector('.pk-undo-bar__drain');
+        drain.style.animation = 'none';
+        void drain.offsetWidth;
+        drain.style.animation = '';
+        clearTimeout(bar.__ftTimer);
+        bar.__ftDeadline = Date.now() + holdMs;
+        if (!bar.classList.contains('is-paused')) bar.__ftTimer = setTimeout(() => closeUndoBar(bar), holdMs);
+        return bar;
+    }
+
+    // A new row takes the area's wash and the crayon underline draws under its word (the app's
+    // FilterRowWash): the wash holds 600 ms, then fades over 300 ms and the underline goes with it.
+    const ROW_WASH_HOLD_MS = 600;
+    const ROW_WASH_FADE_MS = 300;
+
+    function cssEscape(value) {
+        try { return CSS.escape(value); } catch (e) { return String(value).replace(/["\\]/g, '\\$&'); }
+    }
+
+    function highlightAddedRows(selector) {
+        const rows = Array.from(document.querySelectorAll(selector)).filter(row => row.offsetParent !== null);
+        const reduced = (() => { try { return matchMedia('(prefers-reduced-motion: reduce)').matches; } catch (e) { return false; } })();
+        const doodles = document.documentElement.getAttribute('data-ft-companion') !== 'off';
+        rows.forEach(row => {
+            row.classList.remove('pk-row-added', 'pk-row-added--fading');
+            void row.offsetWidth;
+            row.classList.add('pk-row-added');
+            const word = row.querySelector('.item-word, .keyword-text, .channel-name, .item-left') || null;
+            const mark = doodles && word && window.FilterTubeDoodles?.underline ? window.FilterTubeDoodles.underline(word) : null;
+            setTimeout(() => {
+                row.classList.add('pk-row-added--fading');
+                setTimeout(() => {
+                    row.classList.remove('pk-row-added', 'pk-row-added--fading');
+                    if (mark && word) window.FilterTubeDoodles.clear(word);
+                }, reduced ? 0 : ROW_WASH_FADE_MS);
+            }, ROW_WASH_HOLD_MS);
+        });
+    }
+
+    function addedRowSelector(eventType, data) {
+        if (eventType === 'keywordAdded' || eventType === 'kidsKeywordAdded') {
+            const word = typeof data?.word === 'string' ? data.word.trim().toLowerCase() : '';
+            return word ? `[data-ft-rule-word="${cssEscape(word)}"]` : '';
+        }
+        const channel = data?.channel;
+        const key = String(channel?.id || channel?.handle || channel?.customUrl || channel?.name || '').trim().toLowerCase();
+        return key ? `[data-ft-rule-channel="${cssEscape(key)}"]` : '';
+    }
+
+    /** Offers Undo after every rule removal the state manager makes (Main and Kids, both lists), and
+     * marks each newly added row. */
+    function attachRemovalUndo(stateManager) {
+        if (!stateManager?.subscribe || typeof stateManager.getRemovalBatch !== 'function') return () => {};
+        const removals = new Set(['keywordRemoved', 'channelRemoved', 'kidsKeywordRemoved', 'kidsChannelRemoved']);
+        const additions = new Set(['keywordAdded', 'channelAdded', 'kidsKeywordAdded', 'kidsChannelAdded']);
+        return stateManager.subscribe((eventType, data) => {
+            if (additions.has(eventType) && data?.restored !== true) {
+                const selector = addedRowSelector(eventType, data);
+                // After the page's own listener has drawn the list.
+                if (selector) setTimeout(() => requestAnimationFrame(() => {
+                    highlightAddedRows(selector);
+                    // The first rule on this profile: Kriti and Uljhan sieve above the list (once).
+                    try {
+                        const mascots = window.FilterTubeMascots;
+                        const state = stateManager.getState?.();
+                        if (!mascots?.firstFilterMoment || !state || mascots.ruleCount?.(state) !== 1) return;
+                        const row = Array.from(document.querySelectorAll(selector)).find(node => node.offsetParent !== null);
+                        const list = row?.parentElement;
+                        if (list) mascots.firstFilterMoment({ profileId: state.activeProfileId || 'default', anchor: list, allowed: state.mode === 'whitelist' });
+                    } catch (e) { }
+                }), 0);
+                return;
+            }
+            if (!removals.has(eventType)) return;
+            const batch = stateManager.getRemovalBatch();
+            if (!batch || batch.count < 1) return;
+            const words = /keyword/i.test(batch.kind);
+            const message = batch.count === 1 && batch.label
+                ? localizedComponentText('filters.undo.removedOne', 'Removed “{name}”.', { name: batch.label })
+                : (words
+                    ? pluralText('filters.undo.removedWords', 'Removed {count} word.', 'Removed {count} words.', batch.count)
+                    : pluralText('filters.undo.removedChannels', 'Removed {count} channel.', 'Removed {count} channels.', batch.count));
+            showUndoBar({ message, onUndo: () => stateManager.undoRemoval(batch.id) });
+        });
+    }
+
     // ============================================================================
     // PUBLIC API
     // ============================================================================
 
+    /**
+     * The profile picker's parts (Android ProfileDropdownPopup, ProfilePickerRow, ProfilePickerFooter),
+     * shared by the popup and the options page. t(key, fallback, values) is the page's translator.
+     */
+    function profileRoleChip(role, t) {
+        const chip = document.createElement('span');
+        chip.className = `ft-profile-role-chip is-${role}`;
+        chip.textContent = role === 'parent' ? t('profiles.chip.parent', 'Parent') : role === 'kids' ? t('profiles.chip.kids', 'Kids') : t('profiles.chip.adult', 'Adult');
+        chip.setAttribute('aria-hidden', 'true');
+        return chip;
+    }
+
+    function profileAboutLine(role, t, parentName = '') {
+        if (role === 'parent') return t('profiles.about.parent', 'Holds the Master PIN and manages everyone');
+        if (role === 'kids') return parentName ? t('profiles.about.kidsNamed', 'Kids space. {name} sets the rules', { name: parentName }) : t('profiles.about.kids', 'Kids space. A parent sets the rules');
+        return t('profiles.about.adult', 'Own rules and history');
+    }
+
+    /**
+     * What the picker offers under the rows: Kriti's "Just you so far" card while only Default exists,
+     * Add a Kids profile, Add an adult profile (the Parent only) and Manage profiles and PINs. None on a
+     * Kids profile or during a Self-Control Session. opts: {count, role, selfControl, t, onAddKids,
+     * onAddAdult, onManage, kritiSrc}.
+     */
+    function profilePickerFooter(opts) {
+        const t = opts.t;
+        if (opts.selfControl || opts.role === 'kids') return null;
+        const footer = document.createElement('div');
+        footer.className = 'ft-picker-footer';
+        const make = (tag, className, text) => { const node = document.createElement(tag); node.className = className; if (text) node.textContent = text; return node; };
+        if (opts.count <= 1) {
+            const card = make('div', 'ft-picker-empty');
+            if (opts.kritiSrc) {
+                const kriti = make('img', 'ft-picker-empty__kriti');
+                kriti.src = opts.kritiSrc;
+                kriti.alt = '';
+                kriti.setAttribute('aria-hidden', 'true');
+                card.appendChild(kriti);
+            }
+            card.append(make('h4', 'ft-picker-empty__title', t('profiles.emptyTitle', 'Just you so far')),
+                make('p', 'ft-picker-empty__body', t('profiles.emptyBody', 'Add a Kids profile to give a child their own space, with rules you set.')));
+            const add = make('button', 'btn-primary ft-picker-empty__add', t('profiles.addKids', 'Add a Kids profile'));
+            add.type = 'button';
+            add.addEventListener('click', event => { event.stopPropagation(); opts.onAddKids?.(); });
+            card.appendChild(add);
+            footer.appendChild(card);
+        } else {
+            const kids = make('button', 'ft-picker-pill is-kids', t('profiles.addKids', 'Add a Kids profile'));
+            kids.type = 'button';
+            kids.addEventListener('click', event => { event.stopPropagation(); opts.onAddKids?.(); });
+            footer.appendChild(kids);
+        }
+        if (opts.role === 'parent' && opts.onAddAdult) {
+            const adult = make('button', 'ft-picker-pill is-adult', t('profiles.addAdult', 'Add an adult profile'));
+            adult.type = 'button';
+            adult.addEventListener('click', event => { event.stopPropagation(); opts.onAddAdult(); });
+            footer.appendChild(adult);
+        }
+        if (opts.onManage) {
+            const manage = make('button', 'ft-picker-manage', t('profiles.manage', 'Manage profiles and PINs'));
+            manage.type = 'button';
+            manage.addEventListener('click', event => { event.stopPropagation(); opts.onManage(); });
+            footer.appendChild(manage);
+        }
+        return footer;
+    }
+
     return {
+        showUndoBar,
+        attachRemovalUndo,
         Colors,
         getProfileColors,
         PROFILE_AVATAR_DOODLES,
@@ -1223,6 +1540,11 @@ const UIComponents = (() => {
         profileAvatarSticker,
         profileInitial,
         renderProfileAvatar,
+        crayonRingPath,
+        avatarRingWidth,
+        profileRoleChip,
+        profileAboutLine,
+        profilePickerFooter,
         neutralizePlatformLabel,
         createButton,
         flashButtonSuccess,
@@ -1247,6 +1569,19 @@ const UIComponents = (() => {
 try {
     if (typeof window !== 'undefined') {
         window.UIComponents = UIComponents;
+        /**
+         * FilterTubeAvatarRing.render(host, {letter, kind: 'adult'|'kids'|'parent', size, avatar?})
+         * fills `host` with a crayon avatar (wash disc, Android's crayon ring, the initial or a doodle).
+         * ringPath(size, opts) returns the ring's SVG path alone.
+         */
+        window.FilterTubeAvatarRing = Object.freeze({
+            render(host, { letter = '', kind = 'adult', size = 36, avatar = null, id = '' } = {}) {
+                const type = kind === 'kids' ? 'child' : 'account';
+                const profileId = kind === 'parent' ? 'default' : (id && id !== 'default' ? id : `ring-${kind}`);
+                return UIComponents.renderProfileAvatar(host, { id: profileId, name: letter, type, avatar, size });
+            },
+            ringPath: UIComponents.crayonRingPath
+        });
     }
 } catch (e) {
 }

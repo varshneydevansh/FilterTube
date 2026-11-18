@@ -41,8 +41,13 @@
     const SEND_AFTER_SECONDS = 60;
     const BREAK_WAIT_MAX_MS = 5 * 60 * 1000;
     const NOTICE_SHOW_MS = 10 * 1000;
+    const SKIP_UNDO_MS = 5 * 1000;
     const KIDS_TICK_MS = 1000;
-    const KRITI_READING = 'assets/images/mascots/kriti_reading.webp';
+    const KRITI_READING = 'assets/images/mascots/kriti_pose_04.webp';
+    // KRITI_STRETCH (StudyMascotView.Motion): frames and timing as the app plays them on the rest screen.
+    const STRETCH_FRAMES = [1, 2, 3, 4, 5].map(index => `kriti_stretch_0${index}.webp`);
+    const STRETCH_ORDER = [0, 1, 2, 3, 3, 4, 0];
+    const STRETCH_FRAME_MS = 280;
     const COMPANION_KEY = 'ftCompanionMode';
 
     /** "4:12" (minutes and seconds), rounded up so it never shows 0:00 early (Android StudyBreakClock). */
@@ -80,6 +85,8 @@
         let transitionTimer = null;
         let noticeTimer = null;
         let breakSeenAt = null;
+        // After Skip break the screen stays this long with "Break skipped ... Undo" (Android StudyRestActivity).
+        let skipped = null;
         let pendingSeconds = 0;
         let lastCheckAt = null;
         let holdingPlayback = false;
@@ -156,7 +163,8 @@
             if (!state) return null;
             if (state.clockHold) return 'hold';
             if (state.state === 'LIMIT') return 'limit';
-            if (state.state === 'BREAK' && state.breakMode !== 'normal' && !state.breakSkipped) return 'rest';
+            // A skipped break comes back from the clock as STUDY (it folds into the round), so it is never rest.
+            if (state.state === 'BREAK' && state.breakMode !== 'normal') return 'rest';
             // Fail closed: a study round with no known pack (and no own allowed channels) is rest.
             if (state.state === 'STUDY' && state.phase === 'rest') return 'unavailable';
             // Kids holds during an exam or class round; Kids learning packs keep it open.
@@ -203,6 +211,77 @@
                 (doc.body || doc.documentElement).appendChild(note);
             }
             return true;
+        }
+
+        const SKIP_ID = 'filtertube-study-skip';
+
+        /** The playing lecture's title, for "Up next after the break" (Android StudyWatchOverlay lastSubject). */
+        function lectureTitle() {
+            try {
+                const heading = doc.querySelector?.('ytd-watch-metadata h1, h1.ytd-watch-metadata, h1.title, .slim-video-information-title');
+                const value = (heading?.textContent || String(doc.title || '').replace(/\s+-\s+YouTube$/, '')).trim();
+                return value.slice(0, 300);
+            } catch (e) {
+                return '';
+            }
+        }
+
+        function currentVideoId() {
+            try {
+                const url = new URL(String(win.location?.href || ''));
+                const fromQuery = url.searchParams.get('v');
+                if (fromQuery) return fromQuery;
+                const match = url.pathname.match(/^\/(?:shorts|embed)\/([A-Za-z0-9_-]{6,64})/);
+                return match ? match[1] : '';
+            } catch (e) {
+                return '';
+            }
+        }
+
+        /**
+         * "Skip this video" (Android StudyWatchOverlay SKIP_ACTION_ID): while study runs, the video in
+         * the player can be skipped. It hides from now on for this profile and never unblocks anything.
+         */
+        function renderSkip() {
+            // Only a video that plays can be skipped: not one the watch gate already holds back.
+            const gated = !!doc.querySelector?.('[data-filtertube-direct-access-overlay-host="true"]');
+            // During a round, and a break that plays videos (Android: "during a study round or break").
+            const running = state?.state === 'STUDY' || (state?.state === 'BREAK' && state?.breakMode === 'normal');
+            const videoId = running && onWatchRoute() && !overlayKind() && !gated ? currentVideoId() : '';
+            const existing = doc.getElementById(SKIP_ID);
+            if (!videoId) { if (existing) existing.remove(); return; }
+            const rowReady = !!doc.querySelector?.('ytd-watch-metadata #top-level-buttons-computed, #actions #top-level-buttons-computed, ytm-slim-video-action-bar-renderer .slim-video-action-bar-actions');
+            if (existing && existing.getAttribute('data-video-id') === videoId && (existing.getAttribute('data-in-action-row') === 'true' || !rowReady)) return;
+            if (existing) existing.remove();
+            // "Skip this video" is the first chip in the Watch page's action row (Android 9ed6a1e27), never
+            // floating over the recommendations; while the row isn't there yet it waits at the page's corner.
+            const row = doc.querySelector?.('ytd-watch-metadata #top-level-buttons-computed, #actions #top-level-buttons-computed, ytm-slim-video-action-bar-renderer .slim-video-action-bar-actions') || null;
+            const button = element('button', row ? {
+                minHeight: '36px', padding: '0 16px', marginInlineEnd: '8px', borderRadius: '999px', background: 'var(--yt-spec-badge-chip-background, rgba(0,0,0,.05))',
+                color: 'var(--yt-spec-text-primary, #0f0f0f)', border: '0', cursor: 'pointer', font: '500 14px/36px Roboto, Arial, sans-serif', flex: '0 0 auto'
+            } : {
+                position: 'fixed', left: '16px', bottom: '16px', zIndex: '2147483646', minHeight: '40px', padding: '0 16px',
+                borderRadius: '999px', background: '#FFFCF6', color: '#1b1a18', border: '1.5px solid #cdbfae', cursor: 'pointer',
+                font: '700 14px/1 Roboto, Arial, sans-serif', boxShadow: '0 3px 0 rgba(27,26,24,.14)'
+            }, t('study.skipVideo', 'Skip this video'));
+            button.id = SKIP_ID;
+            button.type = 'button';
+            button.setAttribute('data-video-id', videoId);
+            if (row) button.setAttribute('data-in-action-row', 'true');
+            button.addEventListener('click', () => {
+                button.disabled = true;
+                send({ action: 'FilterTube_StudySkipVideo', videoId }).then(response => {
+                    if (response?.ok) {
+                        removeElement(SKIP_ID);
+                        pauseAll();
+                        showNotice(t('study.skipped', 'Skipped. It won\'t show again.'));
+                    } else {
+                        button.disabled = false;
+                    }
+                });
+            });
+            if (row && typeof row.insertBefore === 'function') { row.insertBefore(button, row.firstChild || null); return; }
+            (doc.body || doc.documentElement).appendChild(button);
         }
 
         function removeElement(id) {
@@ -312,8 +391,16 @@
                 hold: [t('study.overlay.holdTitle', 'Study is on hold'), t('study.overlay.holdBody', 'The time or time zone on this device changed during a lock. Study continues when the clock is right again.')],
                 unavailable: [t('study.overlay.unavailableTitle', 'Study pack unavailable'), t('study.overlay.unavailableBody', 'Your study videos can\'t load right now, so nothing plays until this study time ends.')]
             }[kind] || [t('study.overlay.limitTitle', 'Done for today'), ''];
+            if (rest && Number.isFinite(Number(state?.until)) && typeof doc.createElementNS === 'function') box.appendChild(breakSun(dark));
             box.appendChild(element('div', { fontSize: '28px', fontWeight: '600' }, copy[0]));
             box.appendChild(element('div', { fontSize: '16px', maxWidth: '420px', lineHeight: '1.5' }, copy[1]));
+            if (rest && state?.upNext) {
+                // "Up next after the break: {subject}", when the last lecture's subject is known.
+                const next = element('div', { fontSize: '18px', fontWeight: '600', maxWidth: '420px', lineHeight: '1.3' },
+                    t('study.overlay.upNext', 'Up next after the break: {subject}', { subject: state.upNext }));
+                next.dataset.role = 'up-next';
+                box.appendChild(next);
+            }
             if (rest && state?.canSkipBreak) {
                 const button = element('button', {
                     marginTop: '8px', padding: '10px 20px', borderRadius: '20px', border: `1px solid ${dark ? '#f6d58a' : '#854F0B'}`,
@@ -321,17 +408,27 @@
                 }, t('study.overlay.skipBreak', 'Skip break'));
                 button.type = 'button';
                 button.dataset.action = 'skip-break';
+                const preview = state.skipPreview && typeof state.skipPreview === 'object' ? state.skipPreview : null;
                 button.addEventListener('click', () => {
                     send({ action: 'FilterTube_StudySkipBreak' }).then(response => {
-                        if (response?.ok) setState({ ...state, breakSkipped: true });
+                        if (!response?.ok) return;
+                        if (preview) showSkipped(box, preview, dark);
+                        else { setState({ ...state, state: 'STUDY', breakSkipped: true, canSkipBreak: false }); refresh(); }
                     });
                 });
                 box.appendChild(button);
+                if (preview) {
+                    // What skipping costs, under the button (Android study_break_skip_cost).
+                    const cost = element('div', { fontSize: '13px', opacity: '.85', marginTop: '-4px' },
+                        t('study.overlay.skipCost', '+{minutes} min to round {round}', { minutes: preview.addedMinutes, round: preview.round }));
+                    cost.dataset.role = 'skip-cost';
+                    box.appendChild(cost);
+                }
             }
-            // Kriti keeps the break company (her mug), cheers the end of the day, and Uljhan shrugs when the
+            // Kriti stretches as the break opens (Android StudyRestActivity, KRITI_STRETCH), cheers the end of the day, and Uljhan shrugs when the
             // pack can't load. A clock hold has no character. Appended last and drawn first, so the
             // title and body keep their places; the Companion set to Off leaves the words alone.
-            const pose = { rest: 'kriti_mug_06.webp', limit: 'kriti_thumbsup.webp', unavailable: 'uljhan_shrug.webp' }[kind];
+            const pose = { rest: 'kriti_stretch_01.webp', limit: 'kriti_thumbsup.webp', unavailable: 'uljhan_pose_02.webp' }[kind];
             let poseUrl = '';
             try {
                 const companion = localizer()?.getCompanion?.() || 'quiet';
@@ -343,9 +440,140 @@
                 picture.alt = '';
                 picture.setAttribute?.('aria-hidden', 'true');
                 picture.dataset && (picture.dataset.filtertubeStudyMascot = pose);
-                box.appendChild(picture);
+                // On a break she stands at the sun's 4 o'clock edge, never over the numbers (Android StudyRestActivity).
+                const sunNode = rest ? Array.from(box.children || []).find(child => child.dataset?.role === 'break-sun') : null;
+                if (sunNode) {
+                    Object.assign(picture.style, { position: 'absolute', right: '-78px', bottom: '-14px', height: '120px', order: '' });
+                    sunNode.appendChild(picture);
+                } else {
+                    box.appendChild(picture);
+                }
+                // Idle life with the page's interaction wake (shared with the blocked card).
+                try { localizer()?.idle?.(picture); } catch (e) { }
+                // The stretch plays once (280 ms frames) and rests on its first frame; a still with reduced motion.
+                let reduced = false;
+                try { reduced = !!win.matchMedia?.('(prefers-reduced-motion: reduce)')?.matches; } catch (e) { }
+                if (rest && !reduced) {
+                    STRETCH_ORDER.forEach((frame, index) => setTimer(() => {
+                        try { if (picture.isConnected) picture.src = runtime.getURL(`assets/images/mascots/${STRETCH_FRAMES[frame]}`); } catch (e) { }
+                    }, 120 + index * STRETCH_FRAME_MS));
+                }
             }
             (doc.body || doc.documentElement).appendChild(box);
+        }
+
+        /**
+         * The break sun (Android StudyBreakSunView, StudyBreakClock): a crayon sun whose arc drains with
+         * the break and the m:ss left in its middle, ticking every second while the screen shows. Its
+         * accessible name stays the minutes left, so a screen reader isn't read every second.
+         */
+        let sunTimer = null;
+        function breakSun(dark) {
+            const NS = 'http://www.w3.org/2000/svg';
+            const ink = dark ? '#f6d58a' : '#854F0B';
+            const sun = dark ? '#c99a2e' : '#EDB12E';
+            const wrap = element('div', { position: 'relative', width: '200px', height: '200px', order: '-2' });
+            wrap.dataset.role = 'break-sun';
+            wrap.setAttribute?.('role', 'timer');
+            const svg = doc.createElementNS(NS, 'svg');
+            svg.setAttribute('viewBox', '0 0 200 200');
+            svg.setAttribute('width', '200');
+            svg.setAttribute('height', '200');
+            svg.setAttribute('aria-hidden', 'true');
+            for (let i = 0; i < 12; i += 1) {
+                const ray = doc.createElementNS(NS, 'line');
+                const angle = (Math.PI * 2 * i) / 12;
+                ray.setAttribute('x1', String(100 + 82 * Math.cos(angle))); ray.setAttribute('y1', String(100 + 82 * Math.sin(angle)));
+                ray.setAttribute('x2', String(100 + 95 * Math.cos(angle))); ray.setAttribute('y2', String(100 + 95 * Math.sin(angle)));
+                ray.setAttribute('stroke', sun); ray.setAttribute('stroke-width', '5'); ray.setAttribute('stroke-linecap', 'round');
+                svg.appendChild(ray);
+            }
+            const disc = doc.createElementNS(NS, 'circle');
+            disc.setAttribute('cx', '100'); disc.setAttribute('cy', '100'); disc.setAttribute('r', '70');
+            disc.setAttribute('fill', dark ? 'rgba(237,177,46,.12)' : 'rgba(237,177,46,.18)');
+            const track = doc.createElementNS(NS, 'circle');
+            track.setAttribute('cx', '100'); track.setAttribute('cy', '100'); track.setAttribute('r', '62');
+            track.setAttribute('fill', 'none'); track.setAttribute('stroke', sun); track.setAttribute('stroke-opacity', '.25'); track.setAttribute('stroke-width', '10');
+            const arc = doc.createElementNS(NS, 'circle');
+            arc.setAttribute('cx', '100'); arc.setAttribute('cy', '100'); arc.setAttribute('r', '62');
+            arc.setAttribute('fill', 'none'); arc.setAttribute('stroke', sun); arc.setAttribute('stroke-width', '10'); arc.setAttribute('stroke-linecap', 'round');
+            arc.setAttribute('transform', 'rotate(-90 100 100)');
+            svg.append(disc, track, arc);
+            const digits = element('div', { position: 'absolute', inset: '0', display: 'flex', alignItems: 'center', justifyContent: 'center',
+                fontSize: '40px', fontWeight: '600', color: ink, fontVariantNumeric: 'tabular-nums' });
+            digits.dataset.role = 'sun-countdown';
+            wrap.append(svg, digits);
+            const length = 2 * Math.PI * 62;
+            let lastMinutes = null;
+            const tickSun = () => {
+                const at = now();
+                const end = Number(state?.until);
+                const start = Number(state?.segmentStart);
+                const left = Math.max(0, end - at);
+                const remaining = Number.isFinite(start) && end > start ? Math.min(1, Math.max(0, left / (end - start))) : 1;
+                arc.setAttribute('stroke-dasharray', `${(remaining * length).toFixed(1)} ${length.toFixed(1)}`);
+                digits.textContent = countdown(left);
+                const minutes = Math.ceil(left / 60000);
+                if (minutes !== lastMinutes) {
+                    lastMinutes = minutes;
+                    let category = minutes === 1 ? 'one' : 'other';
+                    try { category = new Intl.PluralRules(doc.documentElement?.lang || undefined).select(minutes); } catch (e) { }
+                    wrap.setAttribute?.('aria-label', t(`study.overlay.breakLeft.${category}`, '{count} min left in your break', { count: minutes }));
+                }
+            };
+            tickSun();
+            const every = env.setInterval || ((fn, ms) => win.setInterval(fn, ms));
+            const stop = env.clearInterval || (id => win.clearInterval(id));
+            if (sunTimer !== null) stop(sunTimer);
+            sunTimer = every(() => {
+                if (!wrap.isConnected) { stop(sunTimer); sunTimer = null; return; }
+                tickSun();
+            }, 1000);
+            return wrap;
+        }
+
+        /**
+         * Skip break, then (Android StudyRestActivity.skipBreak): the break's words and button leave, Kriti
+         * gives a thumbs up, and a paper line says "Break skipped. Round 3 is now 55 min." with Undo for
+         * 5 seconds. Undo puts the break back; otherwise the screen closes and study goes on.
+         */
+        function showSkipped(box, preview, dark) {
+            const expiresAt = now() + SKIP_UNDO_MS;
+            skipped = { preview, expiresAt };
+            for (const child of Array.from(box.children || [])) {
+                if (child.dataset?.filtertubeStudyMascot) {
+                    child.dataset.filtertubeStudyMascot = 'kriti_thumbsup.webp';
+                    try { child.src = runtime?.getURL?.('assets/images/mascots/kriti_thumbsup.webp') || child.src; } catch (e) { }
+                } else if (child.style) child.style.visibility = 'hidden';
+            }
+            const toast = element('div', {
+                display: 'flex', alignItems: 'center', gap: '12px', padding: '12px 16px', borderRadius: '16px',
+                background: dark ? '#151c24' : '#fffcf6', color: dark ? '#edf2f7' : '#1b1a18',
+                border: `1px solid ${dark ? '#2a3440' : '#dcd1c2'}`, fontSize: '15px'
+            });
+            toast.dataset.role = 'skip-undo';
+            toast.setAttribute('role', 'status');
+            toast.appendChild(element('span', {}, t('study.overlay.breakSkipped', 'Break skipped. Round {round} is now {minutes} min.',
+                { round: preview.round, minutes: preview.roundMinutes })));
+            const undo = element('button', {
+                padding: '6px 14px', borderRadius: '16px', border: 'none', background: 'transparent',
+                color: dark ? '#e0796b' : '#a93e31', fontWeight: '700', fontSize: '14px', cursor: 'pointer'
+            }, t('study.undo', 'Undo'));
+            undo.type = 'button';
+            undo.dataset.action = 'undo-skip-break';
+            undo.addEventListener('click', () => {
+                skipped = null;
+                send({ action: 'FilterTube_StudyUndoSkipBreak', until: preview.breakEnd }).then(() => refresh());
+            });
+            toast.appendChild(undo);
+            box.appendChild(toast);
+            setTimer(() => {
+                if (!skipped || skipped.expiresAt !== expiresAt) return;
+                skipped = null;
+                // The round runs through the skipped break now; the background says so on the next read.
+                setState({ ...state, state: 'STUDY', breakSkipped: true, skipPreview: null, canSkipBreak: false });
+                refresh();
+            }, SKIP_UNDO_MS);
         }
 
         function holdPlayback(hold) {
@@ -368,6 +596,8 @@
 
         /** Shows or clears the overlay; a rest break waits for a playing video (5 minutes at most). */
         function render() {
+            // The 5 seconds of "Break skipped ... Undo" keep their screen whatever arrives meanwhile.
+            if (skipped && now() < skipped.expiresAt && doc.getElementById(OVERLAY_ID)) return;
             const kind = overlayKind();
             if (!kind) {
                 breakSeenAt = null;
@@ -413,6 +643,7 @@
             lastPhaseKey = phaseKey;
             render();
             guardMiniplayer();
+            renderSkip();
             scheduleNext();
         }
 
@@ -427,6 +658,7 @@
             const at = now();
             const elapsed = lastCheckAt === null ? 0 : Math.min(at - lastCheckAt, TICK_MS + 5000);
             lastCheckAt = at;
+            renderSkip();
             if (state?.state !== 'STUDY' || !visible() || !playingVideo()) return;
             pendingSeconds += Math.max(0, Math.round(elapsed / 1000));
             if (pendingSeconds >= SEND_AFTER_SECONDS) flush();
@@ -436,7 +668,7 @@
             const seconds = Math.min(pendingSeconds, 60);
             if (seconds <= 0) return Promise.resolve(null);
             pendingSeconds -= seconds;
-            return send({ action: 'FilterTube_StudyProgressTick', seconds });
+            return send({ action: 'FilterTube_StudyProgressTick', seconds, title: lectureTitle(), videoId: currentVideoId() || '' });
         }
 
         function onMessage(message) {
@@ -448,7 +680,7 @@
             try { runtime.onMessage?.addListener?.(onMessage); } catch (e) { }
             try { doc.addEventListener('play', onPlay, true); } catch (e) { }
             // SPA navigations (yt-navigate-finish) and leaving the watch page into the miniplayer.
-            try { doc.addEventListener('yt-navigate-finish', () => { guardMiniplayer(); }, true); } catch (e) { }
+            try { doc.addEventListener('yt-navigate-finish', () => { guardMiniplayer(); renderSkip(); }, true); } catch (e) { }
             try { Promise.resolve(localizer()?.loadLocale?.()).then(() => { if (state) render(); }).catch(() => {}); } catch (e) { }
             try { Promise.resolve(localizer()?.loadCompanion?.()).then(() => { if (state) render(); }).catch(() => {}); } catch (e) { }
             try { doc.addEventListener('visibilitychange', () => { if (!visible()) flush(); lastCheckAt = now(); }); } catch (e) { }
@@ -466,7 +698,7 @@
             return api;
         }
 
-        const api = { start, setState, refresh, render, checkTime, flush, onMessage, onPlay, guardMiniplayer, get state() { return state; }, get pendingSeconds() { return pendingSeconds; } };
+        const api = { start, setState, refresh, render, renderSkip, checkTime, flush, onMessage, onPlay, guardMiniplayer, get state() { return state; }, get pendingSeconds() { return pendingSeconds; } };
         return api;
     }
 

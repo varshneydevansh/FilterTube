@@ -1,0 +1,209 @@
+/* Interaction states for the extension's own pages (owner, 2026-11-17: "many buttons give no hover
+ * feedback"). Loaded last on the popup and the options page. Every control answers the same way:
+ *   hover   a faint ink wash, and the edge or the label turns brick where the control has one;
+ *   focus   a 2 px ink ring outside the control (keyboard only, :focus-visible);
+ *   press   the control sinks 1 px and the wash deepens (no movement with reduced motion).
+ * The tokens live in design_tokens.css (--ft-state-*). The sidebar rows and the Controls home
+ * page dress their own states. Earlier layers set colours with !important, so the hover and press
+ * rules below repeat their selectors' weight. */
+
+/* ---------------------------------------------------------------------------
+ * The popup's master switch (Android PaperKit.styleSwitch): on is a sage track with a paper thumb
+ * and a crayon check; off is the plain track with a muted thumb, and the card turns rose.
+ * ------------------------------------------------------------------------- */
+
+:root {
+  --ft-power-on: #3e7d5b;      /* BrandPalette sageMark */
+  --ft-power-on-wash: #edf4e7; /* sage */
+  --ft-power-off-wash: #fae8e6;
+}
+:root[data-theme="dark"] {
+  --ft-power-on: #7fb89a;
+  --ft-power-on-wash: #1e2e26;
+  --ft-power-off-wash: #3a2422;
+}
+
+body.ft-extension-surface[data-surface="popup"] .ft-popup-brand {
+  position: relative;
+  cursor: pointer;
+  transition: background-color var(--ft-state-duration) linear, transform var(--ft-state-duration) ease-out !important;
+}
+body.ft-extension-surface[data-surface="popup"] .ft-popup-brand .brand-text { flex: 1 1 auto; }
+
+.ft-popup-power {
+  flex: none;
+  position: relative;
+  width: 34px;
+  height: 20px;
+  border-radius: 999px;
+  border: 1.5px solid var(--pk-faint);
+  background: var(--pk-track);
+  box-sizing: border-box;
+  transition: background-color var(--ft-state-duration) linear, border-color var(--ft-state-duration) linear;
+}
+.ft-popup-power__thumb {
+  position: absolute;
+  top: 1.5px;
+  left: 1.5px;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: var(--pk-muted);
+  color: var(--ft-power-on);
+  display: grid;
+  place-items: center;
+  transition: transform 180ms cubic-bezier(0.2, 0.9, 0.3, 1.25), background-color var(--ft-state-duration) linear;
+}
+.ft-popup-power__thumb svg { width: 10px; height: 10px; opacity: 0; transition: opacity var(--ft-state-duration) linear; }
+
+.ft-popup-brand.ft-enabled .ft-popup-power {
+  background: var(--ft-power-on);
+  border-color: var(--ft-power-on);
+}
+.ft-popup-brand.ft-enabled .ft-popup-power__thumb {
+  transform: translateX(14px);
+  background: var(--pk-paper);
+}
+.ft-popup-brand.ft-enabled .ft-popup-power__thumb svg { opacity: 1; }
+
+/* The card and its word carry the state too: never colour alone (the word says Enabled / Disabled). */
+:root[data-page-tone][data-theme] body.ft-extension-surface[data-surface="popup"] .ft-popup-brand.ft-enabled,
+body.ft-extension-surface[data-surface="popup"] .ft-popup-brand.ft-enabled {
+  background: color-mix(in srgb, var(--ft-power-on-wash) 70%, var(--pk-paper)) !important;
+}
+:root[data-page-tone][data-theme] body.ft-extension-surface[data-surface="popup"] .ft-popup-brand.ft-disabled,
+body.ft-extension-surface[data-surface="popup"] .ft-popup-brand.ft-disabled {
+  background: color-mix(in srgb, var(--ft-power-off-wash) 80%, var(--pk-paper)) !important;
+}
+body.ft-extension-surface[data-surface="popup"] .ft-popup-brand.ft-enabled .extension-status {
+  color: var(--pk-sage-ink) !important;
+}
+body.ft-extension-surface[data-surface="popup"] .ft-popup-brand.ft-disabled .extension-status,
+body.ft-extension-surface[data-surface="popup"] .extension-status.disabled {
+  color: var(--pk-brick) !important;
+}
+body.ft-extension-surface[data-surface="popup"] .ft-popup-brand.ft-disabled .logo-icon { filter: grayscale(1); opacity: 0.6; }
+:root[data-page-tone][data-theme] body.ft-extension-surface[data-surface="popup"] .ft-popup-brand:hover:not([aria-disabled="true"]) {
+  background-image: linear-gradient(var(--ft-state-hover-wash), var(--ft-state-hover-wash)) !important;
+}
+body.ft-extension-surface[data-surface="popup"] .ft-popup-brand.ft-enabled:hover .ft-popup-power { filter: brightness(1.08); }
+body.ft-extension-surface[data-surface="popup"] .ft-popup-brand.ft-disabled:hover .ft-popup-power { border-color: var(--pk-brick); }
+:root[data-page-tone][data-theme] body.ft-extension-surface[data-surface="popup"] .ft-popup-brand:active:not([aria-disabled="true"]) {
+  transform: var(--ft-state-press-shift);
+}
+body.ft-extension-surface[data-surface="popup"] .ft-popup-brand:focus-visible {
+  outline: var(--ft-state-focus-width) solid var(--ft-state-focus-ring) !important;
+  outline-offset: var(--ft-state-focus-offset) !important;
+  box-shadow: none !important;
+}
+
+/* ---------------------------------------------------------------------------
+ * Focus: one ring for every control (keyboard only)
+ * ------------------------------------------------------------------------- */
+
+body.ft-extension-surface :is(button, a[href], summary, select, [role="button"], [role="tab"], [role="switch"],
+  [role="option"], [role="menuitem"], [role="radio"], [role="checkbox"]):not(.nav-item):focus-visible {
+  outline: var(--ft-state-focus-width) solid var(--ft-state-focus-ring) !important;
+  outline-offset: var(--ft-state-focus-offset) !important;
+}
+body.ft-extension-surface .switch input:focus-visible + .slider {
+  outline: var(--ft-state-focus-width) solid var(--ft-state-focus-ring) !important;
+  outline-offset: var(--ft-state-focus-offset) !important;
+}
+
+/* ---------------------------------------------------------------------------
+ * Bordered buttons: the edge and the label turn brick, the paper takes a faint wash
+ * ------------------------------------------------------------------------- */
+
+:root[data-page-tone][data-theme] body.ft-extension-surface[data-surface] :is(.btn-secondary, .btn-import, .icon-button, .icon-btn,
+  .pk-rule-options-btn, .ft-select-trigger, .video-filters-manage, .nanah-device-compass__evidence-button):hover:not(:disabled):not([aria-disabled="true"]),
+body.ft-extension-surface :is(.btn-secondary, .btn-import, .icon-button, .icon-btn, .pk-rule-options-btn, .ft-select-trigger,
+  .video-filters-manage, .nanah-device-compass__evidence-button):hover:not(:disabled):not([aria-disabled="true"]) {
+  border-color: var(--ft-state-hover-edge) !important;
+  color: var(--ft-state-hover-ink) !important;
+  background-color: color-mix(in srgb, var(--pk-brick) 6%, var(--pk-paper)) !important;
+}
+
+/* Choice cards and list rows (sync modes, the device compass, picker rows): the wash and an ink edge. */
+:root[data-page-tone][data-theme] body.ft-extension-surface[data-surface] :is(.nanah-sync-mode, .nanah-device-compass__choice,
+  .ft-picker-pill, .ft-picker-manage, .ft-profile-dropdown-item, .exact-toggle, .ft-rule-target-tab, .tab-button,
+  .release-note-card__link, .ft-profile-badge):hover:not(:disabled):not([aria-disabled="true"]),
+body.ft-extension-surface :is(.nanah-sync-mode, .nanah-device-compass__choice, .ft-picker-pill, .ft-picker-manage,
+  .ft-profile-dropdown-item, .exact-toggle, .ft-rule-target-tab, .tab-button, .release-note-card__link,
+  .ft-profile-badge):hover:not(:disabled):not([aria-disabled="true"]) {
+  background-image: linear-gradient(var(--ft-state-hover-wash), var(--ft-state-hover-wash)) !important;
+}
+:root[data-page-tone][data-theme] body.ft-extension-surface[data-surface] :is(.nanah-sync-mode, .nanah-device-compass__choice):hover:not(:disabled),
+body.ft-extension-surface :is(.nanah-sync-mode, .nanah-device-compass__choice):hover:not(:disabled) {
+  border-color: var(--pk-ink) !important;
+}
+body.ft-extension-surface :is(.tab-button, .ft-rule-target-tab):not(.active):not(.is-active):hover { color: var(--pk-ink) !important; }
+body.ft-extension-surface .release-note-card__link:hover span,
+body.ft-extension-surface .release-note-card__link:hover { text-decoration: underline; text-underline-offset: 3px; }
+
+/* Plain links in running text. */
+body.ft-extension-surface #viewContainer p a[href]:hover,
+body.ft-extension-surface #viewContainer li a[href]:hover,
+body.ft-extension-surface .help-card a[href]:hover {
+  color: var(--pk-brick) !important;
+  text-decoration-thickness: 2px;
+}
+
+/* Fields that open a choice: the edge darkens to the muted ink and the field takes the wash. */
+body.ft-extension-surface select:hover:not(:disabled),
+:root[data-page-tone][data-theme] body.ft-extension-surface[data-surface] .select-input:hover:not(:disabled) {
+  border-color: var(--pk-muted) !important;
+  background-image: linear-gradient(var(--ft-state-hover-wash), var(--ft-state-hover-wash)) !important;
+}
+
+/* Disclosure rows (details/summary). */
+body.ft-extension-surface summary { cursor: pointer; }
+body.ft-extension-surface summary:hover {
+  background-image: linear-gradient(var(--ft-state-hover-wash), var(--ft-state-hover-wash)) !important;
+  border-radius: 12px;
+}
+
+/* Toggle rows: the whole row answers, and the switch's track edge darkens. */
+body.ft-extension-surface .toggle-row:has(.switch input:not(:disabled)):hover {
+  background-image: linear-gradient(var(--ft-state-hover-wash), var(--ft-state-hover-wash));
+  border-radius: 12px;
+}
+body.ft-extension-surface label.toggle-label:hover,
+body.ft-extension-surface label.switch:hover { cursor: pointer; }
+body.ft-extension-surface .switch:hover input:not(:disabled) + .slider,
+body.ft-extension-surface .toggle-row:hover .switch input:not(:disabled) + .slider {
+  border-color: var(--pk-muted) !important;
+  filter: brightness(0.97);
+}
+:root[data-theme="dark"] body.ft-extension-surface .switch:hover input:not(:disabled) + .slider,
+:root[data-theme="dark"] body.ft-extension-surface .toggle-row:hover .switch input:not(:disabled) + .slider { filter: brightness(1.12); }
+
+/* ---------------------------------------------------------------------------
+ * Press: everything sinks 1 px; the wash deepens
+ * ------------------------------------------------------------------------- */
+
+:root[data-page-tone][data-theme] body.ft-extension-surface[data-surface] :is(.tab-button, .ft-rule-target-tab, .nanah-sync-mode,
+  .nanah-device-compass__choice, .exact-toggle, .ft-profile-badge, .icon-button, .icon-btn, .pk-rule-options-btn, .ft-select-trigger,
+  .video-filters-manage, .release-note-card__link, .ft-picker-pill, .ft-profile-dropdown-item, summary):active:not(:disabled),
+body.ft-extension-surface :is(.tab-button, .ft-rule-target-tab, .nanah-sync-mode, .nanah-device-compass__choice, .exact-toggle,
+  .ft-profile-badge, .icon-button, .icon-btn, .pk-rule-options-btn, .ft-select-trigger, .video-filters-manage,
+  .release-note-card__link, .ft-picker-pill, .ft-profile-dropdown-item, summary):active:not(:disabled) {
+  transform: var(--ft-state-press-shift);
+  background-image: linear-gradient(var(--ft-state-press-wash), var(--ft-state-press-wash)) !important;
+}
+body.ft-extension-surface .switch:active input:not(:disabled) + .slider::before { transform-origin: center; filter: brightness(0.92); }
+body.ft-extension-surface select:active:not(:disabled) { border-color: var(--pk-ink) !important; }
+
+body.ft-extension-surface :is(.tab-button, .ft-rule-target-tab, .nanah-sync-mode, .nanah-device-compass__choice, .exact-toggle,
+  .icon-button, .icon-btn, .pk-rule-options-btn, .ft-select-trigger, .video-filters-manage,
+  .release-note-card__link, .ft-picker-pill, .ft-profile-dropdown-item, summary, .btn-secondary) {
+  transition-property: background-color, background-image, border-color, color, transform, box-shadow;
+  transition-duration: var(--ft-state-duration);
+  transition-timing-function: ease-out;
+}
+
+/* Reduced motion: the colours still answer; nothing moves. */
+@media (prefers-reduced-motion: reduce) {
+  body.ft-extension-surface :is(button, a, summary, [role="button"], [role="tab"], .ft-popup-brand):active { transform: none !important; }
+  .ft-popup-power, .ft-popup-power__thumb, .ft-popup-power__thumb svg { transition: none !important; }
+}

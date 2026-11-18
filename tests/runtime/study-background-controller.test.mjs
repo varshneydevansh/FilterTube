@@ -14,7 +14,7 @@ const catalog = Packs.parseCatalog(JSON.parse(fs.readFileSync('data/study/packs-
 
 const at = (day, hour, minute = 0, second = 0) => new Date(2026, 10, day, hour, minute, second).getTime();
 
-function harness({ study = {}, now = at(16, 12) } = {}) {
+function harness({ study = {}, now = at(16, 12), deps = {} } = {}) {
     const store = {
         ftNanahDeviceId: 'laptop-1',
         ftProfilesV4: { schemaVersion: 4, activeProfileId: 'p1', profiles: { p1: {
@@ -51,7 +51,8 @@ function harness({ study = {}, now = at(16, 12) } = {}) {
             store.ftProfilesV4.profiles[profileId] = structuredClone(profile);
             return { ok: true };
         },
-        onTransition: async reason => { transitions.push(reason); }
+        onTransition: async reason => { transitions.push(reason); },
+        ...deps
     });
     return { controller, store, alarms, transitions, clock, profile: () => store.ftProfilesV4.profiles.p1 };
 }
@@ -246,4 +247,127 @@ test('getState names the active packs for the UI', async () => {
     const state = await h.controller.getState();
     assert.equal(state.packs[0].shortName, 'GATE');
     assert.equal(state.packs[0].variant.id, 'ece');
+});
+
+test('switching profile during study (Android StudyProfileSwitch): parent PIN, locked, Gentle ends first', async () => {
+    // A parent's plan window: the parent who set it, with their PIN.
+    const parentPlan = harness({ study: { plan: { days: ['mon'], start: '16:00', end: '18:00', setByParentId: 'mum' } }, now: at(16, 16, 10) });
+    const viaPlan = await parentPlan.controller.switchDecision('p1', parentPlan.profile(), 'p2');
+    assert.deepEqual({ kind: viaPlan.kind, parent: viaPlan.parentProfileId }, { kind: 'needs_parent_pin', parent: 'mum' });
+    assert.equal((await parentPlan.controller.switchDecision('p1', parentPlan.profile(), 'p1')).kind, 'allowed', 'staying put is always fine');
+    // Outside the window the usual gates apply.
+    parentPlan.clock.now = at(16, 19);
+    assert.equal((await parentPlan.controller.switchDecision('p1', parentPlan.profile(), 'p2')).kind, 'allowed');
+
+    // A self-started Gentle session ends first; a self plan outside a session is free.
+    const gentle = harness({ study: { plan: null }, now: at(17, 10, 0) });
+    assert.equal((await gentle.controller.switchDecision('p1', gentle.profile(), 'p2')).kind, 'allowed');
+    assert.equal((await gentle.controller.startSession({ minutes: 60, lock: 'gentle' })).ok, true);
+    assert.equal((await gentle.controller.switchDecision('p1', gentle.profile(), 'p2')).kind, 'end_gentle_first');
+    // A child never sets study up for itself, and may only tighten what a parent set.
+    gentle.store.ftProfilesV4.profiles.kid = { name: 'Kid', type: 'child', parentProfileId: 'p1', main: { mode: 'blocklist', channels: [], keywords: [] }, kids: { mode: 'blocklist' } };
+    gentle.store.ftProfilesV4.activeProfileId = 'kid';
+    assert.equal((await gentle.controller.update({ activePackIds: ['in_upsc_cse'] })).error, 'child_profile');
+    gentle.store.ftProfilesV4.activeProfileId = 'p1';
+
+    // A parent's lock on a child.
+    const lock = harness({ now: at(16, 12) });
+    lock.store.ftProfilesV4.profiles.kid = { name: 'Kid', type: 'child', parentProfileId: 'p1', main: { mode: 'blocklist', channels: [], keywords: [] }, kids: { mode: 'blocklist' } };
+    assert.equal((await lock.controller.handleMessage({ action: 'FilterTube_StudyUpdateChild', profileId: 'kid', patch: { activePackIds: ['in_upsc_cse'] } }, { extensionPage: true })).ok, true);
+    assert.equal((await lock.controller.startParentLock('kid', { minutes: 60 })).ok, true);
+    const kid = lock.store.ftProfilesV4.profiles.kid;
+    const viaLock = await lock.controller.switchDecision('kid', kid, 'p1');
+    assert.deepEqual({ kind: viaLock.kind, parent: viaLock.parentProfileId }, { kind: 'needs_parent_pin', parent: 'p1' });
+    assert.equal(viaLock.endsAt, kid.study.lock.endsAt);
+});
+
+test('background.js reverts a profile switch the study gate did not allow, and the popup and options page ask first', () => {
+    const background = fs.readFileSync('js/background.js', 'utf8');
+    assert.match(background, /enforceStudyProfileSwitch\(changes\[FT_PROFILES_V4_KEY\]\)/);
+    assert.match(background, /FilterTube_StudySwitchAuthorize/);
+    for (const file of ['js/popup.js', 'js/tab-view.js']) {
+        const source = fs.readFileSync(file, 'utf8');
+        assert.match(source, /if \(!\(await passStudySwitchGate\(targetId\)\)\) return;/, file);
+    }
+});
+
+test('a parent\'s Family edit needs a fresh unlock of that parent (Android ParentModeChrome sensitive unlock)', async () => {
+    let fresh = false;
+    const asked = [];
+    const h = harness({ now: at(16, 12), deps: { parentUnlockFresh: async id => { asked.push(id); return fresh; } } });
+    const profiles = h.store.ftProfilesV4;
+    profiles.profiles.kid = { name: 'Kid', type: 'child', parentProfileId: 'p1', main: { mode: 'blocklist', channels: [], keywords: [] }, kids: { mode: 'blocklist' } };
+    const plan = { days: ['mon'], start: '16:00', end: '18:00' };
+    const refused = await h.controller.updateChild('kid', { activePackIds: ['in_upsc_cse'], plan });
+    assert.deepEqual(refused, { ok: false, error: 'parent_unlock_required', parentId: 'p1' });
+    assert.equal(h.store.ftProfilesV4.profiles.kid.study, undefined, 'nothing was written');
+    assert.equal((await h.controller.startParentLock('kid', { minutes: 60 })).error, 'parent_unlock_required');
+    assert.equal((await h.controller.getChildState('kid')).ok, true, 'reading the child\'s plan needs no PIN');
+    fresh = true;
+    assert.equal((await h.controller.updateChild('kid', { activePackIds: ['in_upsc_cse'], plan })).ok, true);
+    assert.equal((await h.controller.startParentLock('kid', { minutes: 60 })).ok, true);
+    fresh = false;
+    assert.equal((await h.controller.endParentLock('kid')).error, 'parent_unlock_required', 'the unlock is checked again for every edit');
+    assert.ok(asked.every(id => id === 'p1'));
+});
+
+test('background.js counts a parent\'s unlock as fresh for 5 minutes, and only with a PIN to type', () => {
+    const source = fs.readFileSync('js/background.js', 'utf8');
+    assert.match(source, /PARENT_SENSITIVE_UNLOCK_TTL_MS = 5 \* 60 \* 1000/);
+    assert.match(source, /verifiedAt: Date\.now\(\)/);
+    assert.match(source, /parentUnlockFresh: profileId => isParentUnlockFresh\(profileId\)/);
+    const ui = fs.readFileSync('js/study_ui.js', 'utf8');
+    assert.match(ui, /sendAsParent\(body, \{ action: 'FilterTube_StudyUpdateChild'/);
+    assert.match(ui, /FilterTube_SessionPinAuth/);
+});
+
+test('Gentle "End and switch": the session ends after its 30-second pause, then the profile switches; Keep studying cancels both', async () => {
+    const switched = [];
+    const h = harness({ study: { plan: null }, now: at(17, 10, 0), deps: { switchProfile: async (from, to) => { switched.push([from, to]); } } });
+    h.store.ftProfilesV4.profiles.p2 = { name: 'Mira', type: 'account', main: { mode: 'blocklist' }, kids: { mode: 'blocklist' } };
+    await h.controller.startSession({ minutes: 60, lock: 'gentle' });
+    const ending = await h.controller.handleMessage({ action: 'FilterTube_StudyEndGentleThenSwitch', targetProfileId: 'p2' }, { extensionPage: true });
+    assert.equal(ending.ok, true);
+    assert.equal(ending.endsAt, at(17, 10, 0, 30));
+    h.clock.now = at(17, 10, 0, 10);
+    await h.controller.cancelEnd();
+    h.clock.now = at(17, 10, 0, 31);
+    await h.controller.onAlarm(h.controller.ALARM);
+    assert.deepEqual(switched, [], 'Keep studying: no switch');
+    assert.equal((await h.controller.getState()).state, 'STUDY');
+
+    await h.controller.endGentleThenSwitch('p2');
+    h.clock.now = at(17, 10, 0, 50);
+    await h.controller.onAlarm(h.controller.ALARM);
+    assert.deepEqual(switched, [], 'still inside the pause');
+    h.clock.now = at(17, 10, 1, 2);
+    await h.controller.onAlarm(h.controller.ALARM);
+    assert.deepEqual(switched, [['p1', 'p2']]);
+    assert.equal((await h.controller.getState()).state, 'NORMAL');
+    assert.equal((await h.controller.handleMessage({ action: 'FilterTube_StudyEndGentleThenSwitch', targetProfileId: 'p2' }, { youtubeContent: true })).error, 'untrusted_sender');
+});
+
+test('the popup and options page offer "End and switch" and type the other profile\'s PIN first', () => {
+    for (const file of ['js/popup.js', 'js/tab-view.js']) {
+        const source = fs.readFileSync(file, 'utf8');
+        const block = source.slice(source.indexOf("if (decision.kind === 'end_gentle_first') {"), source.indexOf("FilterTube_StudyEndGentleThenSwitch"));
+        assert.match(block, /study\.switch\.end/, file);
+        assert.match(block, /ensureProfileUnlocked\(profilesV4, targetId\)/, file);
+    }
+    const background = fs.readFileSync('js/background.js', 'utf8');
+    assert.match(background, /switchProfile: \(fromProfileId, targetProfileId\) => switchProfileAfterStudy/);
+});
+
+test('"Skip this video" (Android StudyRuntime.skipVideo): only during study, hidden for that profile from then on', async () => {
+    const h = harness({ study: { plan: null }, now: at(17, 10, 0) });
+    assert.equal((await h.controller.handleMessage({ action: 'FilterTube_StudySkipVideo', videoId: 'abcdEFGH123' }, { youtubeContent: true })).error, 'not_studying');
+    await h.controller.startSession({ minutes: 30, lock: 'gentle' });
+    assert.equal((await h.controller.handleMessage({ action: 'FilterTube_StudySkipVideo', videoId: '../x' }, { youtubeContent: true })).error, 'invalid_video');
+    assert.equal((await h.controller.handleMessage({ action: 'FilterTube_StudySkipVideo', videoId: 'abcdEFGH123' }, { youtubeContent: true })).ok, true);
+    assert.ok(h.transitions.includes('skip_video'), 'the tabs hear about it at once');
+    assert.deepEqual(h.controller.skippedVideos('p1', await h.controller.prepare()), ['abcdEFGH123']);
+    h.clock.now = at(17, 12, 0);
+    assert.deepEqual(h.controller.skippedVideos('p1', await h.controller.prepare()), ['abcdEFGH123'], 'still hidden after study');
+    assert.deepEqual(h.controller.skippedVideos('p2', await h.controller.prepare()), []);
+    assert.match(fs.readFileSync('js/background.js', 'utf8'), /studyBackground\.skippedVideos\(activeProfileId, studyPrepared\)/);
 });

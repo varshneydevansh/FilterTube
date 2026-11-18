@@ -1,0 +1,30 @@
+{
+ "blocklist": {
+  "typed": "sad s",
+  "shown": [
+   "sad shayari",
+   "sad status"
+  ],
+  "filterLoaded": "object"
+ },
+ "allowlist": {
+  "typed": "sat m",
+  "shown": [
+   "sat math",
+   "sat ma"
+  ],
+  "filterLoaded": "object"
+ },
+ "allowlist-prefix": {
+  "typed": "alg",
+  "shown": [
+   "algebra by aditya ranjan",
+   "algebra",
+   "algebra formulas",
+   "algebra by gagan pratap",
+   "algebra by abhinay sharma",
+   "algebra one shot"
+  ],
+  "filterLoaded": "object"
+ }
+}

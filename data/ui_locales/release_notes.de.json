@@ -1,4 +1,55 @@
 {
+  "3.6.2": {
+    "headline": "Lerne Kriti und Uljhan kennen, einen neu gebauten Lernplaner und Eltern fragen",
+    "summary": "FilterTube 3.6.2 bekommt einen eigenen Look mit Kriti und Uljhan, Wachsmalstift-Symbolen, Kritzeleien und optionalen Klängen. Lernen ist rund um einen Tagesplaner mit fertigen Paketen für 29 Länder neu aufgebaut, Kinder können Eltern um ein Video oder einen Kanal bitten, und Player, Profile, Tablets und Fernseher bekommen ein ruhigeres Design mit klareren Datenschutzhinweisen.",
+    "bannerSummary": "Kriti und Uljhan, ein neu gebauter Lernplaner, Eltern fragen und ein ruhigerer Player.",
+    "ctaLabel": "Neuigkeiten ansehen",
+    "highlights": [
+      "Lernen ist neu aufgebaut: eine Lernstartseite im Papier-Look mit einem Tagesring aus Wachsmalstift, ein Tagesplaner, eine Einrichtung, die jede Auswahl erklärt, und fertige Pakete für Prüfungen und Schulklassen in 29 Ländern. Feeds folgen der gewählten Fachrichtung, damit GATE Civil auch Civil bleibt, und die Suche während des Lernens sucht nur in den Kanälen deines Plans.",
+      "Eltern fragen: Wenn etwas blockiert ist, kann ein Kind darum bitten, dieses Video anzusehen oder diesen Kanal zu erlauben, und ein Elternteil antwortet. Der Elternmodus öffnet eine eingerahmte Elternsitzung innerhalb eines Kinderprofils mit einem klaren Ausgang, und Kinder-Lernen nach Alter füllt den Kinderbereich während des Lernens mit altersgerecht ausgewählten Lektionen.",
+      "Ein neuer Look: Kriti und Uljhan leisten dir Gesellschaft, während Seiten laden, Listen leer sind, du offline bist oder etwas blockiert ist. FilterTube hat eigene Wachsmalstift-Symbole, Kritzeleien, Kritzel-Avatare, Kriti-, Uljhan- und Duo-App-Symbole zur Auswahl sowie optionale Klänge, die du auf Aus, Sanft oder Verspielt stellen kannst.",
+      "Ein ruhigerer Player: randlose Poster auf Smartphones, eine neue Playlist-Seite und ein neues Kontoblatt, das Leuchten der Wiedergabeseite reicht bis unter die Statusleiste, Uljhan holt beim Scrollen mehr nach, Ziehen zum Aktualisieren und ein einziger klarer Hinweis, wenn die Verbindung langsam ist oder fehlt.",
+      "Profile sind neu gestaltet: mit Wachsmalstift-Avataren, einer Auswahl, die zeigt, wer Elternteil und wer Kind ist, und einem geschützten Weg, ein Profil hinzuzufügen.",
+      "FilterTube verwendet überall seine eigenen Begriffe: Clips, Gefolgt, Gespeichert und Sangeet für Musik, in jeder Sprache.",
+      "Datenschutz: Konten & Synchronisierung erklärt, was das Sync-Relay sehen kann und was nicht, und fragt vor der ersten Synchronisierung über das Internet. Dein Gerätename wird beim Klingeln eines anderen Geräts nicht mehr gesendet, DeArrow-Vorschaubilder sind eine separate Zustimmung, die standardmäßig aus ist, Konto-Cookies gehen nur an die eigenen Websites des Videodienstes, und Release-Builds halten Debug-Protokolle aus dem Systemprotokoll heraus.",
+      "Tablets und Fernseher ziehen mit dem Smartphone gleich: Filter, Suche und Eltern fragen nutzen auf Tablets die volle Breite, und Fernseher bekommen die Wachsmalstift-Symbole in der Seitenleiste, Lernen auf dem großen Bildschirm und eine Karte „Über diesen Fernseher“ mit den Modi Voll und Leicht.",
+      "FilterTube zu unterstützen bleibt kostenlos und freiwillig: Das Unterstützungsblatt ist ein freundlicher Hinweis, niemals eine Sperre.",
+      "Korrekturen: PIN-Prüfungen frieren den Bildschirm nicht mehr ein, das Nachladen in Lernen lässt die Seite nicht mehr aufblitzen, Maskottchen werden nie mitten in der Bewegung abgeschnitten, viele verbliebene englische Beschriftungen sind jetzt übersetzt, und Ladefehler in Sangeet nennen den Videodienst nicht mehr."
+    ]
+  },
+  "3.6.1": {
+    "headline": "Querformat für jeden Bildschirm, stabilere Wiedergabesteuerung und strengere Filterung",
+    "summary": "FilterTube 3.6.1 bemisst jede Seite im Querformat am Fenster, sodass quer gehaltene Smartphones, Tablets und Fernseher ein Video in voller Höhe und ein Seitenfeld rechts bekommen. Untertitel, Transkript und Kartenmenüs verhalten sich wie erwartet, und ein Kanal, den du filterst, wird überall ausgeblendet.",
+    "bannerSummary": "Querformat passend für jeden Bildschirm, Korrekturen an Untertiteln und Transkript und strengere Filterung.",
+    "ctaLabel": "Neuigkeiten ansehen",
+    "highlights": [
+      "Das Querformat wird aus deinem Bildschirm berechnet: Auf einem quer gehaltenen Smartphone, einem Tablet oder einem Fernseher zeigt die Wiedergabeseite ein 16:9-Video in voller Höhe mit „Als Nächstes“ daneben, die Suche sitzt oben in der Seitenleiste, und nichts wird von der Kameraaussparung abgeschnitten.",
+      "Musik im Querformat zeigt dasselbe „Als Nächstes“ wie im Hochformat, der Plattenteller dreht sich mit 33⅓ rpm passend zur Wiedergabegeschwindigkeit, und „Als Nächstes“ beginnt beim laufenden Song.",
+      "Untertitel schalten sich aus, wenn du Aus wählst, die automatische Übersetzung funktioniert beim laufenden Video, und eine Auswahl, die der Player noch nicht anwenden kann, sagt dir das, statt stillschweigend zu scheitern.",
+      "Ein Tippen auf eine Transkriptzeile hält das Transkript geöffnet und mitlaufend, wie bei Songtexten, und das Leuchten der Wiedergabeseite reicht im Querformat über die ganze Seite.",
+      "Ein Kanal auf deiner Filterliste blendet alles von ihm aus, egal wie er hinzugefügt wurde. Blockieren aus einem Kommentar blendet die Kommentare und Videos dieses Kanals aus, Mixe, die von einem blockierten Kanal ausgehen, werden ausgeblendet, und der Live-Chat folgt deinen Regeln.",
+      "Im Modus „Nur Ausgewähltes erlauben“ zeigen Kommentare nur erlaubte Kommentierende oder erlaubte Wörter.",
+      "Kartenmenüs funktionieren nach einer Filteränderung weiter, eine gewählte Kanalsortierung übersteht das Aktualisieren, und das Bild der Wiedergabeseite bleibt nach einer Filteränderung beim Scrollen erhalten.",
+      "Eine Schritt-für-Schritt-Anleitung hilft, YouTube-Links so einzustellen, dass sie in FilterTube geöffnet werden, und Tablets zeigen das Haupt- und das Kinderprofil nebeneinander."
+    ]
+  },
+  "3.6.0": {
+    "headline": "Ein neuer Musik-Player, schnellere Seiten und YouTube-Links, die sich in FilterTube öffnen",
+    "summary": "FilterTube 3.6.0 gestaltet Musik rund um das Cover jedes Songs neu, lädt Musik-, Start- und Albumseiten viel schneller, öffnet YouTube-Links aus anderen Apps im geschützten Player und macht die PIN-Sperre vorhersehbar. Smartphones, Tablets und Fernseher bekommen dieselben Verbesserungen.",
+    "bannerSummary": "Neuer Musik-Player und neue Farben, schnelleres Laden, YouTube-Links in FilterTube und eine klarere PIN-Sperre.",
+    "ctaLabel": "Neuigkeiten ansehen",
+    "highlights": [
+      "Musik wird nach dem gefärbt, was du hörst: Jede Musikseite, der Mini-Player und die untere Leiste übernehmen die Farben des Covers, wechseln sanft zwischen Songs und Alben und kehren zur normalen Darstellung zurück, wenn du Musik verlässt.",
+      "Ein neu gestalteter Musik-Player: ein einziger Spulring um ein sich drehendes Cover, eine Songtext-Karte, die von unten aufsteigt, ein leichter Visualizer, der sich mit dem Beat bewegt, und Live-Sender, die als LIVE angezeigt werden.",
+      "Echte synchronisierte Songtexte von YouTube Music, danach die eigenen Untertitel des Songs in deiner Sprache, mit LRCLIB als optionaler Ergänzung, nach der du einmal gefragt wirst. Songtexte und Transkripte halten die aktuelle Zeile bis zum Ende zentriert.",
+      "Viel schnelleres Laden: Musik-Songs nutzen den Kanal, den YouTube Music bereits angibt, Karten auf dem Bildschirm werden zuerst geprüft, und Kanalprüfungen werden so getaktet, dass YouTube sie nicht mehr ablehnt. Songs aus Alben und Playlists warten nicht mehr minutenlang.",
+      "Musik spielt nur Audio, bis du das Video einblendest, sodass Songs schneller starten und viel weniger Daten verbrauchen. Das Überspringen vom Sperrbildschirm und der Wechsel zum nächsten Song spielen jetzt sofort.",
+      "YouTube-Links aus Chat-Apps und anderen Apps können sich im geschützten Player von FilterTube öffnen. Ein einmaliger Hinweis und eine Prüfung in den Einstellungen helfen Eltern, das einzuschalten.",
+      "Die PIN-Sperre ist vorhersehbar: Profile bleiben während der Nutzung entsperrt und sperren sich, wenn FilterTube geschlossen wird, das Smartphone neu startet oder du das Profil wechselst. Eltern können stattdessen eine Sperre nach einer Abwesenheitszeit wählen.",
+      "Die Wiedergabeseite leuchtet in den Farben des laufenden Videos, von der Statusleiste bis zu den Blättern und „Als Nächstes“; das Transkript dockt unter dem Player an; Chips passen zu ihrer Seite; und Mix-Warteschlangen laden weiter.",
+      "Android TV und Tablets: Musikfarben und der neue Player auf dem Fernseher mit Spulen per Fernbedienung, ein leichterer Visualizer für TV-Boxen, Panels der Wiedergabeseite in den Farben des Videos sowie Korrekturen an der Zweispaltenansicht und größere Albumcover auf Tablets."
+    ]
+  },
   "3.4.1": {
     "headline": "38 Oberflächensprachen und sicherere Wiedergabeprüfungen",
     "summary": "FilterTube 3.4.1 bietet 38 mitgelieferte Oberflächensprachen und verbessert die Videoprüfung auf YouTube und in unterstützten eingebetteten Playern. Außerdem wurden der Dashboard-Start und die Erkennung gespeicherter Kommentar-Schlüsselwörter korrigiert. Die von Mozilla beanstandeten doppelten koreanischen und bengalischen Übersetzungseinträge sind entfernt. Builds prüfen JSON-Schlüssel vor dem Packen auf Duplikate.",

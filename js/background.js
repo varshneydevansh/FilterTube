@@ -266,6 +266,7 @@ function buildAutoBackupPayload({ settings, profilesV3, theme }) {
                 hideEndscreenCards: !!s.hideEndscreenCards,
                 disableAutoplay: !!s.disableAutoplay,
                 skipBlockedAutoplay: !!s.skipBlockedAutoplay,
+                quietBlocking: !!s.quietBlocking,
                 alwaysUseOriginalAudio: !!s.alwaysUseOriginalAudio,
                 disableAnnotations: !!s.disableAnnotations,
                 hideTopHeader: !!s.hideTopHeader,
@@ -351,6 +352,7 @@ function readAutoBackupState() {
             'hideEndscreenCards',
             'disableAutoplay',
             'skipBlockedAutoplay',
+            'quietBlocking',
             'alwaysUseOriginalAudio',
             'disableAnnotations',
             'hideTopHeader',
@@ -459,6 +461,7 @@ function readAutoBackupState() {
                 hideEndscreenCards: boolFromV4('hideEndscreenCards', !!items?.hideEndscreenCards),
                 disableAutoplay: boolFromV4('disableAutoplay', !!items?.disableAutoplay),
                 skipBlockedAutoplay: boolFromV4('skipBlockedAutoplay', !!items?.skipBlockedAutoplay),
+                quietBlocking: boolFromV4('quietBlocking', !!items?.quietBlocking),
                 alwaysUseOriginalAudio: boolFromV4('alwaysUseOriginalAudio', !!items?.alwaysUseOriginalAudio),
                 disableAnnotations: boolFromV4('disableAnnotations', !!items?.disableAnnotations),
                 hideTopHeader: boolFromV4('hideTopHeader', !!items?.hideTopHeader),
@@ -772,6 +775,8 @@ function extractPinVerifierFromProfilesV4(profilesV4, profileId) {
     return verifier && typeof verifier === 'object' ? verifier : null;
 }
 
+// Ask a parent's device-local state (js/ask_parent_background.js): never synced, never backed up.
+const ASK_PARENT_STORE_KEY = 'ftAskParentV1';
 const SESSION_PIN_CACHE_TTL_MS = 15 * 60 * 1000;
 const SESSION_PIN_FAILED_ATTEMPT_SCHEMA = 'filtertube_managed_admin_failed_unlock_rate_limit';
 const SESSION_PIN_FAILED_ATTEMPT_LIMIT = 5;
@@ -967,6 +972,7 @@ async function verifyAndCacheSessionPin(profileId, pin, sender = null) {
     sessionPinCache.set(id, {
         pin,
         tabId: getTrustedUiSenderTabId(sender),
+        verifiedAt: Date.now(),
         expiresAt: Date.now() + SESSION_PIN_CACHE_TTL_MS
     });
     return { ok: true, stored: true };
@@ -1223,7 +1229,7 @@ const browserAPI = IS_FIREFOX ? browser : chrome;
 // Private Notes modules are browser-only; never forwarded to MAIN or native assets.
 try {
     if (typeof importScripts === 'function' && !globalThis.FilterTubeVideoNotesBackground) {
-        importScripts('shared/saved_video_notes.js', 'shared/local_playlists.js', 'shared/study_model.js', 'shared/study_packs.js', 'shared/study_engine.js', 'shared/study_clock_guard.js', 'study_background.js', 'shared/kids_youtube_profiles.js', 'video_notes_store.js', 'video_notes_background.js', 'local_playlists_store.js', 'kids_youtube_profiles_background.js', 'personal_sync.js', 'device_auto_sync.js', 'auto_sync_wakeup.js');
+        importScripts('shared/saved_video_notes.js', 'shared/local_playlists.js', 'shared/study_model.js', 'shared/study_packs.js', 'shared/study_engine.js', 'shared/study_clock_guard.js', 'study_background.js', 'shared/kids_youtube_profiles.js', 'video_notes_store.js', 'video_notes_background.js', 'local_playlists_store.js', 'kids_youtube_profiles_background.js', 'personal_sync.js', 'device_auto_sync.js', 'auto_sync_wakeup.js', 'shared/ask_parent.js', 'ask_parent_background.js');
     }
     globalThis.FilterTubeVideoNotesBackground?.install({
         api: browserAPI,
@@ -1514,9 +1520,24 @@ async function clearSelfControlSessionExpiryAlarm() {
     }
 }
 
+/**
+ * Android 2280f4ee3: Self-Control expiry reads the guarded clock (StudyRuntime.lockClockNow), the
+ * earlier of the wall clock and the study clock guard's trusted time, so moving the device clock
+ * forward can't end a session early.
+ */
+async function selfControlClockNow() {
+    try {
+        if (studyBackground?.lockClockNow) return await studyBackground.lockClockNow();
+    } catch (e) {
+    }
+    return Date.now();
+}
+
 async function getActiveSelfControlSession({ clearExpired = true } = {}) {
     const data = await storageGet([SELF_CONTROL_SESSION_KEY]);
-    const session = normalizeSelfControlSession(data?.[SELF_CONTROL_SESSION_KEY]);
+    const session = data?.[SELF_CONTROL_SESSION_KEY]
+        ? normalizeSelfControlSession(data[SELF_CONTROL_SESSION_KEY], await selfControlClockNow())
+        : null;
     if (!session || session.active !== true) {
         let hardWhitelistRestored = false;
         if (clearExpired && session?.sessionKind === SELF_CONTROL_SESSION_KIND_HARD_WHITELIST && !restoringExpiredHardWhitelistSession) {
@@ -1711,6 +1732,144 @@ async function enforceSelfControlProfileSnapshot(changedProfilesV4) {
     return true;
 }
 
+// Switching profile during study (Android StudyProfileSwitch / StudySwitchPass). A switch away from a
+// profile a parent's lock or plan holds needs that parent's PIN typed now; a Locked session or a clock
+// hold refuses it; a Gentle session ends first. Every writer of the active profile is checked here, so a
+// screen that forgets the gate is reverted rather than trusted.
+const STUDY_SWITCH_PASS_TTL_MS = 60 * 1000;
+let studySwitchPass = null;
+
+async function studySwitchDecisionFor(profilesV4, targetProfileId) {
+    if (!studyBackground?.switchDecision || !isValidProfilesV4(profilesV4)) return { kind: 'allowed' };
+    const fromId = normalizeString(profilesV4.activeProfileId) || DEFAULT_PROFILE_ID;
+    const fromProfile = safeObject(safeObject(profilesV4.profiles)[fromId]);
+    const decision = await studyBackground.switchDecision(fromId, fromProfile, normalizeString(targetProfileId));
+    if (decision?.kind === 'needs_parent_pin') {
+        const parent = safeObject(safeObject(profilesV4.profiles)[decision.parentProfileId]);
+        return {
+            ...decision,
+            parentName: normalizeString(parent.name) || '',
+            parentHasPin: !!extractPinVerifierFromProfilesV4(profilesV4, decision.parentProfileId)
+        };
+    }
+    return decision || { kind: 'allowed' };
+}
+
+function takeStudySwitchPass(targetProfileId) {
+    const pass = studySwitchPass;
+    studySwitchPass = null;
+    return !!pass && pass.targetId === targetProfileId && Date.now() - pass.issuedAt <= STUDY_SWITCH_PASS_TTL_MS;
+}
+
+async function handleStudySwitchMessage(request, sender, sendResponse) {
+    try {
+        if (!isTrustedUiSender(sender)) {
+            sendResponse?.({ ok: false, error: 'untrusted_sender' });
+            return;
+        }
+        const stored = await storageGet([FT_PROFILES_V4_KEY]);
+        const profilesV4 = stored?.[FT_PROFILES_V4_KEY];
+        const targetId = normalizeString(request?.targetProfileId);
+        const decision = await studySwitchDecisionFor(profilesV4, targetId);
+        if (request?.action === 'FilterTube_StudySwitchDecision') {
+            sendResponse?.({ ok: true, decision });
+            return;
+        }
+        // FilterTube_StudySwitchAuthorize: the parent's PIN, typed now, buys one switch to one target.
+        if (decision.kind === 'allowed') {
+            studySwitchPass = { targetId, issuedAt: Date.now() };
+            sendResponse?.({ ok: true, decision });
+            return;
+        }
+        if (decision.kind !== 'needs_parent_pin' || !decision.parentHasPin) {
+            sendResponse?.({ ok: false, error: 'study_switch_refused', decision });
+            return;
+        }
+        const auth = await verifyAndCacheSessionPin(decision.parentProfileId, normalizeString(request?.pin), sender);
+        if (auth?.ok !== true || auth?.stored !== true) {
+            sendResponse?.({ ok: false, error: auth?.error || 'incorrect_pin', reason: auth?.reason || 'incorrect_pin', retryAt: auth?.retryAt || null, decision });
+            return;
+        }
+        studySwitchPass = { targetId, issuedAt: Date.now() };
+        sendResponse?.({ ok: true, decision });
+    } catch (e) {
+        sendResponse?.({ ok: false, error: e?.message || 'study_switch_failed' });
+    }
+}
+
+// An uninstall leaves a page that tells the family (review 4.4): FilterTube can't outlive its own removal.
+try {
+    const uninstallPage = browserAPI.runtime?.setUninstallURL?.('https://filtertube.in/uninstalled');
+    uninstallPage?.catch?.(() => {});
+} catch (e) {
+}
+
+async function enforceStudyProfileSwitch(change) {
+    const oldValue = change?.oldValue;
+    const newValue = change?.newValue;
+    if (!isValidProfilesV4(oldValue) || !isValidProfilesV4(newValue)) return false;
+    const fromId = normalizeString(oldValue.activeProfileId) || DEFAULT_PROFILE_ID;
+    const toId = normalizeString(newValue.activeProfileId) || DEFAULT_PROFILE_ID;
+    if (fromId === toId) return false;
+    if (!safeObject(newValue.profiles)[fromId]) return false; // the old profile was removed: nothing to hold
+    if (takeStudySwitchPass(toId)) return false;
+    const decision = await studySwitchDecisionFor(oldValue, toId);
+    if (decision.kind === 'allowed') return false;
+    studySwitchPass = { targetId: fromId, issuedAt: Date.now() }; // the revert itself is not a switch to check
+    await browserAPI.storage.local.set({
+        [FT_PROFILES_V4_KEY]: { ...newValue, schemaVersion: 4, activeProfileId: fromId }
+    });
+    console.warn('FilterTube Background: profile switch during study reverted', decision.kind);
+    return true;
+}
+
+/**
+ * Study holds the rules (Android AppPreferences.saveProfilesV4 + StudyLooseningSheet): a write that
+ * loosens a profile study holds (a self Gentle or Locked session, or a parent's plan or lock) gets its
+ * settings, Main and Kids put back, and the open pages are told so they show the loosening sheet.
+ * Stricter changes (more blocks, fewer allowed) go through.
+ */
+async function enforceStudyRuleLoosening(change) {
+    const oldValue = change?.oldValue;
+    const newValue = change?.newValue;
+    if (!isValidProfilesV4(oldValue) || !isValidProfilesV4(newValue) || !studyBackground?.looseningNotice) return false;
+    const notice = await studyBackground.looseningNotice(oldValue, newValue);
+    if (!notice) return false;
+    const before = safeObject(safeObject(oldValue.profiles)[notice.profileId]);
+    const stored = (await storageGet([FT_PROFILES_V4_KEY]))?.[FT_PROFILES_V4_KEY];
+    const latest = isValidProfilesV4(stored) ? stored : newValue;
+    const profile = safeObject(safeObject(latest.profiles)[notice.profileId]);
+    if (!Object.keys(profile).length) return false;
+    const Model = globalThis.FilterTubeStudyModel;
+    if (Model?.ruleLoosens && !Model.ruleLoosens(before, profile)) return false; // already put back
+    await browserAPI.storage.local.set({
+        [FT_PROFILES_V4_KEY]: {
+            ...latest,
+            schemaVersion: 4,
+            profiles: {
+                ...safeObject(latest.profiles),
+                [notice.profileId]: { ...profile, settings: cloneJsonValue(safeObject(before.settings)), main: cloneJsonValue(safeObject(before.main)), kids: cloneJsonValue(safeObject(before.kids)) }
+            }
+        }
+    });
+    try {
+        browserAPI.runtime.sendMessage({ action: 'FilterTube_StudyLooseningRefused', notice }, () => void browserAPI.runtime.lastError);
+    } catch (e) {
+    }
+    console.warn('FilterTube Background: a change that loosens study was put back', notice.sheet);
+    return true;
+}
+
+/** For handlers that can only loosen (allow-list imports, a mode switch): the refusal, or null. */
+async function studyLooseningRefusal() {
+    try {
+        const notice = studyBackground?.activeHold ? await studyBackground.activeHold() : null;
+        return notice ? { ok: false, success: false, error: 'study_loosening', errorCode: 'study_loosening', notice } : null;
+    } catch (e) {
+        return null;
+    }
+}
+
 // Study mode (3.6.2): applied at compile time from the plan and the clock; see js/study_background.js.
 async function writeStudyProfile(profileId, profile) {
     if (await getActiveSelfControlSession()) return { ok: false, error: 'self_control_settings_locked' };
@@ -1797,11 +1956,41 @@ const studyBackground = globalThis.FilterTubeStudyBackground?.createStudyBackgro
         startLockedSession: startStudyLockedSession,
         writeProfile: writeStudyProfile,
         onTransition: () => broadcastStudyTransition(),
+        parentUnlockFresh: profileId => isParentUnlockFresh(profileId),
+        switchProfile: (fromProfileId, targetProfileId) => switchProfileAfterStudy(fromProfileId, targetProfileId),
         // The clock guard's network time: the Date header of a tiny request to the video site, read
         // only when a jump is suspected (or the worker restarted) during a lock or a parent's plan.
         networkTime: () => readStudyNetworkTime()
     })
     : null;
+
+// Android ProfileUnlockSession.SENSITIVE_REAUTH_TTL_MILLIS: a parent's edit needs a PIN typed in
+// the last 5 minutes; a profile with no PIN has nothing to type.
+const PARENT_SENSITIVE_UNLOCK_TTL_MS = 5 * 60 * 1000;
+
+async function isParentUnlockFresh(profileId) {
+    const id = normalizeString(profileId) || DEFAULT_PROFILE_ID;
+    const stored = await storageGet([FT_PROFILES_V4_KEY]);
+    const profilesV4 = stored?.[FT_PROFILES_V4_KEY];
+    if (!isValidProfilesV4(profilesV4) || !extractPinVerifierFromProfilesV4(profilesV4, id)) return true;
+    const entry = safeObject(sessionPinCache.get(id));
+    const now = Date.now();
+    return Number(entry.expiresAt) > now && now - Number(entry.verifiedAt || 0) < PARENT_SENSITIVE_UNLOCK_TTL_MS;
+}
+
+// "End and switch": once a Gentle session's pause is over, the profile the person picked becomes
+// active. Its own PIN was typed before the request; the study gate has nothing left to hold.
+async function switchProfileAfterStudy(fromProfileId, targetProfileId) {
+    const stored = await storageGet([FT_PROFILES_V4_KEY]);
+    const profilesV4 = stored?.[FT_PROFILES_V4_KEY];
+    const from = normalizeString(fromProfileId);
+    const target = normalizeString(targetProfileId);
+    if (!isValidProfilesV4(profilesV4) || !target || !safeObject(profilesV4.profiles)[target]) return false;
+    if ((normalizeString(profilesV4.activeProfileId) || DEFAULT_PROFILE_ID) !== from) return false;
+    studySwitchPass = { targetId: target, issuedAt: Date.now() };
+    await browserAPI.storage.local.set({ [FT_PROFILES_V4_KEY]: { ...profilesV4, schemaVersion: 4, activeProfileId: target } });
+    return true;
+}
 
 async function readStudyNetworkTime() {
     try {
@@ -2123,21 +2312,16 @@ function schedulePostBlockEnrichment(channel, profile = 'main', metadata = {}) {
     pendingPostBlockEnrichments.set(key, run);
 }
 
+// "Filter all": the word and key follow Android FilterPayloadCompiler (channelKeywordWord and
+// channelKey), shared in js/shared/identity.js so both platforms derive the same word.
 function getChannelDerivedKeywordRef(channel) {
-    if (!channel || typeof channel !== 'object') return '';
-    const keySource = channel.id || channel.handle || channel.originalInput || channel.name || '';
-    return typeof keySource === 'string' ? keySource.toLowerCase() : '';
+    const shared = globalThis.FilterTubeIdentity?.channelFilterAllKey;
+    return typeof shared === 'function' ? shared(channel) : '';
 }
 
 function getChannelDerivedKeywordWord(channel) {
-    if (!channel || typeof channel !== 'object') return '';
-    if (channel.name && channel.name !== channel.id) {
-        return channel.name;
-    }
-    if (channel.handle) {
-        return channel.handle;
-    }
-    return channel.id || channel.originalInput || '';
+    const shared = globalThis.FilterTubeIdentity?.channelFilterAllWord;
+    return typeof shared === 'function' ? shared(channel) : '';
 }
 
 function parsePackedChannelKeywordSource(sourceValue) {
@@ -3077,6 +3261,12 @@ async function handleManagedProfileSwitch(request, sender, sendResponse) {
             return;
         }
 
+        const studyDecision = await studySwitchDecisionFor(context.profilesV4, targetProfileId);
+        if (studyDecision.kind !== 'allowed') {
+            sendResponse?.({ ok: false, error: 'study_switch_refused', decision: studyDecision });
+            return;
+        }
+
         const auth = await verifyAndCacheSessionPin(targetProfileId, normalizeString(request?.pin), sender);
         if (auth?.ok !== true) {
             sendResponse?.({
@@ -3287,6 +3477,7 @@ function buildProfilesV4FromLegacyState(items, storageUpdates = {}) {
                     hideEndscreenCards: !!items?.hideEndscreenCards,
                     disableAutoplay: !!items?.disableAutoplay,
                     skipBlockedAutoplay: !!items?.skipBlockedAutoplay,
+                    quietBlocking: !!items?.quietBlocking,
                     alwaysUseOriginalAudio: !!items?.alwaysUseOriginalAudio,
                     disableAnnotations: !!items?.disableAnnotations,
                     hideTopHeader: !!items?.hideTopHeader,
@@ -3740,6 +3931,7 @@ async function getCompiledSettings(sender = null, profileType = null, forceRefre
             'hideEndscreenCards',
             'disableAutoplay',
             'skipBlockedAutoplay',
+            'quietBlocking',
             'alwaysUseOriginalAudio',
             'disableAnnotations',
             'hideTopHeader',
@@ -3753,7 +3945,8 @@ async function getCompiledSettings(sender = null, profileType = null, forceRefre
             'videoMetaMap',
             'stats',
             'ftProfilesV3',
-            FT_PROFILES_V4_KEY
+            FT_PROFILES_V4_KEY,
+            ASK_PARENT_STORE_KEY
         ], (items) => {
             const compiledSettings = {};
             const storageUpdates = {};
@@ -3827,6 +4020,8 @@ async function getCompiledSettings(sender = null, profileType = null, forceRefre
                         ? entry.trim()
                         : (typeof entry?.word === 'string' ? entry.word.trim() : '');
                     if (!word) continue;
+                    // A paused managed-list row stays in the list but filters nothing (as on Android).
+                    if (typeof entry === 'object' && entry?.managedListPaused === true) continue;
                     if (predicate && !predicate(entry)) continue;
 
                     const exact = (typeof entry === 'object' && entry) ? entry.exact === true : false;
@@ -3990,16 +4185,64 @@ async function getCompiledSettings(sender = null, profileType = null, forceRefre
             const activeRuleSurface = shouldUseKidsProfile ? activeKids : activeMain;
             // Layered rules (3.6.2): "whitelist" plus layered:true keeps the block list subtracting.
             compiledSettings.listLayered = compiledSettings.listMode === 'whitelist' && activeRuleSurface.layered === true;
+            // Study round: the plan's topics and every synonym they cover ("cement" for GATE Civil), so a
+            // search suggestion about the plan passes (search_suggestions_filter.js, topicsForQuery).
+            compiledSettings.studySearchTerms = (() => {
+                const engine = globalThis.FilterTubeStudyEngine;
+                if (compiledSettings.study?.phase !== 'study' || typeof engine?.planSearchTerms !== 'function') return [];
+                const topics = (Array.isArray(activeRuleSurface.whitelistKeywords) ? activeRuleSurface.whitelistKeywords : [])
+                    .filter(row => row && typeof row === 'object' && row.source === 'study_topic' && typeof row.word === 'string')
+                    .map(row => row.word);
+                try { return engine.planSearchTerms(topics); } catch (e) { return []; }
+            })();
+            // Study round on Main: each pack's channels and topics, so a search also asks the plan's own
+            // channels (channel_search.js, Android StudySearchGroup). Channels without a UC id are left out.
+            compiledSettings.channelSearchGroups = (() => {
+                const engine = globalThis.FilterTubeStudyEngine;
+                if (compiledSettings.study?.phase !== 'study' || shouldUseKidsProfile || typeof engine?.channelSearchGroups !== 'function') return [];
+                try { return engine.channelSearchGroups(activeRuleSurface); } catch (e) { return []; }
+            })();
+            // Kids `videoIds` are the parent's allowed videos (Android NativeOwnedFilterDecider),
+            // never blocked ones; on Main `videoIds` is the legacy alias of `blockedVideoIds`.
             compiledSettings.blockedVideoIds = Array.from(new Set(
-                safeArray(activeRuleSurface.blockedVideoIds || activeRuleSurface.videoIds)
+                safeArray(shouldUseKidsProfile
+                    ? activeRuleSurface.blockedVideoIds
+                    : (activeRuleSurface.blockedVideoIds || activeRuleSurface.videoIds))
                     .map(value => normalizeString(value))
                     .filter(value => /^[a-zA-Z0-9_-]{11}$/.test(value))
+                    // "Skip this video" during study: hidden for this profile from then on (Android StudyRuntime).
+                    .concat(studyBackground?.skippedVideos ? studyBackground.skippedVideos(activeProfileId, studyPrepared) : [])
             ));
+            // Ask a parent: "Allow once" lets the asked video play for 6 hours, read exactly like a
+            // parent's allowed video (Android AskParentPasses). A study break or the plan's limit still
+            // hides everything first.
+            // A blocked channel page offers "Ask for this channel" to a child instead of leaving at once
+            // (Android AskParentBlockedTarget on a channel); the page asks the background whether it can.
+            compiledSettings.askParentChild = activeProfileKind === 'child';
+            compiledSettings.askParentPassVideoIds = (() => {
+                const studyState = normalizeString(compiledSettings.study?.state);
+                if (studyState === 'BREAK' || studyState === 'LIMIT') return [];
+                const Ask = globalThis.FilterTubeAskParent;
+                if (!Ask) return [];
+                const now = Date.now();
+                return Array.from(new Set(Ask.passesFrom(safeObject(items?.[ASK_PARENT_STORE_KEY]).passes)
+                    .filter(pass => pass.profileId === activeProfileId && now < pass.until)
+                    .map(pass => pass.videoId)));
+            })();
             compiledSettings.allowedVideoIds = Array.from(new Set(
                 safeArray(activeRuleSurface.allowedVideoIds)
                     .map(value => normalizeString(value))
                     .filter(value => /^[a-zA-Z0-9_-]{11}$/.test(value))
             ));
+            // Android lets a Kids allowed video through only when no block or allow rule decided
+            // and the Kids list is "Allowed only"; it never outranks a blocked word or channel.
+            compiledSettings.kidsFallbackAllowedVideoIds = shouldUseKidsProfile && kidsModeFromV4 === 'whitelist'
+                ? Array.from(new Set(
+                    safeArray(activeRuleSurface.videoIds)
+                        .map(value => normalizeString(value))
+                        .filter(value => /^[a-zA-Z0-9_-]{11}$/.test(value))
+                ))
+                : [];
 
             if (activeProfileKind === 'child') {
                 const allowMainViewing = activeSettings.allowMainViewing !== false;
@@ -4053,8 +4296,15 @@ async function getCompiledSettings(sender = null, profileType = null, forceRefre
                 return compiledSettings.listMode === 'whitelist' || entry?.modeBootstrapCopy !== true;
             });
 
+            // Kids: channels the child follows are allowed alongside the allow list (Android
+            // kidsSubscriptionKeys); they are plain identity strings.
             const rawWhitelistChannels = shouldUseKidsProfile
-                ? (Array.isArray(activeKids.whitelistChannels) ? activeKids.whitelistChannels : [])
+                ? [
+                    ...(Array.isArray(activeKids.whitelistChannels) ? activeKids.whitelistChannels : []),
+                    ...(Array.isArray(activeKids.subscriptions)
+                        ? activeKids.subscriptions.filter(value => typeof value === 'string' && value.trim())
+                        : [])
+                ]
                 : (() => {
                     const mainChannels = Array.isArray(activeMain.whitelistChannels) ? activeMain.whitelistChannels : [];
                     if (!syncKidsToMain || mainModeFromV4 !== 'whitelist' || kidsModeFromV4 !== 'whitelist') return mainChannels;
@@ -4338,8 +4588,9 @@ async function getCompiledSettings(sender = null, profileType = null, forceRefre
                         };
 
                         // If filterAll is enabled, add the channel name to keywords
-                        if (channelObj.filterAll && channelObj.name && channelObj.name !== channelObj.id) {
-                            additionalKeywordsFromChannels.push(compileKeywordPattern(channelObj.name, true));
+                        const filterAllWord = channelObj.filterAll ? getChannelDerivedKeywordWord(channelObj) : '';
+                        if (filterAllWord) {
+                            additionalKeywordsFromChannels.push(compileKeywordPattern(filterAllWord, true));
                         }
 
                         return channelObj;
@@ -4486,28 +4737,15 @@ async function getCompiledSettings(sender = null, profileType = null, forceRefre
             // Kids profile keyword compilation (YouTube Kids domain only)
             if (shouldUseKidsProfile) {
                 const rawKidsKeywords = effectiveKidsKeywords;
-                const compiledKidsKeywords = rawKidsKeywords.map(entry => {
-                    try {
-                        const word = typeof entry?.word === 'string' ? entry.word.trim() : '';
-                        if (!word) return null;
-                        const exact = entry?.exact === true;
-                        return compileKeywordPattern(word, exact);
-                    } catch (e) {
-                        return null;
-                    }
-                }).filter(Boolean);
+                // Same compiler as Main: plain-string rows (Android stores Kids words as strings),
+                // regex rows, date windows and paused rows all behave as on the phone.
+                const compiledKidsKeywords = compileKeywordEntries(rawKidsKeywords, entry => {
+                    return !(typeof entry === 'object' && entry?.scope === 'comment');
+                });
 
-                const compiledKidsKeywordsComments = rawKidsKeywords.map(entry => {
-                    try {
-                        if (!entry || typeof entry !== 'object' || entry.comments !== true) return null;
-                        const word = typeof entry?.word === 'string' ? entry.word.trim() : '';
-                        if (!word) return null;
-                        const exact = entry?.exact === true;
-                        return compileKeywordPattern(word, exact);
-                    } catch (e) {
-                        return null;
-                    }
-                }).filter(Boolean);
+                const compiledKidsKeywordsComments = compileKeywordEntries(rawKidsKeywords, entry => {
+                    return (typeof entry === 'object' && entry) ? entry.comments === true : false;
+                });
 
                 // Preserve channel-derived keywords (Filter All) alongside kids keyword list.
                 // We want: (kids keyword entries) + (channel-derived patterns) with de-dup.
@@ -4557,6 +4795,7 @@ async function getCompiledSettings(sender = null, profileType = null, forceRefre
             compiledSettings.hideEndscreenCards = boolFromV4('hideEndscreenCards', items.hideEndscreenCards || false);
             compiledSettings.disableAutoplay = boolFromV4('disableAutoplay', items.disableAutoplay || false);
             compiledSettings.skipBlockedAutoplay = boolFromV4('skipBlockedAutoplay', items.skipBlockedAutoplay || false);
+            compiledSettings.quietBlocking = boolFromV4('quietBlocking', items.quietBlocking || false);
             compiledSettings.alwaysUseOriginalAudio = boolFromV4('alwaysUseOriginalAudio', items.alwaysUseOriginalAudio || false);
             compiledSettings.disableAnnotations = boolFromV4('disableAnnotations', items.disableAnnotations || false);
             compiledSettings.hideTopHeader = boolFromV4('hideTopHeader', items.hideTopHeader || false);
@@ -5221,8 +5460,147 @@ async function performWatchIdentityFetch(videoId) {
     }
 }
 
+// Ask a parent (Android AskParentService): js/ask_parent_background.js keeps the device-local state.
+const askParentService = globalThis.FilterTubeAskParentBackground?.createAskParentService
+    ? globalThis.FilterTubeAskParentBackground.createAskParentService({
+        browserAPI,
+        Ask: globalThis.FilterTubeAskParent,
+        parentUnlockFresh: profileId => isParentUnlockFresh(profileId),
+        writeChannelRule: args => writeAskParentChannelRule(args),
+        // Ask for time: a parent's minutes go to the study runtime; a child's report carries its week.
+        addGrant: grant => studyBackground?.addGrant ? studyBackground.addGrant(grant) : { ok: false },
+        studyReport: profileId => studyBackground?.reportFor ? studyBackground.reportFor(profileId) : null,
+        // A pass changes what plays: recompile and tell the open tabs, like a study transition.
+        onChange: () => { scheduleAskParentBadge(); return broadcastStudyTransition(); }
+    })
+    : null;
+
+/**
+ * Requests for a parent (Android notifies with "New family request"). The extension doesn't ask for the
+ * `notifications` permission, which would add an install warning; instead the toolbar badge shows how
+ * many asks and time requests the active parent profile can answer, next to the dashboard's
+ * "Requests · N" row and the popup's Requests entry. A child or nothing open shows no badge.
+ */
+let askParentBadgeTimer = null;
+function scheduleAskParentBadge() {
+    if (askParentBadgeTimer) clearTimeout(askParentBadgeTimer);
+    askParentBadgeTimer = setTimeout(() => { askParentBadgeTimer = null; void refreshAskParentBadge(); }, 250);
+}
+
+async function refreshAskParentBadge() {
+    const action = browserAPI.action || browserAPI.browserAction;
+    if (!askParentService || typeof action?.setBadgeText !== 'function') return;
+    try {
+        const count = await askParentService.openRequestCount();
+        const text = count > 0 ? String(Math.min(count, 99)) : '';
+        await Promise.resolve(action.setBadgeText({ text }));
+        if (text && typeof action.setBadgeBackgroundColor === 'function') {
+            await Promise.resolve(action.setBadgeBackgroundColor({ color: '#AB4438' }));
+        }
+        if (text && typeof action.setBadgeTextColor === 'function') {
+            await Promise.resolve(action.setBadgeTextColor({ color: '#FFFAF4' }));
+        }
+    } catch (e) {
+    }
+}
+
+try {
+    browserAPI.storage?.onChanged?.addListener?.((changes, area) => {
+        if (area === 'local' && (changes.ftAskParentV1 || changes[FT_PROFILES_V4_KEY] || changes.ftNanahTrustedLinks)) scheduleAskParentBadge();
+    });
+} catch (e) {
+}
+scheduleAskParentBadge();
+
+/**
+ * "Always allow this channel" (Android AskParentRuleWrite): on each surface of the child's profile, a
+ * block list drops the channel and an allow list gains it. The parent's authority was checked by the
+ * caller (askParentService.answer); this re-reads the profiles and writes once.
+ */
+async function writeAskParentChannelRule({ parentId, childId, channelId, channelName }) {
+    if (await getActiveSelfControlSession()) return { ok: false, error: 'self_control_settings_locked' };
+    const stored = await storageGet([FT_PROFILES_V4_KEY]);
+    const profilesV4 = stored?.[FT_PROFILES_V4_KEY];
+    const id = normalizeString(channelId);
+    if (!isValidProfilesV4(profilesV4) || !id) return { ok: false, error: 'profiles_unavailable' };
+    const profiles = safeObject(profilesV4.profiles);
+    const child = safeObject(profiles[childId]);
+    if (normalizeString(child.type) !== 'child' || normalizeString(profilesV4.activeProfileId) !== parentId) return { ok: false, error: 'not_parent' };
+    const Identity = globalThis.FilterTubeIdentity;
+    // An ask from a channel page may know only the @handle; the rule then holds the handle.
+    const handle = id.startsWith('@') ? id : null;
+    const meta = handle ? { handle } : { id };
+    const matches = entry => {
+        if (!entry) return false;
+        if (typeof entry === 'string') return entry.trim().toLowerCase() === id.toLowerCase();
+        if (Identity?.channelMatchesFilter) return Identity.channelMatchesFilter(meta, entry, {});
+        return normalizeString(handle ? entry.handle : entry.id).toLowerCase() === id.toLowerCase();
+    };
+    const row = { id: handle ? '' : id, name: normalizeString(channelName) || id, handle, filterAll: false, source: 'ask_parent', addedAt: Date.now() };
+    const next = { ...child };
+    const main = { ...safeObject(child.main) };
+    if (normalizeString(main.mode) === 'whitelist') {
+        const list = safeArray(main.whitelistChannels);
+        main.whitelistChannels = list.some(matches) ? list : [...list, row];
+    } else {
+        main.channels = safeArray(main.channels).filter(entry => !matches(entry));
+    }
+    next.main = main;
+    const kids = { ...safeObject(child.kids) };
+    if (normalizeString(kids.mode) === 'whitelist') {
+        const list = safeArray(kids.whitelistChannels);
+        kids.whitelistChannels = list.some(matches) ? list : [...list, row];
+    } else {
+        kids.blockedChannels = safeArray(kids.blockedChannels).filter(entry => !matches(entry));
+    }
+    next.kids = kids;
+    await browserAPI.storage.local.set({ [FT_PROFILES_V4_KEY]: { ...profilesV4, profiles: { ...profiles, [childId]: next } } });
+    return { ok: true };
+}
+
+const ASK_PARENT_PAGE_ACTIONS = new Set([
+    'FilterTube_AskParentInbox', 'FilterTube_AskParentAnswer', 'FilterTube_AskParentSetAsking',
+    'FilterTube_AskParentTimeState', 'FilterTube_AskParentTimeAsk', 'FilterTube_AskParentTimeCancel', 'FilterTube_AskParentTimeAnswer',
+    'FilterTube_AskParentNanahOutbox', 'FilterTube_AskParentNanahSent', 'FilterTube_AskParentNanahReceive'
+]);
+
+function handleAskParentMessage(request, sender, sendResponse) {
+    const action = request?.action;
+    const extensionPage = isTrustedUiSender(sender);
+    const youtubeContent = isYouTubeContentSender(sender);
+    if (!askParentService) { sendResponse?.({ ok: false, error: 'unavailable' }); return false; }
+    if (!extensionPage && (!youtubeContent || ASK_PARENT_PAGE_ACTIONS.has(action))) {
+        sendResponse?.({ ok: false, error: 'untrusted_sender' });
+        return false;
+    }
+    const run = (() => {
+        switch (action) {
+            case 'FilterTube_AskParentState': return askParentService.stateFor(request);
+            case 'FilterTube_AskParentCreate': return askParentService.ask(request);
+            case 'FilterTube_AskParentCancel': return askParentService.cancel(request.askId);
+            case 'FilterTube_AskParentMarkSeen': return askParentService.markSeen(request.askId);
+            case 'FilterTube_AskParentInbox': return askParentService.inbox();
+            case 'FilterTube_AskParentAnswer': return askParentService.answer(request);
+            case 'FilterTube_AskParentSetAsking': return askParentService.setAsking(request);
+            case 'FilterTube_AskParentTimeState': return askParentService.timeState();
+            case 'FilterTube_AskParentTimeAsk': return askParentService.askTime(request);
+            case 'FilterTube_AskParentTimeCancel': return askParentService.cancelTime(request.requestId);
+            case 'FilterTube_AskParentTimeAnswer': return askParentService.answerTime(request);
+            case 'FilterTube_AskParentNanahOutbox': return askParentService.outbox(request.remote);
+            case 'FilterTube_AskParentNanahSent': return askParentService.markSent(request.sentByLink).then(() => ({ ok: true }));
+            case 'FilterTube_AskParentNanahReceive': return askParentService.receive(normalizeString(request.remoteDeviceId), request.message);
+            default: return Promise.resolve({ ok: false, error: 'unknown_action' });
+        }
+    })();
+    Promise.resolve(run).then(result => sendResponse?.(result)).catch(e => sendResponse?.({ ok: false, error: e?.message || 'ask_parent_failed' }));
+    return true;
+}
+
 // Listen for messages sent from other parts of the extension (e.g., content scripts, popup).
 browserAPI.runtime.onMessage.addListener(function (request, sender, sendResponse) {
+    if (typeof request?.action === 'string' && request.action.startsWith('FilterTube_AskParent')) {
+        return handleAskParentMessage(request, sender, sendResponse);
+    }
     const studyResponse = studyBackground?.handleMessage(request, {
         extensionPage: isTrustedUiSender(sender),
         youtubeContent: isYouTubeContentSender(sender)
@@ -5234,6 +5612,10 @@ browserAPI.runtime.onMessage.addListener(function (request, sender, sendResponse
         return true;
     }
     const action = request?.action || request?.type;
+    if (action === 'FilterTube_StudySwitchDecision' || action === 'FilterTube_StudySwitchAuthorize') {
+        handleStudySwitchMessage(request, sender, sendResponse);
+        return true;
+    }
     if (action === 'FilterTube_AutoSyncAuthorize') return handleAutoSyncAuthorization(request, sender, sendResponse);
     if (action === 'FilterTube_PersonalPlaylistsRead' || action === 'FilterTube_PersonalPlaylistsMerge') {
         return handlePersonalPlaylistsSync(request, sender, sendResponse);
@@ -5346,9 +5728,10 @@ browserAPI.runtime.onMessage.addListener(function (request, sender, sendResponse
         return true;
     } else if (action === 'FilterTube_OpenDashboard') {
         const requestedView = normalizeString(request?.view).toLowerCase();
+        // The page's calm states open Filters or Study (allowlist_feed_view.js); only known views pass.
         const dashboardUrl = requestedView === 'sync'
             ? `${DASHBOARD_PAGE_URL}?view=sync&flow=switch-profile`
-            : DASHBOARD_PAGE_URL;
+            : (['filters', 'study', 'kids'].includes(requestedView) ? `${DASHBOARD_PAGE_URL}?view=${requestedView}` : DASHBOARD_PAGE_URL);
         browserAPI.tabs.create({ url: dashboardUrl, active: true }, (tab) => {
             if (browserAPI.runtime.lastError) {
                 console.warn('FilterTube Background: failed to open dashboard tab', browserAPI.runtime.lastError);
@@ -5468,6 +5851,12 @@ browserAPI.runtime.onMessage.addListener(function (request, sender, sendResponse
             : 'main';
         const shouldCopyBlocklist = request?.copyBlocklist === true;
         (async () => {
+            // During study the list mode is the plan's; switching it would loosen the rules.
+            const studyRefusal = await studyLooseningRefusal();
+            if (studyRefusal) {
+                sendResponse?.(studyRefusal);
+                return;
+            }
             const selfControlSession = await getActiveSelfControlSession();
             if (selfControlSession) {
                 sendResponse?.({
@@ -5693,6 +6082,12 @@ browserAPI.runtime.onMessage.addListener(function (request, sender, sendResponse
             const targetProfileId = normalizeString(request?.targetProfileId) || DEFAULT_PROFILE_ID;
             const requestId = normalizeString(request?.requestId) || '';
             const incomingChannels = safeArray(request?.channels);
+            // Allowed channels added while study holds that profile would open them at once.
+            const studyRefusal = await studyLooseningRefusal();
+            if (studyRefusal && studyRefusal.notice.profileId === targetProfileId) {
+                sendResponse?.(studyRefusal);
+                return;
+            }
 
             const storage = await storageGet([FT_PROFILES_V4_KEY, 'ftProfilesV3', 'channelMap']);
             let profilesV4 = storage?.[FT_PROFILES_V4_KEY];
@@ -5872,7 +6267,8 @@ browserAPI.runtime.onMessage.addListener(function (request, sender, sendResponse
             return false;
         }
 
-        handleAddFilteredChannel(
+        // An allowed Kids channel added while study holds the profile would loosen it.
+        studyLooseningRefusal().then(studyRefusal => studyRefusal || handleAddFilteredChannel(
             input,
             false,
             null,
@@ -5887,7 +6283,11 @@ browserAPI.runtime.onMessage.addListener(function (request, sender, sendResponse
             'kids',
             rawVideoId,
             'whitelist'
-        ).then(result => {
+        )).then(result => {
+            if (result?.error === 'study_loosening') {
+                sendResponse?.(result);
+                return;
+            }
             try {
                 if (result && result.success) {
                     scheduleAutoBackupInBackground('kids_whitelist_channel_added');
@@ -5916,6 +6316,12 @@ browserAPI.runtime.onMessage.addListener(function (request, sender, sendResponse
             : 'main';
 
         (async () => {
+            // The list mode is the plan's during study; moving the allow list back would loosen it.
+            const studyRefusal = await studyLooseningRefusal();
+            if (studyRefusal) {
+                sendResponse?.(studyRefusal);
+                return;
+            }
             const storage = await storageGet([
                 FT_PROFILES_V4_KEY,
                 'filterChannels',
@@ -6638,6 +7044,11 @@ browserAPI.runtime.onMessage.addListener(function (request, sender, sendResponse
         return false;
     }
 
+    else if (request.action === "FilterTube_PackChannelAvatar") {
+        studyChannelAvatar(request).then(logo => sendResponse({ ok: !!logo, logo: logo || null })).catch(() => sendResponse({ ok: false, logo: null }));
+        return true;
+    }
+
     else if (request.action === "fetchChannelDetails") {
         console.log("FilterTube Background: Received fetchChannelDetails request for:", request.channelIdOrHandle);
         fetchChannelInfo(request.channelIdOrHandle).then(channelInfo => {
@@ -6672,6 +7083,14 @@ browserAPI.storage.onChanged.addListener((changes, area) => {
         if (changes[FT_PROFILES_V4_KEY]?.newValue && !importedMetadataWrite) {
             enforceSelfControlProfileSnapshot(changes[FT_PROFILES_V4_KEY].newValue).catch((error) => {
                 console.warn('FilterTube Background: failed to restore Self-Control Session policy', error);
+            });
+        }
+        if (changes[FT_PROFILES_V4_KEY]?.newValue && changes[FT_PROFILES_V4_KEY]?.oldValue && !importedMetadataWrite) {
+            enforceStudyProfileSwitch(changes[FT_PROFILES_V4_KEY]).catch((error) => {
+                console.warn('FilterTube Background: failed to check a profile switch during study', error);
+            });
+            enforceStudyRuleLoosening(changes[FT_PROFILES_V4_KEY]).catch((error) => {
+                console.warn('FilterTube Background: failed to check a rule change during study', error);
             });
         }
         const relevantKeys = [
@@ -6752,6 +7171,43 @@ function extractCustomUrlFromPath(path) {
     }
 
     return '';
+}
+
+/**
+ * Android StudyChannelAvatars: a study pack channel's round picture. Pack channels carry no picture, so
+ * each one is looked up once, one at a time, and its address is remembered on this device
+ * (ftStudyChannelAvatarsV1, channel id or lower-case handle -> https picture address).
+ */
+const STUDY_CHANNEL_AVATARS_KEY = 'ftStudyChannelAvatarsV1';
+const STUDY_CHANNEL_AVATARS_MAX = 600;
+let studyChannelAvatarQueue = Promise.resolve();
+const studyChannelAvatarPending = new Map();
+function studyChannelAvatar(request) {
+    const channelId = typeof request?.channelId === 'string' && /^UC[A-Za-z0-9_-]{22}$/.test(request.channelId.trim()) ? request.channelId.trim() : '';
+    const handle = typeof request?.handle === 'string' ? request.handle.trim().replace(/^@/, '') : '';
+    const key = channelId || handle.toLowerCase();
+    if (!key) return Promise.resolve(null);
+    if (studyChannelAvatarPending.has(key)) return studyChannelAvatarPending.get(key);
+    const job = new Promise(resolve => browserAPI.storage.local.get([STUDY_CHANNEL_AVATARS_KEY], resolve)).then(stored => {
+        const known = stored?.[STUDY_CHANNEL_AVATARS_KEY]?.[key];
+        if (typeof known === 'string' && known.startsWith('https://')) return known;
+        const lookup = studyChannelAvatarQueue.then(async () => {
+            const info = await fetchChannelInfo(channelId || `@${handle}`);
+            // A 40 px circle needs a small picture: the channel's s900 becomes s88.
+            const logo = typeof info?.logo === 'string' && info.logo.startsWith('https://') ? info.logo.replace(/=s\d+-/, '=s88-') : null;
+            if (!logo) return null;
+            const current = await new Promise(resolve => browserAPI.storage.local.get([STUDY_CHANNEL_AVATARS_KEY], resolve));
+            const table = { ...(current?.[STUDY_CHANNEL_AVATARS_KEY] || {}), [key]: logo };
+            const keys = Object.keys(table);
+            if (keys.length > STUDY_CHANNEL_AVATARS_MAX) keys.slice(0, keys.length - STUDY_CHANNEL_AVATARS_MAX).forEach(old => delete table[old]);
+            await new Promise(resolve => browserAPI.storage.local.set({ [STUDY_CHANNEL_AVATARS_KEY]: table }, resolve));
+            return logo;
+        }).catch(() => null);
+        studyChannelAvatarQueue = lookup.then(() => undefined);
+        return lookup;
+    }).finally(() => studyChannelAvatarPending.delete(key));
+    studyChannelAvatarPending.set(key, job);
+    return job;
 }
 
 async function fetchChannelInfo(channelIdOrHandle) {
@@ -7527,8 +7983,17 @@ browserAPI.runtime.onMessage.addListener((message, sender, sendResponse) => {
                 }
             } catch (e) {
             }
+            // "Comments from X hidden · Undo" on the site: a block from a comment can be taken back.
+            if (result && result.success && isYouTubeContentSender(sender)) {
+                rememberCommentAuthorBlock(result, targetProfile);
+            }
             sendResponse(result);
         });
+        return true;
+    }
+
+    if (message.type === 'undoCommentAuthorBlock') {
+        undoCommentAuthorBlock(message, sender).then(sendResponse).catch(e => sendResponse({ success: false, error: e?.message || 'undo_failed' }));
         return true;
     }
 
@@ -7547,6 +8012,65 @@ browserAPI.runtime.onMessage.addListener((message, sender, sendResponse) => {
 
     return false;
 });
+
+// "Comments from X hidden · Undo" (Android NativeCommentsHiddenNote): a channel blocked from a
+// comment on the site can be taken back from the note that takes the comment's place, for as long as
+// the note can still be on screen (10 minutes) and only for blocks this worker made.
+const COMMENT_AUTHOR_UNDO_TTL_MS = 10 * 60 * 1000;
+const recentCommentAuthorBlocks = new Map();
+
+function commentAuthorBlockKey(value) {
+    return normalizeString(value).toLowerCase();
+}
+
+function rememberCommentAuthorBlock(result, profile) {
+    const data = safeObject(result.channelData);
+    const key = commentAuthorBlockKey(data.id || data.handle);
+    if (!key) return;
+    const now = Date.now();
+    for (const [existing, entry] of recentCommentAuthorBlocks) {
+        if (now - entry.at > COMMENT_AUTHOR_UNDO_TTL_MS) recentCommentAuthorBlocks.delete(existing);
+    }
+    recentCommentAuthorBlocks.set(key, { at: now, profile: profile === 'kids' ? 'kids' : 'main', id: normalizeString(data.id), handle: normalizeString(data.handle) });
+}
+
+async function undoCommentAuthorBlock(message, sender) {
+    if (!isYouTubeContentSender(sender)) return { success: false, error: 'untrusted_sender' };
+    const key = commentAuthorBlockKey(message.channelKey);
+    const entry = recentCommentAuthorBlocks.get(key);
+    if (!entry || Date.now() - entry.at > COMMENT_AUTHOR_UNDO_TTL_MS) return { success: false, error: 'undo_expired' };
+    if (await getActiveSelfControlSession()) return { success: false, error: 'self_control_settings_locked' };
+    recentCommentAuthorBlocks.delete(key);
+    const stored = await storageGet([FT_PROFILES_V4_KEY, 'filterChannels']);
+    const profilesV4 = stored?.[FT_PROFILES_V4_KEY];
+    if (!isValidProfilesV4(profilesV4)) return { success: false, error: 'profiles_unavailable' };
+    const activeId = normalizeString(profilesV4.activeProfileId) || DEFAULT_PROFILE_ID;
+    const profiles = safeObject(profilesV4.profiles);
+    const profile = safeObject(profiles[activeId]);
+    const matches = row => {
+        const value = typeof row === 'string' ? { id: row } : safeObject(row);
+        return (entry.id && commentAuthorBlockKey(value.id) === commentAuthorBlockKey(entry.id))
+            || (entry.handle && [value.handle, value.handleDisplay, value.canonicalHandle].some(handle => commentAuthorBlockKey(handle) === commentAuthorBlockKey(entry.handle)));
+    };
+    const update = {};
+    if (entry.profile === 'kids') {
+        const kids = safeObject(profile.kids);
+        profiles[activeId] = { ...profile, kids: { ...kids, blockedChannels: safeArray(kids.blockedChannels).filter(row => !matches(row)) } };
+    } else {
+        const main = safeObject(profile.main);
+        const channels = safeArray(main.channels).filter(row => !matches(row));
+        const keywords = syncStoredMainKeywordsWithChannels(Array.isArray(main.keywords) ? main.keywords : safeArray(main.blockedKeywords), channels);
+        profiles[activeId] = { ...profile, main: { ...main, channels, keywords, blockedKeywords: keywords } };
+        if (activeId === DEFAULT_PROFILE_ID && Array.isArray(stored?.filterChannels)) {
+            update.filterChannels = stored.filterChannels.filter(row => !matches(row));
+        }
+    }
+    update[FT_PROFILES_V4_KEY] = { ...profilesV4, schemaVersion: 4, profiles };
+    await browserAPI.storage.local.set(update);
+    compiledSettingsCache.main = null;
+    compiledSettingsCache.kids = null;
+    return { success: true };
+}
 
 /**
  * Handle adding a filtered channel (from 3-dot menu or enrichment queue)
@@ -8885,9 +9409,11 @@ function initializeImportedChannelEnrichment() {
 async function reconcileSelfControlSessionExpiry() {
     try {
         const data = await storageGet([SELF_CONTROL_SESSION_KEY]);
-        const session = normalizeSelfControlSession(data?.[SELF_CONTROL_SESSION_KEY]);
+        const guardedNow = await selfControlClockNow();
+        const session = normalizeSelfControlSession(data?.[SELF_CONTROL_SESSION_KEY], guardedNow);
         if (session?.active === true) {
-            await scheduleSelfControlSessionExpiry(session);
+            // A forward clock fired the alarm early: wake again when the guarded time really runs out.
+            await scheduleSelfControlSessionExpiry(session, Date.now() + Math.max(1000, session.lockedUntil - guardedNow));
             return session;
         }
         if (session) {

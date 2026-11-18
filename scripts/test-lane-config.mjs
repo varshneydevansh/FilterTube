@@ -158,6 +158,7 @@ const FILTER_LOGIC_AUDIT_PROOF_TESTS = Object.freeze([
 const SAFETY_AND_PREFERENCE_TESTS = Object.freeze([
   'tests/runtime/managed-time-usage-transactions.test.mjs',
   'tests/runtime/profile-preference-reset.test.mjs',
+  'tests/runtime/quiet-blocking-overlay.test.mjs',
 ]);
 const AUTO_SYNC_TESTS = Object.freeze([
   'tests/runtime/auto-sync-two-endpoint.test.mjs',
@@ -187,6 +188,7 @@ const STUDY_TESTS = Object.freeze([
   'tests/runtime/study-backup-roundtrip.test.mjs',
   'tests/runtime/study-personal-sync.test.mjs',
   'tests/runtime/study-family-scopes.test.mjs',
+  'tests/runtime/study-scope-routes.test.mjs',
   'tests/runtime/study-packs-catalog.test.mjs',
   'tests/runtime/study-layered-rules.test.mjs',
   'tests/runtime/study-engine-clock.test.mjs',
@@ -200,9 +202,36 @@ const STUDY_TESTS = Object.freeze([
   'tests/runtime/study-topic-synonyms.test.mjs',
   'tests/runtime/study-branch-kids-parity.test.mjs',
 ]);
+// Parity with the Android app: filtering decisions, Ask a parent, live chat (docs/design/PARITY_PASS4.md).
+const APP_PARITY_TESTS = Object.freeze([
+  'tests/runtime/app-parity-channel-decisions.test.mjs',
+  'tests/runtime/app-parity-ask-parent.test.mjs',
+  'tests/runtime/app-parity-live-chat.test.mjs',
+  'tests/runtime/app-parity-comments-note.test.mjs',
+  'tests/runtime/app-parity-doodles.test.mjs',
+  'tests/runtime/app-parity-pass5.test.mjs',
+  'tests/runtime/app-parity-country-accent.test.mjs',
+  'tests/runtime/app-parity-study-topic-label.test.mjs',
+  'tests/runtime/app-parity-study-merge.test.mjs',
+  'tests/runtime/app-parity-rule-options.test.mjs',
+  'tests/runtime/app-parity-study-skip-break.test.mjs',
+  'tests/runtime/app-parity-study-setup.test.mjs',
+  'tests/runtime/app-parity-study-session-end.test.mjs',
+  'tests/runtime/app-parity-study-break-sun.test.mjs',
+  'tests/runtime/app-parity-study-page-theme.test.mjs',
+  'tests/runtime/app-parity-study-silent-device.test.mjs',
+  'tests/runtime/app-parity-study-review-leftovers.test.mjs',
+  'tests/runtime/app-parity-study-day-ring.test.mjs',
+  'tests/runtime/app-parity-parent-mode.test.mjs',
+  'tests/runtime/app-parity-people-motion.test.mjs',
+  // The Android -> extension port ledger's own checks (docs/parity/HOW_TO_PORT.md).
+  'tools/parity/ledger.test.mjs',
+]);
 // Companion characters in the popup and options page (js/mascots.js).
 const COMPANION_TESTS = Object.freeze([
   'tests/runtime/mascots.test.mjs',
+  // The options page's Home and "What Uljhan tried today" (js/dashboard_home.js, js/shared/hidden_log.js).
+  'tests/runtime/dashboard-home.test.mjs',
 ]);
 // App parity: profile avatars (Android ProfileAvatarCodec), the profile picker's look and the
 // neutral terminology guard (docs/app/design-system/TERMINOLOGY.md in the app repo).
@@ -240,6 +269,7 @@ export const LANES = Object.freeze({
       ...SAFETY_AND_PREFERENCE_TESTS,
       ...VIDEO_NOTES_TESTS,
       ...STUDY_TESTS,
+      ...APP_PARITY_TESTS,
       ...COMPANION_TESTS,
       ...PROFILE_AVATAR_TESTS,
       'tests/runtime/ad-void-native-ownership-current-behavior.test.mjs',
@@ -515,6 +545,7 @@ export const LANES = Object.freeze({
       ...SAFETY_AND_PREFERENCE_TESTS,
       ...VIDEO_NOTES_TESTS,
       ...STUDY_TESTS,
+      ...APP_PARITY_TESTS,
       ...COMPANION_TESTS,
       ...PROFILE_AVATAR_TESTS,
       'tests/runtime/content-playback-admission-current-behavior.test.mjs',
@@ -603,9 +634,15 @@ export const LANES = Object.freeze({
       ...SAFETY_AND_PREFERENCE_TESTS,
       ...VIDEO_NOTES_TESTS,
       ...STUDY_TESTS,
+      ...APP_PARITY_TESTS,
       ...COMPANION_TESTS,
       ...PROFILE_AVATAR_TESTS,
       ...CONTENT_PLAYBACK_TESTS,
+      'tests/runtime/search-suggestions-filter.test.mjs',
+      'tests/runtime/paced-fetch.test.mjs',
+      'tests/runtime/channel-search.test.mjs',
+      'tests/runtime/manifest-world-split.test.mjs',
+      'tests/runtime/allowlist-feed.test.mjs',
       'tests/runtime/get-watch-streaming-interception.test.mjs',
       'tests/runtime/ad-void-duration-seek-current-behavior.test.mjs',
       'tests/runtime/popup-intrinsic-sizing.test.mjs',

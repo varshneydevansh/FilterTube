@@ -1,4 +1,55 @@
 {
+  "3.6.2": {
+    "headline": "Kutana na Kriti na Uljhan, kipanga Masomo kilichojengwa upya na Muulize mzazi",
+    "summary": "FilterTube 3.6.2 inapata mwonekano wake yenyewe, ikiwa na Kriti na Uljhan, aikoni za kalamu za rangi, michoro na sauti za hiari. Masomo yamejengwa upya kuzunguka kipanga siku chenye vifurushi vilivyo tayari kwa nchi 29, watoto wanaweza kumwomba mzazi video au chaneli, na kitazamaji, wasifu, kompyuta kibao na TV zinapata muundo mpya tulivu zaidi wenye maelezo ya faragha yaliyo wazi zaidi.",
+    "bannerSummary": "Kriti na Uljhan, kipanga Masomo kilichojengwa upya, Muulize mzazi na kitazamaji tulivu zaidi.",
+    "ctaLabel": "Angalia mapya",
+    "highlights": [
+      "Masomo yamejengwa upya: ukurasa wa nyumbani wa Masomo wa karatasi wenye Pete ya Siku ya kalamu za rangi, kipanga siku, usanidi unaoeleza kila chaguo, na vifurushi vilivyo tayari kwa mitihani na madarasa ya shule katika nchi 29. Milisho hufuata tawi unalochagua, kwa hivyo GATE Civil inabaki Civil, na Utafutaji wakati wa masomo hutafuta tu katika chaneli za mpango wako.",
+      "Muulize mzazi: kitu kinapozuiwa, mtoto anaweza kuomba kutazama video hiyo au kuruhusu chaneli hiyo, na mzazi anajibu. Hali ya mzazi hufungua kipindi cha mzazi chenye fremu ndani ya wasifu wa Kids chenye njia moja wazi ya kutoka, na Mafunzo ya Kids kwa umri hujaza nafasi ya Kids na masomo yaliyochaguliwa kwa umri wakati wa masomo.",
+      "Mwonekano mpya: Kriti na Uljhan wanakuweka pamoja wakati kurasa zinapakia, orodha zikiwa tupu, ukiwa nje ya mtandao au kitu kikiwa kimezuiwa. FilterTube ina aikoni zake za kalamu za rangi, michoro, avatari za michoro, aikoni za programu za Kriti, Uljhan na wawili hao za kuchagua, na sauti za hiari unazoweza kuweka kuwa Zima, Laini au Za kuchangamsha.",
+      "Kitazamaji tulivu zaidi: mabango ya skrini nzima kwenye simu, ukurasa mpya wa orodha ya kucheza na karatasi ya akaunti, mng'ao wa Tazama unaofika hadi chini ya upau wa hali, Uljhan akileta zaidi unaposogeza, vuta ili kuonyesha upya, na taarifa moja wazi muunganisho ukiwa wa polepole au haupo.",
+      "Wasifu umesanifiwa upya ukiwa na avatari za kalamu za rangi, kichaguzi kinachoonyesha nani ni mzazi na nani ni mtoto, na njia iliyolindwa ya kuongeza wasifu.",
+      "FilterTube inatumia maneno yake yenyewe kila mahali: Klipu, Unaofuata, Vilivyohifadhiwa, na Sangeet kwa muziki, katika kila lugha.",
+      "Faragha: Akaunti na Usawazishaji inaeleza kile ambacho kisambazaji cha usawazishaji kinaweza na kisichoweza kuona na inauliza kabla ya usawazishaji wa kwanza kupitia intaneti, jina la kifaa chako halitumwi tena unapopigia kifaa kingine, vijipicha vya DeArrow ni chaguo tofauti linaloanza likiwa limezimwa, vidakuzi vya akaunti huenda tu kwenye tovuti za huduma ya video yenyewe, na matoleo rasmi huweka kumbukumbu za utatuzi nje ya kumbukumbu ya mfumo.",
+      "Kompyuta kibao na TV zinalingana na simu: Vichujio, Utafutaji na Muulize mzazi hutumia upana wote kwenye kompyuta kibao, na TV zinapata aikoni za kalamu za rangi kwenye reli, Masomo kwenye skrini kubwa na kadi ya Kuhusu TV hii yenye hali za Kamili na Nyepesi.",
+      "Kuiunga mkono FilterTube kunabaki bure na kwa hiari: karatasi ya usaidizi ni ujumbe wa kirafiki, kamwe si kizuizi.",
+      "Marekebisho: ukaguzi wa PIN haugandishi tena skrini, kupakia zaidi katika Masomo hakufanyi tena ukurasa umulike, wahusika hawakatwi kamwe katikati ya mwendo, lebo nyingi zilizobaki za Kiingereza sasa zimetafsiriwa, na hitilafu za upakiaji za Sangeet hazitaji tena huduma ya video."
+    ]
+  },
+  "3.6.1": {
+    "headline": "Mlalo unaotosha kila skrini, vidhibiti thabiti zaidi vya uchezaji na uchujaji mkali zaidi",
+    "summary": "FilterTube 3.6.1 hupima kila ukurasa wa mlalo kutoka kwa dirisha, kwa hivyo simu zilizolazwa, kompyuta kibao na TV zinapata video ya urefu kamili na paneli upande wa kulia. Manukuu, nakala ya maandishi na menyu za kadi hufanya kazi inavyotarajiwa, na chaneli unayoichuja hufichwa kila mahali.",
+    "bannerSummary": "Mlalo uliopimwa kwa kila skrini, marekebisho ya manukuu na nakala ya maandishi, na uchujaji mkali zaidi.",
+    "ctaLabel": "Angalia mapya",
+    "highlights": [
+      "Mlalo hukokotolewa kutoka kwa skrini yako: kwenye simu iliyolazwa, kompyuta kibao au TV, Tazama huonyesha video ya 16:9 ya urefu kamili na Inayofuata kando yake, Utafutaji uko juu ya reli ya pembeni, na hakuna kinachokatwa na sehemu ya kamera.",
+      "Muziki ukiwa mlalo huonyesha Inayofuata ile ile kama ukiwa wima, santuri huzunguka kwa 33⅓ rpm pamoja na kasi ya uchezaji, na Inayofuata huanza kwenye wimbo unaocheza.",
+      "Manukuu huzimika unapochagua Zima, Tafsiri ya kiotomatiki hufanya kazi kwenye video inayocheza, na chaguo ambalo kichezaji hakiwezi kutekeleza bado hukuambia hivyo badala ya kushindwa kimya kimya.",
+      "Kugusa mstari wa nakala ya maandishi huiacha nakala wazi na ikifuata, kama maneno ya wimbo, na mng'ao wa Tazama hufika kwenye ukurasa wote ukiwa mlalo.",
+      "Chaneli iliyo kwenye orodha yako ya vichujio huficha kila kitu kutoka kwayo, haijalishi iliongezwa vipi. Kuzuia kutoka kwenye maoni huficha maoni na video za chaneli hiyo, Mchanganyiko ulioanzishwa na chaneli iliyozuiwa hufichwa, na gumzo la moja kwa moja hufuata sheria zako.",
+      "Katika hali ya Ruhusu zilizochaguliwa pekee, maoni huonyesha tu watoa maoni walioruhusiwa au maneno yaliyoruhusiwa.",
+      "Menyu za kadi huendelea kufanya kazi baada ya kubadilisha kichujio, upangaji wa chaneli uliouchagua hubaki baada ya kuonyesha upya, na picha ya Tazama hubaki baada ya kubadilisha kichujio ukiwa umesogeza chini.",
+      "Mwongozo wa hatua kwa hatua husaidia kuweka viungo vya YouTube vifunguke katika FilterTube, na kompyuta kibao huonyesha wasifu wa Main na Kids kando kwa kando."
+    ]
+  },
+  "3.6.0": {
+    "headline": "Kichezaji kipya cha Muziki, kurasa za haraka zaidi na viungo vya YouTube vinavyofunguka katika FilterTube",
+    "summary": "FilterTube 3.6.0 inasanifu upya Muziki kuzunguka jalada la kila wimbo, inapakia kurasa za Muziki, Nyumbani na albamu kwa haraka zaidi sana, inafungua viungo vya YouTube kutoka programu nyingine katika kitazamaji kilicholindwa na inafanya ufungaji wa PIN utabirike. Simu, kompyuta kibao na TV zinapata maboresho yale yale.",
+    "bannerSummary": "Kichezaji na rangi mpya za Muziki, upakiaji wa haraka zaidi, viungo vya YouTube katika FilterTube na kufuli ya PIN iliyo wazi zaidi.",
+    "ctaLabel": "Angalia mapya",
+    "highlights": [
+      "Muziki hupakwa rangi za kile unachosikiliza: kila ukurasa wa Muziki, kichezaji kidogo na upau wa chini huchukua rangi za jalada, hubadilika taratibu kati ya nyimbo na albamu, na kurudi kawaida unapotoka kwenye Muziki.",
+      "Kichezaji cha Muziki kilichosanifiwa upya: pete moja ya kusogeza kuzunguka jalada linalozunguka, kadi ya maneno ya wimbo inayoinuka kutoka chini, kionyeshi chepesi kinachosonga na mdundo, na vituo vya moja kwa moja vinavyoonyeshwa kama LIVE.",
+      "Maneno halisi ya wimbo yaliyosawazishwa kutoka YouTube Music, kisha manukuu ya wimbo wenyewe katika lugha yako, na LRCLIB kama ziada ya hiari unayoulizwa mara moja. Maneno ya wimbo na nakala za maandishi huweka mstari wa sasa katikati hadi mwisho.",
+      "Upakiaji wa haraka zaidi sana: nyimbo za Muziki hutumia chaneli ambayo YouTube Music tayari inaorodhesha, kadi zilizo kwenye skrini hukaguliwa kwanza, na ukaguzi wa chaneli hupangwa kwa mwendo ili YouTube iache kuukataa. Nyimbo za albamu na orodha za kucheza hazisubiri tena kwa dakika.",
+      "Muziki hucheza sauti pekee hadi uonyeshe video, kwa hivyo nyimbo huanza haraka zaidi na kutumia data kidogo zaidi sana. Kuruka kutoka skrini iliyofungwa na kwenda kwenye wimbo unaofuata sasa hucheza mara moja.",
+      "Viungo vya YouTube kutoka programu za gumzo na programu nyingine vinaweza kufunguka katika kitazamaji kilicholindwa cha FilterTube. Kidokezo cha mara moja na ukaguzi katika Mipangilio huwasaidia wazazi kukiwasha.",
+      "Ufungaji wa PIN unatabirika: wasifu hubaki wazi ukiwa unatumika na hufungwa FilterTube inapofungwa, simu inapowashwa upya au unapobadilisha wasifu. Wazazi wanaweza kuchagua kufunga baada ya muda wa kutokuwepo badala yake.",
+      "Ukurasa wa Tazama hung'aa kwa rangi za video inayocheza, kuanzia upau wa hali hadi karatasi na Inayofuata; nakala ya maandishi hukaa chini ya kichezaji; chipu zinalingana na ukurasa wao; na foleni za Mchanganyiko huendelea kupakia.",
+      "Android TV na kompyuta kibao: rangi za Muziki na kichezaji kipya kwenye TV pamoja na kusogeza kwa rimoti, kionyeshi chepesi zaidi kwa visanduku vya TV, paneli za Tazama katika rangi za video, na marekebisho ya paneli mbili na majalada makubwa zaidi ya albamu kwenye kompyuta kibao."
+    ]
+  },
   "3.4.1": {
     "headline": "Lugha 38 za kiolesura na ukaguzi salama zaidi wa uchezaji",
     "summary": "FilterTube 3.4.1 inaongeza lugha 38 za kiolesura zilizojumuishwa na kuboresha ukaguzi wa video kwenye YouTube na vichezaji vilivyopachikwa vinavyotumika. Pia inarekebisha kuanza kwa dashibodi na ulinganishaji wa maneno muhimu ya maoni yaliyohifadhiwa. Maingizo rudufu ya tafsiri za Kikorea na Kibengali yaliyokataliwa na Mozilla yamerekebishwa. Ujenzi sasa hukagua funguo rudufu za JSON kabla ya kufungasha.",

@@ -40,7 +40,7 @@ const playbackStack = [
   'js/content/content_playback_native.js',
   'js/content/content_playback.js',
 ];
-const normalHelperStack = [...helperStack.slice(0, -1), ...playbackStack, 'js/content/video_notes.js', 'js/content/study_overlay.js', ...helperStack.slice(-1)];
+const normalHelperStack = [...helperStack.slice(0, -1), ...playbackStack, 'js/content/video_notes.js', 'js/content/study_overlay.js', 'js/shared/paced_fetch.js', 'js/shared/channel_search.js', 'js/content/channel_search_shelf.js', ...helperStack.slice(-1)];
 
 const commonMatches = [
   '*://*.youtube.com/*',
@@ -166,7 +166,7 @@ test('normal, embedded and Google preview paths retain explicit browser-specific
     assert.deepEqual(normal.exclude_matches, ['*://*.youtube.com/embed/*']);
     assert.equal(normal.world, isolatedWorld);
     if (!firefox) {
-      assert.deepEqual(entries[0].js, ['js/shared/view_count.js','js/seed.js']);
+      assert.deepEqual(entries[0].js, ['js/shared/view_count.js','js/shared/search_suggestions_filter.js','js/seed.js']);
       assert.deepEqual(entries[0].matches, commonMatches);
       assert.equal(entries[0].world, opera ? undefined : 'MAIN');
       assert.deepEqual(entries[0].exclude_matches, ['*://*.youtube.com/embed/*']);
@@ -220,7 +220,7 @@ test('every declared script/resource exists and quarantined CSS cannot be activa
 });
 
 test('fallback resources explicitly cover view counts, admission, localization and host-limited Google icons', () => {
-  const resources = ['html/video-notes.html','js/injector.js','js/content/content_playback_response.js','js/filter_logic.js','js/seed.js','js/shared/identity.js','js/shared/view_count.js','js/content/admission_overlay.js','data/ui_locales/*.json','assets/images/homepage_hero_day.mp4','assets/images/mascots/*.webp','icons/icon-48.png'];
+  const resources = ['html/video-notes.html','js/injector.js','js/content/content_playback_response.js','js/filter_logic.js','js/seed.js','js/shared/identity.js','js/shared/view_count.js','js/shared/search_suggestions_filter.js','js/content/admission_overlay.js','data/ui_locales/*.json','assets/images/homepage_hero_day.mp4','assets/images/mascots/*.webp','icons/icon-48.png'];
   for (const file of manifestFiles) {
     const entries = readJson(file).web_accessible_resources;
     assert.deepEqual(entries[0].resources, file.includes('opera') ? resources : [...resources,'icons/file.svg']);

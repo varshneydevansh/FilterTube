@@ -1,4 +1,55 @@
 {
+  "3.6.2": {
+    "headline": "Kenalan dengan Kriti dan Uljhan, perencana Study yang dibangun ulang, dan Tanya orang tua",
+    "summary": "FilterTube 3.6.2 punya tampilan sendiri, dengan Kriti dan Uljhan, ikon krayon, coretan, dan suara opsional. Study dibangun ulang di sekitar perencana harian dengan paket siap pakai untuk 29 negara, anak dapat meminta video atau channel kepada orang tua, dan penampil, profil, tablet, serta TV mendapat desain ulang yang lebih tenang dengan catatan privasi yang lebih jelas.",
+    "bannerSummary": "Kriti dan Uljhan, perencana Study yang dibangun ulang, Tanya orang tua, dan penampil yang lebih tenang.",
+    "ctaLabel": "Lihat Yang Baru",
+    "highlights": [
+      "Study dibangun ulang: beranda Study bergaya kertas dengan Cincin Hari krayon, perencana harian, penyiapan yang menjelaskan setiap pilihan, dan paket siap pakai untuk ujian dan kelas sekolah di 29 negara. Feed mengikuti jurusan yang Anda pilih, jadi GATE Civil tetap Civil, dan Penelusuran saat belajar hanya mencari di channel dalam rencana Anda.",
+      "Tanya orang tua: saat sesuatu diblokir, anak dapat meminta untuk menonton video itu atau mengizinkan channel itu, lalu orang tua menjawab. Mode orang tua membuka sesi orang tua yang berbingkai di dalam profil Kids dengan satu jalan keluar yang jelas, dan Belajar Kids menurut usia mengisi ruang Kids dengan pelajaran sesuai usia selama belajar.",
+      "Tampilan baru: Kriti dan Uljhan menemani Anda saat halaman dimuat, daftar kosong, Anda offline, atau sesuatu diblokir. FilterTube punya ikon krayon sendiri, coretan, avatar coretan, ikon aplikasi Kriti, Uljhan, dan duo untuk dipilih, serta suara opsional yang dapat diatur ke Mati, Lembut, atau Ceria.",
+      "Penampil yang lebih tenang: poster penuh di ponsel, halaman playlist dan lembar akun baru, cahaya Watch yang naik hingga di bawah bilah status, Uljhan yang memuat lebih banyak saat Anda menggulir, tarik untuk memuat ulang, dan satu pemberitahuan jelas saat koneksi lambat atau offline.",
+      "Profil didesain ulang dengan avatar krayon, pemilih yang menunjukkan siapa orang tua dan siapa anak, serta cara yang dijaga untuk menambahkan profil.",
+      "FilterTube memakai kata-katanya sendiri di mana saja: klip, diikuti, tersimpan, dan Sangeet untuk musik, di setiap bahasa.",
+      "Privasi: Akun & Sinkronisasi menjelaskan apa yang dapat dan tidak dapat dilihat relai sinkronisasi dan bertanya sebelum sinkronisasi internet pertama, nama perangkat Anda tidak lagi dikirim saat membunyikan perangkat lain, thumbnail DeArrow adalah opsi terpisah yang awalnya mati, cookie akun hanya dikirim ke situs layanan video itu sendiri, dan build rilis menjaga log debug tetap di luar log sistem.",
+      "Tablet dan TV menyamai ponsel: Filter, Penelusuran, dan Tanya orang tua memakai lebar penuh di tablet, dan TV mendapat ikon krayon di rel samping, Study di layar besar, serta kartu Tentang TV ini dengan mode Lengkap dan Ringan.",
+      "Mendukung FilterTube tetap gratis dan opsional: lembar dukungan adalah catatan ramah, bukan penghalang.",
+      "Perbaikan: pemeriksaan PIN tidak lagi membekukan layar, memuat lebih banyak di Study tidak lagi membuat halaman berkedip, maskot tidak pernah terpotong di tengah gerakan, banyak label bahasa Inggris yang tersisa kini diterjemahkan, dan pesan galat pemuatan Sangeet tidak lagi menyebut layanan video."
+    ]
+  },
+  "3.6.1": {
+    "headline": "Lanskap yang pas di setiap layar, kontrol pemutaran yang lebih stabil, dan pemfilteran yang lebih ketat",
+    "summary": "FilterTube 3.6.1 mengukur setiap halaman lanskap dari jendela, sehingga ponsel yang dimiringkan, tablet, dan TV mendapat video setinggi layar dan panel di kanan. Teks, transkrip, dan menu kartu berfungsi sebagaimana mestinya, dan channel yang Anda filter disembunyikan di mana saja.",
+    "bannerSummary": "Lanskap yang pas di setiap layar, perbaikan teks dan transkrip, dan pemfilteran yang lebih ketat.",
+    "ctaLabel": "Lihat Yang Baru",
+    "highlights": [
+      "Lanskap dihitung dari layar Anda: di ponsel yang dimiringkan, tablet, atau TV, Watch menampilkan video 16:9 setinggi layar dengan Berikutnya di sampingnya, Penelusuran ada di bagian atas rel samping, dan tidak ada yang terpotong oleh lubang kamera.",
+      "Musik dalam posisi miring menampilkan Berikutnya yang sama seperti saat tegak, piringan hitam berputar 33⅓ rpm mengikuti kecepatan putar, dan Berikutnya dimulai dari lagu yang sedang diputar.",
+      "Teks mati saat Anda memilih Mati, Terjemahan otomatis bekerja pada video yang sedang diputar, dan pilihan yang belum dapat diterapkan pemutar akan memberi tahu Anda alih-alih gagal diam-diam.",
+      "Mengetuk baris transkrip membuat transkrip tetap terbuka dan mengikuti, seperti lirik, dan cahaya Watch menjangkau seluruh halaman dalam lanskap.",
+      "Channel di daftar filter Anda menyembunyikan semua darinya, bagaimana pun cara menambahkannya. Memblokir dari komentar menyembunyikan komentar dan video channel itu, Mix yang berasal dari channel yang diblokir disembunyikan, dan live chat mengikuti aturan Anda.",
+      "Dalam mode Izinkan yang dipilih saja, komentar hanya menampilkan pemberi komentar yang diizinkan atau kata yang diizinkan.",
+      "Menu kartu tetap berfungsi setelah filter diubah, urutan channel yang dipilih tetap ada setelah dimuat ulang, dan gambar Watch tetap ada setelah filter diubah saat menggulir.",
+      "Panduan langkah demi langkah membantu mengatur agar tautan YouTube terbuka di FilterTube, dan tablet menampilkan profil Main dan Kids berdampingan."
+    ]
+  },
+  "3.6.0": {
+    "headline": "Pemutar Music baru, halaman lebih cepat, dan tautan YouTube yang terbuka di FilterTube",
+    "summary": "FilterTube 3.6.0 mendesain ulang Music di sekitar sampul setiap lagu, memuat halaman Music, Beranda, dan album jauh lebih cepat, membuka tautan YouTube dari aplikasi lain di penampil terlindungi, dan membuat penguncian PIN dapat diprediksi. Ponsel, tablet, dan TV mendapat peningkatan yang sama.",
+    "bannerSummary": "Pemutar dan warna Music baru, pemuatan lebih cepat, tautan YouTube di FilterTube, dan kunci PIN yang lebih jelas.",
+    "ctaLabel": "Lihat Yang Baru",
+    "highlights": [
+      "Music diwarnai sesuai yang Anda dengarkan: setiap halaman Music, pemutar mini, dan bilah bawah mengambil warna sampul, berganti dengan mulus antara lagu dan album, dan kembali normal saat Anda keluar dari Music.",
+      "Pemutar Music yang didesain ulang: satu cincin penggeser di sekitar sampul yang berputar, kartu lirik yang naik dari bawah, visualizer ringan yang bergerak mengikuti ketukan, dan stasiun langsung yang ditandai LIVE.",
+      "Lirik tersinkron asli dari YouTube Music, lalu teks milik lagu itu sendiri dalam bahasa Anda, dengan LRCLIB sebagai tambahan opsional yang ditanyakan sekali. Lirik dan transkrip menjaga baris saat ini tetap di tengah sampai akhir.",
+      "Pemuatan jauh lebih cepat: lagu Music memakai channel yang sudah dicantumkan YouTube Music, kartu di layar diperiksa lebih dulu, dan pemeriksaan channel diberi jeda agar YouTube berhenti menolaknya. Lagu album dan playlist tidak lagi menunggu bermenit-menit.",
+      "Music hanya memutar audio sampai Anda menampilkan video, sehingga lagu mulai lebih cepat dan memakai jauh lebih sedikit data. Melewati lagu dari layar kunci dan berpindah ke lagu berikutnya kini langsung diputar.",
+      "Tautan YouTube dari aplikasi chat dan aplikasi lain dapat terbuka di penampil terlindungi FilterTube. Permintaan satu kali dan pemeriksaan di Pengaturan membantu orang tua mengaktifkannya.",
+      "Penguncian PIN dapat diprediksi: profil tetap terbuka selama digunakan dan terkunci saat FilterTube ditutup, ponsel dimulai ulang, atau Anda berganti profil. Sebagai gantinya, orang tua dapat memilih untuk mengunci setelah lama ditinggalkan.",
+      "Halaman Watch bercahaya dengan warna video yang sedang diputar, dari bilah status hingga lembar dan Berikutnya; transkrip menempel di bawah pemutar; chip cocok dengan halamannya; dan antrean Mix terus dimuat.",
+      "Android TV dan tablet: warna Music dan pemutar baru di TV dengan penggeseran lewat remote, visualizer yang lebih ringan untuk TV box, panel Watch dalam warna video, serta perbaikan dua panel dan sampul album yang lebih besar di tablet."
+    ]
+  },
   "3.4.1": {
     "headline": "38 bahasa antarmuka dan pemeriksaan pemutaran yang lebih aman",
     "summary": "FilterTube 3.4.1 menambahkan 38 bahasa antarmuka bawaan dan meningkatkan pemeriksaan video di YouTube serta pemutar sematan yang didukung. Pembaruan ini juga memperbaiki awal pemuatan dasbor dan pencocokan kata kunci komentar tersimpan. Entri terjemahan Korea dan Bengali duplikat yang ditolak Mozilla diperbaiki. Build kini memeriksa kunci JSON duplikat sebelum pengemasan.",

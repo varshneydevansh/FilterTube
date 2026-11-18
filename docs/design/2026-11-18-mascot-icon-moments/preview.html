@@ -1,0 +1,107 @@
+<!doctype html>
+<!-- A static preview of the 2026-11-18 moments, drawn by the real js/mascots.js and css/*.css (the
+     extension APIs are stubbed). Render: chrome-headless-shell --screenshot preview.html?state=... -->
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<link rel="stylesheet" href="../../../css/design_tokens.css">
+<link rel="stylesheet" href="../../../css/components.css">
+<link rel="stylesheet" href="../../../css/tab-view.css">
+<link rel="stylesheet" href="../../../css/study.css">
+<link rel="stylesheet" href="../../../css/mascots.css">
+<link rel="stylesheet" href="../../../css/paperkit.css">
+<style>
+  body { margin: 0; padding: 24px; background: #f6efe4; font-family: system-ui, sans-serif; color: #2a241f; }
+  h2 { font-size: 15px; margin: 18px 0 8px; }
+  .row { display: flex; gap: 22px; align-items: flex-end; flex-wrap: wrap; }
+  .cell { display: flex; flex-direction: column; align-items: center; gap: 4px; font-size: 12px; }
+  .ft-toast { position: static; opacity: 1; transform: none; }
+  .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; max-width: 980px; }
+  .panel { background: #fffcf6; border: 1.5px solid #dcd1c2; border-radius: 18px; padding: 14px; }
+  .empty-state-large { text-align: center; padding: 10px; }
+</style>
+<script>
+  // Stubs: storage in memory; getURL resolves to the repo root.
+  window.chrome = { runtime: { getURL: path => '../../../' + path }, storage: { local: { get: (k, cb) => cb({}), set: (i, cb) => cb && cb() } } };
+  const TEMPLATES = { en: 'Locked until {time}', de: 'Gesperrt bis {time}', ja: '{time} までロック中', ar: 'مقفل حتى {time}', hi: '{time} तक लॉक' };
+  window.__lang = 'en';
+  window.FilterTubeUiLocalization = {
+    get locale() { return window.__lang; },
+    text(key, values) { if (key !== 'study.lockedUntil') return ''; return TEMPLATES[window.__lang].replace('{time}', values.time); }
+  };
+</script>
+<script src="../../../js/mascots.js"></script>
+</head>
+<body>
+<div class="grid">
+  <section class="panel">
+    <h2>Locked sign (study Locked sheet, 132 px), five locales</h2>
+    <div class="row" id="signs"></div>
+    <h2>Refused profile switch: toast with the sign (96 px)</h2>
+    <div id="toastHost"></div>
+  </section>
+  <section class="panel">
+    <h2>Connection strip: offline (tangled still) and back online (untangled still)</h2>
+    <div id="strips"></div>
+    <h2>Frames: tangle 1-3, untangle 1-3</h2>
+    <div class="row" id="netFrames"></div>
+  </section>
+  <section class="panel">
+    <h2>Backup saved beside Download JSON (rests on the clap)</h2>
+    <div class="help-item"><button id="ftExportV3Btn" class="btn-primary" type="button">Download JSON</button></div>
+    <h2>Frames: backup 1-4</h2>
+    <div class="row" id="backupFrames"></div>
+  </section>
+  <section class="panel">
+    <h2>Search with no results (options keyword list)</h2>
+    <div id="viewContainer"><div class="empty-state-large" id="emptySearch">No keywords found</div></div>
+    <h2>Frames: search empty 1-4</h2>
+    <div class="row" id="searchFrames"></div>
+  </section>
+</div>
+<script>
+  const M = window.FilterTubeMascots;
+  const url = name => '../../../assets/images/mascots/' + name;
+  const until = (() => { const d = new Date(); d.setHours(23, 30, 0, 0); return d.getTime(); })();
+  const later = until + 2 * 86400000;
+  for (const [lang, end] of [['en', until], ['de', until], ['ja', until], ['ar', until], ['hi', later]]) {
+    window.__lang = lang;
+    const cell = document.createElement('div');
+    cell.className = 'cell';
+    const sign = M.lockedSign(end, { height: 132 });
+    cell.append(sign, lang);
+    document.getElementById('signs').append(cell);
+  }
+  window.__lang = 'en';
+  const toast = document.createElement('div');
+  toast.className = 'ft-toast ft-toast-error show';
+  toast.textContent = 'Profile switching is locked until the Self-Control Session ends';
+  document.getElementById('toastHost').append(toast);
+  M.lockedToast(until);
+
+  for (const [state, title, body, art] of [['offline', 'You’re offline', 'Your filters still work. Sync will wait.', M.stillImage('uljhanTangle')],
+    ['restored', 'Back online', '', M.stillImage('duoUntangle')]]) {
+    const strip = document.createElement('div');
+    strip.className = 'pk-net';
+    strip.dataset.state = state;
+    strip.innerHTML = `<span class="pk-net__art"><img class="pk-net__image" src="${url(art)}" height="40"></span><strong class="pk-net__title">${title}</strong><span class="pk-net__body">${body}</span>`;
+    document.getElementById('strips').append(strip);
+  }
+  const frames = (id, names, height) => {
+    for (const name of names) {
+      const img = document.createElement('img');
+      img.src = url(name);
+      img.height = height;
+      document.getElementById(id).append(img);
+    }
+  };
+  frames('netFrames', [...M.ASSETS.uljhanTangle, ...M.ASSETS.duoUntangle], 64);
+  frames('backupFrames', M.ASSETS.duoBackup, 80);
+  frames('searchFrames', M.ASSETS.duoSearchEmpty, 88);
+  M.backupSaved('ftExportV3Btn');
+  const empty = document.getElementById('emptySearch');
+  empty.__ftRendererCopy = { textContent: { key: 'render.emptyKeywordsFound' } };
+  M.decorateEmptyList(empty, 'search');
+</script>
+</body>
+</html>

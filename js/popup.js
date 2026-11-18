@@ -906,7 +906,7 @@ function initializePopupFiltersTabs() {
             manage.textContent = popupUiText('popup.kidsProfiles.manage', 'Link profiles in Kids Mode');
             manage.addEventListener('click', () => api.tabs.create({ url: api.runtime.getURL('html/tab-view.html?view=kids') }));
             section.append(title, chips, status, manage);
-            const anchorNode = document.querySelector('.ft-popup-android-link');
+            const anchorNode = document.querySelector('.ft-popup-apps');
             if (anchorNode?.parentNode) anchorNode.parentNode.insertBefore(section, anchorNode);
             else (document.querySelector('.ft-popup-shell__frame') || document.body).appendChild(section);
         }
@@ -1139,6 +1139,9 @@ function initializePopupFiltersTabs() {
         renderPopupKidsYouTubeProfiles().catch(() => {});
     }, 100);
 
+    // Undo after a removal, as the app's PaperUndoBar.
+    UIComponents.attachRemovalUndo?.(StateManager);
+
     StateManager.subscribe((eventType, data) => {
         if (eventType === 'contentFiltersUpdated') {
             applyPopupVideoFiltersForActiveProfile();
@@ -1244,6 +1247,9 @@ document.addEventListener('DOMContentLoaded', async () => {
         } catch (e) {
         }
     }
+
+    // Declared before any listener that reads it: a locale change can fire during start-up.
+    let isPopupChannelAddInProgress = false;
 
     const openInTabBtn = document.getElementById('openInTabBtn');
     const toggleEnabledBrandBtn = document.getElementById('toggleEnabledBrandBtn');
@@ -1392,6 +1398,73 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
     }
 
+    // The effective mode (js/shared/effective_mode.js): during study the pill says "Study", not the
+    // profile's own Blocklist/Whitelist, and opens the Study page instead of switching the list.
+    // var without a value: the page can draw the pill before these lines run (no temporal dead zone),
+    // and reaching them later must not reset a load already started.
+    var popupStudyState;
+    var popupStudyLoad;
+    var popupStudyTimer;
+    var popupStudyAsked;
+    function refreshPopupStudyState() {
+        popupStudyAsked = true;
+        if (popupStudyLoad) return popupStudyLoad;
+        popupStudyLoad = (async () => {
+            try {
+                const resp = await sendRuntimeMessage({ action: 'FilterTube_StudyGetState' });
+                popupStudyState = resp && resp.ok !== false ? resp : null;
+            } catch (e) {
+                popupStudyState = null;
+            }
+            popupStudyLoad = null;
+            renderListModeControls();
+            // The pill changes back on its own when the round, the break or the session ends.
+            if (popupStudyTimer) clearTimeout(popupStudyTimer);
+            const at = [popupStudyState?.until, popupStudyState?.next?.at].map(Number).filter(value => Number.isFinite(value) && value > Date.now());
+            if (at.length) popupStudyTimer = setTimeout(refreshPopupStudyState, Math.min(Math.min(...at) - Date.now() + 500, 10 * 60 * 1000));
+        })();
+        return popupStudyLoad;
+    }
+    try {
+        const storageApi = (typeof chrome !== 'undefined' && chrome.storage) || (typeof browser !== 'undefined' && browser.storage);
+        storageApi?.onChanged?.addListener?.((changes, area) => {
+            if (area === 'local' && (changes.ftStudyRuntimeV1 || changes.ftProfilesV4)) refreshPopupStudyState();
+        });
+    } catch (e) {
+    }
+
+    function renderStudyModePill(container, effective) {
+        const Effective = window.FilterTubeEffectiveMode;
+        const text = Effective?.effectiveModeText?.(effective, (key, fallback, values) => popupUiText(key, fallback, values),
+            at => new Date(at).toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' }));
+        if (!text) return false;
+        const pill = document.createElement('div');
+        pill.className = 'exact-toggle active ft-list-mode-pill ft-list-mode-pill--study';
+        pill.dataset.effectiveMode = 'study';
+        const icon = document.createElement('span');
+        icon.className = 'ft-list-mode-pill__icon';
+        icon.setAttribute('aria-hidden', 'true');
+        icon.innerHTML = '<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="13" r="8"/><path d="M12 9v4l2 2M9 2h6"/></svg>';
+        const label = document.createElement('span');
+        label.textContent = text.label;
+        pill.append(icon, label);
+        pill.title = text.title;
+        pill.setAttribute('aria-label', text.title);
+        pill.setAttribute('role', 'link');
+        pill.setAttribute('tabindex', '0');
+        const open = () => {
+            const api = (typeof chrome !== 'undefined' && chrome.runtime) ? chrome : (typeof browser !== 'undefined' ? browser : null);
+            const url = api?.runtime?.getURL ? api.runtime.getURL('html/tab-view.html?view=study') : 'html/tab-view.html?view=study';
+            try { api.tabs.create({ url }); } catch (e) { window.open(url, '_blank'); }
+        };
+        pill.addEventListener('click', open);
+        pill.addEventListener('keydown', event => {
+            if (event.key === 'Enter' || event.key === ' ') { event.preventDefault(); open(); }
+        });
+        container.appendChild(pill);
+        return true;
+    }
+
     function renderListModeControls() {
         const state = StateManager.getState();
         const locked = isUiLocked();
@@ -1440,6 +1513,9 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         if (!ftTopBarListModeControlsPopup) return;
         ftTopBarListModeControlsPopup.innerHTML = '';
+        if (!popupStudyAsked) refreshPopupStudyState();
+        const studyEffective = window.FilterTubeEffectiveMode?.effectiveModeFor?.(effectiveMode, popupStudyState, Date.now());
+        if (studyEffective?.mode === 'study' && renderStudyModePill(ftTopBarListModeControlsPopup, studyEffective)) return;
 
         const toggle = document.createElement('div');
         toggle.className = [
@@ -1520,6 +1596,11 @@ document.addEventListener('DOMContentLoaded', async () => {
                 });
 
                 if (!resp || resp.ok !== true) {
+                    // During study the list mode is the plan's: the app's loosening sheet says why.
+                    if (resp?.error === 'study_loosening' && window.FilterTubeStudyUi?.showLooseningNotice?.(resp.notice)) {
+                        renderListModeControls();
+                        return;
+                    }
                     UIComponents.showToast(popupUiText('popup.listMode.updateFailed', 'Failed to update list mode'), 'error');
                     renderListModeControls();
                     return;
@@ -1826,7 +1907,28 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
     }
 
-    async function showPromptModal({ eyebrow = '', title, message, placeholder = '', inputType = 'text', confirmText = 'Confirm', cancelText = popupUiText('popup.modal.cancel', 'Cancel'), initialValue = '' }) {
+    /**
+     * A wrong PIN (Android 4ff67ce1b PinGateMotion): the field shakes 0, -10, 10, -7, 7, -3, 0 px over
+     * 320 ms (still with reduced motion), the polite line says "That PIN didn't work. Try again.", and
+     * the field clears for the next try. No sound and no mascot on a PIN gate.
+     */
+    function rejectPinInput(input, line, text) {
+        line.textContent = text;
+        line.hidden = false;
+        input.value = '';
+        input.setAttribute('aria-invalid', 'true');
+        input.addEventListener('input', () => input.removeAttribute('aria-invalid'), { once: true });
+        try {
+            const still = window.matchMedia?.('(prefers-reduced-motion: reduce)')?.matches === true;
+            if (!still && typeof input.animate === 'function') {
+                input.animate([0, -10, 10, -7, 7, -3, 0].map(x => ({ transform: `translateX(${x}px)` })), { duration: 320, easing: 'ease-out' });
+            }
+        } catch (e) {
+        }
+        try { input.focus(); } catch (e) { }
+    }
+
+    async function showPromptModal({ eyebrow = '', title, message, placeholder = '', inputType = 'text', confirmText = 'Confirm', cancelText = popupUiText('popup.modal.cancel', 'Cancel'), initialValue = '', check = null }) {
         return new Promise((resolve) => {
             const overlay = document.createElement('div');
             overlay.className = 'ft-modal-overlay';
@@ -1857,12 +1959,31 @@ document.addEventListener('DOMContentLoaded', async () => {
                 body.appendChild(msg);
             }
 
+            // inputType 'none': a question with two answers; resolves true or null.
             const input = document.createElement('input');
             input.className = 'text-input';
-            input.type = inputType;
+            input.type = inputType === 'none' ? 'hidden' : inputType;
+            // A PIN (Android PinGateActivity): eyebrow over the title, the digits centred, Unlock across
+            // the card with Cancel under it, the "Try again" line in the danger ink.
+            if (inputType === 'none') card.classList.add('is-message');
+            if (inputType === 'password') {
+                card.classList.add('is-pin');
+                card.setAttribute('role', 'dialog');
+                card.setAttribute('aria-modal', 'true');
+                input.inputMode = 'numeric';
+                input.autocomplete = 'off';
+                input.setAttribute('aria-label', placeholder || title);
+            }
             input.placeholder = placeholder;
             input.value = initialValue;
-            body.appendChild(input);
+            if (inputType !== 'none') body.appendChild(input);
+            // A wrong answer's line, read politely (the PIN gate's "Try again").
+            const errorLine = document.createElement('p');
+            errorLine.className = 'ft-modal-error';
+            errorLine.setAttribute('role', 'status');
+            errorLine.setAttribute('aria-live', 'polite');
+            errorLine.hidden = true;
+            body.appendChild(errorLine);
 
             const actions = document.createElement('div');
             actions.className = 'ft-modal-actions';
@@ -1890,7 +2011,16 @@ document.addEventListener('DOMContentLoaded', async () => {
             };
 
             cancelBtn.addEventListener('click', () => closeWith(null));
-            okBtn.addEventListener('click', () => closeWith(input.value));
+            okBtn.addEventListener('click', async () => {
+                const value = inputType === 'none' ? true : input.value;
+                if (typeof check !== 'function' || inputType === 'none') { closeWith(value); return; }
+                okBtn.disabled = true;
+                const result = await Promise.resolve(check(value)).catch(() => ({ ok: false, close: true }));
+                okBtn.disabled = false;
+                if (result?.ok) closeWith(value);
+                else if (result?.close) closeWith(null);
+                else rejectPinInput(input, errorLine, result?.message || popupUiText('people.pinTryAgain', "That PIN didn't work. Try again."));
+            });
 
             input.addEventListener('keydown', (e) => {
                 if (e.key === 'Enter') {
@@ -1945,24 +2075,39 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (!verifier) return true;
 
         const copy = getProfileAccessCopy(profilesV4, profileId);
+        // The background checks the PIN and counts wrong attempts (the same limit as the options page and
+        // the app's PIN lockout); a local check stays only for when the background can't answer. A wrong
+        // PIN shakes the field and asks again in place (Android PinGateActivity); the limit closes it.
+        let auth = null;
         const pin = await showPromptModal({
             eyebrow: copy.eyebrow,
             title: copy.title,
             message: copy.message,
             placeholder: copy.placeholder,
             inputType: 'password',
-            confirmText: popupUiText('profileAccess.unlockButton', 'Unlock')
+            confirmText: popupUiText('profileAccess.unlockButton', 'Unlock'),
+            check: async value => {
+                const entered = normalizeString(value);
+                if (!entered) return { ok: false };
+                try {
+                    auth = await sendRuntimeMessage({ action: 'FilterTube_SessionPinAuth', profileId, pin: entered });
+                } catch (e) {
+                    auth = null;
+                }
+                const ok = auth && typeof auth.ok === 'boolean' ? auth.ok : await verifyPin(entered, verifier);
+                if (ok) return { ok: true };
+                if (auth?.reason === 'rate_limited') {
+                    UIComponents.showToast(popupUiText('dashboard.toast.pinRateLimited', 'Too many incorrect PIN attempts. Try again later.'), 'error');
+                    return { ok: false, close: true };
+                }
+                return { ok: false };
+            }
         });
 
         const normalized = normalizeString(pin);
         if (!normalized) return false;
-        const ok = await verifyPin(normalized, verifier);
-        if (!ok) {
-            UIComponents.showToast(popupUiText('popup.pin.incorrect', 'Incorrect PIN'), 'error');
-            return false;
-        }
         unlockedProfiles.add(profileId);
-        await notifyBackgroundUnlocked(profileId, normalized);
+        if (!auth) await notifyBackgroundUnlocked(profileId, normalized);
         return true;
     }
 
@@ -2143,9 +2288,13 @@ document.addEventListener('DOMContentLoaded', async () => {
             nameEl.className = 'ft-profile-dropdown-name';
             nameEl.textContent = getProfileName(profilesV4, id);
 
+            // Android ProfilePickerRow: the name with a quiet role chip, then what the profile is for.
+            const role = id === 'default' ? 'parent' : (isChild ? 'kids' : 'adult');
+            const kit = window.UIComponents;
+            if (kit?.profileRoleChip) nameEl.appendChild(kit.profileRoleChip(role, popupUiText));
             const subtitleEl = document.createElement('div');
             subtitleEl.className = 'ft-profile-dropdown-subtitle';
-            subtitleEl.textContent = buildProfileSubtitle(profilesV4, id);
+            subtitleEl.textContent = kit?.profileAboutLine ? kit.profileAboutLine(role, popupUiText) : buildProfileSubtitle(profilesV4, id);
 
             meta.appendChild(nameEl);
             meta.appendChild(subtitleEl);
@@ -2176,8 +2325,14 @@ document.addEventListener('DOMContentLoaded', async () => {
         };
 
         const accountIds = getAccountIds(profilesV4);
+        const pickerTitle = document.createElement('div');
+        pickerTitle.className = 'ft-picker-title';
+        pickerTitle.setAttribute('role', 'presentation');
+        pickerTitle.textContent = popupUiText('profiles.popupTitle', 'Switch profile');
+        ftProfileDropdownPopup.appendChild(pickerTitle);
         accountIds.forEach((accountId, idx) => {
             const header = document.createElement('div');
+            if (accountIds.length < 2) header.hidden = true;
             header.className = 'ft-profile-dropdown-group';
             header.setAttribute('role', 'presentation');
             const groupKey = accountId === 'default' ? 'popup.profile.groupMaster' : 'popup.profile.groupAccount';
@@ -2197,6 +2352,27 @@ document.addEventListener('DOMContentLoaded', async () => {
             }
         });
 
+        // The picker's footer (Android ProfilePickerFooter): adding and managing open the options page,
+        // where the existing create flow and its PIN gate run.
+        const openOptions = query => {
+            try {
+                const api = typeof chrome !== 'undefined' ? chrome : browser;
+                const url = api.runtime.getURL(`html/tab-view.html?view=sync&${query}`);
+                if (api.tabs?.create) api.tabs.create({ url }); else window.open(url, '_blank');
+                window.close?.();
+            } catch (e) { }
+        };
+        const activeRole = current === 'default' ? 'parent' : (getProfileType(profilesV4, current) === 'child' ? 'kids' : 'adult');
+        const mascots = window.FilterTubeMascots;
+        const footer = window.UIComponents?.profilePickerFooter?.({
+            count: Object.keys(profiles).length, role: activeRole, selfControl: popupSelfControlSessionState?.active === true, t: popupUiText,
+            kritiSrc: mascots?.showsCharacters?.(mascots.mode) ? `../assets/images/mascots/${mascots.stillImage('kritiWave')}` : '',
+            onAddKids: () => openOptions('flow=create-kids'),
+            onAddAdult: () => openOptions('flow=create-adult'),
+            onManage: () => openOptions('flow=profiles')
+        });
+        if (footer) ftProfileDropdownPopup.appendChild(footer);
+
         positionProfileDropdown();
     }
 
@@ -2214,15 +2390,193 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
     }
 
+
+    // Switching profile during study (Android StudySwitchGate): the background decides, and reverts any
+    // switch it didn't allow; this asks for the parent's PIN or says why switching waits.
+    /**
+     * Ask a parent: a child's answer card (Android AskParentAnswerActivity). Kriti stays warm either way;
+     * a yes offers "Watch now", the parent's kind reply shows as their note. OK marks it seen.
+     */
+    async function renderAskParentAnswer() {
+        const state = await sendRuntimeMessage({ action: 'FilterTube_AskParentState' }).catch(() => null);
+        const answer = state?.isChild && Array.isArray(state.unseen) ? state.unseen[0] : null;
+        document.getElementById('ftAskParentAnswerPopup')?.remove();
+        if (!answer) return;
+        const yes = answer.decision !== 'no';
+        const name = answer.parentName || state.parentName || popupUiText('askParent.parentFallback', 'Your parent');
+        const card = document.createElement('section');
+        card.id = 'ftAskParentAnswerPopup';
+        card.className = `ft-ask-answer ${yes ? 'is-yes' : 'is-no'}`;
+        card.setAttribute('role', 'status');
+        const mascots = window.FilterTubeMascots;
+        if (mascots && mascots.showsCharacters(mascots.mode)) {
+            const pose = document.createElement('img');
+            pose.className = 'ft-ask-answer__pose';
+            pose.alt = '';
+            pose.setAttribute('aria-hidden', 'true');
+            // AskParentUi.answerCard: happy for a yes, reading when the parent wrote a note, else facing the child.
+            pose.src = `../assets/images/mascots/${mascots.stillImage(yes ? 'kritiHappy' : (answer.reply ? 'kritiReading' : 'kritiFront'))}`;
+            card.appendChild(pose);
+        }
+        const words = document.createElement('div');
+        words.className = 'ft-ask-answer__words';
+        const title = document.createElement('h3');
+        title.textContent = yes
+            ? popupUiText('askParent.answerYes', '{name} said yes!', { name })
+            : popupUiText('askParent.answerNo', 'Not this time');
+        const body = document.createElement('p');
+        body.textContent = !yes
+            ? popupUiText('askParent.answerNoBody', '{name} said not now.', { name })
+            : (answer.decision === 'channel'
+                ? popupUiText('askParent.answerChannelBody', 'You can watch “{title}” now, and more from this channel.', { title: answer.title })
+                : popupUiText('askParent.answerYesBody', 'You can watch “{title}” now.', { title: answer.title }));
+        words.append(title, body);
+        if (answer.reply) {
+            // The parent's note on washed Family paper: who wrote it, then the words in the hand font.
+            const note = document.createElement('div');
+            note.className = 'ft-ask-answer__note';
+            const from = document.createElement('span');
+            from.className = 'ft-ask-answer__note-from';
+            from.textContent = popupUiText('askParent.answerNote', 'A note from {name}', { name });
+            const said = document.createElement('span');
+            said.className = 'ft-ask-answer__note-text';
+            said.textContent = answer.reply;
+            note.append(from, said);
+            words.appendChild(note);
+        }
+        const actions = document.createElement('div');
+        actions.className = 'ft-ask-answer__actions';
+        const done = async () => {
+            await sendRuntimeMessage({ action: 'FilterTube_AskParentMarkSeen', askId: answer.id }).catch(() => null);
+            card.remove();
+            void renderAskParentAnswer();
+        };
+        if (yes && answer.videoId) {
+            const watch = document.createElement('button');
+            watch.type = 'button';
+            watch.className = 'btn-primary';
+            watch.textContent = popupUiText('askParent.answerWatch', 'Watch now');
+            watch.addEventListener('click', async () => {
+                await done();
+                try { chrome.tabs.create({ url: `https://www.youtube.com/watch?v=${encodeURIComponent(answer.videoId)}` }); } catch (e) {}
+            });
+            actions.appendChild(watch);
+        }
+        const ok = document.createElement('button');
+        ok.type = 'button';
+        ok.className = yes && answer.videoId ? 'btn-secondary' : 'btn-primary';
+        ok.textContent = popupUiText('askParent.ok', 'OK');
+        ok.addEventListener('click', done);
+        actions.appendChild(ok);
+        words.appendChild(actions);
+        card.appendChild(words);
+        const anchor = document.getElementById('ftManagedTimeStatusPopup');
+        if (anchor?.parentNode) anchor.parentNode.insertBefore(card, anchor);
+        else document.body.prepend(card);
+    }
+
+    /**
+     * Ask a parent, the parent's side: "Requests · 2" with Answer, which opens the dashboard where the
+     * Requests are answered with a fresh PIN. With the toolbar badge, this stands in for the app's
+     * notification (no `notifications` permission, so no extra install warning).
+     */
+    async function renderAskParentRequestsEntry() {
+        const data = await sendRuntimeMessage({ action: 'FilterTube_AskParentInbox' }).catch(() => null);
+        document.getElementById('ftAskParentRequestsPopup')?.remove();
+        if (!data?.isParent) return;
+        const count = ['here', 'remote', 'timeHere', 'timeRemote'].reduce((sum, key) => sum + (Array.isArray(data[key]) ? data[key].length : 0), 0);
+        if (!count) return;
+        const row = document.createElement('section');
+        row.id = 'ftAskParentRequestsPopup';
+        row.className = 'ft-ask-hub-row ft-ask-hub-row--popup';
+        const words = document.createElement('span');
+        words.className = 'ft-ask-hub-row__words';
+        words.textContent = `${popupUiText('askParent.inboxTitle', 'Requests')} · ${count}`;
+        const open = document.createElement('button');
+        open.type = 'button';
+        open.className = 'btn-primary';
+        open.textContent = popupUiText('askParent.answer', 'Answer');
+        open.addEventListener('click', () => {
+            const api = (typeof chrome !== 'undefined' && chrome.runtime) ? chrome : (typeof browser !== 'undefined' ? browser : null);
+            const url = api?.runtime?.getURL ? api.runtime.getURL('html/tab-view.html?view=dashboard') : 'html/tab-view.html?view=dashboard';
+            try { api.tabs.create({ url }); } catch (e) { window.open(url, '_blank', 'noopener,noreferrer'); }
+            try { window.close(); } catch (e) {}
+        });
+        row.append(words, open);
+        const anchor = document.getElementById('ftManagedTimeStatusPopup');
+        if (anchor?.parentNode) anchor.parentNode.insertBefore(row, anchor);
+        else document.body.prepend(row);
+    }
+
+    async function passStudySwitchGate(targetId) {
+        let decision = null;
+        try {
+            const response = await sendRuntimeMessage({ action: 'FilterTube_StudySwitchDecision', targetProfileId: targetId });
+            decision = response?.ok ? response.decision : null;
+        } catch (e) {
+            decision = null;
+        }
+        if (!decision || decision.kind === 'allowed') return true;
+        const timeLabel = Number.isFinite(decision.endsAt) && decision.endsAt > Date.now()
+            ? new Date(decision.endsAt).toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' })
+            : '';
+        if (decision.kind === 'needs_parent_pin' && decision.parentHasPin) {
+            const pin = await showPromptModal({
+                title: popupUiText('study.switch.pausedTitle', 'Profile switching is paused'),
+                message: decision.parentName
+                    ? popupUiText('study.switch.parentBody', '{name} can switch now with their PIN.', { name: decision.parentName })
+                    : popupUiText('study.switch.parentBodyGeneric', 'A parent can switch now with their PIN.'),
+                placeholder: 'PIN',
+                inputType: 'password',
+                confirmText: popupUiText('study.switch.withPin', 'Switch')
+            });
+            const normalized = normalizeString(pin);
+            if (!normalized) return false;
+            const auth = await sendRuntimeMessage({ action: 'FilterTube_StudySwitchAuthorize', targetProfileId: targetId, pin: normalized });
+            if (auth?.ok === true) return true;
+            UIComponents.showToast(auth?.reason === 'rate_limited'
+                ? popupUiText('dashboard.toast.pinRateLimited', 'Too many incorrect PIN attempts. Try again later.')
+                : popupUiText('study.switch.pinWrong', "That PIN didn't work. Try again."), 'error');
+            return false;
+        }
+        if (decision.kind === 'end_gentle_first') {
+            // Android StudySwitchGate: "End and switch" ends the session after its 30-second pause,
+            // then switches. The other profile's own PIN is typed now; the background switches later.
+            const endAndSwitch = await showPromptModal({
+                title: popupUiText('study.switch.gentleTitle', 'Switch profile?'),
+                message: popupUiText('study.switch.gentleBody', 'Your study session ends first. You can still cancel during a 30-second pause.'),
+                inputType: 'none',
+                confirmText: popupUiText('study.switch.end', 'End and switch'),
+                cancelText: popupUiText('study.switch.keep', 'Keep studying')
+            });
+            if (endAndSwitch !== true) return false;
+            const io = window.FilterTubeIO || {};
+            const profilesV4 = typeof io.loadProfilesV4 === 'function' ? await io.loadProfilesV4() : null;
+            if (!profilesV4 || !(await ensureProfileUnlocked(profilesV4, targetId))) return false;
+            const ending = await sendRuntimeMessage({ action: 'FilterTube_StudyEndGentleThenSwitch', targetProfileId: targetId });
+            UIComponents.showToast(ending?.ok
+                ? popupUiText('study.switch.ending', 'Your session ends in 30 seconds. The profile switches then.')
+                : popupUiText('study.error.generic', 'That didn\'t save. Try again.'), ending?.ok ? 'info' : 'error');
+            return false;
+        }
+        UIComponents.showToast(timeLabel
+            ? popupUiText('study.switch.locked', 'Other profiles open after {time}.', { time: timeLabel })
+            : popupUiText('study.switch.lockedNoTime', 'Other profiles open after study.'), 'error');
+        return false;
+    }
+
     async function switchToProfile(nextProfileId) {
         if (isHandlingProfileSwitch) return;
         if (popupSelfControlSessionState?.active === true) {
             UIComponents.showToast(popupUiText('popup.profile.switchLocked',
                 'Profile switching is locked until the Self-Control Session ends'), 'error');
+            // Kriti holds the "Locked until <time>" sign beside the words (a still; Companion Off: words only).
+            window.FilterTubeMascots?.lockedToast?.(popupSelfControlSessionState?.lockedUntil);
             return;
         }
         const targetId = normalizeString(nextProfileId);
         if (!targetId) return;
+        if (!(await passStudySwitchGate(targetId))) return;
 
         isHandlingProfileSwitch = true;
         try {
@@ -2257,7 +2611,11 @@ document.addEventListener('DOMContentLoaded', async () => {
             renderChannels();
             updateCheckboxes();
             applyLockGateIfNeeded();
-            UIComponents.showToast(popupUiText('popup.profile.switched', 'Profile switched'), 'success');
+            // The switch moment, once the switch has landed (Android ProfileSwitchMoment): Kriti waves at most
+            // three times a day, else the crayon check.
+            const switchedName = normalizeString(safeObject(safeObject(profilesV4Cache?.profiles)[targetId] || profiles?.[targetId]).name);
+            if (window.FilterTubeMascots?.profileSwitched && switchedName) window.FilterTubeMascots.profileSwitched(switchedName, (m, k) => UIComponents.showToast(m, k));
+            else UIComponents.showToast(popupUiText('popup.profile.switched', 'Profile switched'), 'success');
         } catch (e) {
             console.warn('Popup: profile switch failed', e);
             UIComponents.showToast(popupUiText('popup.profile.switchFailed', 'Failed to switch profile'), 'error');
@@ -2466,6 +2824,8 @@ document.addEventListener('DOMContentLoaded', async () => {
     filterContentControlsPopup();
     await refreshProfilesUI();
     updateSubscriptionsShortcut();
+    void renderAskParentAnswer();
+    void renderAskParentRequestsEntry();
 
     if (ftProfileBadgeBtnPopup && ftProfileDropdownPopup) {
         closeProfileDropdown();
@@ -2515,8 +2875,6 @@ document.addEventListener('DOMContentLoaded', async () => {
             filterContentControlsPopup();
         });
     }
-
-    let isPopupChannelAddInProgress = false;
 
     // Add keyword
     if (addKeywordBtn) {

@@ -279,3 +279,32 @@ test('the admission overlay renders the study card with Back to study in the top
     const embeddedCard = embedded.overlay.children.find(child => child.attributes['data-filtertube-study-card']);
     assert.equal(embeddedCard.children[4].children.length, 0, 'an embedded player gets no navigation button');
 });
+
+test('"Skip this video" shows on a watch page during STUDY and asks the background to hide it for good', async () => {
+    const dom = fakeDom();
+    const sent = [];
+    const overlay = createStudyOverlay({
+        window: { addEventListener() {}, location: { href: 'https://www.youtube.com/watch?v=abcdEFGH123', pathname: '/watch' } },
+        document: dom.doc,
+        runtime: { sendMessage: async message => { sent.push(message); return { ok: true }; }, onMessage: { addListener() {} } },
+        now: () => 1_000_000, setTimeout: () => 0, clearTimeout: () => {}, setInterval: () => 0
+    });
+    overlay.setState({ state: 'NORMAL' });
+    assert.equal(dom.nodes.get('filtertube-study-skip'), undefined, 'outside study there is nothing to skip');
+    overlay.setState({ state: 'STUDY', until: 1_200_000 });
+    const skip = dom.nodes.get('filtertube-study-skip');
+    assert.ok(skip);
+    assert.equal(skip.textContent, 'Skip this video');
+    skip.handlers.click();
+    await new Promise(resolve => setImmediate(resolve));
+    assert.deepEqual(sent.find(message => message.action === 'FilterTube_StudySkipVideo'), { action: 'FilterTube_StudySkipVideo', videoId: 'abcdEFGH123' });
+    assert.equal(dom.nodes.get('filtertube-study-skip'), undefined);
+    assert.match(dom.nodes.get(NOTICE_ID).textContent, /Skipped/);
+    overlay.setState({ state: 'BREAK', breakMode: 'rest', until: 1_300_000 });
+    assert.equal(dom.nodes.get('filtertube-study-skip'), undefined, 'a rest break shows its own card instead');
+    overlay.setState({ state: 'STUDY', until: 1_200_000 });
+    assert.ok(dom.nodes.get('filtertube-study-skip'));
+    dom.doc.querySelector = selector => (selector.includes('direct-access-overlay-host') ? {} : null);
+    overlay.renderSkip();
+    assert.equal(dom.nodes.get('filtertube-study-skip'), undefined, 'a video the watch gate holds back has nothing to skip');
+});

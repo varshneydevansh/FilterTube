@@ -261,3 +261,18 @@ test('StudyTighten rules: packs, edits, plan window, limit, music, breaks, focus
   assert.deepEqual(plain(merged.activePackIds), ['a', 'b'], 'Merge holds a loosening change while the parent plan runs');
   assert.deepEqual(plain(merged.progress), { other: { '2026-11-15': 30 } }, 'progress still merges');
 });
+
+test('a parent\'s lock during a Self-Control session waits unwritten and unacknowledged, then applies (Android commitProfiles)', async () => {
+  const r = receiver({ version: 1, activePackIds: ['in_upsc_cse'], lock: null });
+  const lock = { sessionId: 'exam-week', sessionKind: 'hard_whitelist', mode: 'locked', startsAt: 1779300000000, endsAt: 1779307200000 };
+  const envelope = envelopeFor('focus_lock', { scope: 'focus_lock', lock }, 1);
+  const held = await r.adapter.applyManagedPolicyEnvelope(envelope, { ...context(r, ['time_limits']), selfControlActive: async () => true });
+  assert.equal(held.accepted, false);
+  assert.equal(held.reason, 'self_control_active');
+  assert.equal(held.ackState, 'pending', 'never acknowledged as rejected, so it comes again');
+  assert.equal(r.study().lock, null, 'nothing is written while the session holds the profile');
+  const later = await r.adapter.applyManagedPolicyEnvelope(envelope, { ...context(r, ['time_limits']), selfControlActive: async () => false });
+  assert.equal(later.accepted, true, later.reason);
+  assert.equal(r.study().lock.sessionId, 'exam-week');
+  assert.equal(r.study().lock.setByParentId, 'parent-profile-1');
+});

@@ -1,0 +1,1254 @@
+/* Second PaperKit pass: the extension's own pages in the app's exact visual language
+ * (PaperKit.kt, ControlsPaper.kt, StudyPaper.kt, BrandPalette.kt; docs/app/design-system/PAPERKIT.md).
+ * Loaded last. Colour only from the --pk-* tokens (css/paperkit.css), crayon edges from
+ * css/paperkit-edges.css. It restyles; it never hides a control or changes what is saved.
+ *
+ * What the app does, and so what this does:
+ * - Type: Delius for page titles, card titles, section headers and numerals; Outfit 600 for button
+ *   labels; the system face for reading (Roboto on Android). No uppercase eyebrows.
+ * - Cards: paper sheets with a wobbly crayon edge (20 px corners) and a second sheet peeking 3 px
+ *   below. Tiles and chips wear their area's hue; brick is the only action colour.
+ * - Buttons: the brick pill standing on its 3 px ledge (sinks onto it when pressed); the paper
+ *   secondary on a 2 px ledge. 52 px and 48 px tall.
+ * - Fields: desk-coloured, 16 px corners. Switches: the area ink when on, with a check in the thumb.
+ * - Glass, glows and blur are gone: paper, not glass, for anything you read or press.
+ */
+
+:root {
+  --ft-font-family-base: system-ui, Roboto, "Segoe UI", -apple-system, "Helvetica Neue", Arial, sans-serif;
+  --pk-font-label: "FilterTube Outfit", "Outfit", system-ui, sans-serif;
+  --pk-ledge-brick: #76291f;
+  --pk-area-wash: var(--pk-paper);
+  --pk-area-ink: var(--pk-brick);
+  --pk-area-edge: var(--pk-edge-line);
+  --pk-tick: var(--pk-brick);
+  --pk-switch-on: var(--pk-plum);
+  --pk-crayon-check: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M5.2 12.6c1.4 1.3 2.6 2.7 3.9 4.3 2.6-4.2 5.8-7.9 9.8-10.6' fill='none' stroke='%23000' stroke-width='2.6' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+  --pk-crayon-tick: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 28 6'%3E%3Cpath d='M1.6 4.2C7 3.9 14 3.4 26.4 2.6' fill='none' stroke='%23000' stroke-width='3' stroke-linecap='round'/%3E%3C/svg%3E");
+}
+:root[data-theme="dark"] { --pk-ledge-brick: #4a1712; }
+
+/* The area of the open page (js/paperkit_parity.js). */
+:root[data-pk-area="filters"] { --pk-area-wash: var(--pk-rose); --pk-area-ink: var(--pk-brick); --pk-area-edge: var(--pk-edge-filters); --pk-tick: var(--pk-brick); --pk-switch-on: var(--pk-brick); }
+:root[data-pk-area="content"] { --pk-area-wash: var(--pk-sky); --pk-area-ink: var(--pk-sky-ink); --pk-area-edge: var(--pk-edge-content); --pk-tick: var(--pk-sky-ink); --pk-switch-on: var(--pk-sky-ink); }
+:root[data-pk-area="kids"] { --pk-area-wash: var(--pk-sun-wash); --pk-area-ink: var(--pk-sun-ink); --pk-area-edge: var(--pk-edge-kids); --pk-tick: var(--pk-sun-ink); --pk-switch-on: var(--pk-sun-ink); }
+:root[data-pk-area="study"] { --pk-area-wash: var(--pk-sage); --pk-area-ink: var(--pk-sage-ink); --pk-area-edge: var(--pk-edge-study); --pk-tick: var(--pk-sage-ink); --pk-switch-on: var(--pk-sage-ink); }
+:root[data-pk-area="family"] { --pk-area-wash: var(--pk-lilac); --pk-area-ink: var(--pk-plum); --pk-area-edge: var(--pk-edge-family); --pk-tick: var(--pk-plum); --pk-switch-on: var(--pk-plum); }
+
+/* ---------------------------------------------------------------------------
+   Page: cream canvas over the theme video with the app's scrim
+   (NativeHeroBackground: paper at 95%, 85%, 55% from top-start to bottom-end).
+   --------------------------------------------------------------------------- */
+body.ft-extension-surface {
+  font-family: var(--ft-font-family-base) !important;
+  letter-spacing: 0;
+}
+:root[data-page-tone][data-theme] body.ft-extension-surface[data-surface="tab-view"] {
+  background: var(--pk-canvas) !important;
+  color: var(--pk-ink) !important;
+}
+body.ft-extension-surface .ft-tab-view-ambient__media {
+  background: url("../assets/images/homepage_hero_poster.webp") center / cover no-repeat;
+}
+:root[data-page-tone][data-theme] body.ft-extension-surface[data-surface] .ft-tab-view-ambient__media-scrim {
+  background: linear-gradient(135deg,
+    color-mix(in srgb, var(--pk-canvas) 95%, transparent) 0%,
+    color-mix(in srgb, var(--pk-canvas) 85%, transparent) 50%,
+    color-mix(in srgb, var(--pk-canvas) 55%, transparent) 100%) !important;
+}
+
+/* ---------------------------------------------------------------------------
+   Paper sheets with a crayon edge and a sheet beneath (StudyPaper.card)
+   --------------------------------------------------------------------------- */
+body.ft-extension-surface .sidebar,
+body.ft-extension-surface .top-bar,
+body.ft-extension-surface .card,
+body.ft-extension-surface .settings-card,
+body.ft-extension-surface .view-hero,
+body.ft-extension-surface .content-control-group,
+body.ft-extension-surface .help-technical-card,
+body.ft-extension-surface .help-start-card,
+body.ft-extension-surface .nanah-delivery-card,
+body.ft-extension-surface .pk-today,
+body.ft-extension-surface .ft-dash-status,
+body.ft-extension-surface #viewContainer > .view-section > .view-shell > .card,
+:root[data-page-tone][data-theme] body.ft-extension-surface[data-surface] .card,
+:root[data-page-tone][data-theme] body.ft-extension-surface[data-surface] .view-hero,
+:root[data-page-tone][data-theme] body.ft-extension-surface[data-surface] .content-control-group,
+:root[data-page-tone][data-theme] body.ft-extension-surface[data-surface] .settings-card {
+  background: var(--pk-paper) !important;
+  border: 1.5px solid transparent !important;
+  border-image: var(--pk-edge-line) 20 / 20px / 0 round !important;
+  border-radius: 20px !important;
+  box-shadow: 2px 3px 0 0 var(--pk-desk), 2px 3px 0 1px color-mix(in srgb, var(--pk-line) 60%, transparent) !important;
+  -webkit-backdrop-filter: none !important;
+  backdrop-filter: none !important;
+}
+/* The glass glows and sheens that used to sit on these are gone. */
+body.ft-extension-surface .sidebar::before,
+body.ft-extension-surface .sidebar::after,
+body.ft-extension-surface .card::before,
+body.ft-extension-surface .card::after,
+body.ft-extension-surface .view-hero::after,
+body.ft-extension-surface .view-hero::before {
+  display: none !important;
+}
+/* The main column is the page itself, not a frosted panel. */
+body.ft-extension-surface .view-container,
+:root[data-page-tone][data-theme] body.ft-extension-surface[data-surface] .view-container {
+  background: transparent !important;
+  border: 0 !important;
+  box-shadow: none !important;
+  -webkit-backdrop-filter: none !important;
+  backdrop-filter: none !important;
+}
+/* Cards inside cards stay flat (the app never stacks a sheet on a sheet). */
+body.ft-extension-surface .card .card,
+body.ft-extension-surface .settings-card .card,
+body.ft-extension-surface .content-control-group .content-control-group {
+  box-shadow: none !important;
+}
+
+/* ---------------------------------------------------------------------------
+   Type
+   --------------------------------------------------------------------------- */
+body.ft-extension-surface .top-bar #pageTitle,
+body.ft-extension-surface .view-hero__title,
+body.ft-extension-surface .card-header h2,
+body.ft-extension-surface .card-header h3,
+body.ft-extension-surface .settings-card h2,
+body.ft-extension-surface .settings-card h3,
+body.ft-extension-surface .content-control-group__title,
+body.ft-extension-surface .section-header h2,
+body.ft-extension-surface .ft-dash-apps__title,
+body.ft-extension-surface .stat-value,
+body.ft-extension-surface .ft-dash-status__name,
+body.ft-extension-surface .pk-support__title,
+body.ft-extension-surface .pk-duo-card__title,
+:root[data-page-tone][data-theme] body.ft-extension-surface[data-surface] .view-hero__title,
+:root[data-page-tone][data-theme] body.ft-extension-surface[data-surface] .top-bar #pageTitle {
+  font-family: var(--pk-font-hand) !important;
+  font-weight: 400 !important;
+  letter-spacing: 0 !important;
+  font-variation-settings: normal;
+}
+body.ft-extension-surface .top-bar #pageTitle { font-size: 30px !important; line-height: 1.15 !important; }
+body.ft-extension-surface .view-hero__title,
+:root[data-page-tone][data-theme] body.ft-extension-surface[data-surface] .view-hero__title {
+  font-size: clamp(24px, 2.4vw, 30px) !important;
+  line-height: 1.22 !important;
+  max-width: 34ch;
+}
+body.ft-extension-surface .view-hero__body { font-size: 15px !important; line-height: 1.5 !important; color: var(--pk-muted) !important; }
+/* Eyebrows are compact section headers in the app: sentence case, never shouted. */
+body.ft-extension-surface .view-hero__eyebrow,
+body.ft-extension-surface .ft-about-eyebrow,
+body.ft-extension-surface .nanah-delivery-card__eyebrow,
+body.ft-extension-surface .stat-label,
+body.ft-extension-surface .ft-dash-status__label,
+:root[data-page-tone][data-theme] body.ft-extension-surface[data-surface] .view-hero__eyebrow {
+  text-transform: none !important;
+  letter-spacing: 0 !important;
+  font-size: 13px !important;
+  font-weight: 600 !important;
+  color: var(--pk-muted) !important;
+}
+/* The marketing pills under the old heroes are not part of the app's language. */
+body.ft-extension-surface .view-hero__meta { display: none !important; }
+
+/* Card titles and section headers: Delius with a short crayon tick in the area's ink
+   (PaperKit.sectionHeader: 19 sp, a 28 dp tick 3 dp thick). */
+body.ft-extension-surface .content-control-group__title,
+body.ft-extension-surface .card-header h2,
+body.ft-extension-surface .card-header h3,
+body.ft-extension-surface .settings-card > h3,
+body.ft-extension-surface .settings-card__body > h3 {
+  position: relative;
+  font-size: 20px !important;
+  line-height: 1.2 !important;
+  color: var(--pk-ink) !important;
+  padding-bottom: 12px !important;
+}
+body.ft-extension-surface .content-control-group__title::after,
+body.ft-extension-surface .card-header h2::after,
+body.ft-extension-surface .card-header h3::after,
+body.ft-extension-surface .settings-card > h3::after,
+body.ft-extension-surface .settings-card__body > h3::after {
+  content: "";
+  position: absolute;
+  inset-inline-start: 0;
+  bottom: 0;
+  width: 28px;
+  height: 6px;
+  background: var(--pk-tick);
+  -webkit-mask: var(--pk-crayon-tick) center / contain no-repeat;
+  mask: var(--pk-crayon-tick) center / contain no-repeat;
+}
+
+/* ---------------------------------------------------------------------------
+   Sidebar and top bar: paper, the open page washed in its area
+   --------------------------------------------------------------------------- */
+body.ft-extension-surface .sidebar .nav-item {
+  border-radius: 14px !important;
+  background: transparent !important;
+  box-shadow: none !important;
+}
+body.ft-extension-surface .sidebar .nav-item.active:not([aria-current="page"]) {
+  background: transparent !important;
+  border: 1.5px solid transparent !important;
+}
+body.ft-extension-surface .sidebar .nav-item.active[aria-current="page"] {
+  background: var(--pk-area-wash) !important;
+  color: var(--pk-ink) !important;
+  border: 1.5px solid color-mix(in srgb, var(--pk-area-ink) 45%, transparent) !important;
+}
+body.ft-extension-surface .sidebar .nav-item.active[aria-current="page"] .nav-label { color: var(--pk-area-ink) !important; font-weight: 700 !important; }
+body.ft-extension-surface .sidebar .nav-item.active[aria-current="page"] .nav-icon { color: var(--pk-area-ink) !important; }
+body.ft-extension-surface .sidebar .nav-item.active::before { display: none !important; }
+body.ft-extension-surface .sidebar .nav-item:hover:not(.active) { background: color-mix(in srgb, var(--pk-ink) 6%, transparent) !important; }
+body.ft-extension-surface .sidebar .nav-label { font-weight: 600; }
+body.ft-extension-surface .sidebar .brand {
+  background: transparent !important;
+  box-shadow: none !important;
+  border: 0 !important;
+}
+body.ft-extension-surface .sidebar .brand-name { font-family: var(--pk-font-hand) !important; font-weight: 400 !important; font-size: 24px !important; }
+body.ft-extension-surface .nav-divider { border-color: var(--pk-line) !important; background: var(--pk-line) !important; opacity: 0.8; }
+
+/* ---------------------------------------------------------------------------
+   Buttons (PaperKit.style)
+   --------------------------------------------------------------------------- */
+body.ft-extension-surface .btn-primary,
+:root[data-page-tone][data-theme] body.ft-extension-surface[data-surface] .btn-primary {
+  background: var(--pk-brick-fill) !important;
+  color: var(--pk-on-brick-fill) !important;
+  border: 0 !important;
+  border-radius: 999px !important;
+  min-height: 52px;
+  padding-inline: 24px !important;
+  font-family: var(--pk-font-label) !important;
+  font-weight: 600 !important;
+  font-size: 16px !important;
+  letter-spacing: 0 !important;
+  text-transform: none !important;
+  box-shadow: 0 3px 0 0 var(--pk-ledge-brick) !important;
+  transform: none;
+  transition: transform 90ms cubic-bezier(0.16, 1, 0.3, 1), box-shadow 90ms cubic-bezier(0.16, 1, 0.3, 1) !important;
+}
+body.ft-extension-surface .btn-primary:hover:not(:disabled) { filter: brightness(1.05); }
+body.ft-extension-surface .btn-primary:active:not(:disabled) {
+  transform: translateY(3px) !important;
+  box-shadow: 0 0 0 0 var(--pk-ledge-brick) !important;
+}
+body.ft-extension-surface .btn-secondary,
+:root[data-page-tone][data-theme] body.ft-extension-surface[data-surface] .btn-secondary {
+  background: var(--pk-paper) !important;
+  color: var(--pk-ink) !important;
+  border: 1.5px solid color-mix(in srgb, var(--pk-muted) 70%, transparent) !important;
+  border-radius: 999px !important;
+  min-height: 44px;
+  font-family: var(--pk-font-label) !important;
+  font-weight: 600 !important;
+  letter-spacing: 0 !important;
+  text-transform: none !important;
+  box-shadow: 0 2px 0 0 var(--pk-line) !important;
+  transition: transform 90ms cubic-bezier(0.16, 1, 0.3, 1), box-shadow 90ms cubic-bezier(0.16, 1, 0.3, 1) !important;
+}
+body.ft-extension-surface .btn-secondary:active:not(:disabled) {
+  transform: translateY(2px) !important;
+  box-shadow: 0 0 0 0 var(--pk-line) !important;
+}
+body.ft-extension-surface .btn-primary:focus-visible,
+body.ft-extension-surface .btn-secondary:focus-visible,
+body.ft-extension-surface .pk-tile:focus-visible {
+  outline: 3px solid var(--pk-ink) !important;
+  outline-offset: 2px !important;
+}
+
+/* ---------------------------------------------------------------------------
+   Fields (PaperKit.styleField: desk fill, 16 dp corners, 48 dp tall)
+   --------------------------------------------------------------------------- */
+body.ft-extension-surface .text-input,
+body.ft-extension-surface .select-input,
+body.ft-extension-surface #viewContainer input[type="text"],
+body.ft-extension-surface #viewContainer input[type="search"],
+body.ft-extension-surface #viewContainer input[type="number"],
+body.ft-extension-surface #viewContainer input[type="date"],
+body.ft-extension-surface #viewContainer textarea,
+:root[data-page-tone][data-theme] body.ft-extension-surface[data-surface] .text-input,
+:root[data-page-tone][data-theme] body.ft-extension-surface[data-surface] .select-input {
+  background: color-mix(in srgb, var(--pk-desk) 82%, var(--pk-paper)) !important;
+  color: var(--pk-ink) !important;
+  border: 1.5px solid var(--pk-line) !important;
+  border-radius: 16px !important;
+  min-height: 48px;
+  box-shadow: none !important;
+  font-family: var(--ft-font-family-base) !important;
+}
+body.ft-extension-surface .text-input:focus,
+body.ft-extension-surface .select-input:focus,
+body.ft-extension-surface #viewContainer input:focus-visible,
+body.ft-extension-surface #viewContainer textarea:focus-visible {
+  border-color: var(--pk-area-ink) !important;
+  outline: 2px solid color-mix(in srgb, var(--pk-area-ink) 35%, transparent) !important;
+  outline-offset: 1px;
+}
+
+/* ---------------------------------------------------------------------------
+   Switches (PaperKit.switch: the area ink when on, a check in the thumb; a muted thumb when off)
+   --------------------------------------------------------------------------- */
+body.ft-extension-surface .switch .slider,
+:root[data-page-tone][data-theme] body.ft-extension-surface[data-surface] .switch .slider {
+  background: var(--pk-track) !important;
+  border: 1.5px solid color-mix(in srgb, var(--pk-ink) 40%, transparent) !important;
+  box-shadow: none !important;
+}
+body.ft-extension-surface .switch .slider::before,
+:root[data-page-tone][data-theme] body.ft-extension-surface[data-surface] .switch .slider::before {
+  background: color-mix(in srgb, var(--pk-ink) 62%, var(--pk-paper)) !important;
+  border: 0 !important;
+  box-shadow: none !important;
+  height: 20px !important;
+  width: 20px !important;
+  left: 3px !important;
+  transition: transform 220ms cubic-bezier(0.65, 0, 0.35, 1), background-color 120ms linear !important;
+}
+body.ft-extension-surface .switch input:checked + .slider,
+:root[data-page-tone][data-theme] body.ft-extension-surface[data-surface] .switch input:checked + .slider {
+  background: var(--pk-switch-on) !important;
+  border-color: var(--pk-switch-on) !important;
+}
+body.ft-extension-surface .switch input:checked + .slider::before,
+:root[data-page-tone][data-theme] body.ft-extension-surface[data-surface] .switch input:checked + .slider::before {
+  background: var(--pk-paper) var(--pk-switch-check) center / 14px no-repeat !important;
+  transform: translate(25px, -50%) !important;
+}
+/* The thumb's check: the area ink drawn on paper (an SVG per area, as masks cannot go in a pseudo's background). */
+:root { --pk-switch-check: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M5.2 12.6c1.4 1.3 2.6 2.7 3.9 4.3 2.6-4.2 5.8-7.9 9.8-10.6' fill='none' stroke='%235b3aa4' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E"); }
+:root[data-pk-area="content"] { --pk-switch-check: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M5.2 12.6c1.4 1.3 2.6 2.7 3.9 4.3 2.6-4.2 5.8-7.9 9.8-10.6' fill='none' stroke='%231f5f86' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E"); }
+:root[data-pk-area="filters"] { --pk-switch-check: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M5.2 12.6c1.4 1.3 2.6 2.7 3.9 4.3 2.6-4.2 5.8-7.9 9.8-10.6' fill='none' stroke='%23a93e31' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E"); }
+:root[data-pk-area="kids"] { --pk-switch-check: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M5.2 12.6c1.4 1.3 2.6 2.7 3.9 4.3 2.6-4.2 5.8-7.9 9.8-10.6' fill='none' stroke='%235a3a07' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E"); }
+:root[data-pk-area="study"] { --pk-switch-check: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M5.2 12.6c1.4 1.3 2.6 2.7 3.9 4.3 2.6-4.2 5.8-7.9 9.8-10.6' fill='none' stroke='%2328623f' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E"); }
+@media (prefers-reduced-motion: reduce) {
+  body.ft-extension-surface .switch .slider::before { transition: none !important; }
+}
+
+/* The status line under each content control ("Hidden everywhere" / "Showing"). */
+.pk-toggle-status {
+  display: block;
+  margin-top: 2px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--pk-muted);
+}
+.pk-toggle-status.is-on { color: var(--pk-area-ink); }
+body.ft-extension-surface .content-control-group .toggle-row {
+  background: transparent !important;
+  border: 0 !important;
+  border-bottom: 1.5px solid transparent !important;
+  border-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 4'%3E%3Cpath d='M0 2.2C10 1.2 20 3 40 1.9' fill='none' stroke='%23dcd1c2' stroke-width='1.4'/%3E%3C/svg%3E") 0 0 4 0 / 0 0 4px 0 stretch !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+}
+:root[data-theme="dark"] body.ft-extension-surface .content-control-group .toggle-row {
+  border-image-source: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 4'%3E%3Cpath d='M0 2.2C10 1.2 20 3 40 1.9' fill='none' stroke='%232a3440' stroke-width='1.4'/%3E%3C/svg%3E") !important;
+}
+body.ft-extension-surface .content-control-group .toggle-row:last-child { border-image: none !important; border-bottom: 0 !important; }
+body.ft-extension-surface .toggle-title { font-size: 16px !important; font-weight: 600 !important; color: var(--pk-ink) !important; }
+
+/* ---------------------------------------------------------------------------
+   Tabs and the Blocked / Allowed segments (FiltersActivity tabs; ControlsPaper.styleSegment)
+   --------------------------------------------------------------------------- */
+body.ft-extension-surface .tab-buttons,
+:root[data-page-tone][data-theme] body.ft-extension-surface[data-surface] .tab-buttons {
+  background: var(--pk-lilac) !important;
+  border: 1.5px solid transparent !important;
+  border-image: var(--pk-edge-line) 20 / 20px / 0 round !important;
+  border-radius: 20px !important;
+  padding: 4px 8px !important;
+  box-shadow: none !important;
+}
+body.ft-extension-surface .tab-buttons .tab-button,
+:root[data-page-tone][data-theme] body.ft-extension-surface[data-surface] .tab-buttons .tab-button {
+  background: transparent !important;
+  color: var(--pk-muted) !important;
+  font-weight: 700 !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  position: relative;
+}
+body.ft-extension-surface .tab-buttons .tab-button.active,
+:root[data-page-tone][data-theme] body.ft-extension-surface[data-surface] .tab-buttons .tab-button.active {
+  color: var(--pk-ink) !important;
+  background: transparent !important;
+}
+body.ft-extension-surface .tab-buttons .tab-button.active::after {
+  content: "";
+  position: absolute;
+  inset-inline: 18%;
+  bottom: 2px;
+  height: 5px;
+  background: var(--pk-brick);
+  -webkit-mask: var(--pk-crayon-tick) center / 100% 100% no-repeat;
+  mask: var(--pk-crayon-tick) center / 100% 100% no-repeat;
+}
+body.ft-extension-surface .ft-rule-target-tabs {
+  background: transparent !important;
+  border: 0 !important;
+  box-shadow: none !important;
+  gap: 0 !important;
+}
+body.ft-extension-surface .ft-rule-target-tab {
+  position: relative;
+  background: var(--pk-paper) !important;
+  color: var(--pk-muted) !important;
+  border: 1.5px solid var(--pk-line) !important;
+  min-height: 48px;
+  box-shadow: none !important;
+  font-weight: 600 !important;
+}
+body.ft-extension-surface .ft-rule-target-tab:first-child { border-radius: 999px 0 0 999px !important; }
+body.ft-extension-surface .ft-rule-target-tab:last-child { border-radius: 0 999px 999px 0 !important; }
+[dir="rtl"] body.ft-extension-surface .ft-rule-target-tab:first-child { border-radius: 0 999px 999px 0 !important; }
+[dir="rtl"] body.ft-extension-surface .ft-rule-target-tab:last-child { border-radius: 999px 0 0 999px !important; }
+body.ft-extension-surface .ft-rule-target-tab.is-active {
+  background: var(--pk-rose) !important;
+  color: var(--pk-brick) !important;
+  border-color: color-mix(in srgb, var(--pk-brick) 55%, transparent) !important;
+}
+
+/* ---------------------------------------------------------------------------
+   The Controls hub (dashboard): today card and area tiles
+   --------------------------------------------------------------------------- */
+#dashboardView:has(.pk-hub) .ft-dash-stats,
+#dashboardView:has(.pk-hub) .dashboard-actions { display: none !important; }
+
+.pk-hub { display: grid; gap: 18px; margin-block: 8px 28px; }
+.pk-today {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  padding: 18px 22px !important;
+}
+.pk-today__number {
+  position: relative;
+  flex: none;
+  min-width: 56px;
+  padding-bottom: 10px;
+  text-align: center;
+  font-family: var(--pk-font-hand);
+  font-size: 46px;
+  line-height: 1;
+  color: var(--pk-ink);
+  font-variant-numeric: tabular-nums;
+}
+.pk-today__words { display: grid; gap: 4px; min-width: 0; }
+.pk-today__title { font-size: 17px; font-weight: 700; color: var(--pk-ink); }
+.pk-today__detail { font-size: 14px; color: var(--pk-muted); }
+
+.pk-hub__grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 14px;
+}
+.pk-tile {
+  --pk-tile-wash: var(--pk-paper);
+  --pk-tile-ink: var(--pk-brick);
+  --pk-tile-edge: var(--pk-edge-line);
+  position: relative;
+  display: grid;
+  grid-template-rows: auto 1fr auto auto;
+  align-content: start;
+  gap: 4px;
+  min-height: 150px;
+  padding: 16px 18px 16px;
+  text-align: start;
+  color: var(--pk-ink);
+  background: var(--pk-paper);
+  border: 1.5px solid transparent;
+  border-image: var(--pk-tile-edge) 20 / 18px / 0 round;
+  border-radius: 18px;
+  cursor: pointer;
+  font: inherit;
+  transition: transform 90ms cubic-bezier(0.16, 1, 0.3, 1), background-color 120ms linear;
+}
+.pk-tile[data-area="filters"] { --pk-tile-wash: var(--pk-rose); --pk-tile-ink: var(--pk-brick); --pk-tile-edge: var(--pk-edge-filters); }
+.pk-tile[data-area="content"] { --pk-tile-wash: var(--pk-sky); --pk-tile-ink: var(--pk-sky-ink); --pk-tile-edge: var(--pk-edge-content); }
+.pk-tile[data-area="kids"] { --pk-tile-wash: var(--pk-sun-wash); --pk-tile-ink: var(--pk-sun-ink); --pk-tile-edge: var(--pk-edge-kids); }
+.pk-tile[data-area="study"] { --pk-tile-wash: var(--pk-sage); --pk-tile-ink: var(--pk-sage-ink); --pk-tile-edge: var(--pk-edge-study); }
+.pk-tile[data-area="family"] { --pk-tile-ink: var(--pk-plum); --pk-tile-edge: var(--pk-edge-family); }
+.pk-tile.is-washed { background: var(--pk-tile-wash); }
+.pk-tile:hover { background: color-mix(in srgb, var(--pk-tile-wash) 70%, var(--pk-paper)); }
+.pk-tile.is-washed:hover { background: color-mix(in srgb, var(--pk-tile-wash) 88%, var(--pk-tile-ink)); }
+.pk-tile:active { transform: scale(0.98); }
+.pk-tile:active .pk-tile__ring { transform: translateY(-2px); }
+.pk-tile__head { display: flex; align-items: flex-start; justify-content: space-between; min-height: 44px; }
+.pk-tile__ring {
+  position: relative;
+  display: inline-grid;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  color: var(--pk-tile-ink);
+  transition: transform 90ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+.pk-tile__ring svg { position: absolute; inset: 0; width: 100%; height: 100%; }
+.pk-tile__ring path { fill: none; stroke: currentColor; stroke-width: 1.6; stroke-linecap: round; }
+.pk-tile__icon {
+  width: 23px;
+  height: 23px;
+  background: currentColor;
+  -webkit-mask: var(--pk-tile-icon) center / contain no-repeat;
+  mask: var(--pk-tile-icon) center / contain no-repeat;
+}
+.pk-tile.is-washed .pk-tile__icon {
+  -webkit-mask-image: var(--pk-tile-icon-on);
+  mask-image: var(--pk-tile-icon-on);
+}
+.pk-tile__count {
+  font-family: var(--pk-font-hand);
+  font-size: 26px;
+  line-height: 1;
+  color: var(--pk-tile-ink);
+  font-variant-numeric: tabular-nums;
+}
+.pk-tile__title {
+  align-self: end;
+  margin-top: 18px;
+  font-family: var(--pk-font-hand);
+  font-size: 20px;
+  line-height: 1.2;
+}
+.pk-tile__sub { font-size: 14px; line-height: 1.35; color: var(--pk-muted); }
+.pk-tile__badge {
+  justify-self: start;
+  margin-top: 6px;
+  padding: 3px 10px 3px 8px;
+  border-radius: 999px;
+  border: 1.5px solid color-mix(in srgb, var(--pk-sage-ink) 45%, transparent);
+  background: var(--pk-sage);
+  color: var(--pk-sage-ink);
+  font-size: 13px;
+  font-weight: 700;
+}
+.pk-tile__badge::before { content: "✓ "; }
+.pk-tile__badge[hidden] { display: none; }
+
+@media (prefers-reduced-motion: reduce) {
+  .pk-tile, .pk-tile__ring { transition: none; }
+  .pk-tile:active { transform: none; }
+}
+
+/* ---------------------------------------------------------------------------
+   Doodles (js/doodles.js): masks tinted brick or the area ink
+   --------------------------------------------------------------------------- */
+@property --pk-doodle-sweep {
+  syntax: "<angle>";
+  inherits: false;
+  initial-value: 360deg;
+}
+.pk-doodle-host { position: relative; }
+.pk-doodle-mark {
+  display: inline-block;
+  pointer-events: none;
+  background: var(--pk-doodle-ink, var(--pk-brick));
+  -webkit-mask: var(--pk-doodle-art) center / contain no-repeat;
+  mask: var(--pk-doodle-art) center / contain no-repeat;
+}
+.pk-doodle-mark--check { width: 28px; height: 28px; flex: none; }
+.pk-doodle-mark--underline {
+  position: absolute;
+  inset-inline: 2px;
+  bottom: -4px;
+  height: 12px;
+  -webkit-mask-size: 100% 100%;
+  mask-size: 100% 100%;
+}
+.pk-doodle-mark--scribble {
+  position: absolute;
+  inset: -6px -10px;
+  --pk-doodle-ink: var(--pk-plum);
+  -webkit-mask: var(--pk-doodle-art) center / 100% 100% no-repeat, conic-gradient(#000 var(--pk-doodle-sweep), transparent 0);
+  -webkit-mask-composite: source-in;
+  mask: var(--pk-doodle-art) center / 100% 100% no-repeat, conic-gradient(#000 var(--pk-doodle-sweep), transparent 0);
+  mask-composite: intersect;
+}
+.ft-toast .pk-toast-check { --pk-doodle-ink: currentColor; margin-inline-end: 4px; }
+
+/* Mascot idle sparkle (MascotIdle SPARKLE) and the loading moment's 600 ms wait. */
+.pk-idle-host { position: relative; }
+.pk-idle-sparkle {
+  position: absolute;
+  top: 2px;
+  inset-inline-end: -4px;
+  width: 18px;
+  height: 18px;
+  pointer-events: none;
+}
+.pk-moment.is-waiting .pk-moment__art,
+.pk-moment.is-waiting .pk-moment__line { visibility: hidden; }
+
+/* ---------------------------------------------------------------------------
+   Popup: the same paper and crayon
+   --------------------------------------------------------------------------- */
+body.ft-extension-surface[data-surface="popup"] .ft-popup-header,
+body.ft-extension-surface[data-surface="popup"] .popup-card,
+body.ft-extension-surface[data-surface="popup"] .ft-popup-card {
+  -webkit-backdrop-filter: none !important;
+  backdrop-filter: none !important;
+}
+
+/* Night: the thumb is light, so the area's check on it stays readable. */
+:root[data-theme="dark"] body.ft-extension-surface .switch input:checked + .slider::before {
+  background-color: var(--pk-ink) !important;
+}
+
+/* Popup (392 px): the app's Controls header and paper rows. The frame is the cream canvas over the
+   theme video's still, with the same scrim as the pages; every panel is paper with a crayon edge. */
+body.ft-extension-surface[data-surface="popup"] .ft-popup-shell__ambient,
+body.ft-extension-surface[data-surface="popup"] .ft-popup-shell__video-tint { display: none !important; }
+:root[data-page-tone][data-theme] body.ft-extension-surface[data-surface="popup"] .ft-popup-shell__video-scrim {
+  background: linear-gradient(160deg,
+    color-mix(in srgb, var(--pk-canvas) 92%, transparent) 0%,
+    color-mix(in srgb, var(--pk-canvas) 85%, transparent) 55%,
+    color-mix(in srgb, var(--pk-canvas) 60%, transparent) 100%) !important;
+}
+body.ft-extension-surface[data-surface="popup"] .ft-popup-shell__media {
+  background: url("../assets/images/homepage_hero_poster.webp") center / cover no-repeat;
+}
+body.ft-extension-surface[data-surface="popup"] .ft-popup-shell__frame {
+  background: transparent !important;
+  -webkit-backdrop-filter: none !important;
+  backdrop-filter: none !important;
+}
+body.ft-extension-surface[data-surface="popup"] .ft-popup-brand,
+body.ft-extension-surface[data-surface="popup"] .ft-mascot-tally,
+body.ft-extension-surface[data-surface="popup"] .ft-popup-filter-card,
+body.ft-extension-surface[data-surface="popup"] .ft-popup-time-status,
+:root[data-page-tone][data-theme] body.ft-extension-surface[data-surface="popup"] .ft-popup-brand,
+:root[data-page-tone][data-theme] body.ft-extension-surface[data-surface="popup"] .ft-popup-filter-card {
+  background: var(--pk-paper) !important;
+  border: 1.5px solid transparent !important;
+  border-image: var(--pk-edge-line) 20 / 18px / 0 round !important;
+  border-radius: 18px !important;
+  box-shadow: 2px 3px 0 0 var(--pk-desk) !important;
+  -webkit-backdrop-filter: none !important;
+  backdrop-filter: none !important;
+}
+body.ft-extension-surface[data-surface="popup"] .ft-popup-brand .app-title {
+  font-family: var(--pk-font-hand) !important;
+  font-weight: 400 !important;
+  letter-spacing: 0 !important;
+}
+body.ft-extension-surface[data-surface="popup"] .extension-status {
+  text-transform: none !important;
+  letter-spacing: 0 !important;
+  font-weight: 700 !important;
+  color: var(--pk-sage-ink) !important;
+}
+body.ft-extension-surface[data-surface="popup"] .ft-mascot-tally__count { font-family: var(--pk-font-hand); font-weight: 400; font-size: 17px; color: var(--pk-ink); }
+body.ft-extension-surface[data-surface="popup"] input[type="text"],
+body.ft-extension-surface[data-surface="popup"] input[type="search"] {
+  background: color-mix(in srgb, var(--pk-desk) 82%, var(--pk-paper)) !important;
+  border: 1.5px solid var(--pk-line) !important;
+  border-radius: 16px !important;
+  /* The app's 48 dp field: the whole box, padding included. */
+  box-sizing: border-box !important;
+  min-height: 48px !important;
+  height: 48px !important;
+  padding-block: 0 !important;
+  box-shadow: none !important;
+  color: var(--pk-ink) !important;
+}
+body.ft-extension-surface[data-surface="popup"] .search-row,
+body.ft-extension-surface[data-surface="popup"] .add-keyword-row { min-height: 0 !important; align-items: center; }
+body.ft-extension-surface[data-surface="popup"] .btn-primary,
+body.ft-extension-surface[data-surface="popup"] button.add-btn {
+  box-sizing: border-box !important;
+  min-height: 48px !important;
+  height: 48px !important;
+  padding-block: 0 !important;
+}
+body.ft-extension-surface[data-surface="popup"] .ft-popup-filter-card .tab-buttons,
+body.ft-extension-surface[data-surface="popup"] .tabs-container .tab-buttons { margin-bottom: 8px; }
+
+/* The app never shouts: sentence case everywhere on the extension's own pages (labels, eyebrows,
+   the list-mode pill). Words that are capitals (PIN) stay capitals. */
+body.ft-extension-surface,
+body.ft-extension-surface * { text-transform: none !important; }
+body.ft-extension-surface [class*="eyebrow"],
+body.ft-extension-surface [class*="kicker"],
+body.ft-extension-surface .ft-list-mode-pill,
+body.ft-extension-surface [class*="__label"] { letter-spacing: 0 !important; }
+
+/* Study and focus wears the app's sage (BrandPalette STUDY), breaks its sun. */
+:root, :root[data-theme] {
+  --ft-study-teal: var(--pk-sage-ink);
+  --ft-study-teal-surface: var(--pk-sage);
+  --ft-study-amber: var(--pk-sun);
+  --ft-study-amber-text: var(--pk-sun-ink);
+  --ft-study-amber-surface: var(--pk-sun-wash);
+  --ft-study-grey-surface: var(--pk-sage);
+}
+body.ft-extension-surface .ft-study-status {
+  color: var(--pk-ink) !important;
+  border: 1.5px solid transparent;
+  border-image: var(--pk-edge-study) 20 / 18px / 0 round;
+  border-radius: 18px;
+}
+body.ft-extension-surface .ft-study-status.is-break { background: var(--pk-sun-wash) !important; border-image-source: var(--pk-edge-kids); }
+body.ft-extension-surface .ft-study-status.is-done,
+body.ft-extension-surface .ft-study-status.is-normal,
+body.ft-extension-surface .ft-study-status.is-hold { background: var(--pk-sage) !important; }
+
+/* ---------------------------------------------------------------------------
+ * Pass 3: the hub's header, as in the app (NativeControlCenterView): no hero copy and no Play
+ * promotion, just the active profile, the Main/Kids switch and Switch profile in one paper strip,
+ * with Kriti and Uljhan standing on its top edge.
+ * ------------------------------------------------------------------------- */
+:root[data-page-tone][data-theme] body.ft-extension-surface[data-surface="tab-view"] #dashboardView .ft-dash-hero.ft-dash-hero--hub {
+  display: block;
+  padding: 0;
+  border: 0;
+  background: none;
+  box-shadow: none;
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+  overflow: visible;
+}
+
+#dashboardView .ft-dash-hero--hub .ft-dash-status {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 0.9rem 1.4rem;
+  margin-top: 0;
+}
+
+#dashboardView .ft-dash-hero--hub .ft-dash-status__source {
+  grid-column: 1 / -1;
+}
+
+@media (min-width: 900px) {
+  #dashboardView .ft-dash-hero--hub .ft-dash-status {
+    grid-template-columns: minmax(0, 1fr) minmax(15rem, 22rem);
+  }
+  #dashboardView .ft-dash-hero--hub .ft-dash-status__source {
+    grid-column: auto;
+  }
+}
+
+/* Kriti thinking while pairing waits for the other device (a still, beside the code). */
+.pk-moment.pk-pairing-thinking {
+  justify-items: start;
+  padding: 0.25rem 0 0;
+}
+
+/* The undo bar after a removal (the app's PaperUndoBar): a paper sheet at the foot, at most 560 px
+ * wide, rising 16 px over 220 ms; the brick line along its foot drains over the hold (5 s), paused
+ * while hovered or focused; a second removal crossfades the words (120 ms). */
+.pk-undo-bar {
+  position: fixed;
+  z-index: 10050;
+  inset-inline: 16px;
+  bottom: 16px;
+  margin-inline: auto;
+  max-width: 560px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 12px 14px 18px;
+  overflow: hidden;
+  border: 1px solid var(--pk-line);
+  border-radius: 16px;
+  background: var(--pk-paper);
+  color: var(--pk-ink);
+  box-shadow: 0 3px 0 var(--pk-desk), 0 14px 30px -18px rgba(27, 26, 24, 0.45);
+  font: 500 14px/1.4 system-ui, sans-serif;
+  opacity: 0;
+  transform: translateY(16px);
+  transition: opacity 220ms cubic-bezier(0.2, 0, 0, 1), transform 220ms cubic-bezier(0.2, 0, 0, 1);
+}
+.pk-undo-bar.is-shown { opacity: 1; transform: none; }
+.pk-undo-bar.is-leaving { opacity: 0; transform: translateY(8px); transition-duration: 160ms; }
+.pk-undo-bar.is-swapping .pk-undo-bar__text { animation: pk-undo-swap 120ms linear; }
+.pk-undo-bar__text { flex: 1 1 auto; min-width: 0; overflow-wrap: anywhere; }
+.pk-undo-bar__action {
+  flex: none;
+  min-height: 36px;
+  padding: 6px 16px;
+  border: 0;
+  border-radius: 999px;
+  background: transparent;
+  color: var(--pk-brick);
+  font: 600 14px/1 "FilterTube Outfit", "Outfit", system-ui, sans-serif;
+  cursor: pointer;
+}
+.pk-undo-bar__action:hover { background: var(--pk-rose); }
+.pk-undo-bar__action:focus-visible { outline: 2px solid var(--pk-brick); outline-offset: 2px; }
+.pk-undo-bar__drain {
+  position: absolute;
+  inset-inline: 0;
+  bottom: 0;
+  height: 3px;
+  background: var(--pk-brick);
+  transform-origin: 0 50%;
+  animation: pk-undo-drain var(--pk-undo-hold, 5000ms) linear forwards;
+}
+[dir="rtl"] .pk-undo-bar__drain { transform-origin: 100% 50%; }
+.pk-undo-bar.is-paused .pk-undo-bar__drain { animation-play-state: paused; }
+.pk-undo-bar.is-done .pk-undo-bar__drain { visibility: hidden; }
+@keyframes pk-undo-drain { from { transform: scaleX(1); } to { transform: scaleX(0); } }
+@keyframes pk-undo-swap { from { opacity: 0.2; } to { opacity: 1; } }
+
+/* A new rule row (the app's FilterRowWash): the area's wash, held, then faded over 300 ms. */
+.pk-row-added {
+  background: var(--pk-area-wash, var(--pk-rose)) !important;
+  transition: background-color 300ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+.pk-row-added.pk-row-added--fading { background-color: transparent !important; background-image: none !important; }
+
+@media (prefers-reduced-motion: reduce) {
+  .pk-undo-bar, .pk-undo-bar.is-leaving { transition: opacity 150ms linear; transform: none; }
+  .pk-undo-bar.is-swapping .pk-undo-bar__text { animation: none; }
+  .pk-row-added { transition: none; }
+}
+
+/* Keyword rows in the app's layout (item_keyword.xml): the word on its own line, then the chip row
+ * (Comment, Exact, Date, ...) with the move action, and delete at the end of the chip row. */
+body.ft-extension-surface[data-surface="tab-view"] .list-item:not(.channel-item):has(> .item-left > .item-word) {
+  flex-direction: column;
+  align-items: stretch;
+  gap: 10px;
+}
+body.ft-extension-surface[data-surface="tab-view"] .list-item:not(.channel-item) > .item-left:has(> .item-word) {
+  flex-wrap: wrap;
+  min-width: 0;
+}
+body.ft-extension-surface[data-surface="tab-view"] .list-item:not(.channel-item) > .item-left > .item-word {
+  overflow-wrap: anywhere;
+}
+body.ft-extension-surface[data-surface="tab-view"] .list-item:not(.channel-item):has(> .item-left > .item-word) > .item-controls {
+  justify-content: flex-start;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+body.ft-extension-surface[data-surface="tab-view"] .list-item:not(.channel-item):has(> .item-left > .item-word) > .item-controls > .delete-btn {
+  margin-inline-start: auto;
+}
+
+/* Rolling digits (RollingCounterView): tabular figures, each cell clips its own roll. */
+.pk-roll-digit { position: relative; display: inline-block; overflow: hidden; vertical-align: bottom; font-variant-numeric: tabular-nums; }
+.pk-roll-digit__now { display: inline-block; }
+.pk-roll-digit__old { position: absolute; inset: 0; display: inline-block; }
+
+/* The first-filter moment above the list, and Kriti's peek over the hub's tiles. */
+.pk-first-filter { display: flex; justify-content: center; padding: 8px 0 4px; transition: opacity 300ms ease, transform 300ms ease; }
+.pk-first-filter.is-leaving { opacity: 0; transform: translateY(-6px); }
+.pk-hub-peek {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 0 0 12px;
+  padding: 6px 14px 6px 6px;
+  border-radius: 16px;
+  color: var(--pk-ink);
+}
+.pk-hub-peek__art { height: 96px; width: auto; flex: none; cursor: pointer; user-select: none; border-radius: 12px; }
+.pk-hub-peek__art:focus-visible { outline: 2px solid var(--pk-brick); outline-offset: 2px; }
+/* Lively: her bubble (a paper speech card with an ink edge); Quiet: a plain brick text action. */
+.pk-hub-peek__line {
+  margin: 0; flex: 0 1 auto; max-width: 320px; padding: 8px 12px 10px; border: 1.5px solid var(--pk-ink); border-radius: 16px 16px 16px 4px;
+  background: var(--pk-paper); color: var(--pk-ink); font-family: var(--pk-font-hand); font-size: 15px; text-align: start; cursor: pointer;
+}
+.pk-hub-peek__action {
+  flex: none;
+  min-height: 48px;
+  padding: 0 8px;
+  border: 0;
+  background: none;
+  color: var(--pk-brick);
+  font: 600 15px/1 "FilterTube Outfit", "Outfit", system-ui, sans-serif;
+  cursor: pointer;
+}
+.pk-hub-peek__action:focus-visible { outline: 2px solid var(--pk-brick); outline-offset: 2px; }
+@media (prefers-reduced-motion: reduce) { .pk-first-filter { transition: none; } }
+
+/* The welcome, three pages as in the app (FirstInstallWelcomePlan). */
+.ft-mascot-welcome--pages { align-items: center; }
+.ft-mascot-welcome--pages .ft-mascot__line { display: none !important; }
+.ft-mascot-welcome__title { margin: 0; font: 400 26px/1.2 var(--pk-font-hand); color: var(--pk-ink); outline: none; }
+.ft-mascot-welcome__subtitle { margin: -4px 0 0; font-weight: 600; color: var(--pk-ink); }
+.ft-mascot-welcome__text { margin: 0; max-width: 46ch; color: var(--pk-muted); line-height: 1.55; }
+.ft-mascot-welcome__facts { margin: 0; padding-inline-start: 1.1rem; color: var(--pk-ink); line-height: 1.6; }
+.ft-mascot-welcome__nav { display: flex; align-items: center; gap: 10px; width: 100%; }
+.ft-mascot-welcome__dots { display: flex; gap: 6px; margin-inline-end: auto; }
+.ft-mascot-welcome__dots span { width: 8px; height: 8px; border-radius: 50%; background: var(--pk-line); }
+.ft-mascot-welcome__dots span.is-current { width: 20px; border-radius: 4px; background: var(--pk-brick); }
+
+/* Ask a parent: the parent's Requests (Android AskParentUi request card, lilac). */
+.ft-ask-inbox { display: grid; gap: 12px; }
+.ft-ask-inbox__list { display: grid; gap: 10px; }
+.ft-ask-request {
+  display: grid;
+  gap: 8px;
+  padding: 14px 16px;
+  border-radius: 18px;
+  background: var(--pk-lilac);
+  color: var(--pk-ink);
+  border: 1px solid var(--pk-edge-family, var(--pk-edge-line));
+}
+.ft-ask-request__title { font: 400 17px/1.3 var(--pk-font-display, "FilterTube Delius", "Delius", system-ui, sans-serif); }
+.ft-ask-request__meta { margin: 0; color: var(--pk-ink-soft, var(--pk-ink)); font-size: 13px; opacity: 0.85; }
+.ft-ask-request__note { margin: 0; font-style: italic; }
+.ft-ask-request__reply { min-height: 48px; }
+.ft-ask-request__actions { display: flex; flex-wrap: wrap; gap: 8px; }
+.ft-ask-request__done { display: flex; align-items: center; gap: 8px; font-weight: 700; color: var(--pk-plum); }
+.ft-ask-request__done .pk-doodle-mark--check { width: 22px; height: 22px; }
+.ft-ask-inbox__switches { display: grid; gap: 6px; }
+/* A linked child's device that stopped reporting (Android StudyFamilyActivity addNotice). */
+.ft-ask-inbox__stopped { display: grid; gap: 4px; padding: 12px 14px; border: 1.5px solid var(--pk-line); border-radius: 16px; background: var(--pk-sun-wash); color: var(--pk-sun-ink); }
+.ft-ask-inbox__stopped .help-item-body { margin: 0; color: inherit; }
+.ft-ask-inbox__switch { display: flex; align-items: center; gap: 8px; min-height: 40px; cursor: pointer; }
+
+/* Ask a parent: the child's answer card in the popup (Android AskParentAnswerActivity). */
+.ft-ask-answer {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+  margin: 8px 12px;
+  padding: 12px 14px;
+  border-radius: 18px;
+  background: var(--pk-sun-wash);
+  color: var(--pk-ink);
+  border: 1px solid var(--pk-edge-kids, var(--pk-edge-line));
+}
+.ft-ask-answer.is-no { background: var(--pk-paper); }
+.ft-ask-answer__pose { width: auto; height: 72px; flex: none; }
+.ft-ask-answer__words { display: grid; gap: 4px; min-width: 0; }
+.ft-ask-answer__words h3 { margin: 0; font: 400 18px/1.25 var(--pk-font-display, "FilterTube Delius", "Delius", system-ui, sans-serif); display: flex; align-items: center; gap: 6px; }
+.ft-ask-answer__words p { margin: 0; font-size: 13px; }
+.ft-ask-answer__note { display: grid; gap: 4px; margin-top: 6px; padding: 10px 14px 12px; border-radius: 14px; background: var(--pk-lilac); border: 1px solid color-mix(in srgb, var(--pk-plum) 22%, transparent); }
+.ft-ask-answer__note-from { font-size: 12px; color: var(--pk-muted); }
+.ft-ask-answer__note-text { font-family: var(--pk-font-hand); font-size: 16px; color: var(--pk-ink); }
+.ft-ask-answer__actions { display: flex; gap: 8px; margin-top: 6px; }
+.ft-ask-hub-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin: 0 0 16px;
+  padding: 12px 16px;
+  border-radius: 18px;
+  background: var(--pk-lilac);
+  color: var(--pk-ink);
+  border: 1px solid var(--pk-edge-family, var(--pk-edge-line));
+}
+.ft-ask-hub-row__words { font: 400 18px/1.25 var(--pk-font-display, "FilterTube Delius", "Delius", system-ui, sans-serif); }
+
+/* Channel rows in the app's layout (item_channel.xml): logo, name with the handle under it, delete;
+ * the mapping line on its own ("@handle → UC…" in caption ink, a brand arrow, the id as a soft chip,
+ * scrolling sideways when long), then the chip row with Filter all. No glowing connector, no green box. */
+body.ft-extension-surface[data-surface="tab-view"] .channel-item .channel-name-block {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+body.ft-extension-surface[data-surface="tab-view"] .channel-item .channel-subtitle {
+  margin-top: 2px;
+  color: var(--ft-color-text-secondary);
+  font-size: var(--ft-font-size-caption);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 100%;
+}
+body.ft-extension-surface[data-surface="tab-view"] .channel-item .channel-map-row {
+  padding-inline-start: 3.25rem;
+  padding-top: 8px;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+body.ft-extension-surface[data-surface="tab-view"] .channel-item .channel-map-row::-webkit-scrollbar { display: none; }
+body.ft-extension-surface[data-surface="tab-view"] .channel-item .channel-map-row .channel-node-container {
+  display: inline-flex;
+  flex-wrap: nowrap;
+  gap: 0;
+  white-space: nowrap;
+}
+body.ft-extension-surface[data-surface="tab-view"] .channel-item .channel-map-row .node-source-text {
+  font-family: inherit;
+  font-weight: 400;
+  overflow-wrap: normal;
+}
+body.ft-extension-surface[data-surface="tab-view"] .channel-item .channel-map-row .node-connector,
+body.ft-extension-surface[data-surface="tab-view"] .channel-item .channel-map-row .node-connector.active {
+  color: #ab4438;
+  filter: none;
+  margin: 0 8px;
+  padding: 0;
+}
+body.ft-extension-surface[data-surface="tab-view"] .channel-item .channel-map-row .node-connector::before,
+body.ft-extension-surface[data-surface="tab-view"] .channel-item .channel-map-row .node-connector::after { content: none; }
+body.ft-extension-surface[data-surface="tab-view"] .channel-item .channel-map-row .node-badge.resolved {
+  font-family: inherit;
+  font-weight: 600;
+  padding: 7px 12px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.87);
+  color: #ab4438;
+  border: 1px solid rgba(168, 159, 143, 0.22);
+  box-shadow: none;
+  max-width: none;
+}
+:root[data-theme="dark"] body.ft-extension-surface[data-surface="tab-view"] .channel-item .channel-map-row .node-badge.resolved {
+  background: rgba(27, 32, 39, 0.9);
+  color: #e0796b;
+  border-color: rgba(255, 255, 255, 0.31);
+}
+body.ft-extension-surface[data-surface="tab-view"] .channel-item > .channel-body-row { padding-top: 8px; }
+.ft-ask-hub-row--popup { margin: 8px 12px; padding: 10px 14px; }
+.ft-ask-hub-row--popup .ft-ask-hub-row__words { font-size: 16px; }
+
+/* Keywords and Channels: date and sort behind one filter button beside search (Android
+   NativeMainRuleFilterSheet: 56 dp square, 18 dp corners, 22 dp brand icon, 8 dp gap; brick-soft while
+   a sort, a date range or a source narrows the list). The options open in a paper panel below. */
+html.pk-parity .filter-controls.pk-rule-search-row { justify-content: flex-start; align-items: center; gap: 8px; flex-wrap: nowrap; }
+html.pk-parity .pk-rule-search-row > .search-input { flex: 1 1 auto; min-width: 0; }
+html.pk-parity .pk-rule-options-btn {
+  flex: 0 0 56px; width: 56px; height: 56px; padding: 0; display: inline-grid; place-items: center;
+  border: 1px solid var(--pk-line); border-radius: 18px; background: transparent; cursor: pointer;
+}
+html.pk-parity .pk-rule-options-btn__icon { width: 22px; height: 22px; display: block; background-color: var(--pk-brick); -webkit-mask: var(--pk-rule-icon) center / contain no-repeat; mask: var(--pk-rule-icon) center / contain no-repeat; }
+html.pk-parity .pk-rule-options-btn.is-active { background: #fee2e2; border-color: transparent; }
+html.pk-parity .pk-rule-options-btn:focus-visible { outline: 2px solid var(--pk-brick); outline-offset: 2px; }
+html.pk-parity .pk-rule-options {
+  margin: 0 0 var(--ft-space-md, 16px); padding: 12px 20px 24px; border-radius: 20px;
+  background: var(--pk-paper); border: 1px solid var(--pk-line);
+}
+html.pk-parity .pk-rule-options[hidden] { display: none; }
+html.pk-parity .pk-rule-options > .date-filter-controls { margin-bottom: 8px; }
+html.pk-parity .pk-rule-options > .sort-controls { flex-wrap: wrap; }
+html.pk-parity[data-theme="dark"] .pk-rule-options-btn.is-active { background: #3a2020; }
+@media (prefers-color-scheme: dark) {
+  html.pk-parity:not([data-theme]) .pk-rule-options-btn.is-active { background: #3a2020; }
+}
+/* Android AskParentUi.requestCard: the reason as a note badge, the answers stacked full width, then
+ * "Not now" and "Open {name}'s space" as quiet text buttons on one row. */
+.ft-ask-request__reason { justify-self: start; width: max-content; align-self: flex-start; padding: 2px 10px 3px; border-radius: 999px; font-size: 12px; font-weight: 600; color: var(--pk-ink); background: var(--pk-paper); border: 1px solid var(--pk-line); }
+.ft-ask-request__actions { flex-direction: column; align-items: stretch; flex-wrap: nowrap; }
+.ft-ask-request__wide { width: 100%; min-height: 48px; }
+.ft-ask-request__row { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+.ft-ask-request__send { align-self: flex-end; }
+.ft-ask-request__reply[hidden], .ft-ask-request__send[hidden] { display: none; }
+
+/* ---- Connect a device (Android SettingsSectionActivity: addNearbyDevicesCard, addNanahSyncCard) ----
+ * "Your devices" first (what tapping does, the relay disclosure, the device list, the nearby buttons),
+ * then the pairing card always open (Profile update, Start Pairing, Session state; Join another device),
+ * then Step 1-3 and the privacy and trust notes, then Keep in sync. The old device map's radar, hub and
+ * compass rule are gone. */
+#familyDeviceUpdatesCard .nanah-your-devices { display: grid; gap: 8px; margin-bottom: 12px; }
+#familyDeviceUpdatesCard .nanah-your-devices__title { margin: 0; font-family: var(--pk-font-hand); font-weight: 400; font-size: 1.25rem; color: var(--pk-ink); }
+#familyDeviceUpdatesCard .nanah-device-radar { min-height: 0 !important; padding: 0 !important; background: none !important; border: 0 !important; display: grid; gap: 8px; }
+#familyDeviceUpdatesCard .nanah-device-radar::before, #familyDeviceUpdatesCard .nanah-device-radar::after { display: none !important; }
+#familyDeviceUpdatesCard .nanah-device-empty { position: static !important; transform: none !important; margin: 4px 0 !important; text-align: start !important; }
+#familyDeviceUpdatesCard .nanah-device-toolbar { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 4px; }
+#familyDeviceUpdatesCard .nanah-device-compass, #familyDeviceUpdatesCard .nanah-device-compass-stage { background: none !important; border: 0 !important; box-shadow: none !important; padding: 0 !important; }
+.nanah-pairing-details--page > summary { display: none !important; }
+.nanah-pairing-details--page { margin-top: 18px; padding-top: 18px; border-top: 1px solid var(--pk-line); }
+.nanah-flow-steps { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 8px; margin-top: 16px; }
+.nanah-trust-notes { display: grid; gap: 8px; margin-top: 16px; }
+.nanah-trust-notes h5 { margin: 0; font-family: var(--pk-font-hand); font-weight: 400; font-size: 1.1rem; color: var(--pk-ink); }
+.nanah-flow-step { display: grid; gap: 4px; padding: 12px 14px; border-radius: 16px; background: var(--pk-paper); border: 1px solid var(--pk-line); }
+.nanah-flow-step > span { font-family: var(--pk-font-hand); font-size: 1.05rem; color: var(--pk-ink); }
+.nanah-flow-step > span::after { content: ''; display: block; width: 22px; height: 3px; margin-top: 4px; border-radius: 2px; background: var(--pk-plum); }
+.nanah-flow-step > strong { font-size: 0.85rem; color: var(--pk-ink); }
+.nanah-flow-step > small { font-size: 0.85rem; color: var(--pk-muted); line-height: 1.4; }
+#ftDeviceAutoSync { margin-top: 18px; }
+/* The app's pairing card keeps its headings in every phase: "Profile update / Choose the update" with
+ * Review first, "Session state" with the Secure handshake pill; "Join another device / Enter pairing
+ * code" only while connecting (Android createNanahJoinPanel shows it in the CONNECT phase). */
+#familyDeviceUpdatesCard #ftNanahPairingDetails[data-pairing-phase] .nanah-sync-panel--setup .nanah-sync-panel__header { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; }
+#familyDeviceUpdatesCard #ftNanahPairingDetails[data-pairing-phase="connect"] .nanah-sync-panel--join .nanah-sync-panel__header { display: flex; align-items: flex-start; gap: 12px; }
+#familyDeviceUpdatesCard #ftNanahPairingDetails[data-pairing-phase] .nanah-sync-status__eyebrow { display: block; }
+#familyDeviceUpdatesCard #ftNanahPairingDetails[data-pairing-phase] #ftNanahStatusSignal { display: inline-flex; }
+#familyDeviceUpdatesCard #ftNanahPairingDetails .nanah-sync-panel__eyebrow { font-family: var(--pk-font-hand); font-size: 1.15rem; color: var(--pk-ink); text-transform: none; letter-spacing: 0; }
+#familyDeviceUpdatesCard #ftNanahPairingDetails .nanah-sync-panel__eyebrow::after { content: ''; display: block; width: 22px; height: 3px; margin-top: 4px; border-radius: 2px; background: var(--pk-plum); }
+#familyDeviceUpdatesCard #ftNanahPairingDetails .nanah-sync-panel__badge { color: var(--pk-brick); background: var(--pk-paper); border: 1px solid var(--pk-line); border-radius: 999px; padding: 4px 10px; font-size: 12px; font-weight: 600; }
+#familyDeviceUpdatesCard #ftNanahPairingDetails .nanah-sync-status[data-tone="retry"] { background: var(--pk-rose); border-color: color-mix(in srgb, var(--pk-brick) 30%, transparent); }
+#familyDeviceUpdatesCard #ftNanahDeviceCompassRule, #familyDeviceUpdatesCard #ftNanahDeviceSelectionPreview { display: none !important; }
+
+/* The effective mode during study (js/shared/effective_mode.js): the list-mode pill says "Study" in the
+   app's sage with the study timer; it opens the Study page instead of switching the list. */
+:root[data-theme] body.ft-extension-surface .ft-topbar-list-mode .exact-toggle.ft-list-mode-pill--study,
+:root body.ft-extension-surface .ft-topbar-list-mode .exact-toggle.ft-list-mode-pill--study {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35em;
+  background: var(--pk-sage) !important;
+  color: var(--pk-sage-ink) !important;
+  border: 1.5px solid var(--pk-sage-ink) !important;
+  box-shadow: none !important;
+  cursor: pointer;
+}
+:root[data-theme] body.ft-extension-surface .ft-topbar-list-mode .exact-toggle.ft-list-mode-pill--study:hover {
+  background: color-mix(in srgb, var(--pk-sage) 78%, var(--pk-sage-ink)) !important;
+}
+:root[data-theme] body.ft-extension-surface .ft-topbar-list-mode .exact-toggle.ft-list-mode-pill--study:focus-visible {
+  outline: 2px solid var(--pk-ink, #1b1a18);
+  outline-offset: 2px;
+}
+.ft-list-mode-pill--study .ft-list-mode-pill__icon { display: inline-flex; line-height: 0; }
+
+/* A loosening refused while study holds the rules (study_ui.js showLooseningNotice): the app's sheet,
+   over whichever page made the change. */
+.ft-study-loosen-float {
+  position: fixed;
+  inset-inline: 0;
+  bottom: 24px;
+  z-index: 2147483000;
+  display: flex;
+  justify-content: center;
+  padding: 0 16px;
+  pointer-events: none;
+}
+.ft-study-loosen-float > .ft-study-loosen {
+  pointer-events: auto;
+  max-width: 420px;
+  width: 100%;
+  background: var(--pk-paper, #fffdfa);
+  color: var(--pk-ink, #1b1a18);
+  border: 1.5px solid var(--pk-sage-ink);
+  border-radius: 18px;
+  padding: 16px 18px;
+  box-shadow: 0 10px 28px rgba(27, 26, 24, 0.18);
+  display: grid;
+  gap: 8px;
+}
+
+/* FilterTube apps pills: small paper tabs, sage for Android and lilac for iPhone (the dashboard cards' tints).
+   Hover lifts the paper and tips the badge; press sinks it; focus draws the ink ring. */
+:root[data-page-tone][data-theme] body.ft-extension-surface[data-surface="popup"] .ft-popup-apps__pill {
+  position: relative;
+  background: var(--pk-paper) !important;
+  border: 1.5px solid transparent !important;
+  border-image: var(--pk-edge-line) 20 / 14px / 0 round !important;
+  border-radius: 14px !important;
+  box-shadow: 2px 3px 0 0 var(--pk-desk) !important;
+  color: var(--pk-ink) !important;
+  -webkit-backdrop-filter: none !important;
+  backdrop-filter: none !important;
+  transition: transform var(--ft-state-duration) ease-out, box-shadow var(--ft-state-duration) ease-out,
+    background-color var(--ft-state-duration) linear !important;
+}
+:root[data-page-tone][data-theme] body.ft-extension-surface[data-surface="popup"] .ft-popup-apps__pill--android .ft-popup-apps__badge {
+  background: color-mix(in srgb, var(--pk-sage) 80%, var(--pk-paper));
+}
+:root[data-page-tone][data-theme] body.ft-extension-surface[data-surface="popup"] .ft-popup-apps__pill--ios .ft-popup-apps__badge {
+  background: color-mix(in srgb, var(--pk-lilac) 80%, var(--pk-paper));
+  color: var(--pk-ink);
+}
+body.ft-extension-surface[data-surface="popup"] .ft-popup-apps__text strong {
+  font-family: var(--pk-font-hand);
+  font-weight: 400;
+  font-size: 0.86rem;
+  color: var(--pk-ink);
+}
+body.ft-extension-surface[data-surface="popup"] .ft-popup-apps__text span { color: var(--pk-muted); }
+:root[data-page-tone][data-theme] body.ft-extension-surface[data-surface="popup"] .ft-popup-apps__pill:hover {
+  background: color-mix(in srgb, var(--pk-paper) 92%, var(--pk-ink)) !important;
+  box-shadow: 3px 4px 0 0 var(--pk-desk) !important;
+  transform: translateY(-1px);
+}
+:root[data-page-tone][data-theme] body.ft-extension-surface[data-surface="popup"] .ft-popup-apps__pill--android:hover {
+  background: color-mix(in srgb, var(--pk-sage) 70%, var(--pk-paper)) !important;
+}
+:root[data-page-tone][data-theme] body.ft-extension-surface[data-surface="popup"] .ft-popup-apps__pill--ios:hover {
+  background: color-mix(in srgb, var(--pk-lilac) 70%, var(--pk-paper)) !important;
+}
+body.ft-extension-surface[data-surface="popup"] .ft-popup-apps__pill:hover .ft-popup-apps__badge { transform: rotate(-8deg) scale(1.06); }
+body.ft-extension-surface[data-surface="popup"] .ft-popup-apps__pill:hover .ft-popup-apps__text span { color: var(--pk-brick); }
+:root[data-page-tone][data-theme] body.ft-extension-surface[data-surface="popup"] .ft-popup-apps__pill:active {
+  transform: var(--ft-state-press-shift);
+  box-shadow: 1px 1px 0 0 var(--pk-desk) !important;
+  background-image: linear-gradient(var(--ft-state-press-wash), var(--ft-state-press-wash)) !important;
+}
+body.ft-extension-surface[data-surface="popup"] .ft-popup-apps__pill:active .ft-popup-apps__badge { transform: rotate(-4deg) scale(0.96); }
+:root[data-page-tone][data-theme] body.ft-extension-surface[data-surface="popup"] .ft-popup-apps__pill:focus-visible {
+  outline: var(--ft-state-focus-width) solid var(--ft-state-focus-ring) !important;
+  outline-offset: var(--ft-state-focus-offset) !important;
+}
+@media (prefers-reduced-motion: reduce) {
+  :root[data-page-tone][data-theme] body.ft-extension-surface[data-surface="popup"] .ft-popup-apps__pill,
+  body.ft-extension-surface[data-surface="popup"] .ft-popup-apps__badge { transition: none !important; }
+  :root[data-page-tone][data-theme] body.ft-extension-surface[data-surface="popup"] .ft-popup-apps__pill:hover,
+  body.ft-extension-surface[data-surface="popup"] .ft-popup-apps__pill:hover .ft-popup-apps__badge,
+  body.ft-extension-surface[data-surface="popup"] .ft-popup-apps__pill:active .ft-popup-apps__badge { transform: none; }
+}
+
+/* Popup, owner 2026-11-18: more meadow, less white. A thinner scrim lets the video read; the panels are
+   frosted paper (translucent with a blur) so the meadow shows through as soft colour, never as detail
+   behind words. Text stays the same --pk-ink and --pk-muted, checked at WCAG AA against the frosted
+   panels over the brightest and darkest parts of the video. Reduced motion shows the poster still. */
+body.ft-extension-surface[data-surface="popup"] {
+  --ft-popup-glass: color-mix(in srgb, var(--pk-paper) 66%, transparent);
+  --ft-popup-glass-firm: color-mix(in srgb, var(--pk-paper) 80%, transparent);
+  --ft-popup-blur: blur(18px) saturate(1.12);
+}
+:root[data-theme="dark"] body.ft-extension-surface[data-surface="popup"] {
+  --ft-popup-glass: color-mix(in srgb, var(--pk-paper) 64%, transparent);
+  --ft-popup-glass-firm: color-mix(in srgb, var(--pk-paper) 78%, transparent);
+  --ft-popup-blur: blur(18px) saturate(1.05);
+}
+:root[data-page-tone][data-theme] body.ft-extension-surface[data-surface="popup"] .ft-popup-shell__video-scrim {
+  background: linear-gradient(180deg,
+    color-mix(in srgb, var(--pk-canvas) 34%, transparent) 0%,
+    color-mix(in srgb, var(--pk-canvas) 22%, transparent) 45%,
+    color-mix(in srgb, var(--pk-canvas) 40%, transparent) 100%) !important;
+}
+:root[data-theme="dark"] body.ft-extension-surface[data-surface="popup"] .ft-popup-shell__video { opacity: 1; filter: brightness(0.82) saturate(0.9); }
+:root[data-page-tone][data-theme="dark"] body.ft-extension-surface[data-surface="popup"] .ft-popup-shell__video-scrim {
+  background: linear-gradient(180deg,
+    color-mix(in srgb, var(--pk-canvas) 52%, transparent) 0%,
+    color-mix(in srgb, var(--pk-canvas) 40%, transparent) 45%,
+    color-mix(in srgb, var(--pk-canvas) 58%, transparent) 100%) !important;
+}
+/* Reduced motion: the poster still under the same scrim (the video is not shown). */
+:root[data-theme="dark"] body.ft-extension-surface[data-surface="popup"] .ft-popup-shell__media { background-color: var(--pk-canvas); }
+
+:root[data-page-tone][data-theme] body.ft-extension-surface[data-surface="popup"] :is(.ft-popup-brand, .ft-mascot-tally, .ft-popup-filter-card, .ft-popup-time-status, .ft-popup-apps__pill) {
+  background: var(--ft-popup-glass) !important;
+  -webkit-backdrop-filter: var(--ft-popup-blur) !important;
+  backdrop-filter: var(--ft-popup-blur) !important;
+}
+:root[data-page-tone][data-theme] body.ft-extension-surface[data-surface="popup"] .ft-popup-brand.ft-enabled {
+  background: color-mix(in srgb, var(--pk-sage) 34%, var(--ft-popup-glass)) !important;
+}
+/* The header's round controls and the inner panels are firmer frosted paper: small, busy-edged, or
+   holding typed words. */
+:root[data-page-tone][data-theme] body.ft-extension-surface[data-surface="popup"] :is(#ftProfileBadgeBtnPopup, #openInTabBtn, .ft-popup-filter-card .tab-buttons, .ft-popup-filter-card .text-input, .ft-popup-filter-card .keyword-list, .ft-popup-filter-card .channel-list) {
+  background-color: var(--ft-popup-glass-firm) !important;
+  -webkit-backdrop-filter: var(--ft-popup-blur) !important;
+  backdrop-filter: var(--ft-popup-blur) !important;
+}
+:root[data-page-tone][data-theme] body.ft-extension-surface[data-surface="popup"] .ft-popup-filter-card .tab-buttons {
+  background-color: color-mix(in srgb, var(--pk-lilac) 50%, var(--ft-popup-glass-firm)) !important;
+}
+/* The filter card's contents had no inset: the tabs and fields touched its crayon edge. */
+:root[data-page-tone][data-theme] body.ft-extension-surface[data-surface="popup"] .ft-popup-filter-card { padding: 8px !important; }
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  body.ft-extension-surface[data-surface="popup"] { --ft-popup-glass: color-mix(in srgb, var(--pk-paper) 92%, transparent); }
+}
+/* The list-mode pill sat straight on the video at 8.7 px: firm rose paper, and a size that reads. */
+:root[data-page-tone][data-theme] body.ft-extension-surface[data-surface="popup"] .ft-topbar-list-mode .exact-toggle.ft-list-mode-pill:not(.ft-list-mode-pill--study) {
+  min-height: 30px !important;
+  padding: 0 10px !important;
+  border-radius: 999px !important;
+  font-size: 11px !important;
+  background: color-mix(in srgb, var(--pk-rose) 60%, var(--pk-paper)) !important;
+  border: 1.5px solid color-mix(in srgb, var(--pk-brick) 45%, transparent) !important;
+  -webkit-backdrop-filter: var(--ft-popup-blur) !important;
+  backdrop-filter: var(--ft-popup-blur) !important;
+}
+:root[data-page-tone][data-theme="light"] body.ft-extension-surface[data-surface="popup"] .ft-topbar-list-mode .exact-toggle.ft-list-mode-pill:not(.ft-list-mode-pill--study) { color: var(--pk-brick) !important; }

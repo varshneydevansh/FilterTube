@@ -1,4 +1,55 @@
 {
+  "3.6.2": {
+    "headline": "Meet Kriti and Uljhan, Study planner wey dem rebuild, and Ask a parent",
+    "summary": "FilterTube 3.6.2 don get im own look, with Kriti and Uljhan, crayon icons, doodles and sounds wey you fit choose. Study don rebuild around day planner with ready-made packs for 29 countries, pikin fit ask parent for one video or channel, and the viewer, profiles, tablets and TVs get calmer redesign with privacy notes wey clear well.",
+    "bannerSummary": "Kriti and Uljhan, Study planner wey dem rebuild, Ask a parent and calmer viewer.",
+    "ctaLabel": "See Wetin New",
+    "highlights": [
+      "Study don rebuild: paper Study home with crayon Day Ring, day planner, setup wey dey explain every choice, and ready-made packs for exams and school classes for 29 countries. Feeds dey follow the branch wey you pick, so GATE Civil go remain Civil, and Search during study dey look only inside your plan channels.",
+      "Ask a parent: when something block, pikin fit ask to watch that video or allow that channel, and parent go answer. Parent mode dey open parent session wey get frame inside Kids profile with one clear way to comot, and Kids learning by age dey fill Kids space with lessons wey dem pick by age during study.",
+      "New look: Kriti and Uljhan dey keep you company while pages dey load, when lists empty, when you dey offline or when something block. FilterTube get im own crayon icons, doodles, doodle avatars, Kriti, Uljhan and duo app icons wey you fit choose from, and sounds wey you fit set to Off, Gentle or Playful.",
+      "Calmer viewer: posters wey full screen for phones, new playlist page and account sheet, the Watch glow wey reach up under status bar, Uljhan dey bring more as you dey scroll, pull to refresh, and one clear notice when connection slow or offline.",
+      "Profiles don get new design with crayon avatars, picker wey dey show who be parent and who be pikin, and guarded way to add profile.",
+      "FilterTube dey use im own words everywhere: Clips, Following, Saved, and Sangeet for music, for every language.",
+      "Privacy: Accounts & Sync dey explain wetin the sync relay fit see and wetin e no fit see, and e go ask before the first internet sync; dem no dey send your device name again when you ring another device; DeArrow thumbnails na separate option wey start as off; account cookies dey go only to the video service own sites; and release builds dey keep debug logs comot from system log.",
+      "Tablets and TVs dey match phone: Filters, Search and Ask a parent dey use full width for tablets, and TVs get crayon icons for the rail, Study for big screen and About this TV card with Full and Light modes.",
+      "To support FilterTube still free and na your choice: support sheet na friendly note, e no be gate.",
+      "Fixes: PIN checks no dey freeze screen again, to load more for Study no dey make page flash again, mascots no go ever cut for middle of motion, plenty English labels wey remain don translate now, and Sangeet load errors no dey mention the video service again."
+    ]
+  },
+  "3.6.1": {
+    "headline": "Landscape wey fit every screen, steadier playback controls and stricter filtering",
+    "summary": "FilterTube 3.6.1 dey size every landscape page from the window, so phones wey lie for side, tablets and TVs dey get full-height video and panel for right-hand side. Captions, transcript and card menus dey behave as dem suppose, and channel wey you filter dey hide everywhere.",
+    "bannerSummary": "Landscape wey fit every screen, caption and transcript fixes, and stricter filtering.",
+    "ctaLabel": "See Wetin New",
+    "highlights": [
+      "Dem dey calculate landscape from your screen: for phone wey lie for side, tablet or TV, Watch dey show full-height 16:9 video with Up next for im side, Search dey for top of side rail, and camera cutout no dey cut anything.",
+      "Music for side dey show the same Up next as when e stand, the turntable dey turn for 33⅓ rpm with the playback speed, and Up next dey start from the song wey dey play.",
+      "Captions dey off when you choose Off, Auto-translate dey work for the video wey dey play, and if player never fit apply your choice yet, e go tell you instead of to fail quietly.",
+      "To tap transcript line dey keep transcript open and following, like lyrics, and Watch glow dey reach across the whole page for landscape.",
+      "Channel wey dey your filter list dey hide everything from am, no matter how dem take add am. To block from comment dey hide that channel comments and videos, Mixes wey blocked channel start dey hide, and live chat dey follow your rules.",
+      "For Allow only selected mode, comments dey show only commenters wey you allow or words wey you allow.",
+      "Card menus dey still work after filter change, channel sort wey you pick dey survive refresh, and Watch picture dey stay after filter change while you don scroll.",
+      "Step-by-step guide dey help set YouTube links to open for FilterTube, and tablets dey show Main and Kids profiles side by side."
+    ]
+  },
+  "3.6.0": {
+    "headline": "New Music player, faster pages and YouTube links wey dey open for FilterTube",
+    "summary": "FilterTube 3.6.0 redesign Music around every song cover, dey load Music, Home and album pages much faster, dey open YouTube links from other apps for the protected viewer and make PIN locking predictable. Phones, tablets and TVs get the same improvements.",
+    "bannerSummary": "New Music player and colours, faster loading, YouTube links for FilterTube and PIN lock wey clear pass.",
+    "ctaLabel": "See Wetin New",
+    "highlights": [
+      "Music dey take colour from wetin you dey listen: every Music page, mini player and bottom bar dey take the cover colours, dey change smooth between songs and albums, and dey return to normal when you comot Music.",
+      "Music player wey dem redesign: one seek ring around cover wey dey turn, lyrics card wey dey rise from bottom, light visualizer wey dey move with the beat, and live stations wey dey show as LIVE.",
+      "Real synced lyrics from YouTube Music, then the song own captions for your language, with LRCLIB as optional extra wey dem go ask you about once. Lyrics and transcripts dey keep the current line for centre till the end.",
+      "Much faster loading: Music songs dey use the channel wey YouTube Music don already list, cards wey dey screen dey check first, and channel checks dey go small small so YouTube go stop to refuse dem. Album and playlist songs no dey wait for minutes again.",
+      "Music dey play only audio until you show the video, so songs dey start faster and dey use far less data. To skip from lock screen and to move to next song now dey play sharp sharp.",
+      "YouTube links from chat apps and other apps fit open for FilterTube protected viewer. One-time prompt and check for Settings dey help parents switch am on.",
+      "PIN locking dey predictable: profiles dey stay unlocked while you dey use dem and dey lock when FilterTube close, phone restart or you switch profile. Parents fit choose to lock after time away instead.",
+      "Watch page dey glow with the colours of the video wey dey play, from status bar reach the sheets and Up next; transcript dey dock under player; chips dey match their page; and Mix queues dey keep loading.",
+      "Android TV and tablets: Music colours and the new player for TV with remote seeking, lighter visualizer for TV boxes, Watch panels for the video colours, and two-pane fixes and bigger album covers for tablets."
+    ]
+  },
   "3.4.1": {
     "headline": "38 interface languages and playback checks wey safer",
     "summary": "FilterTube 3.4.1 bring 38 interface languages wey dey inside the extension and improve video checks for YouTube and supported embedded players. E also fix dashboard startup and how saved comment keywords dey match. Duplicate Korean and Bengali translation entries wey Mozilla reject don fix. Build go now check duplicate JSON keys before packaging.",

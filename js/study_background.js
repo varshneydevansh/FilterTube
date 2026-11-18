@@ -32,6 +32,8 @@
     'use strict';
 
     const RUNTIME_KEY = 'ftStudyRuntimeV1';
+    /** Android StudySessionEnds (sessionOpen:/sessionEnd:<profile>): {profileId: {open, ended}}. */
+    const SESSION_ENDS_KEY = 'ftStudySessionEndsV1';
     const DEVICE_KEY = 'ftStudyDeviceIdV1';
     const NANAH_DEVICE_KEY = 'ftNanahDeviceId';
     const PROFILES_KEY = 'ftProfilesV4';
@@ -54,9 +56,30 @@
             version: 1,
             profiles: object(clone(raw.profiles)),
             seconds: object(clone(raw.seconds)),
-            lastCreditAt: Number.isFinite(raw.lastCreditAt) ? raw.lastCreditAt : 0
+            lastCreditAt: Number.isFinite(raw.lastCreditAt) ? raw.lastCreditAt : 0,
+            // "Skip this video" (Android StudyRuntimeStore skip:<profile>): per profile, newest last.
+            skipped: object(clone(raw.skipped)),
+            // Minutes a parent gave (Android StudyRuntimeStore grants): normal rules until each ends.
+            grants: array(clone(raw.grants)),
+            // The subject of the last lecture played in a round (Android StudyWatchOverlay lastSubject:<profile>).
+            subjects: object(clone(raw.subjects)),
+            // The lecture playing last in a round, for the Study page's "Continue lecture" (Android
+            // StudyWatchOverlay.lastVideoKey): {profileId: {at, videoId}}.
+            lastVideo: object(clone(raw.lastVideo))
         };
     }
+
+    /** Skipped break starts are kept this long (Android StudyRuntime prunes them after 36 hours). */
+    const SKIPPED_BREAK_KEEP_MS = 36 * 60 * 60 * 1000;
+    /** No Skip break in a session's last minute (Android StudyRuntime.canSkipBreak). */
+    const SKIP_BREAK_LAST_MS = 60 * 1000;
+
+    function prunedSkips(list, at) {
+        return [...new Set(array(list).filter(start => Number.isFinite(start) && at - start < SKIPPED_BREAK_KEEP_MS))].sort((a, b) => a - b);
+    }
+
+    /** Android StudyRuntimeStore.MAX_SKIPPED. */
+    const MAX_SKIPPED = 500;
 
     function profileRuntime(runtime, profileId) {
         const value = object(runtime.profiles[profileId]);
@@ -64,7 +87,12 @@
             session: isObject(value.session) ? value.session : null,
             endRequestedAt: Number.isFinite(value.endRequestedAt) ? value.endRequestedAt : null,
             endedUntil: Number.isFinite(value.endedUntil) ? value.endedUntil : null,
-            breakSkippedUntil: Number.isFinite(value.breakSkippedUntil) ? value.breakSkippedUntil : null
+            // Before 3.6.2's fold: the end of the one skipped break (read as its start, then dropped).
+            breakSkippedUntil: Number.isFinite(value.breakSkippedUntil) ? value.breakSkippedUntil : null,
+            // Skipped breaks by their start time (Android StudyRuntime skipped breaks), pruned after 36 h.
+            skippedBreaks: array(value.skippedBreaks).filter(Number.isFinite),
+            // "End and switch": the profile to switch to once a Gentle session's pause is over.
+            switchTo: typeof value.switchTo === 'string' && value.switchTo.trim() ? value.switchTo.trim() : null
         };
     }
 
@@ -77,6 +105,8 @@
         const Engine = deps.Engine || root.FilterTubeStudyEngine;
         const Model = deps.Model || root.FilterTubeStudyModel;
         const Packs = deps.Packs || root.FilterTubeStudyPacks;
+        const Ask = deps.Ask || root.FilterTubeAskParent
+            || (typeof module === 'object' && module.exports && typeof require === 'function' ? require('./shared/ask_parent.js') : null);
         const Guard = deps.Guard || root.FilterTubeStudyClockGuard
             || (typeof module === 'object' && module.exports && typeof require === 'function' ? require('./shared/study_clock_guard.js') : null);
         const now = () => (typeof deps.now === 'function' ? deps.now() : Date.now());
@@ -169,21 +199,49 @@
             return false;
         }
 
+        /**
+         * Time a parent gave, running now on both clocks (Android StudyRuntime.clockState: a grant wins
+         * over rounds, the rest screen, the limit and a lock), or null.
+         */
+        function runningGrant(runtime, profileId, at, reading) {
+            if (!Ask?.activeGrant) return null;
+            const grants = array(runtime?.grants);
+            const times = reading ? [reading.wall, reading.trusted].filter(Number.isFinite) : [at];
+            const found = (times.length ? times : [at]).map(time => Ask.activeGrant(grants, profileId, time));
+            return found.every(Boolean) ? found[0] : null;
+        }
+
         /** The clock for one profile, from its study plan, this device's runtime and the clock guard. */
         function clockFor(profile, runtime, profileId, at = now(), options = {}) {
             const study = Model.profileStudy(profile);
             const local = profileRuntime(runtime, profileId);
             if (!study) return { study: null, local, clock: Engine.studyClock({ plan: null, now: at }), reading: null };
             const reading = options.reading || (Guard ? Guard.wallOnly(at, zoneId()) : null);
+            const grant = runningGrant(runtime, profileId, at, options.reading || null);
+            if (grant) {
+                const endsAt = Ask.grantEndsAt(grant);
+                const clock = { ...Engine.studyClock({ plan: null, now: at }), next: { state: Engine.NORMAL, at: endsAt, round: null },
+                    grantUntil: endsAt, grantMinutes: grant.minutes, grantBy: grant.parentProfileId || null };
+                return { study, local, clock, reading, parentLock: { active: false, ended: false, remainingMs: 0 } };
+            }
             const guarded = reading ? guardFor(study, reading, options.clockStore) : { lock: { active: false }, window: null };
             const clockHold = !!reading && reading.changed && clockInForce(study, local, reading, guarded);
-            const clock = Engine.studyClock({
+            const input = {
                 plan: study.plan, focus: study.focus, breakMode: study.breakMode, now: at,
                 session: local.session, endedUntil: local.endedUntil, limitReached: options.limitReached === true,
                 parentLock: guarded.window, clockHold
-            });
-            if (clock.state === Engine.BREAK && Number.isFinite(local.breakSkippedUntil) && at < local.breakSkippedUntil) clock.breakSkipped = true;
-            return { study, local, clock, reading, parentLock: guarded.lock };
+            };
+            // The clock without any skip: where the breaks really are (Skip break and Undo read it).
+            const plain = Engine.studyClock(input);
+            const skippedBreaks = [...local.skippedBreaks];
+            // An older runtime kept only the skipped break's end: read it as that break's start.
+            if (Number.isFinite(local.breakSkippedUntil)) {
+                const legacy = array(plain.segments).find(item => item.kind === Engine.BREAK && item.end === local.breakSkippedUntil);
+                if (legacy && !skippedBreaks.includes(legacy.start)) skippedBreaks.push(legacy.start);
+            }
+            // A skipped break is study (Android StudyClock.withSkips): the allow list stays on and the time counts.
+            const clock = options.ignoreSkips || !skippedBreaks.length ? plain : Engine.studyClock({ ...input, skippedBreaks });
+            return { study, local: { ...local, skippedBreaks }, clock, plain, reading, parentLock: guarded.lock };
         }
 
         /**
@@ -234,6 +292,19 @@
             return { reading: result.reading, clockStore };
         }
 
+        /**
+         * Android StudyRuntime.lockClockNow: the time locks are measured on, the earlier of the wall clock
+         * and the guard's trusted clock, so moving the device clock forward can't end one early.
+         */
+        async function lockClockNow() {
+            try {
+                const guard = await readClock();
+                return Number.isFinite(guard.reading?.lockNow) ? guard.reading.lockNow : now();
+            } catch (e) {
+                return now();
+            }
+        }
+
         /** When a lock ends, for "Locked until ...": a parent's lock or plan, or a self Locked session. */
         function lockedUntil(study, local, clock) {
             if (clock.setByParentId) return clock.source === 'parent_lock' ? Number(object(study?.lock).endsAt) || clock.sessionEnd : clock.sessionEnd;
@@ -241,8 +312,14 @@
             return null;
         }
 
+        /** "Up next after the break": the last lecture's subject, only from this session. */
+        function upNextFor(runtime, profileId, clock) {
+            const last = object(object(runtime?.subjects)[profileId]);
+            return clock.state === Engine.BREAK && Number.isFinite(last.at) && last.at >= clock.sessionStart ? text(last.subject) || null : null;
+        }
+
         function publicState(study, local, clock, packIds, at, applied = {}) {
-            const breakSkipped = clock.state === Engine.BREAK && Number.isFinite(local.breakSkippedUntil) && at < local.breakSkippedUntil;
+            const breakSkipped = clock.breakSkipped === true;
             let policy = study ? Engine.endPolicy(study) : { canEnd: false, reason: 'no_study' };
             if (clock.setByParentId) policy = { canEnd: false, reason: 'set_by_parent' };
             else if (local.session?.lockMode === 'locked') policy = { canEnd: false, reason: 'locked' };
@@ -260,13 +337,24 @@
                 round: clock.round,
                 rounds: clock.rounds,
                 until: clock.until,
+                // Where the current round or break began: the break sun drains from it.
+                segmentStart: (Array.isArray(clock.segments) ? clock.segments : []).find(item => item.end === clock.until)?.start ?? null,
+                // The session's rounds and breaks, for the Day Ring (a skipped break folds into its round).
+                segments: (Array.isArray(clock.segments) ? clock.segments : []).map(({ kind, start, end, round }) => ({ kind, start, end, round })),
                 sessionStart: clock.sessionStart,
                 sessionEnd: clock.sessionEnd,
                 source: clock.source,
                 breakMode: clock.breakMode,
                 breakNoticeAt: clock.breakNoticeAt,
                 breakSkipped,
-                canSkipBreak: !!study && Engine.selfStarted(study) && !clock.setByParentId && clock.state === Engine.BREAK,
+                canSkipBreak: !!study && Engine.selfStarted(study) && !clock.setByParentId && clock.state === Engine.BREAK
+                    && !(Number.isFinite(clock.sessionEnd) && clock.sessionEnd - at <= SKIP_BREAK_LAST_MS),
+                // The skipped break the round runs through now ({start, end}), for Undo.
+                skippedBreak: clock.skippedBreak || null,
+                // "+5 min to round 3" under Skip break, and the "Round 3 is now 55 min" line after it.
+                skipPreview: !!study && Engine.selfStarted(study) && !clock.setByParentId && clock.state === Engine.BREAK && !breakSkipped
+                    && Engine.breakSkipPreview ? Engine.breakSkipPreview(clock.segments,
+                        (Array.isArray(clock.segments) ? clock.segments : []).find(item => item.kind === Engine.BREAK && item.end === clock.until)?.start) : null,
                 next: clock.next,
                 packIds,
                 phase: applied.phase || 'normal',
@@ -277,6 +365,9 @@
                 lockMode: clock.setByParentId ? 'locked' : (local.session?.lockMode || null),
                 endPolicy: policy,
                 endRequestedAt: local.endRequestedAt,
+                grantUntil: Number.isFinite(clock.grantUntil) ? clock.grantUntil : null,
+                grantMinutes: Number.isFinite(clock.grantMinutes) ? clock.grantMinutes : null,
+                grantBy: clock.grantBy || null,
                 validUntil: transitions.length ? Math.min(...transitions) : null
             };
         }
@@ -292,13 +383,144 @@
          * Synchronous, for the compiler: the profile the filters use and the public study state.
          * Returns {profile, applied, state}.
          */
+        /** The videos [profileId] skipped during study: always hidden for that profile, studying or not. */
+        function skippedVideos(profileId, prepared = null) {
+            const runtime = prepared?.runtime || emptyRuntime();
+            const list = runtime.skipped?.[text(profileId)];
+            return Array.isArray(list) ? list.filter(id => typeof id === 'string' && id) : [];
+        }
+
+        /**
+         * Minutes a parent gave (Android StudyRuntime.addGrant): added once by id; one that arrives while
+         * another runs starts when that one ends. Only the Ask-a-parent service calls this, after the
+         * parent's authority (here) or signature (from the parent's device) was checked.
+         */
+        async function addGrant(grant) {
+            if (!Ask?.addGrant) return { ok: false, error: 'unavailable' };
+            const items = await storageGet([RUNTIME_KEY]);
+            const runtime = normalizeRuntime(items[RUNTIME_KEY]);
+            const next = Ask.addGrant(runtime.grants, grant, now());
+            if (!next) return { ok: false, error: 'duplicate' };
+            runtime.grants = next;
+            await writeRuntime(runtime);
+            await schedule();
+            await deps.onTransition?.('grant');
+            return { ok: true, grant: next[next.length - 1] };
+        }
+
+        /** Whole minutes studied this week per day and when a parent's lock ends, for a child's report. */
+        async function reportFor(profileId) {
+            const [{ profiles, runtime }, device] = await Promise.all([readAll(), deviceId()]);
+            const profile = object(object(profiles.profiles)[text(profileId)]);
+            const study = Model.profileStudy(profile);
+            if (!study) return { dayMinutes: {}, lockEndsAt: null };
+            const progress = Model.mergeProgress(study.progress, { [device]: Object.fromEntries(
+                Object.entries(object(runtime.seconds[text(profileId)])).map(([day, seconds]) => [day, Math.floor(seconds / 60)])) });
+            const start = Ask?.weekStart ? Ask.weekStart(now()) : Engine.localDateKey(now());
+            const dayMinutes = {};
+            for (let index = 0; index < 7; index += 1) {
+                const date = new Date(`${start}T12:00:00`);
+                date.setDate(date.getDate() + index);
+                const key = Engine.localDateKey(date.getTime());
+                const minutes = Engine.minutesOn(progress, key);
+                if (minutes > 0) dayMinutes[key] = minutes;
+            }
+            const lock = study.lock;
+            const lockEndsAt = Model.isParentLock?.(lock) && Number(lock.endsAt) > now() ? Number(lock.endsAt) : null;
+            return { dayMinutes, lockEndsAt };
+        }
+
+        /**
+         * "Skip this video" (Android StudyRuntime.skipVideo): hides it from now on for this profile, even
+         * while locked. It only ever hides more, so a child may use it and nobody needs a PIN.
+         */
+        async function skipVideo(videoId) {
+            const id = text(videoId);
+            if (!/^[A-Za-z0-9_-]{6,64}$/.test(id)) return { ok: false, error: 'invalid_video' };
+            const { profileId, profile, runtime } = await readAll();
+            const study = Model.profileStudy(profile);
+            const { clock } = clockFor(profile, runtime, profileId);
+            if (!study || !clock.studying) return { ok: false, error: 'not_studying' };
+            const current = Array.isArray(runtime.skipped[profileId]) ? runtime.skipped[profileId] : [];
+            if (current.includes(id)) return { ok: true, already: true };
+            runtime.skipped[profileId] = [...current, id].slice(-MAX_SKIPPED);
+            await writeRuntime(runtime);
+            await deps.onTransition?.('skip_video');
+            return { ok: true };
+        }
+
+        /**
+         * Does study hold this profile's rules now, and with which sheet (Android StudyLoosening.sheet)?
+         * {sheet: 'parent'|'locked'|'gentle', endsAt, parentId, lockMode} or null.
+         */
+        function holdFrom({ study, local, clock, parentLock }, activeProfileId) {
+            if (!study) return null;
+            const running = clock.state === Engine.STUDY || clock.state === Engine.BREAK || clock.clockHold === true;
+            const lock = object(study.lock);
+            const parentLockActive = !!parentLock?.active && Model.isParentLock?.(lock);
+            const parentId = text(clock.setByParentId) || (parentLockActive ? text(lock.setByParentId) : '') || null;
+            const parentHolds = !!parentId && (running || parentLockActive);
+            const lockMode = local.session && running ? text(local.session.lockMode) || 'gentle'
+                : (!Model.isParentLock?.(lock) && text(lock.mode)) || null;
+            const sheet = Model.looseningSheetKind({ parentHolds, activeIsSetter: !!parentId && activeProfileId === parentId, lockMode, running });
+            if (!sheet) return null;
+            const endsAt = [clock.sessionEnd, parentLockActive ? Number(lock.endsAt) : null, Number(local.session?.endsAt)]
+                .find(value => Number.isFinite(value) && value > 0) || null;
+            return { sheet, endsAt, parentId: parentId || null, lockMode };
+        }
+
+        /** The rules each held profile had when study took hold (worker memory; the store is reverted too). */
+        const heldRules = new Map();
+
+        /**
+         * A save that would loosen a held profile (Android StudyLooseningSheet.noticeFor): the first held
+         * profile that loosens decides. {sheet, profileId, endsAt, parentId, parentName, lockMode} or null.
+         */
+        async function looseningNotice(current, next) {
+            if (!Model.ruleLoosens) return null;
+            const before = object(object(current).profiles);
+            const after = object(object(next).profiles);
+            const activeId = text(object(current).activeProfileId) || text(object(next).activeProfileId);
+            const runtime = normalizeRuntime((await storageGet([RUNTIME_KEY]))[RUNTIME_KEY]);
+            const at = now();
+            for (const [profileId, profile] of Object.entries(after)) {
+                const old = before[profileId];
+                if (!isObject(old) || !Model.profileStudy(old)) continue;
+                if (!Model.ruleLoosens(old, profile)) continue;
+                const hold = holdFrom(clockFor(old, runtime, profileId, at), activeId);
+                if (!hold) continue;
+                const parent = hold.parentId ? object(before[hold.parentId]) : {};
+                return { ...hold, profileId, parentName: text(parent.name) || null };
+            }
+            return null;
+        }
+
+        /** The active profile's hold, for handlers that would only loosen it (allow-list imports, mode switch). */
+        async function activeHold() {
+            const { profileId, profile, profiles, runtime } = await readAll();
+            const hold = holdFrom(clockFor(profile, runtime, profileId, now()), profileId);
+            if (!hold) return null;
+            const parent = hold.parentId ? object(object(object(profiles).profiles)[hold.parentId]) : {};
+            return { ...hold, profileId, parentName: text(parent.name) || null };
+        }
+
         function apply(profileId, profile, prepared, options = {}) {
             const at = prepared?.now ?? now();
-            const { study, local, clock } = clockFor(profile, prepared?.runtime || emptyRuntime(), profileId, at,
+            const read = clockFor(profile, prepared?.runtime || emptyRuntime(), profileId, at,
                 { ...options, reading: prepared?.reading, clockStore: prepared?.clockStore });
-            if (!study) return { profile, applied: false, state: null };
-            const result = Engine.studyEffectiveProfile(profile, { catalog: prepared?.catalog, clock, study });
-            return { profile: result.profile, applied: result.applied, state: publicState(study, local, clock, result.packIds, at, result) };
+            const { study, local, clock } = read;
+            if (!study) { heldRules.delete(profileId); return { profile, applied: false, state: null }; }
+            // While study holds the profile, compile from the rules it had then plus stricter changes only,
+            // so a loosening write never compiles in the moment before it is put back.
+            let rulesProfile = profile;
+            if (Model.ruleLoosens && holdFrom(read, profileId)) {
+                const held = heldRules.get(profileId);
+                if (held && Model.ruleLoosens(held, profile)) rulesProfile = Model.withHeldRules(profile, held);
+                else heldRules.set(profileId, Model.ruleSnapshot(profile));
+            } else heldRules.delete(profileId);
+            const result = Engine.studyEffectiveProfile(rulesProfile, { catalog: prepared?.catalog, clock, study });
+            return { profile: result.profile, applied: result.applied,
+                state: { ...publicState(study, local, clock, result.packIds, at, result), upNext: upNextFor(prepared?.runtime, profileId, clock) } };
         }
 
         async function writeRuntime(runtime) {
@@ -351,6 +573,52 @@
             });
         }
 
+        /**
+         * Android StudySessionEnds.observe: keeps the running session per profile and, once it leaves the
+         * clock, its end card until it's seen (ftStudySessionEndsV1, its own key so the runtime's
+         * read-modify-writes never race it). Returns the pending end card, or null.
+         */
+        async function observeSessionEnd(profileId, study, local, clock, at) {
+            if (!Engine.sessionEndStep) return null;
+            const items = await storageGet([SESSION_ENDS_KEY]);
+            const table = object(clone(items[SESSION_ENDS_KEY]));
+            const entry = object(table[profileId]);
+            const skipped = array(local.skippedBreaks).filter(start => Number.isFinite(clock.sessionStart) && start >= clock.sessionStart
+                && (!Number.isFinite(clock.sessionEnd) || start < clock.sessionEnd));
+            const [open, ended] = Engine.sessionEndStep(isObject(entry.open) ? entry.open : null, clock, study?.focus, skipped, at);
+            const next = { open, ended: ended || (isObject(entry.ended) ? entry.ended : null) };
+            if (JSON.stringify(next) !== JSON.stringify({ open: entry.open || null, ended: entry.ended || null })) {
+                table[profileId] = next;
+                await storageSet({ [SESSION_ENDS_KEY]: table });
+            }
+            return Engine.pendingSessionEnd(next.ended, at);
+        }
+
+        /** The end card was seen (Done or Plan tomorrow): it doesn't show again. */
+        async function acknowledgeSessionEnd() {
+            const [{ profileId }, items] = await Promise.all([readAll(), storageGet([SESSION_ENDS_KEY])]);
+            const table = object(clone(items[SESSION_ENDS_KEY]));
+            if (isObject(table[profileId])) {
+                table[profileId] = { ...table[profileId], ended: null };
+                await storageSet({ [SESSION_ENDS_KEY]: table });
+            }
+            return { ok: true };
+        }
+
+        /** Whether the browser lets FilterTube run in private windows (true, false, or null when unknown). */
+        function incognitoAllowed() {
+            const ext = api?.extension;
+            if (typeof ext?.isAllowedIncognitoAccess !== 'function') return Promise.resolve(null);
+            return new Promise(resolve => {
+                try {
+                    const maybe = ext.isAllowedIncognitoAccess(value => resolve(typeof value === 'boolean' ? value : null));
+                    if (maybe && typeof maybe.then === 'function') maybe.then(value => resolve(typeof value === 'boolean' ? value : null), () => resolve(null));
+                } catch (e) {
+                    resolve(null);
+                }
+            });
+        }
+
         /** The UI state for the active profile. */
         async function getState() {
             const guard = await readClock();
@@ -362,19 +630,31 @@
             const progress = study ? Model.mergeProgress(study.progress, { [device]: Object.fromEntries(
                 Object.entries(object(runtime.seconds[profileId])).map(([day, seconds]) => [day, Math.floor(seconds / 60)])) }) : {};
             const lock = await deps.getSelfControlSession?.();
+            // A session that ended while no page was open is noticed the moment one asks.
+            const sessionEnded = await observeSessionEnd(profileId, study, local, clock, at).catch(() => null);
             return {
                 ok: true,
                 profileId,
+                sessionEnded,
                 deviceId: device,
                 study,
                 ...publicState(study, local, clock, applied.packIds || [], at, applied),
+                upNext: upNextFor(runtime, profileId, clock),
+                // Only a lecture from this session (Continue lecture shows during a round).
+                lastVideoId: clock.state === Engine.STUDY && Number(object(runtime.lastVideo?.[profileId]).at) >= Number(clock.sessionStart)
+                    ? text(object(runtime.lastVideo[profileId]).videoId) || null : null,
                 session: local.session,
                 clockNotes: array(object(guard.clockStore?.notes)[profileId]),
                 lock: lock ? { sessionId: lock.sessionId, sessionKind: lock.sessionKind, lockedUntil: lock.lockedUntil } : null,
                 packs: packLabels(study, catalog),
                 todayMinutes: Engine.minutesOn(progress, date),
                 week: Engine.weekProgress(progress, at, study?.focus?.dailyGoalMinutes || 0),
-                weekView: study ? Model.weekViewEnabled(study, profile.type) : false
+                weekView: study ? Model.weekViewEnabled(study, profile.type) : false,
+                isChild: text(profile.type) === 'child',
+                // Private windows run without FilterTube unless the browser allows it: the Study page says so.
+                incognitoAllowed: await incognitoAllowed(),
+                // "How search works while studying", worked out here where the pack catalog is loaded.
+                searchHow: study && Engine.searchExplainer ? Engine.searchExplainer(study, catalog) : null
             };
         }
 
@@ -384,6 +664,7 @@
             const { profileId, profile, runtime } = await readAll();
             const at = now();
             const { study, local, clock, parentLock } = clockFor(profile, runtime, profileId, at, guard);
+            await observeSessionEnd(profileId, study, local, clock, at).catch(() => null);
             // A hold re-checks every minute; a parent's lock advances its running-time meter every minute.
             const minute = clock.clockHold || parentLock?.active || clockSensitive(study, local) && clock.studying ? at + 60 * 1000 : null;
             const candidates = [clock.next?.at, local.endRequestedAt ? local.endRequestedAt + Engine.GENTLE_END_PAUSE_MS : null, minute]
@@ -403,14 +684,21 @@
             if (!local.endRequestedAt || now() < local.endRequestedAt + Engine.GENTLE_END_PAUSE_MS) return false;
             const { profile } = await readAll();
             const { clock } = clockFor(profile, runtime, profileId);
+            const switchTo = text(local.switchTo);
             runtime.profiles[profileId] = {
                 ...local,
                 session: null,
                 endRequestedAt: null,
+                switchTo: null,
                 endedUntil: clock.sessionEnd || now()
             };
             await writeRuntime(runtime);
             await updateProfileStudy(profileId, study => ({ ...study, lock: null }));
+            // "End and switch" (Android StudySwitchGate.endGentleThenSwitch): the pause is over, so the
+            // switch the person asked for goes ahead now.
+            if (switchTo && typeof deps.switchProfile === 'function') {
+                try { await deps.switchProfile(profileId, switchTo); } catch (e) { }
+            }
             return true;
         }
 
@@ -446,6 +734,10 @@
             const { profileId, profile, runtime } = await readAll();
             const study = Model.profileStudy(profile);
             if (!study || !study.activePackIds.length) return { ok: false, error: 'no_active_pack' };
+            // Android StudyRuntime.startGentle: a child, or a profile under a parent's plan or lock, waits for the parent.
+            if (text(profile.type) === 'child' || text(object(study.plan).setByParentId) || Model.isParentLock?.(study.lock)) {
+                return { ok: false, error: 'set_by_parent' };
+            }
             const { clock } = clockFor(profile, runtime, profileId);
             if (clock.studying) return { ok: false, error: 'already_studying' };
             if (await deps.getSelfControlSession?.()) return { ok: false, error: 'session_already_active' };
@@ -458,14 +750,15 @@
                 if (!result?.ok) return result || { ok: false, error: 'lock_failed' };
             }
             const local = profileRuntime(runtime, profileId);
-            runtime.profiles[profileId] = { ...local, session: { sessionId, startedAt, endsAt, lockMode: mode }, endRequestedAt: null, breakSkippedUntil: null };
+            runtime.profiles[profileId] = { ...local, session: { sessionId, startedAt, endsAt, lockMode: mode }, endRequestedAt: null, breakSkippedUntil: null,
+                skippedBreaks: prunedSkips(local.skippedBreaks, startedAt) };
             await writeRuntime(runtime);
             if (mode === 'gentle') {
                 await updateProfileStudy(profileId, value => ({ ...value, lock: { sessionId, sessionKind: 'self_control', mode: 'gentle', setByParentId: null } }));
             }
             await schedule();
             await deps.onTransition?.('start');
-            return { ok: true, sessionId, startedAt, endsAt, lock: mode };
+            return { ok: true, sessionId, startedAt, endsAt, lock: mode, incognitoAllowed: await incognitoAllowed() };
         }
 
         /** Gentle: the session ends after a 30-second pause, unless cancelled. Locked: refused. */
@@ -483,31 +776,74 @@
             return { ok: true, endsAt: endRequestedAt + Engine.GENTLE_END_PAUSE_MS };
         }
 
+        /**
+         * "End and switch" (Android StudySwitchGate): a Gentle session ends after its 30-second pause,
+         * then the profile switches to [targetProfileId]. "Keep studying" (cancelEnd) drops both.
+         */
+        async function endGentleThenSwitch(targetProfileId) {
+            const target = text(targetProfileId);
+            if (!target) return { ok: false, error: 'invalid_target' };
+            const result = await requestEnd();
+            if (!result?.ok) return result;
+            const { profileId, runtime } = await readAll();
+            const local = profileRuntime(runtime, profileId);
+            runtime.profiles[profileId] = { ...local, switchTo: target };
+            await writeRuntime(runtime);
+            return { ...result, switchTo: target };
+        }
+
         async function cancelEnd() {
             const { profileId, runtime } = await readAll();
             const local = profileRuntime(runtime, profileId);
-            runtime.profiles[profileId] = { ...local, endRequestedAt: null };
+            runtime.profiles[profileId] = { ...local, endRequestedAt: null, switchTo: null };
             await writeRuntime(runtime);
             await schedule();
             return { ok: true };
         }
 
+        /**
+         * Skip break (Android StudyRuntime.skipBreak): the break folds into study, so the allow list stays
+         * on and the time is credited. The person's own session or plan only; never in the last minute.
+         */
         async function skipBreak() {
             const { profileId, profile, runtime } = await readAll();
-            const { study, local, clock } = clockFor(profile, runtime, profileId);
+            const at = now();
+            const { study, local, clock } = clockFor(profile, runtime, profileId, at);
             if (!study || clock.state !== Engine.BREAK) return { ok: false, error: 'not_on_break' };
-            if (!Engine.selfStarted(study)) return { ok: false, error: 'set_by_parent' };
-            runtime.profiles[profileId] = { ...local, breakSkippedUntil: clock.until };
+            if (!Engine.selfStarted(study) || clock.setByParentId) return { ok: false, error: 'set_by_parent' };
+            if (Number.isFinite(clock.sessionEnd) && clock.sessionEnd - at <= SKIP_BREAK_LAST_MS) return { ok: false, error: 'last_minute' };
+            const segment = array(clock.segments).find(item => item.kind === Engine.BREAK && item.start <= at && at < item.end);
+            if (!segment) return { ok: false, error: 'not_on_break' };
+            runtime.profiles[profileId] = { ...local, breakSkippedUntil: null, skippedBreaks: prunedSkips([...local.skippedBreaks, segment.start], at) };
             await writeRuntime(runtime);
             await deps.onTransition?.('skip_break');
-            return { ok: true, until: clock.until };
+            return { ok: true, until: segment.end, breakStart: segment.start };
+        }
+
+        /**
+         * "Undo" in the seconds after Skip break (Android StudyRuntime.undoSkipBreak): the skipped break
+         * ending at `until` comes back while its time hasn't passed. Not skipped, or over: refused.
+         */
+        async function undoSkipBreak({ until } = {}) {
+            const { profileId, profile, runtime } = await readAll();
+            const at = now();
+            const { local, plain } = clockFor(profile, runtime, profileId, at);
+            const end = Number(until);
+            const segment = array(plain?.segments).find(item => item.kind === Engine.BREAK && item.end === end);
+            if (!segment || !local.skippedBreaks.includes(segment.start) || at >= end) {
+                return { ok: false, error: 'not_skipped' };
+            }
+            runtime.profiles[profileId] = { ...local, breakSkippedUntil: null, skippedBreaks: local.skippedBreaks.filter(start => start !== segment.start) };
+            await writeRuntime(runtime);
+            await deps.onTransition?.('undo_skip_break');
+            return { ok: true, until: end };
         }
 
         /**
          * Study time from a content script: credited only while the active profile is in STUDY, at most
          * the wall time since the last credit, so two playing tabs never count twice.
          */
-        async function tick({ seconds } = {}) {
+        async function tick({ seconds, title, videoId } = {}) {
             const value = Math.trunc(Number(seconds));
             if (!Number.isFinite(value) || value <= 0) return { ok: false, error: 'invalid_seconds' };
             const { profileId, profile, runtime } = await readAll();
@@ -522,6 +858,13 @@
             days[date] = Math.min(86400, (Number(days[date]) || 0) + credited);
             runtime.seconds[profileId] = Object.fromEntries(Object.entries(days).sort().slice(-400));
             runtime.lastCreditAt = at;
+            // "Up next after the break: {subject}": the subject the lecture's title names, if any.
+            if (Engine.subjectOf && typeof title === 'string' && title.trim()) {
+                const study = Model.profileStudy(profile);
+                const subject = Engine.subjectOf(title.slice(0, 300), Engine.studySubjects(study, await loadCatalog()));
+                if (subject) runtime.subjects[profileId] = { at, subject };
+            }
+            if (typeof videoId === 'string' && /^[A-Za-z0-9_-]{11}$/.test(videoId)) runtime.lastVideo[profileId] = { at, videoId };
             await writeRuntime(runtime);
             return { ok: true, credited, date, seconds: days[date] };
         }
@@ -530,16 +873,29 @@
         async function update(patch = {}) {
             if (await deps.getSelfControlSession?.()) return { ok: false, error: 'locked' };
             const allowed = ['activePackIds', 'packEdits', 'focus', 'plan', 'breakMode', 'weekView', 'packChannelsOnly'];
-            const { profileId, profile } = await readAll();
+            const { profileId, profile, runtime } = await readAll();
             const current = Model.profileStudy(profile);
             const apply = study => {
                 const next = { ...study };
                 for (const key of allowed) if (Object.prototype.hasOwnProperty.call(object(patch), key)) next[key] = clone(patch[key]);
                 return next;
             };
-            // Under a parent's plan or lock the person may tighten study, never loosen it (StudyTighten).
-            if (current && (current.plan?.setByParentId || current.lock?.setByParentId)
-                && !Model.tightenAllowed(current, apply(clone(current)), { now: now() })) return { ok: false, error: 'set_by_parent' };
+            // A child never sets study up for itself (Android StudySetupActivity); a parent does that from
+            // Family control. It may only make what it has stricter.
+            const isChild = text(profile.type) === 'child';
+            if (isChild && !current) return { ok: false, error: 'child_profile' };
+            // Under a parent's plan or lock the person may tighten study, never loosen it (StudyTighten),
+            // and nobody loosens it during a clock hold (Android StudyRuntime.holdsLoosening).
+            // A self-started session holds too while it runs (Android StudyLoosening: Gentle during a round
+            // or break, Locked for its whole window), so a loosening save says why instead of going through.
+            const held = current ? clockFor(profile, runtime, profileId, now()) : null;
+            const running = !!held && held.clock.clockHold === true;
+            const selfRunning = !!held && !!held.local.session && held.clock.studying === true && held.clock.source === 'session';
+            if (current && (isChild || running || selfRunning || current.plan?.setByParentId || current.lock?.setByParentId)
+                && !Model.tightenAllowed(current, apply(clone(current)), { now: now(), held: isChild || running || selfRunning })) {
+                if (isChild || current.plan?.setByParentId || current.lock?.setByParentId) return { ok: false, error: 'set_by_parent' };
+                return { ok: false, error: selfRunning && held.local.session.lockMode === 'locked' ? 'locked' : 'study_running' };
+            }
             const result = await updateProfileStudy(profileId, apply);
             if (result?.ok === false) return result;
             await schedule();
@@ -553,7 +909,7 @@
          * sends it as the schedule scope and the child can only tighten it. A plan or lock another
          * parent set stays theirs.
          */
-        async function parentContext(childId) {
+        async function parentContext(childId, { edit = false } = {}) {
             if (await deps.getSelfControlSession?.()) return { ok: false, error: 'locked' };
             const { profiles } = await readAll();
             const parentId = text(profiles.activeProfileId) || 'default';
@@ -563,6 +919,11 @@
             const parentIsAccount = parentId === 'default' || text(parent.type || 'account') === 'account';
             if (!Object.keys(child).length || text(child.type) !== 'child' || text(child.parentProfileId) !== parentId || !parentIsAccount) {
                 return { ok: false, error: 'not_parent' };
+            }
+            // An edit needs a fresh unlock of that parent (Android ParentModeChrome.openSpace:
+            // requestActiveProfileUnlock with sensitiveAction, a PIN typed in the last 5 minutes).
+            if (edit && typeof deps.parentUnlockFresh === 'function' && !(await deps.parentUnlockFresh(parentId))) {
+                return { ok: false, error: 'parent_unlock_required', parentId };
             }
             return { ok: true, parentId, child, childId: text(childId) };
         }
@@ -578,7 +939,7 @@
         }
 
         async function updateChild(childId, patch = {}) {
-            const context = await parentContext(childId);
+            const context = await parentContext(childId, { edit: true });
             if (!context.ok) return context;
             const current = Model.profileStudy(context.child) || Model.createStudy();
             const owner = value => text(object(value).setByParentId);
@@ -600,7 +961,7 @@
 
         /** A parent's session lock on a child: study rounds for `minutes` (7 days at most), from now. */
         async function startParentLock(childId, { minutes } = {}) {
-            const context = await parentContext(childId);
+            const context = await parentContext(childId, { edit: true });
             if (!context.ok) return context;
             const length = Math.trunc(Number(minutes));
             if (!Number.isFinite(length) || length < 15 || length > Engine.PARENT_LOCK_MAX_MINUTES) {
@@ -624,7 +985,7 @@
 
         /** Only the parent who set a lock ends it early. */
         async function endParentLock(childId) {
-            const context = await parentContext(childId);
+            const context = await parentContext(childId, { edit: true });
             if (!context.ok) return context;
             const current = Model.profileStudy(context.child);
             if (!current?.lock) return { ok: true };
@@ -634,6 +995,40 @@
             await schedule();
             await deps.onTransition?.('parent_unlock');
             return { ok: true };
+        }
+
+        /**
+         * Switching profile during study (Android StudyProfileSwitch). Study is per profile, so a switch
+         * away from [fromProfileId] is a way out unless it's checked:
+         * - a parent's lock, a parent's plan window or a parent's plan limit: the PIN of the parent who
+         *   set it, typed now ({kind: 'needs_parent_pin', parentProfileId, endsAt});
+         * - a clock hold or a self-started Locked session: no switching ({kind: 'locked', endsAt});
+         * - a Gentle session: it ends first ({kind: 'end_gentle_first'});
+         * - otherwise {kind: 'allowed'} and the usual PIN gates apply.
+         */
+        async function switchDecision(fromProfileId, fromProfile, targetId) {
+            const from = text(fromProfileId);
+            if (!from || text(targetId) === from) return { kind: 'allowed' };
+            const items = await storageGet([RUNTIME_KEY, CLOCK_KEY]);
+            const runtime = normalizeRuntime(items[RUNTIME_KEY]);
+            const clockStore = normalizeClockStore(items[CLOCK_KEY]);
+            const { study, local, clock, parentLock } = clockFor(object(fromProfile), runtime, from, now(), { clockStore });
+            if (!study) return { kind: 'allowed' };
+            const lock = object(study.lock);
+            if (parentLock?.active && text(lock.setByParentId)) {
+                return { kind: 'needs_parent_pin', parentProfileId: text(lock.setByParentId), endsAt: Number(lock.endsAt) || null };
+            }
+            if (clock.setByParentId && clock.studying) {
+                return { kind: 'needs_parent_pin', parentProfileId: text(clock.setByParentId), endsAt: clock.sessionEnd || null };
+            }
+            if (clock.state === Engine.LIMIT) {
+                const planParent = text(object(study.plan).setByParentId);
+                if (planParent) return { kind: 'needs_parent_pin', parentProfileId: planParent, endsAt: clock.clockHold ? null : clock.until || null };
+                if (clock.clockHold) return { kind: 'locked', endsAt: clock.until || null };
+            }
+            if (local.session?.lockMode === 'locked' && clock.studying) return { kind: 'locked', endsAt: Number(local.session.endsAt) || null };
+            if (local.session && clock.studying) return { kind: 'end_gentle_first' };
+            return { kind: 'allowed' };
         }
 
         /** Runtime messages. Returns a promise of the response, or null when the action isn't ours. */
@@ -648,14 +1043,24 @@
                 if (!youtubeContent) return Promise.resolve({ ok: false, error: 'untrusted_sender' });
                 return tick(request);
             }
+            if (action === 'FilterTube_StudySkipVideo') {
+                if (!extensionPage && !youtubeContent) return Promise.resolve({ ok: false, error: 'untrusted_sender' });
+                return skipVideo(request.videoId);
+            }
             if (action === 'FilterTube_StudySkipBreak') {
                 if (!extensionPage && !youtubeContent) return Promise.resolve({ ok: false, error: 'untrusted_sender' });
                 return skipBreak();
             }
+            if (action === 'FilterTube_StudyUndoSkipBreak') {
+                if (!extensionPage && !youtubeContent) return Promise.resolve({ ok: false, error: 'untrusted_sender' });
+                return undoSkipBreak(request);
+            }
             if (!extensionPage) return Promise.resolve({ ok: false, error: 'untrusted_sender' });
+            if (action === 'FilterTube_StudyAckSessionEnd') return acknowledgeSessionEnd();
             if (action === 'FilterTube_StudyStartSession') return startSession(request);
             if (action === 'FilterTube_StudyEndSession') return requestEnd();
             if (action === 'FilterTube_StudyCancelEnd') return cancelEnd();
+            if (action === 'FilterTube_StudyEndGentleThenSwitch') return endGentleThenSwitch(request.targetProfileId);
             if (action === 'FilterTube_StudyUpdate') return update(request.patch);
             if (action === 'FilterTube_StudyGetChild') return getChildState(request.profileId);
             if (action === 'FilterTube_StudyUpdateChild') return updateChild(request.profileId, request.patch);
@@ -665,8 +1070,9 @@
         }
 
         return Object.freeze({
-            ALARM, RUNTIME_KEY, prepare, apply, getState, schedule, onAlarm, startSession, requestEnd, cancelEnd,
-            skipBreak, tick, update, foldProgress, handleMessage, deviceId, getChildState, updateChild, startParentLock, endParentLock
+            ALARM, RUNTIME_KEY, prepare, apply, getState, schedule, onAlarm, startSession, requestEnd, cancelEnd, endGentleThenSwitch,
+            skipBreak, undoSkipBreak, skipVideo, looseningNotice, activeHold, skippedVideos, tick, update, foldProgress, handleMessage, deviceId, getChildState, updateChild, startParentLock, endParentLock,
+            switchDecision, addGrant, reportFor, acknowledgeSessionEnd, lockClockNow
         });
     }
 

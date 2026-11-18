@@ -33,9 +33,10 @@ function profile(extra = {}) {
     };
 }
 
-test('outside study and in a normal or skipped break, the profile is unchanged', () => {
+test('outside study and in a normal break, the profile is unchanged', () => {
     const base = profile();
-    for (const clock of [{ state: Engine.NORMAL }, { state: Engine.BREAK, breakMode: 'normal' }, { state: Engine.BREAK, breakMode: 'rest', breakSkipped: true }]) {
+    // A skipped break is not here: the clock folds it into the round (Android StudyClock.withSkips), so it is study.
+    for (const clock of [{ state: Engine.NORMAL }, { state: Engine.BREAK, breakMode: 'normal' }]) {
         const result = Engine.studyEffectiveProfile(base, { catalog, clock });
         assert.equal(result.applied, false);
         assert.equal(result.profile, base);

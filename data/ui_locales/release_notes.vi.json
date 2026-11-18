@@ -1,4 +1,55 @@
 {
+  "3.6.2": {
+    "headline": "Gặp gỡ Kriti và Uljhan, trình lập kế hoạch Học tập được làm lại và Hỏi phụ huynh",
+    "summary": "FilterTube 3.6.2 có diện mạo riêng với Kriti và Uljhan, biểu tượng bút sáp, hình vẽ nguệch ngoạc và âm thanh tùy chọn. Học tập được làm lại xoay quanh trình lập kế hoạch ngày với các gói soạn sẵn cho 29 quốc gia, trẻ em có thể xin phụ huynh cho xem một video hoặc kênh, còn trình xem, hồ sơ, máy tính bảng và TV được thiết kế lại nhẹ nhàng hơn với ghi chú quyền riêng tư rõ ràng hơn.",
+    "bannerSummary": "Kriti và Uljhan, trình lập kế hoạch Học tập được làm lại, Hỏi phụ huynh và trình xem nhẹ nhàng hơn.",
+    "ctaLabel": "Xem điểm mới",
+    "highlights": [
+      "Học tập được làm lại: trang chủ Học tập kiểu giấy với Vòng ngày bằng bút sáp, trình lập kế hoạch ngày, phần thiết lập giải thích từng lựa chọn và các gói soạn sẵn cho kỳ thi và lớp học ở 29 quốc gia. Nguồn cấp theo nhánh bạn chọn, nên GATE Civil vẫn chỉ là Civil, và Tìm kiếm trong lúc học chỉ tìm trong các kênh thuộc kế hoạch của bạn.",
+      "Hỏi phụ huynh: khi nội dung bị chặn, trẻ có thể xin xem video đó hoặc xin cho phép kênh đó, và phụ huynh sẽ trả lời. Chế độ phụ huynh mở một phiên phụ huynh có khung bên trong hồ sơ Trẻ em với một lối ra rõ ràng duy nhất, và Học theo độ tuổi cho Trẻ em lấp đầy không gian Trẻ em bằng bài học chọn theo độ tuổi trong giờ học.",
+      "Diện mạo mới: Kriti và Uljhan ở bên bạn khi trang đang tải, danh sách trống, bạn ngoại tuyến hoặc có nội dung bị chặn. FilterTube có biểu tượng bút sáp, hình vẽ nguệch ngoạc, ảnh đại diện vẽ nguệch ngoạc riêng, các biểu tượng ứng dụng Kriti, Uljhan và bộ đôi để chọn, cùng âm thanh tùy chọn có thể đặt là Tắt, Nhẹ nhàng hoặc Vui nhộn.",
+      "Trình xem nhẹ nhàng hơn: áp phích tràn viền trên điện thoại, trang danh sách phát và bảng tài khoản mới, ánh sáng của trang Xem lan lên dưới thanh trạng thái, Uljhan tải thêm khi bạn cuộn, kéo để làm mới, và một thông báo rõ ràng duy nhất khi kết nối chậm hoặc ngoại tuyến.",
+      "Hồ sơ được thiết kế lại với ảnh đại diện bút sáp, bộ chọn cho thấy ai là phụ huynh và ai là trẻ em, và một cách thêm hồ sơ có bảo vệ.",
+      "FilterTube dùng từ ngữ riêng ở mọi nơi: Clip, Đang theo dõi, Đã lưu, và Sangeet cho âm nhạc, ở mọi ngôn ngữ.",
+      "Quyền riêng tư: Tài khoản & Đồng bộ giải thích máy chủ chuyển tiếp đồng bộ có thể và không thể thấy gì, đồng thời hỏi trước lần đồng bộ qua internet đầu tiên; tên thiết bị của bạn không còn được gửi khi đổ chuông thiết bị khác; hình thu nhỏ DeArrow là tùy chọn bật riêng, mặc định tắt; cookie tài khoản chỉ được gửi đến các trang của chính dịch vụ video; và bản phát hành giữ nhật ký gỡ lỗi ngoài nhật ký hệ thống.",
+      "Máy tính bảng và TV giống điện thoại: Bộ lọc, Tìm kiếm và Hỏi phụ huynh dùng toàn bộ chiều rộng trên máy tính bảng, còn TV có biểu tượng bút sáp ở thanh bên, Học tập trên màn hình lớn và thẻ Giới thiệu về TV này với chế độ Đầy đủ và Nhẹ.",
+      "Ủng hộ FilterTube vẫn miễn phí và không bắt buộc: bảng ủng hộ là một lời nhắn thân thiện, không bao giờ là rào chắn.",
+      "Sửa lỗi: kiểm tra PIN không còn làm đơ màn hình, tải thêm trong Học tập không còn làm trang nhấp nháy, linh vật không bao giờ bị cắt giữa chuyển động, nhiều nhãn tiếng Anh còn sót nay đã được dịch, và lỗi tải của Sangeet không còn nêu tên dịch vụ video."
+    ]
+  },
+  "3.6.1": {
+    "headline": "Chế độ ngang vừa mọi màn hình, điều khiển phát ổn định hơn và lọc chặt chẽ hơn",
+    "summary": "FilterTube 3.6.1 tính kích thước mọi trang ngang theo cửa sổ, nên điện thoại xoay ngang, máy tính bảng và TV đều có video toàn chiều cao và bảng bên phải. Phụ đề, bản chép lời và menu thẻ hoạt động như mong đợi, và kênh bạn lọc sẽ bị ẩn ở mọi nơi.",
+    "bannerSummary": "Chế độ ngang vừa mọi màn hình, sửa lỗi phụ đề và bản chép lời, cùng lọc chặt chẽ hơn.",
+    "ctaLabel": "Xem điểm mới",
+    "highlights": [
+      "Chế độ ngang được tính theo màn hình của bạn: trên điện thoại xoay ngang, máy tính bảng hoặc TV, trang Xem hiển thị video 16:9 toàn chiều cao với Tiếp theo bên cạnh, Tìm kiếm nằm ở đầu thanh bên, và không có gì bị phần khoét camera che mất.",
+      "Nhạc khi xoay ngang hiển thị cùng danh sách Tiếp theo như khi dọc, mâm đĩa quay ở 33⅓ rpm theo tốc độ phát, và Tiếp theo bắt đầu từ bài đang phát.",
+      "Phụ đề tắt khi bạn chọn Tắt, Tự động dịch hoạt động trên video đang phát, và lựa chọn mà trình phát chưa áp dụng được sẽ báo cho bạn biết thay vì thất bại âm thầm.",
+      "Chạm vào một dòng trong bản chép lời sẽ giữ bản chép lời mở và tiếp tục theo dõi, giống lời bài hát, và ánh sáng của trang Xem lan khắp cả trang ở chế độ ngang.",
+      "Kênh trong danh sách lọc của bạn bị ẩn mọi nội dung, bất kể được thêm bằng cách nào. Chặn từ một bình luận sẽ ẩn bình luận và video của kênh đó, các Mix bắt nguồn từ kênh bị chặn bị ẩn, và trò chuyện trực tiếp tuân theo quy tắc của bạn.",
+      "Ở chế độ Chỉ cho phép mục đã chọn, bình luận chỉ hiển thị người bình luận được cho phép hoặc từ được cho phép.",
+      "Menu thẻ vẫn hoạt động sau khi thay đổi bộ lọc, cách sắp xếp kênh đã chọn được giữ sau khi làm mới, và hình ảnh trang Xem vẫn còn sau khi thay đổi bộ lọc trong lúc đang cuộn.",
+      "Hướng dẫn từng bước giúp thiết lập để liên kết YouTube mở trong FilterTube, và máy tính bảng hiển thị hồ sơ Chính và Trẻ em cạnh nhau."
+    ]
+  },
+  "3.6.0": {
+    "headline": "Trình phát Nhạc mới, trang nhanh hơn và liên kết YouTube mở trong FilterTube",
+    "summary": "FilterTube 3.6.0 thiết kế lại Nhạc xoay quanh ảnh bìa của từng bài, tải các trang Nhạc, Trang chủ và album nhanh hơn nhiều, mở liên kết YouTube từ ứng dụng khác trong trình xem được bảo vệ và giúp khóa PIN hoạt động dễ đoán. Điện thoại, máy tính bảng và TV đều có cùng các cải tiến.",
+    "bannerSummary": "Trình phát Nhạc và màu sắc mới, tải nhanh hơn, liên kết YouTube trong FilterTube và khóa PIN rõ ràng hơn.",
+    "ctaLabel": "Xem điểm mới",
+    "highlights": [
+      "Nhạc mang màu của thứ bạn đang nghe: mọi trang Nhạc, trình phát mini và thanh dưới cùng lấy màu của ảnh bìa, chuyển mượt giữa các bài và album, và trở lại bình thường khi bạn rời Nhạc.",
+      "Trình phát Nhạc được thiết kế lại: một vòng tua quanh ảnh bìa đang xoay, thẻ lời bài hát trượt lên từ dưới, hiệu ứng hình ảnh nhẹ chuyển động theo nhịp, và các đài phát trực tiếp hiển thị là LIVE.",
+      "Lời bài hát đồng bộ thực từ YouTube Music, sau đó là phụ đề của chính bài hát bằng ngôn ngữ của bạn, với LRCLIB là nguồn bổ sung tùy chọn mà bạn chỉ được hỏi một lần. Lời bài hát và bản chép lời giữ dòng hiện tại ở giữa cho đến hết.",
+      "Tải nhanh hơn nhiều: bài hát trong Nhạc dùng kênh mà YouTube Music đã liệt kê, thẻ trên màn hình được kiểm tra trước, và việc kiểm tra kênh được giãn nhịp để YouTube không còn từ chối. Bài hát trong album và danh sách phát không còn phải chờ hàng phút.",
+      "Nhạc chỉ phát âm thanh cho đến khi bạn hiện video, nên bài hát bắt đầu nhanh hơn và tốn ít dữ liệu hơn nhiều. Bỏ qua từ màn hình khóa và chuyển sang bài tiếp theo giờ phát ngay lập tức.",
+      "Liên kết YouTube từ ứng dụng trò chuyện và ứng dụng khác có thể mở trong trình xem được bảo vệ của FilterTube. Lời nhắc một lần và mục kiểm tra trong Cài đặt giúp phụ huynh bật tính năng này.",
+      "Khóa PIN dễ đoán: hồ sơ vẫn mở khóa khi đang dùng và khóa khi FilterTube đóng, điện thoại khởi động lại hoặc bạn chuyển hồ sơ. Phụ huynh có thể chọn khóa sau một khoảng thời gian rời đi thay vào đó.",
+      "Trang Xem phát sáng theo màu của video đang phát, từ thanh trạng thái đến các bảng và Tiếp theo; bản chép lời nằm gọn dưới trình phát; các chip khớp với trang của chúng; và hàng đợi Mix tiếp tục tải.",
+      "Android TV và máy tính bảng: màu Nhạc và trình phát mới trên TV với tua bằng điều khiển từ xa, hiệu ứng hình ảnh nhẹ hơn cho TV box, bảng Xem theo màu video, cùng sửa lỗi bố cục hai ngăn và ảnh bìa album lớn hơn trên máy tính bảng."
+    ]
+  },
   "3.4.1": {
     "headline": "38 ngôn ngữ giao diện và kiểm tra phát video an toàn hơn",
     "summary": "FilterTube 3.4.1 bổ sung 38 ngôn ngữ giao diện tích hợp và cải thiện kiểm tra video trên YouTube cùng các trình phát nhúng được hỗ trợ. Bản cập nhật cũng sửa lỗi khởi động bảng điều khiển và khớp từ khóa bình luận đã lưu. Đã sửa các mục dịch tiếng Hàn và Bengali trùng lặp bị Mozilla từ chối. Quá trình dựng hiện kiểm tra khóa JSON trùng trước khi đóng gói.",

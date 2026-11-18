@@ -49,6 +49,15 @@ function PopupShell() {
                 Enabled
               </span>
             </div>
+            {/* The app's switch (PaperKit.styleSwitch): sage track and a checked paper thumb when on,
+                a plain track and a muted thumb when off. The brand card is the button; this only shows it. */}
+            <span className="ft-popup-power" aria-hidden="true">
+              <span className="ft-popup-power__thumb">
+                <svg viewBox="0 0 16 16" width="12" height="12" fill="none" stroke="currentColor">
+                  <path d="M3.4 8.6l3 2.9 6.2-6.8" strokeWidth="2.1" strokeLinecap="round" strokeLinejoin="round" />
+                </svg>
+              </span>
+            </span>
           </div>
 
           <div className="header-actions">
@@ -99,7 +108,7 @@ function PopupShell() {
           aria-live="polite"
           hidden
         >
-          <span className="ft-popup-time-status__label" data-ft-i18n="popup.youtubeTime">YouTube time</span>
+          <span className="ft-popup-time-status__label" data-ft-i18n="popup.youtubeTime">Viewing time</span>
           <strong id="ftManagedTimeStatusValuePopup" className="ft-popup-time-status__value" />
         </div>
 
@@ -117,19 +126,46 @@ function PopupShell() {
           </section>
         </main>
 
-        <a
-          id="androidAppLinkPopup"
-          className="ft-popup-android-link"
-          href="https://play.google.com/store/apps/details?id=com.filtertube.app"
-          target="_blank"
-          rel="noopener noreferrer"
+        {/* FilterTube apps: one quiet row, two pills (Android on Google Play, the iPhone guide). */}
+        <nav
+          id="ftPopupApps"
+          className="ft-popup-apps"
+          aria-label="FilterTube apps"
+          data-ft-i18n-aria-label="popup.apps.label"
         >
-          <img src="../assets/images/Android_icon.png" alt="" width="48" height="36" />
-          <span data-ft-i18n="dashboard.androidTesting.join">Open FilterTube on Google Play</span>
-          <svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-            <path d="M7 17L17 7M7 7h10v10" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
-          </svg>
-        </a>
+          <a
+            id="androidAppLinkPopup"
+            className="ft-popup-apps__pill ft-popup-apps__pill--android"
+            href="https://play.google.com/store/apps/details?id=com.filtertube.app"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            <span className="ft-popup-apps__badge" aria-hidden="true">
+              <img src="../assets/images/apps/android_robot.webp" alt="" width="22" height="27" />
+            </span>
+            <span className="ft-popup-apps__text">
+              <strong data-ft-i18n="popup.apps.android">Android</strong>
+              <span data-ft-i18n="popup.apps.androidStore">Google Play</span>
+            </span>
+          </a>
+          <a
+            id="iosAppLinkPopup"
+            className="ft-popup-apps__pill ft-popup-apps__pill--ios"
+            href="https://filtertube.in/ios"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            <span className="ft-popup-apps__badge" aria-hidden="true">
+              <svg width="18" height="20" viewBox="0 0 17 20" fill="currentColor">
+                <path d="M14.1 10.6c0-2.6 2.1-3.8 2.2-3.9-1.2-1.8-3.1-2-3.7-2-1.6-.2-3.1.9-3.9.9-.8 0-2-.9-3.4-.9C3.6 4.8 2 5.8 1.1 7.4c-1.9 3.2-.5 8 1.3 10.6.9 1.3 1.9 2.7 3.3 2.6 1.3-.1 1.8-.8 3.4-.8s2 .8 3.4.8c1.4 0 2.3-1.3 3.2-2.6 1-1.5 1.4-2.9 1.4-3-.1 0-2.8-1.1-3-4.4zM11.5 3c.7-.9 1.2-2 1.1-3.2-1 0-2.3.7-3 1.6-.7.8-1.3 2-1.1 3.1 1.1.1 2.3-.6 3-1.5z" />
+              </svg>
+            </span>
+            <span className="ft-popup-apps__text">
+              <strong data-ft-i18n="popup.apps.ios">Now on iPhone</strong>
+              <span data-ft-i18n="popup.apps.iosGuide">SideStore guide</span>
+            </span>
+          </a>
+        </nav>
       </div>
     </div>
   );

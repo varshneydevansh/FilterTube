@@ -796,6 +796,8 @@ function getCompiledChannelFilterIndex(settings, listOverride = null) {
     const stableNames = new Set();
     const nameOnlyNames = new Set();
     const blockTubeNameRules = [];
+    // Android strongAliasKeys: the stable aliases of rules that carry a UC id.
+    const strongAliases = new Set();
     const unresolvedHandleKeys = [];
     const unresolvedHandleKeysSeen = new Set();
 
@@ -892,6 +894,13 @@ function getCompiledChannelFilterIndex(settings, listOverride = null) {
             if (idKey) {
                 const mappedHandle = normalizeHandleForComparison(lookupChannelMap(idKey));
                 if (mappedHandle) handles.add(mappedHandle);
+                strongAliases.add(idKey);
+                [entry.handle, entry.canonicalHandle, entry.handleDisplay].forEach(value => {
+                    const handle = normalizeHandleForComparison(typeof value === 'string' ? value : '');
+                    if (handle) strongAliases.add(handle);
+                });
+                const ruleCustomUrl = normalizeCustomUrlForComparison(entry.customUrl || '');
+                if (ruleCustomUrl) strongAliases.add(ruleCustomUrl);
             }
         }
     }
@@ -906,6 +915,7 @@ function getCompiledChannelFilterIndex(settings, listOverride = null) {
         names,
         stableNames,
         nameOnlyNames,
+        strongAliases,
         blockTubeNameRules,
         blockTubeNameMatcher: buildFilterTubeDomBlockTubeChannelNameMatcher(blockTubeNameRules),
         unresolvedHandleKeys
@@ -951,7 +961,10 @@ function channelMetaMatchesIndex(meta, index, channelMap) {
 
     const metaName = normalizeChannelNameForComparison(meta.name || '');
     if (metaName && index.nameOnlyNames?.has(metaName)) return true;
-    if (metaName && !metaId && index.stableNames?.has(metaName)) return true;
+    // Android matches channel keys as one set (NativeOwnedFilterDecider matchesAnyChannel): a
+    // rule's name or handle meets the card's name or handle whatever UC id either side carries.
+    if (metaName && index.stableNames?.has(metaName)) return true;
+    if (metaName && !/\s/.test(metaName) && index.handles.has(`@${metaName}`)) return true;
     if (
         metaName &&
         !index.nameOnlyNames &&
@@ -964,7 +977,7 @@ function channelMetaMatchesIndex(meta, index, channelMap) {
     if (metaHandle) {
         const withoutAt = metaHandle.replace(/^@/, '');
         if (withoutAt && index.nameOnlyNames?.has(withoutAt)) return true;
-        if (withoutAt && !metaId && index.stableNames?.has(withoutAt)) return true;
+        if (withoutAt && index.stableNames?.has(withoutAt)) return true;
     }
 
     if (metaId) {
@@ -1272,13 +1285,18 @@ function setLocalizedAdmissionOverlayMessage(overlay, state, message) {
     const sourceMessage = String(message || '');
     overlay.__filtertubeAdmissionSourceMessage = sourceMessage;
     overlay.__filtertubeAdmissionSourceState = state;
+    overlay.__filtertubeAdmissionSourceQuiet = isQuietBlockingEnabled();
 
     const localizer = window.FilterTubeAdmissionOverlay;
     const renderMessage = localized => {
+        const quiet = isQuietBlockingEnabled();
         if (typeof localizer?.render === 'function') {
-            localizer.render(overlay, state, localized);
+            localizer.render(overlay, state, localized, { quiet });
             Object.assign(overlay.style, { position: 'absolute', width: '100%', height: '100%' });
-        } else if (overlay.textContent !== localized) overlay.textContent = localized;
+        } else {
+            const text = quiet ? '' : localized;
+            if (overlay.textContent !== text) overlay.textContent = text;
+        }
     };
     const applyDirection = () => {
         try {
@@ -1315,6 +1333,19 @@ function setLocalizedAdmissionOverlayMessage(overlay, state, message) {
     }
 }
 
+// Quiet blocking (settings.quietBlocking, parent-locked): the player covers drop the brand and the
+// reason. Presentation only; pause, play guard and decisions are unchanged.
+function isQuietBlockingEnabled(settings) {
+    try {
+        const source = settings && typeof settings === 'object'
+            ? settings
+            : (typeof currentSettings !== 'undefined' ? currentSettings : null);
+        return source?.quietBlocking === true;
+    } catch (e) {
+        return false;
+    }
+}
+
 function setCurrentShortAdmissionOverlay(state, message) {
     const host = getCurrentShortPlayerHost();
     if (!host) return false;
@@ -1330,7 +1361,8 @@ function setCurrentShortAdmissionOverlay(state, message) {
     const nextMessage = String(message || '');
     if (overlay.getAttribute('data-state') !== nextState) overlay.setAttribute('data-state', nextState);
     if (overlay.__filtertubeAdmissionSourceMessage !== nextMessage ||
-        overlay.__filtertubeAdmissionSourceState !== nextState) {
+        overlay.__filtertubeAdmissionSourceState !== nextState ||
+        overlay.__filtertubeAdmissionSourceQuiet !== isQuietBlockingEnabled()) {
         setLocalizedAdmissionOverlayMessage(overlay, nextState, nextMessage);
     }
     host.setAttribute('data-filtertube-current-short-admission-host', 'true');
@@ -1761,7 +1793,8 @@ function setDirectAccessOverlay(stateValue, message) {
     const nextMessage = String(message || (stateValue === 'blocked' ? 'Blocked by FilterTube' : 'Checking FilterTube rules…'));
     if (overlay.getAttribute('data-state') !== nextState) overlay.setAttribute('data-state', nextState);
     if (overlay.__filtertubeAdmissionSourceMessage !== nextMessage ||
-        overlay.__filtertubeAdmissionSourceState !== nextState) {
+        overlay.__filtertubeAdmissionSourceState !== nextState ||
+        overlay.__filtertubeAdmissionSourceQuiet !== isQuietBlockingEnabled()) {
         setLocalizedAdmissionOverlayMessage(overlay, nextState, nextMessage);
     }
     return true;
@@ -1889,6 +1922,12 @@ function showCurrentVideoAdmissionPendingState(state, isShortRoute) {
         return;
     }
     showDirectAccessPendingState(state, isShortRoute, message);
+}
+
+/** A study round on the Kids site with a Kids learning pack (study_engine KIDS_SPACE.LEARNING). */
+function isKidsLearningRound(settings) {
+    const study = settings && typeof settings === 'object' ? settings.study : null;
+    return !!study && study.applied === true && study.kidsSpace === 'learning';
 }
 
 function getDirectAccessRuleRequirements(settings) {
@@ -2200,10 +2239,39 @@ function getStudyAdmissionLine(settings) {
     return study.phase === 'study' && study.rest !== true ? FILTERTUBE_STUDY_OFF_LIST : FILTERTUBE_STUDY_NOT_NOW;
 }
 
+/**
+ * Ask a parent (Android AskParentBlockedTarget): what a child could ask about on this blocked video.
+ * The ask comes from the typed block reason, never from translated text: a channel rule offers
+ * "Always allow this channel", the allow list or anything else offers "Allow once"; Study offers none.
+ */
+function rememberAskParentTarget(decision, ownerMeta = {}, studyLine = '') {
+    try {
+        const videoId = typeof getCurrentWatchVideoId === 'function' ? getCurrentWatchVideoId() : '';
+        if (!videoId || studyLine) {
+            window.__filtertubeAskParentTarget = null;
+            return;
+        }
+        const settings = typeof currentSettings !== 'undefined' ? currentSettings : null;
+        const meta = settings?.videoMetaMap?.[videoId] || {};
+        const pageTitle = String(document.title || '').replace(/\s*-\s*YouTube\s*$/i, '').trim();
+        const title = String(meta.title || pageTitle || videoId).slice(0, 120);
+        window.__filtertubeAskParentTarget = {
+            kind: 'video',
+            videoId,
+            title,
+            channelId: String(ownerMeta.id || '').trim() || null,
+            channelName: String(ownerMeta.name || ownerMeta.handle || decision?.ownerName || '').trim(),
+            blockedBy: decision?.kind === 'channel' ? 'channel' : (decision?.kind === 'allow-only' ? 'allow_list' : 'other')
+        };
+    } catch (e) {
+    }
+}
+
 function formatCurrentWatchAdmissionMessage(decision, ownerMeta = {}) {
     const ownerName = ownerMeta.name || ownerMeta.handle || ownerMeta.id || decision?.ownerName || '';
     const trimForOverlay = value => String(value || '').replace(/\s+/g, ' ').trim().slice(0, 160);
     const studyLine = getStudyAdmissionLine(typeof currentSettings !== 'undefined' ? currentSettings : null);
+    rememberAskParentTarget(decision, ownerMeta, studyLine);
     if (studyLine) return `${studyLine}${ownerName ? `\n${trimForOverlay(ownerName)}` : ''}`;
     if (decision?.kind === 'video') {
         return `Blocked video\nVideo ID: ${trimForOverlay(decision.videoId)}`;
@@ -2231,14 +2299,77 @@ function formatCurrentWatchAdmissionMessage(decision, ownerMeta = {}) {
     return 'Blocked by an active FilterTube rule';
 }
 
+const FILTERTUBE_BLOCKED_CHANNEL_PAGE_ID = 'filtertube-blocked-channel-page';
+
+/** The channel a child could ask for: its UC id, else its @handle (what a channel rule can hold). */
+function blockedChannelAskId(pageMeta = {}) {
+    const id = String(pageMeta?.id || '').trim();
+    if (/^UC[\w-]{22}$/.test(id)) return id;
+    const handle = String(pageMeta?.handle || '').trim();
+    if (handle) return handle.startsWith('@') ? handle : `@${handle}`;
+    return '';
+}
+
+function clearBlockedChannelPage() {
+    try {
+        const overlay = document.getElementById(FILTERTUBE_BLOCKED_CHANNEL_PAGE_ID);
+        if (!overlay) return;
+        window.FilterTubeAdmissionOverlay?.clear?.(overlay);
+        overlay.remove();
+        if (window.__filtertubeAskParentTarget?.kind === 'channel') window.__filtertubeAskParentTarget = null;
+    } catch (e) {
+    }
+}
+
+/**
+ * A blocked channel page for a child: a full-page blocked card (the admission overlay's look) with
+ * "Ask for this channel" when a parent can answer, and Back to Home. The channel's own videos pause.
+ * Returns false when there is nothing to draw it with, so the caller leaves the page as before.
+ */
+function showBlockedChannelPage(path, pageMeta, channelName, blockedBy) {
+    try {
+        const renderer = window.FilterTubeAdmissionOverlay;
+        const host = document.body || document.documentElement;
+        const channelId = blockedChannelAskId(pageMeta);
+        if (typeof renderer?.render !== 'function' || !host || !channelId) return false;
+        const name = String(channelName || pageMeta?.name || channelId).replace(/\s+/g, ' ').trim().slice(0, 120);
+        window.__filtertubeAskParentTarget = {
+            kind: 'channel', videoId: null, channelId, title: name, channelName: name,
+            blockedBy: blockedBy === 'allow_list' ? 'allow_list' : 'channel'
+        };
+        let overlay = document.getElementById(FILTERTUBE_BLOCKED_CHANNEL_PAGE_ID);
+        if (!overlay) {
+            overlay = document.createElement('div');
+            overlay.id = FILTERTUBE_BLOCKED_CHANNEL_PAGE_ID;
+            overlay.setAttribute('role', 'dialog');
+            overlay.setAttribute('aria-modal', 'true');
+            overlay.setAttribute('data-state', 'blocked');
+            host.appendChild(overlay);
+        }
+        const message = `${blockedBy === 'allow_list' ? 'Not in Allow only selected' : 'Blocked channel'}\n${name}`;
+        const quiet = isQuietBlockingEnabled();
+        if (overlay.__filtertubeChannelPath !== path || overlay.__filtertubeAdmissionMessage !== message ||
+            overlay.__filtertubeAdmissionQuiet !== quiet) {
+            overlay.__filtertubeChannelPath = path;
+            overlay.__filtertubeAdmissionKind = 'channel';
+            renderer.render(overlay, 'blocked', message, { quiet });
+        }
+        try { document.querySelectorAll('video').forEach(video => video.pause?.()); } catch (e) {}
+        return true;
+    } catch (e) {
+        return false;
+    }
+}
+
 function enforceCurrentChannelPageDirectAccess(settings) {
     try {
         if (!isFilterTubeFilteringEnabled(settings)) {
+            clearBlockedChannelPage();
             releaseDisabledDirectAccessState();
             return false;
         }
         const path = String(document.location?.pathname || '');
-        if (!isCreatorChannelPagePath(path)) return false;
+        if (!isCreatorChannelPagePath(path)) { clearBlockedChannelPage(); return false; }
         const routeMeta = buildChannelMetadata('', path) || {};
         const pageMeta = getCurrentPageChannelMeta() || routeMeta;
         const channelName = pageMeta?.name || pageMeta?.handle || pageMeta?.id || pageMeta?.customUrl || '';
@@ -2258,7 +2389,10 @@ function enforceCurrentChannelPageDirectAccess(settings) {
                 Array.isArray(settings?.whitelistChannels) &&
                 settings.whitelistChannels.length > 0
             ));
-        if (!shouldBlock) return false;
+        if (!shouldBlock) { clearBlockedChannelPage(); return false; }
+        // A child may ask a parent for this channel (Android: the ask from a blocked channel): the page
+        // stays behind a blocked card with "Ask for this channel" and Back instead of leaving at once.
+        if (settings?.askParentChild === true && showBlockedChannelPage(path, pageMeta, channelName, blockMatch ? 'channel' : 'allow_list')) return true;
         if (document.documentElement?.getAttribute('data-filtertube-direct-channel-redirect') === path) return true;
         document.documentElement?.setAttribute('data-filtertube-direct-channel-redirect', path);
         document.location.replace('/');
@@ -2301,11 +2435,21 @@ function enforceCurrentWatchOwnerBlock(settings) {
             clearCurrentShortAdmissionOverlay();
             return;
         }
-        if (String(document.location?.hostname || '').includes('youtubekids.com')) return;
+        // The Kids site keeps its own watch flow, except during a Kids learning round: then a direct
+        // watch link is checked like any other (only the round's packs play), not only by the data filter.
+        if (String(document.location?.hostname || '').includes('youtubekids.com') && !isKidsLearningRound(settings)) return;
         const listMode = (settings && settings.listMode === 'whitelist') ? 'whitelist' : 'blocklist';
 
         const routeVideoId = getCurrentWatchVideoId();
         if (!routeVideoId) return;
+        // A parent's "Allow once" plays the asked video before any rule or content filter (Android
+        // AskParentPasses); a study break or limit never compiles a pass.
+        if (Array.isArray(settings?.askParentPassVideoIds) && settings.askParentPassVideoIds.includes(routeVideoId)) {
+            rememberCurrentVideoAdmission(routeVideoId, settings);
+            releaseDirectAccessGuard(routeVideoId, true);
+            if (isShortRoute) clearCurrentShortAdmissionOverlay();
+            return;
+        }
         // Views are optional evidence: a known low total can block immediately,
         // but missing totals never request metadata or create a pending state.
         const viewCountDecision = getCurrentWatchViewCountDecision(settings, settings?.videoMetaMap?.[routeVideoId] || {});
@@ -2844,10 +2988,11 @@ function setCurrentWatchCategoryOverlay(state, message) {
         : (state === 'unavailable' ? 'unavailable' : 'pending');
     overlay.setAttribute('data-state', normalizedState);
     const overlayMessage = message || (state === 'blocked' ? 'Blocked by Category Filter' : 'Checking category…');
+    const quiet = isQuietBlockingEnabled();
     if (window.FilterTubeAdmissionOverlay) {
-        window.FilterTubeAdmissionOverlay.render(overlay, normalizedState, overlayMessage);
+        window.FilterTubeAdmissionOverlay.render(overlay, normalizedState, overlayMessage, { quiet });
         Object.assign(overlay.style, { position: 'absolute', width: '100%', height: '100%' });
-    } else overlay.textContent = overlayMessage;
+    } else overlay.textContent = quiet ? '' : overlayMessage;
     return true;
 }
 
@@ -4133,40 +4278,12 @@ function isAlphanumeric(char) {
     return char.toUpperCase() !== char.toLowerCase();
 }
 
-function matchesKeyword(regex, rawText, keywordData) {
+function matchesKeyword(regex, rawText) {
     if (!rawText) return false;
-
+    // The page scan matches exactly as the data-level filter and the app do: the compiled
+    // pattern against the text as written, with no accent folding ("cafe" does not hide "café").
     regex.lastIndex = 0;
-    if (regex.test(rawText)) {
-        return true;
-    }
-
-    const normalized = normalizeTextForMatching(rawText);
-    if (normalized && normalized !== rawText) {
-        regex.lastIndex = 0;
-        return regex.test(normalized);
-    }
-
-    const plainKeyword = extractPlainKeyword(keywordData);
-    if (plainKeyword) {
-        const normalizedKeyword = normalizeTextForMatching(plainKeyword).toLowerCase();
-        const normalizedText = normalized.toLowerCase();
-
-        if (normalizedKeyword && normalizedText.includes(normalizedKeyword)) {
-            const index = normalizedText.indexOf(normalizedKeyword);
-            const beforeChar = index > 0 ? normalizedText[index - 1] : '';
-            const afterCharIndex = index + normalizedKeyword.length;
-            const afterChar = afterCharIndex < normalizedText.length ? normalizedText[afterCharIndex] : '';
-
-            const hasLeftBoundary = !beforeChar || !isAlphanumeric(beforeChar);
-            const hasRightBoundary = !afterChar || !isAlphanumeric(afterChar);
-
-            if (hasLeftBoundary || hasRightBoundary) {
-                return true;
-            }
-        }
-    }
-    return false;
+    return regex.test(rawText);
 }
 
 // ============================================================================
@@ -4260,6 +4377,28 @@ function handleHomeFeedFallback(settings) {
             toggleVisibility(element, false, '', true);
         }
     });
+}
+
+// Allowed-only mode flips comments as it flips cards (Android commentHidden): a comment
+// shows only when its author is allowed or its words match an allowed word; with layered
+// rules a blocked word in it still hides it.
+function commentHiddenByAllowList(settings, commentText, channelMeta) {
+    if (!settings || settings.listMode !== 'whitelist') return false;
+    const allowChannels = Array.isArray(settings.whitelistChannels) ? settings.whitelistChannels : [];
+    const allowKeywords = Array.isArray(settings.whitelistKeywords) ? settings.whitelistKeywords : [];
+    let allowed = false;
+    if (allowChannels.length > 0 && channelMeta && (channelMeta.id || channelMeta.handle || channelMeta.customUrl || channelMeta.name)) {
+        const index = getCompiledChannelFilterIndex(settings, allowChannels);
+        allowed = !!(index && channelMetaMatchesIndex(channelMeta, index, settings.channelMap || {}));
+    }
+    if (!allowed && commentText && allowKeywords.length > 0) {
+        allowed = getCompiledKeywordRegexes(allowKeywords).some(regex => matchesKeyword(regex, commentText));
+    }
+    if (!allowed) return true;
+    if (settings.listLayered === true && commentText && Array.isArray(settings.filterKeywords) && settings.filterKeywords.length > 0) {
+        return getCompiledKeywordRegexes(settings.filterKeywords).some(regex => matchesKeyword(regex, commentText));
+    }
+    return false;
 }
 
 function handleCommentsFallback(settings) {
@@ -4365,6 +4504,7 @@ function handleCommentsFallback(settings) {
         ? settings.filterKeywordsComments
         : settings.filterKeywords;
     const shouldFilterKeywords = Boolean(commentKeywordList?.length > 0);
+    const allowOnlyComments = settings?.listMode === 'whitelist';
 
     // 3. Per-thread filtering
     commentThreads.forEach(thread => {
@@ -4419,7 +4559,7 @@ function handleCommentsFallback(settings) {
         }
 
         // If nothing is enabled, restore and stop.
-        if (!hasChannelFilters && !shouldFilterKeywords) {
+        if (!hasChannelFilters && !shouldFilterKeywords && !allowOnlyComments) {
             toggleVisibility(thread, false, '', true);
             return;
         }
@@ -4434,6 +4574,7 @@ function handleCommentsFallback(settings) {
             channelMeta,
             contentTag: (thread.tagName || '').toLowerCase()
         });
+        const hiddenByAllowList = !shouldHide && commentHiddenByAllowList(settings, commentText, channelMeta);
 
         let reason = 'Comment Filter';
         if (shouldHide && hasChannelFilters && (channelMeta.handle || channelMeta.id || channelMeta.customUrl)) {
@@ -4443,7 +4584,7 @@ function handleCommentsFallback(settings) {
             }
         }
 
-        toggleVisibility(thread, shouldHide, reason);
+        toggleVisibility(thread, shouldHide || hiddenByAllowList, hiddenByAllowList ? 'Comment not on the allowed list' : reason);
     });
 
     // 4. Reply/comment-renderer filtering (replies are often separate commentRenderer nodes)
@@ -4480,7 +4621,7 @@ function handleCommentsFallback(settings) {
                 toggleVisibility(commentEl, false, '', true);
             }
 
-            if (!hasChannelFilters && !shouldFilterKeywords) {
+            if (!hasChannelFilters && !shouldFilterKeywords && !allowOnlyComments) {
                 toggleVisibility(commentEl, false, '', true);
                 return;
             }
@@ -4509,6 +4650,7 @@ function handleCommentsFallback(settings) {
                 channelMeta,
                 contentTag: (commentEl.tagName || '').toLowerCase()
             });
+            const hiddenByAllowList = !shouldHide && commentHiddenByAllowList(settings, commentText, channelMeta);
 
             let reason = 'Comment Filter';
             if (shouldHide && hasChannelFilters && (channelMeta.handle || channelMeta.id || channelMeta.customUrl)) {
@@ -4518,7 +4660,7 @@ function handleCommentsFallback(settings) {
                 }
             }
 
-            toggleVisibility(commentEl, shouldHide, reason);
+            toggleVisibility(commentEl, shouldHide || hiddenByAllowList, hiddenByAllowList ? 'Comment not on the allowed list' : reason);
         } catch (e) {
         }
     });
@@ -4575,7 +4717,7 @@ function handleCommentsFallback(settings) {
                 toggleVisibility(containerToHide, false, '', true);
             }
 
-            if (!hasChannelFilters && !shouldFilterKeywords) {
+            if (!hasChannelFilters && !shouldFilterKeywords && !allowOnlyComments) {
                 toggleVisibility(containerToHide, false, '', true);
                 return;
             }
@@ -4610,6 +4752,7 @@ function handleCommentsFallback(settings) {
                 channelMeta,
                 contentTag: (commentVm.tagName || '').toLowerCase()
             });
+            const hiddenByAllowList = !shouldHide && commentHiddenByAllowList(settings, commentText, channelMeta);
 
             let reason = 'Comment Filter';
             if (shouldHide && hasChannelFilters && (channelMeta.handle || channelMeta.id || channelMeta.customUrl)) {
@@ -4619,7 +4762,7 @@ function handleCommentsFallback(settings) {
                 }
             }
 
-            toggleVisibility(containerToHide, shouldHide, reason);
+            toggleVisibility(containerToHide, shouldHide || hiddenByAllowList, hiddenByAllowList ? 'Comment not on the allowed list' : reason);
         } catch (e) {
         }
     });
@@ -7265,7 +7408,12 @@ async function applyDOMFallback(settings, options = {}) {
                 channelMeta,
                 collaborators: collaboratorMetas,
                 contentTag: isShortVideoRenderer ? 'ytd-video-renderer-short' : elementTag,
-                publishTimestamp: keywordPublishTimestamp
+                publishTimestamp: keywordPublishTimestamp,
+                videoId: keywordVideoId || '',
+                expectedCollaboratorCount: Math.max(
+                    parseInt(element.getAttribute?.('data-filtertube-expected-collaborators') || '0', 10) || 0,
+                    window.FilterTubeIdentity?.collapsedCollaboratorExpectedCount?.(channel) || 0
+                )
             });
 
             // Handle Container Logic (e.g., rich-grid-media inside rich-item)
@@ -8181,6 +8329,75 @@ async function applyDOMFallback(settings, options = {}) {
 }
 
 // Helper function to check if content should be hidden
+const FILTERTUBE_DOM_SHORT_TAGS = new Set([
+    'ytd-reel-item-renderer',
+    'ytm-shorts-lockup-view-model',
+    'ytm-shorts-lockup-view-model-v2',
+    'ytd-video-renderer-short'
+]);
+
+/**
+ * The page scan's half of Android's "channel identity pending" (NativeOwnedFilterDecider lines
+ * 884-999). 'block', 'allow', 'wait' (hidden until the channel arrives) or null (the channel is
+ * known, or the extension keeps its own fallback for an unmatched weak solo card in block mode).
+ */
+function domPendingChannelIdentityDecision(input) {
+    const Identity = window.FilterTubeIdentity;
+    if (!Identity || typeof Identity.decidePendingChannelIdentity !== 'function') return null;
+    const { title, settings, channelMeta, videoId, tag, skipKeywords, publishTimestamp, listMode } = input;
+    if (!videoId || !settings) return null;
+    const allowMode = listMode === 'whitelist';
+    const isShort = FILTERTUBE_DOM_SHORT_TAGS.has(tag);
+    const filterChannels = Array.isArray(settings.filterChannels) ? settings.filterChannels : [];
+    const whitelistChannels = Array.isArray(settings.whitelistChannels) ? settings.whitelistChannels : [];
+    if (filterChannels.length === 0 && whitelistChannels.length === 0 && !(allowMode && isShort)) return null;
+    const layered = settings.listLayered === true;
+    const blockedVideo = Array.isArray(settings.blockedVideoIds) && settings.blockedVideoIds.includes(videoId);
+    const allowedVideo = Array.isArray(settings.allowedVideoIds) && settings.allowedVideoIds.includes(videoId);
+    if (blockedVideo || (!layered && allowedVideo)) return null;
+    const channelMap = settings.channelMap || {};
+    const blockIndex = getCompiledChannelFilterIndex(settings, filterChannels);
+    const allowIndex = getCompiledChannelFilterIndex(settings, whitelistChannels);
+    const usable = meta => meta && typeof meta === 'object' && (meta.id || meta.handle || meta.customUrl || meta.name);
+    const collaboratorList = (Array.isArray(input.collaborators) ? input.collaborators : []).filter(usable);
+    const roster = collaboratorList.length > 0 ? collaboratorList : [channelMeta].filter(usable);
+    const strength = Identity.channelIdentityStrength(roster, {
+        indexes: [blockIndex, allowIndex],
+        channelMap,
+        expectedCollaboratorCount: Number(input.expectedCollaboratorCount) || 0
+    });
+    if (strength === 'strong') return null;
+    if (strength === 'weak') {
+        try {
+            const path = document.location?.pathname || '';
+            if (isCreatorChannelPagePath(path) && getCurrentPageChannelMeta()) return null;
+        } catch (e) {
+        }
+    }
+    const keywordMatch = keywords => {
+        if (skipKeywords || !Array.isArray(keywords) || keywords.length === 0) return false;
+        return getCompiledKeywordRegexes(keywords).some(regex =>
+            matchesKeyword(regex, title) && keywordDateFilterAllows(regex, publishTimestamp));
+    };
+    const nameRows = index => !!index && roster.some(meta =>
+        (index.blockTubeNameMatcher && matchesFilterTubeDomBlockTubeChannelNameRules(meta.name, index.blockTubeNameMatcher)) ||
+        (Array.isArray(index.blockTubeNameRules) && !index.blockTubeNameMatcher &&
+            index.blockTubeNameRules.some(rule => matchesFilterTubeDomBlockTubeChannelNameRule(rule, meta))));
+    const decision = Identity.decidePendingChannelIdentity({
+        layered,
+        allowMode,
+        isShort,
+        blockedKeyword: keywordMatch(settings.filterKeywords),
+        allowedKeyword: keywordMatch(settings.whitelistKeywords),
+        blockedChannelName: nameRows(blockIndex),
+        allowedChannelName: nameRows(allowIndex),
+        allowedVideo,
+        hasBlockedChannelRules: filterChannels.some(entry => entry && !isFilterTubeDomBlockTubeChannelNameRule(entry))
+    });
+    if (decision !== 'wait') return decision;
+    return (strength === 'resolving' || allowMode || layered) ? 'wait' : null;
+}
+
 function shouldHideContent(title, channel, settings, options = {}) {
     const {
         skipKeywords = false,
@@ -8189,7 +8406,8 @@ function shouldHideContent(title, channel, settings, options = {}) {
         collaborators = [],
         contentTag = '',
         publishTimestamp = null,
-        videoId = ''
+        videoId = '',
+        expectedCollaboratorCount = 0
     } = options;
     const channelMeta = providedChannelMeta || buildChannelMetadata(channel, channelHref);
     const hasChannelIdentity = Boolean(channelMeta.handle || channelMeta.id || channelMeta.customUrl);
@@ -8243,6 +8461,28 @@ function shouldHideContent(title, channel, settings, options = {}) {
         return false;
     }
     const isCommentContext = typeof contentTag === 'string' && contentTag.toLowerCase().includes('comment');
+
+    // A parent's "Allow once" (Android AskParentPasses) lets the asked video through before any list rule.
+    if (!isCommentContext && videoId && Array.isArray(settings?.askParentPassVideoIds) && settings.askParentPassVideoIds.includes(videoId)) {
+        return false;
+    }
+
+    // A card whose channel isn't known yet decides like the app (see filter_logic.js
+    // _pendingChannelIdentityDecision and FilterTubeIdentity.decidePendingChannelIdentity).
+    if (!isCommentContext) {
+        const pending = domPendingChannelIdentityDecision({
+            title, settings, channelMeta, collaborators, videoId, tag, skipKeywords, publishTimestamp,
+            expectedCollaboratorCount, listMode
+        });
+        if (pending === 'block' || pending === 'wait') {
+            logWhitelistDecision(`${pending}:channel_identity_pending`);
+            return true;
+        }
+        if (pending === 'allow') {
+            logWhitelistDecision('allow:channel_identity_pending');
+            return false;
+        }
+    }
 
     // Keep block and allow rules active together in the DOM fallback too. This
     // mirrors the JSON-first evaluator: channel rules outrank keyword rules and

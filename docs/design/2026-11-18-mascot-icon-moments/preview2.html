@@ -1,0 +1,81 @@
+<!doctype html>
+<!-- The second 2026-11-18 batch, drawn by the real js/mascots.js and CSS (extension APIs stubbed).
+     Render: chrome-headless-shell --screenshot preview2.html -->
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<link rel="stylesheet" href="../../../css/design_tokens.css">
+<link rel="stylesheet" href="../../../css/components.css">
+<link rel="stylesheet" href="../../../css/tab-view.css">
+<link rel="stylesheet" href="../../../css/mascots.css">
+<link rel="stylesheet" href="../../../css/paperkit.css">
+<style>
+  body { margin: 0; padding: 24px; background: #f6efe4; font-family: system-ui, sans-serif; color: #2a241f; }
+  h2 { font-size: 15px; margin: 14px 0 8px; }
+  .row { display: flex; gap: 10px; align-items: flex-end; flex-wrap: wrap; }
+  .cell { display: flex; flex-direction: column; align-items: center; gap: 2px; font-size: 11px; }
+  .panel { background: #fffcf6; border: 1.5px solid #dcd1c2; border-radius: 18px; padding: 12px 14px; margin-bottom: 14px; max-width: 1140px; }
+  .ft-toast { position: static; opacity: 1; transform: none; }
+  .stat-card { width: 220px; padding: 12px; border: 1px solid #dcd1c2; border-radius: 14px; text-align: center; }
+</style>
+<script>
+  window.chrome = { runtime: { getURL: path => '../../../' + path }, storage: { local: {
+    get: (k, cb) => cb({ statsBySurface: { main: { totalSavedSeconds: 36500, savedSeconds: 900 } } }), set: (i, cb) => cb && cb() } } };
+  window.FilterTubeUiLocalization = { locale: 'en', text: () => '' };
+  window.matchMedia = () => ({ matches: true }); // reduced motion: every moment shows its resting still
+</script>
+<script src="../../../js/mascots.js"></script>
+</head>
+<body>
+<section class="panel"><h2>v3 sieve, frames 1-11 (loop holds 3200/420/300/300/360/700/700/420/300/360/600 ms; played once = 1-7)</h2><div class="row" id="sieve"></div></section>
+<section class="panel"><h2>Poses (POSES registry): Kriti wave, cheer, think, read, sleepy, proud, shh, point; Uljhan peek, shrug, knotted, hop, tiptoe, asleep</h2><div class="row" id="poses"></div></section>
+<section class="panel"><h2>Shipped frames: medal 1-4, Uljhan bounce 1-6, Kriti breath 1-4, sweep 1-6, high five 1-6</h2><div id="sheets"></div></section>
+<section class="panel"><h2>Moments (resting stills): 10 h saved on the Home card; a sync toast; an error toast; nothing to import</h2>
+  <div class="row" style="align-items:flex-start;gap:24px">
+    <div id="viewContainer"><div class="stat-card" data-stat="saved"><div class="stat-value" id="statSavedTime">15m</div><div class="stat-label">Time saved</div></div></div>
+    <div id="toasts" style="display:grid;gap:10px"></div>
+  </div>
+</section>
+<script>
+  const M = window.FilterTubeMascots;
+  const url = name => '../../../assets/images/mascots/' + name;
+  const strip = (id, names, height, labels = []) => {
+    const host = document.getElementById(id);
+    names.forEach((name, index) => {
+      const cell = document.createElement('div');
+      cell.className = 'cell';
+      const img = document.createElement('img');
+      img.src = url(name);
+      img.height = height;
+      cell.append(img, labels[index] || String(index + 1));
+      host.append(cell);
+    });
+  };
+  strip('sieve', M.ASSETS.duoSieve, 96);
+  const poses = [...Object.entries(M.POSES.kriti).map(([name, key]) => ['Kriti ' + name, key]), ...Object.entries(M.POSES.uljhan).map(([name, key]) => ['Uljhan ' + name, key])];
+  strip('poses', poses.map(([, key]) => M.ASSETS[key]), 80, poses.map(([label]) => label));
+  for (const sheet of ['duoMedal', 'uljhanBounce', 'kritiBreath', 'duoSweep', 'duoHighFive']) {
+    const row = document.createElement('div');
+    row.className = 'row';
+    row.id = 'row-' + sheet;
+    document.getElementById('sheets').append(row);
+    strip(row.id, M.ASSETS[sheet], 72, M.ASSETS[sheet].map((_, index) => `${sheet} ${index + 1}`));
+  }
+  document.addEventListener('DOMContentLoaded', () => setTimeout(() => M.setMode('lively'), 0));
+  const toast = (text, type, mark) => {
+    const node = document.createElement('div');
+    node.className = `ft-toast ft-toast-${type} show`;
+    node.textContent = text;
+    if (mark) node.dataset.ftMascot = mark;
+    document.getElementById('toasts').append(node);
+  };
+  // The companions' toast watcher reads the body; place the toasts there once it runs.
+  setTimeout(() => {
+    toast('Applied managed policy update', 'success', 'highfive');
+    toast('Export failed', 'error');
+    toast('No followed channels found', 'info', 'shrug');
+    for (const node of document.querySelectorAll('#toasts .ft-toast')) document.body.append(node);
+  }, 300);
+</script>
+</body>
+</html>

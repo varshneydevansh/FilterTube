@@ -334,8 +334,9 @@ test('CSS load topology separates extension pages website and quarantined conten
   for (const href of ['../css/design_tokens.css', '../css/components.css', '../css/tab-view.css', '../css/serene-shell.css']) {
     assert.match(tabView, new RegExp(`href="${href.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}"`));
   }
-  assert.match(popup, /fonts\.googleapis\.com/);
-  assert.match(tabView, /fonts\.googleapis\.com/);
+  // No web font is fetched: Delius and Outfit ship with the extension (css/paperkit.css).
+  assert.doesNotMatch(popup, /fonts\.googleapis\.com/);
+  assert.doesNotMatch(tabView, /fonts\.googleapis\.com/);
   assert.match(websiteLayout, /import "\.\/globals\.css"/);
 
   for (const manifestFile of ['manifest.json', 'manifest.chrome.json', 'manifest.firefox.json', 'manifest.opera.json']) {

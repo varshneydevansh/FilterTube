@@ -1,4 +1,55 @@
 {
+  "3.6.2": {
+    "headline": "Kenalan karo Kriti lan Uljhan, perencana Study sing digawe anyar, lan Takon wong tuwa",
+    "summary": "FilterTube 3.6.2 duwe tampilan dhewe, kanthi Kriti lan Uljhan, ikon krayon, corètan lan swara opsional. Study digawe anyar adhedhasar perencana dina kanthi paket siap pakai kanggo 29 negara, bocah bisa njaluk video utawa channel marang wong tuwa, lan pamuter, profil, tablet lan TV éntuk desain anyar sing luwih tenang kanthi cathetan privasi sing luwih cetha.",
+    "bannerSummary": "Kriti lan Uljhan, perencana Study sing digawe anyar, Takon wong tuwa lan pamuter sing luwih tenang.",
+    "ctaLabel": "Deleng Sing Anyar",
+    "highlights": [
+      "Study digawe anyar: beranda Study gaya kertas kanthi Cincin Dina krayon, perencana dina, setelan sing nerangake saben pilihan, lan paket siap pakai kanggo ujian lan kelas sekolah ing 29 negara. Feed manut jurusan sing sampeyan pilih, dadi GATE Civil tetep Civil, lan Panelusuran nalika sinau mung nggoleki ing channel saka rencana sampeyan.",
+      "Takon wong tuwa: yèn ana sing diblokir, bocah bisa njaluk nonton video kuwi utawa ngidini channel kuwi, lan wong tuwa sing mangsuli. Mode wong tuwa mbukak sesi wong tuwa sing dibingkai ing njero profil Kids kanthi siji dalan metu sing cetha, lan Sinau Kids miturut umur ngisi papan Kids nganggo pelajaran sing dipilih miturut umur nalika sinau.",
+      "Tampilan anyar: Kriti lan Uljhan ngancani sampeyan nalika kaca lagi dimuat, dhaptar kosong, sampeyan offline utawa ana sing diblokir. FilterTube duwe ikon krayon dhewe, corètan, avatar corètan, ikon aplikasi Kriti, Uljhan lan duo sing bisa dipilih, lan swara opsional sing bisa disetel Mati, Alus utawa Dolanan.",
+      "Pamuter sing luwih tenang: poster sakamba layar ing ponsel, kaca playlist lan lembar akun anyar, cahya Watch sing tekan ing ngisor bar status, Uljhan sing njupuk luwih akèh nalika sampeyan nggulung, tarik kanggo nyegerake, lan siji kabar sing cetha yèn sambungan alon utawa offline.",
+      "Profil didesain anyar kanthi avatar krayon, pamilih sing nuduhake sapa wong tuwa lan sapa bocah, lan cara sing dijaga kanggo nambah profil.",
+      "FilterTube nganggo tembungé dhéwé ing ngendi waé: klip, sing diikuti, sing disimpen, lan Sangeet kanggo musik, ing saben basa.",
+      "Privasi: Akun & Sinkronisasi nerangake apa sing bisa lan ora bisa dideleng relai sinkronisasi lan takon dhisik sadurungé sinkronisasi internet pisanan, jeneng piranti sampeyan ora dikirim manèh nalika muni-ake piranti liya, thumbnail DeArrow dadi pilihan kapisah sing wiwitané mati, cookie akun mung tumuju menyang situs layanan video kuwi dhéwé, lan build rilis njaga log debug ing njaba log sistem.",
+      "Tablet lan TV padha karo ponsel: Filter, Panelusuran lan Takon wong tuwa nganggo ambané kebak ing tablet, lan TV éntuk ikon krayon ing rel samping, Study ing layar gedhé lan kertu Babagan TV iki kanthi mode Lengkap lan Entheng.",
+      "Ndhukung FilterTube tetep gratis lan opsional: lembar dhukungan iku cathetan sing grapyak, dudu alangan.",
+      "Pandandan: pamriksan PIN ora gawé layar macet manèh, ngemot luwih akèh ing Study ora gawé kaca kelip-kelip manèh, maskot ora tau kepotong ing tengah gerakan, akèh label basa Inggris sing isih ana saiki wis diterjemahaké, lan kesalahan ngemot Sangeet ora nyebut layanan video manèh."
+    ]
+  },
+  "3.6.1": {
+    "headline": "Lanskap sing pas ing saben layar, kontrol puter sing luwih ajeg lan nyaring sing luwih ketat",
+    "summary": "FilterTube 3.6.1 ngukur saben kaca lanskap saka jendhela, dadi ponsel sing dimiringaké, tablet lan TV éntuk video sadhuwuré layar lan panel ing sisih tengen. Teks, transkrip lan menu kertu mlaku kaya sing dikarepaké, lan channel sing sampeyan saring didhelikaké ing ngendi waé.",
+    "bannerSummary": "Lanskap sing pas ing saben layar, pandandan teks lan transkrip, lan nyaring sing luwih ketat.",
+    "ctaLabel": "Deleng Sing Anyar",
+    "highlights": [
+      "Lanskap diétung saka layar sampeyan: ing ponsel sing dimiringaké, tablet utawa TV, Watch nuduhaké video 16:9 sadhuwuré layar kanthi Sabanjuré ing sandhingé, Panelusuran ana ing pucuk rel samping, lan ora ana sing kepotong bolongan kamera.",
+      "Musik ing posisi miring nuduhaké Sabanjuré sing padha kaya nalika ngadeg, piringan muter ing 33⅓ rpm manut kacepetan puter, lan Sabanjuré diwiwiti saka lagu sing lagi diputer.",
+      "Teks mati yèn sampeyan milih Mati, Terjemahan otomatis mlaku ing video sing lagi diputer, lan pilihan sing durung bisa ditrapaké pamuter bakal ngandhani sampeyan tinimbang gagal kanthi meneng.",
+      "Nutul baris transkrip njaga transkrip tetep mbukak lan ngetutaké, kaya lirik, lan cahya Watch tekan ing sakabèhé kaca nalika lanskap.",
+      "Channel ing dhaptar saringan sampeyan ndhelikaké kabèh saka channel kuwi, piyé waé carané ditambahaké. Mblokir saka komentar ndhelikaké komentar lan video channel kuwi, Mix sing asalé saka channel sing diblokir didhelikaké, lan live chat manut aturan sampeyan.",
+      "Ing mode Mung ngidini sing dipilih, komentar mung nuduhaké sing komentar sing diidini utawa tembung sing diidini.",
+      "Menu kertu tetep mlaku sawisé saringan diganti, urutan channel sing dipilih tetep ana sawisé disegeraké, lan gambar Watch tetep ana sawisé saringan diganti nalika nggulung.",
+      "Pandhuan langkah-langkah mbantu nyetel supaya link YouTube kabukak ing FilterTube, lan tablet nuduhaké profil Main lan Kids jèjèr."
+    ]
+  },
+  "3.6.0": {
+    "headline": "Pamuter Music anyar, kaca luwih cepet lan link YouTube sing kabukak ing FilterTube",
+    "summary": "FilterTube 3.6.0 ndesain anyar Music adhedhasar sampul saben lagu, ngemot kaca Music, Beranda lan album luwih cepet banget, mbukak link YouTube saka aplikasi liya ing pamuter sing dilindhungi lan nggawé kunci PIN bisa ditebak. Ponsel, tablet lan TV éntuk paningkatan sing padha.",
+    "bannerSummary": "Pamuter lan warna Music anyar, ngemot luwih cepet, link YouTube ing FilterTube lan kunci PIN sing luwih cetha.",
+    "ctaLabel": "Deleng Sing Anyar",
+    "highlights": [
+      "Music diwarnani manut apa sing sampeyan rungokaké: saben kaca Music, pamuter mini lan bar ngisor njupuk warna sampul, ganti kanthi alus antarané lagu lan album, lan bali normal yèn sampeyan metu saka Music.",
+      "Pamuter Music sing didesain anyar: siji cincin geser ing sakubengé sampul sing muter, kertu lirik sing munggah saka ngisor, visualizer entheng sing obah manut ketukan, lan stasiun langsung sing ditandhani LIVE.",
+      "Lirik sinkron asli saka YouTube Music, banjur teks lagu kuwi dhéwé ing basa sampeyan, kanthi LRCLIB minangka tambahan opsional sing ditakokaké sapisan. Lirik lan transkrip njaga baris saiki tetep ing tengah nganti pungkasan.",
+      "Ngemot luwih cepet banget: lagu Music nganggo channel sing wis kadhaptar ing YouTube Music, kertu ing layar dipriksa dhisik, lan pamriksan channel diwènèhi jeda supaya YouTube ora nolak manèh. Lagu album lan playlist ora ngenteni nganti pirang-pirang menit manèh.",
+      "Music mung muter audio nganti sampeyan nuduhaké video, dadi lagu luwih cepet diwiwiti lan nganggo data luwih sithik banget. Nglewati saka layar kunci lan pindhah menyang lagu sabanjuré saiki langsung muter.",
+      "Link YouTube saka aplikasi chat lan aplikasi liya bisa kabukak ing pamuter FilterTube sing dilindhungi. Pitakon sapisan lan pamriksan ing Setelan mbantu wong tuwa ngaktifaké.",
+      "Kunci PIN bisa ditebak: profil tetep kabukak nalika dienggo lan dikunci yèn FilterTube ditutup, ponsel diwiwiti manèh utawa sampeyan ganti profil. Minangka gantiné, wong tuwa bisa milih ngunci sawisé ditinggal sawetara wektu.",
+      "Kaca Watch sumorot nganggo warna video sing lagi diputer, saka bar status nganti lembar lan Sabanjuré; transkrip nempel ing ngisor pamuter; chip cocog karo kacané; lan antrian Mix terus dimuat.",
+      "Android TV lan tablet: warna Music lan pamuter anyar ing TV kanthi geser nganggo remot, visualizer sing luwih entheng kanggo TV box, panel Watch nganggo warna video, lan pandandan rong panel uga sampul album sing luwih gedhé ing tablet."
+    ]
+  },
   "3.4.1": {
     "headline": "38 basa antarmuka lan pamriksa puter video sing luwih aman",
     "summary": "FilterTube 3.4.1 nambah 38 basa antarmuka bawaan lan ningkatake pamriksa video ing YouTube lan pamuter sematan sing didhukung. Uga ndandani wiwitan dasbor lan pencocokan tembung kunci komentar sing disimpen. Entri terjemahan Korea lan Bengali sing dobel lan ditolak Mozilla wis didandani. Build saiki mriksa kunci JSON dobel sadurunge dikemas.",

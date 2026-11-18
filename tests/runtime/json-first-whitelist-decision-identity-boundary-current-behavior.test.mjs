@@ -348,20 +348,27 @@ test('channel-rule whitelist blocks unresolved identity when creator fallback is
   assert.deepEqual(plain(unresolved.result), { contents: [] });
 });
 
-test('comments bypass empty whitelist fail-closed but still honor comment keyword blocking', () => {
+test('allowed-only comments show only allowed authors or allowed words, and still honor comment keyword blocking', () => {
   const neutralData = payload('commentRenderer', commentRenderer());
   const matchingData = payload('commentRenderer', commentRenderer({
     contentText: { simpleText: 'blocked phrase appears here' }
   }));
 
+  // Android NativeMainCommentsProvider.commentHidden: whitelist mode flips comments as it flips cards.
   const neutralWhitelist = run(neutralData, { listMode: 'whitelist' });
+  const allowedWord = run(neutralData, {
+    listMode: 'whitelist',
+    whitelistKeywords: [keyword('ordinary')]
+  });
   const keywordBlocked = run(matchingData, {
     listMode: 'whitelist',
+    whitelistKeywords: [keyword('appears')],
     filterKeywordsComments: [keyword('blocked phrase')]
   });
 
-  assert.equal(neutralWhitelist.result.contents.length, 1);
-  assert.equal(neutralWhitelist.result.contents[0].commentRenderer.authorText.simpleText, 'Comment Author');
+  assert.deepEqual(plain(neutralWhitelist.result), { contents: [] });
+  assert.equal(allowedWord.result.contents.length, 1);
+  assert.equal(allowedWord.result.contents[0].commentRenderer.authorText.simpleText, 'Comment Author');
   assert.deepEqual(plain(keywordBlocked.result), { contents: [] });
 });
 

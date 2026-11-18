@@ -1,0 +1,954 @@
+/* Home (js/dashboard_home.js, owner 2026-11-17): the older dashboard's hero, stats, quick actions
+ * and app cards, combined with the app's tile hues, in paper and crayon. Colour only from the --pk-*
+ * tokens (css/paperkit.css), states from --ft-state-* (css/design_tokens.css). Loaded after
+ * paperkit-states.css, so its selectors repeat the weight of the earlier layers where they must.
+ *
+ * One loud thing: the greeting card (a big hand-drawn hello, Kriti sieving Uljhan). Everything else
+ * stays quiet: paper cards, crayon numerals, one brick action per card. */
+
+/* ---------------------------------------------------------------------------
+ * Sidebar: the Controls tiles become the navigation rows
+ * ------------------------------------------------------------------------- */
+
+body.ft-extension-surface #sidebarNav .nav-item[data-pk-tint] {
+  --row-wash: var(--pk-paper);
+  --row-ink: var(--pk-ink);
+  --row-edge: color-mix(in srgb, var(--pk-ink) 14%, transparent);
+  position: relative;
+  margin: 3px 0 !important;
+  padding-inline-end: 10px !important;
+  background: color-mix(in srgb, var(--row-wash) 70%, var(--pk-paper)) !important;
+  border: 1.5px solid var(--row-edge) !important;
+  border-radius: 14px !important;
+  transition: background-color var(--ft-state-duration) linear, border-color var(--ft-state-duration) linear,
+    transform var(--ft-state-duration) ease-out, box-shadow var(--ft-state-duration) linear !important;
+}
+body.ft-extension-surface #sidebarNav .nav-item[data-pk-tint="filters"] { --row-wash: var(--pk-rose); --row-ink: var(--pk-brick); --row-edge: color-mix(in srgb, var(--pk-brick) 24%, transparent); }
+body.ft-extension-surface #sidebarNav .nav-item[data-pk-tint="content"] { --row-wash: var(--pk-sky); --row-ink: var(--pk-sky-ink); --row-edge: color-mix(in srgb, var(--pk-sky-ink) 24%, transparent); }
+body.ft-extension-surface #sidebarNav .nav-item[data-pk-tint="kids"] { --row-wash: var(--pk-sun-wash); --row-ink: var(--pk-sun-ink); --row-edge: color-mix(in srgb, var(--pk-sun-ink) 24%, transparent); }
+body.ft-extension-surface #sidebarNav .nav-item[data-pk-tint="study"] { --row-wash: var(--pk-sage); --row-ink: var(--pk-sage-ink); --row-edge: color-mix(in srgb, var(--pk-sage-ink) 24%, transparent); }
+body.ft-extension-surface #sidebarNav .nav-item[data-pk-tint="family"] { --row-wash: var(--pk-lilac); --row-ink: var(--pk-plum); --row-edge: color-mix(in srgb, var(--pk-plum) 24%, transparent); }
+body.ft-extension-surface #sidebarNav .nav-item[data-pk-tint="home"] { --row-ink: var(--pk-brick); }
+
+body.ft-extension-surface #sidebarNav .nav-item[data-pk-tint] .nav-icon { color: var(--row-ink) !important; }
+body.ft-extension-surface #sidebarNav .nav-item[data-pk-tint] .nav-label { color: var(--pk-ink) !important; }
+body.ft-extension-surface #sidebarNav .nav-item[data-pk-tint] .nav-summary { color: var(--pk-muted) !important; }
+
+/* The live count, in the area's ink, at the row's end (Filters, Content Controls, Kids Mode). */
+body.ft-extension-surface #sidebarNav .nav-item .nav-count {
+  margin-inline-start: auto;
+  padding-inline-start: 8px;
+  font-family: var(--pk-font-hand);
+  font-size: 19px;
+  line-height: 1;
+  color: var(--row-ink);
+  font-variant-numeric: tabular-nums;
+}
+body.ft-extension-surface #sidebarNav .nav-item:not(.has-count) .nav-count { display: none; }
+
+/* Hover: the wash deepens and the edge darkens. Press: sinks 1 px. Focus: the ink ring. */
+body.ft-extension-surface #sidebarNav .nav-item[data-pk-tint]:hover {
+  background: var(--row-wash) !important;
+  border-color: color-mix(in srgb, var(--row-ink) 48%, transparent) !important;
+}
+body.ft-extension-surface #sidebarNav .nav-item[data-pk-tint="plain"]:hover,
+body.ft-extension-surface #sidebarNav .nav-item[data-pk-tint="home"]:hover {
+  background: color-mix(in srgb, var(--pk-ink) 5%, var(--pk-paper)) !important;
+}
+body.ft-extension-surface #sidebarNav .nav-item[data-pk-tint]:active { transform: var(--ft-state-press-shift); }
+body.ft-extension-surface #sidebarNav .nav-item:focus-visible {
+  outline: var(--ft-state-focus-width) solid var(--ft-state-focus-ring) !important;
+  outline-offset: var(--ft-state-focus-offset) !important;
+}
+
+/* Selected: the full wash, the ink edge, and a crayon tab on the leading edge. */
+body.ft-extension-surface #sidebarNav .nav-item[data-pk-tint][aria-current="page"],
+body.ft-extension-surface #sidebarNav .nav-item[data-pk-tint].active[aria-current="page"] {
+  background: var(--row-wash) !important;
+  border-color: color-mix(in srgb, var(--row-ink) 70%, transparent) !important;
+  box-shadow: 2px 3px 0 0 color-mix(in srgb, var(--row-ink) 18%, transparent) !important;
+}
+body.ft-extension-surface #sidebarNav .nav-item[data-pk-tint="plain"][aria-current="page"],
+body.ft-extension-surface #sidebarNav .nav-item[data-pk-tint="home"][aria-current="page"] {
+  background: var(--pk-paper) !important;
+  border-color: color-mix(in srgb, var(--pk-brick) 60%, transparent) !important;
+}
+body.ft-extension-surface #sidebarNav .nav-item[data-pk-tint][aria-current="page"] .nav-label { color: var(--row-ink) !important; font-weight: 700 !important; }
+body.ft-extension-surface #sidebarNav .nav-item[data-pk-tint][aria-current="page"]::after {
+  content: "";
+  position: absolute;
+  inset-block: 10px;
+  inset-inline-start: -1.5px;
+  width: 4px;
+  border-radius: 0 4px 4px 0;
+  background: var(--row-ink);
+}
+
+/* Dividers are spacing now; the cards separate themselves. */
+body.ft-extension-surface #sidebarNav .nav-divider { margin: 6px 0 !important; opacity: 0.5; }
+
+/* What's New, Help, About and Support: quiet text links at the bottom. */
+body.ft-extension-surface #sidebarNav .nav-item.nav-item--quiet {
+  min-height: 0 !important;
+  margin: 0 !important;
+  padding-block: 5px !important;
+  background: transparent !important;
+  border: 1.5px solid transparent !important;
+  box-shadow: none !important;
+}
+body.ft-extension-surface #sidebarNav .nav-item.nav-item--quiet .nav-summary { display: none !important; }
+body.ft-extension-surface #sidebarNav .nav-item.nav-item--quiet .nav-icon { transform: scale(0.82); color: var(--pk-muted) !important; }
+body.ft-extension-surface #sidebarNav .nav-item.nav-item--quiet .nav-label { font-size: 14px !important; font-weight: 600 !important; color: var(--pk-muted) !important; }
+body.ft-extension-surface #sidebarNav .nav-item.nav-item--quiet .nav-quiet-note { display: block; font-size: 12px; color: var(--pk-faint); }
+body.ft-extension-surface #sidebarNav .nav-item.nav-item--quiet:hover { background: transparent !important; }
+body.ft-extension-surface #sidebarNav .nav-item.nav-item--quiet:hover .nav-label {
+  color: var(--ft-state-hover-ink) !important;
+  text-decoration: underline;
+  text-decoration-thickness: 1.5px;
+  text-underline-offset: 3px;
+}
+body.ft-extension-surface #sidebarNav .nav-item.nav-item--quiet:active { transform: var(--ft-state-press-shift); }
+body.ft-extension-surface #sidebarNav .nav-item.nav-item--quiet[aria-current="page"],
+body.ft-extension-surface #sidebarNav .nav-item.nav-item--quiet.active[aria-current="page"] {
+  background: transparent !important;
+  border-color: transparent !important;
+}
+body.ft-extension-surface #sidebarNav .nav-item.nav-item--quiet[aria-current="page"] .nav-label,
+body.ft-extension-surface #sidebarNav .nav-item.nav-item--quiet[aria-current="page"] .nav-icon { color: var(--pk-brick) !important; }
+.nav-quiet-note { display: none; }
+
+@media (prefers-reduced-motion: reduce) {
+  body.ft-extension-surface #sidebarNav .nav-item:active { transform: none !important; }
+}
+
+/* ---------------------------------------------------------------------------
+ * Home
+ * ------------------------------------------------------------------------- */
+
+#dashboardView[data-ft-home] .ft-home {
+  display: grid;
+  gap: 20px;
+  max-width: 1080px;
+}
+
+.ft-home-card,
+#dashboardView[data-ft-home] .ft-home-greeting {
+  background: var(--pk-paper);
+  border: 1.5px solid transparent;
+  border-image: var(--pk-edge-line) 20 / 18px / 0 round;
+  border-radius: 20px;
+  box-shadow: 2px 3px 0 0 var(--pk-desk);
+}
+
+.ft-home-section-title,
+.ft-home-card__title {
+  margin: 0 0 12px;
+  font-family: var(--pk-font-hand);
+  font-weight: 400;
+  font-size: 22px;
+  line-height: 1.2;
+  color: var(--pk-ink);
+}
+
+/* 1. Greeting */
+:root[data-theme] body.ft-extension-surface #dashboardView[data-ft-home] .ft-home .ft-home-greeting {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: end;
+  gap: 8px 24px;
+  padding: 26px 28px 22px;
+  background: var(--pk-paper) !important;
+}
+.ft-home-greeting__words { display: grid; gap: 6px; min-width: 0; }
+.ft-home-greeting__hello {
+  margin: 0;
+  font-family: var(--pk-font-hand);
+  font-weight: 400;
+  font-size: clamp(30px, 3.4vw, 40px);
+  line-height: 1.1;
+  color: var(--pk-ink);
+}
+.ft-home-greeting__kept {
+  margin: 0 0 14px;
+  font-size: 17px;
+  line-height: 1.45;
+  color: var(--pk-muted);
+}
+.ft-home-greeting__duo { width: 180px; display: flex; justify-content: center; align-self: end; }
+.ft-home-greeting__duo .pk-loop__art { height: 168px; } /* duo frames are 0.9:1 with a transparent margin: 151px wide */
+:root[data-theme] body.ft-extension-surface #dashboardView[data-ft-home] .ft-home .ft-dash-status {
+  margin: 0;
+  padding: 12px 14px;
+  background: color-mix(in srgb, var(--pk-desk) 45%, var(--pk-paper)) !important;
+  border: 1.5px solid var(--pk-line) !important;
+  border-radius: 16px !important;
+  box-shadow: none !important;
+}
+
+/* 2. Stats: crayon numerals on a brick swoosh */
+:root[data-theme] body.ft-extension-surface #dashboardView[data-ft-home] .ft-home .ft-dash-stats .stats-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 14px;
+}
+:root[data-theme] body.ft-extension-surface #dashboardView[data-ft-home] .ft-home .ft-dash-stats .stat-card {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-height: 0;
+  padding: 16px 18px 14px;
+  background: var(--pk-paper) !important;
+  border: 1.5px solid transparent !important;
+  border-image: var(--pk-edge-line) 20 / 18px / 0 round !important;
+  border-radius: 18px !important;
+  box-shadow: 2px 3px 0 0 var(--pk-desk) !important;
+  transform: none !important;
+}
+:root[data-theme] body.ft-extension-surface #dashboardView[data-ft-home] .ft-home .ft-dash-stats .stat-value {
+  position: relative;
+  align-self: flex-start;
+  font-family: var(--pk-font-hand) !important;
+  font-weight: 400 !important;
+  font-size: 38px !important;
+  line-height: 1 !important;
+  color: var(--pk-ink) !important;
+  padding-bottom: 8px;
+}
+:root[data-theme] body.ft-extension-surface #dashboardView[data-ft-home] .ft-home .ft-dash-stats .stat-value::after {
+  content: "";
+  position: absolute;
+  left: -2px;
+  right: -6px;
+  bottom: 0;
+  height: 8px;
+  background: var(--pk-brick);
+  -webkit-mask: url("../assets/images/doodles/underline_swoosh.webp") center / 100% 100% no-repeat;
+  mask: url("../assets/images/doodles/underline_swoosh.webp") center / 100% 100% no-repeat;
+  opacity: 0.85;
+}
+:root[data-theme] body.ft-extension-surface #dashboardView[data-ft-home] .ft-home .ft-dash-stats .stat-label {
+  font-family: var(--pk-font-label) !important;
+  font-size: 14px !important;
+  font-weight: 600 !important;
+  letter-spacing: 0 !important;
+  text-transform: none !important;
+  color: var(--pk-muted) !important;
+}
+
+/* 3 and 4: Study today, What Uljhan tried today */
+.ft-home-pair {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: 20px;
+  align-items: start;
+}
+.ft-home-card { padding: 20px 22px; }
+.ft-home-study { border-image-source: var(--pk-edge-study); background: color-mix(in srgb, var(--pk-sage) 45%, var(--pk-paper)); }
+.ft-home-study__big { display: flex; align-items: baseline; gap: 8px; margin: 0; }
+.ft-home-study__minutes { font-family: var(--pk-font-hand); font-size: 40px; line-height: 1; color: var(--pk-sage-ink); }
+.ft-home-study__unit { font-size: 15px; color: var(--pk-muted); }
+.ft-home-study__lead { margin: 0 0 4px; font-family: var(--pk-font-hand); font-size: 19px; color: var(--pk-ink); }
+.ft-home-study__line { margin: 6px 0 10px; font-size: 15px; line-height: 1.45; color: var(--pk-muted); min-height: 1em; }
+.ft-home-study__line:empty { display: none; }
+.ft-home-study__bar {
+  position: relative;
+  height: 10px;
+  border-radius: 999px;
+  background: var(--pk-track);
+  overflow: hidden;
+}
+.ft-home-study__fill {
+  position: absolute;
+  inset: 0;
+  transform-origin: left center;
+  transform: scaleX(var(--ft-home-progress, 0));
+  background: var(--pk-sage-ink);
+  border-radius: inherit;
+  transition: transform 400ms cubic-bezier(0.2, 0.9, 0.3, 1);
+}
+.ft-home-study__studied { margin: 6px 0 0; font-size: 13px; color: var(--pk-muted); }
+.ft-home-study__slider { margin-top: 14px; }
+.ft-home-study__actions { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 16px; }
+.ft-home-study__go { margin-top: 6px; }
+
+.ft-home-tried__list { list-style: none; margin: 0; padding: 0; display: grid; gap: 2px; }
+.ft-home-tried__row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 4px;
+  border-bottom: 1px dashed var(--pk-line);
+}
+.ft-home-tried__row:last-child { border-bottom: 0; }
+.ft-home-tried__words { display: grid; gap: 3px; min-width: 0; flex: 1 1 auto; }
+.ft-home-tried__title {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--pk-ink);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.ft-home-tried__meta { display: flex; flex-wrap: wrap; gap: 6px 10px; font-size: 13px; color: var(--pk-muted); }
+.ft-home-tried__reason {
+  padding: 1px 8px;
+  border-radius: 999px;
+  background: var(--pk-rose);
+  color: var(--pk-brick);
+  font-weight: 600;
+}
+.ft-home-tried__row--channel .ft-home-tried__reason { background: var(--pk-lilac); color: var(--pk-plum); }
+.ft-home-tried__row--control .ft-home-tried__reason { background: var(--pk-sky); color: var(--pk-sky-ink); }
+.ft-home-tried__row--allowOnly .ft-home-tried__reason { background: var(--pk-sun-wash); color: var(--pk-sun-ink); }
+.ft-home-tried__channel { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 14em; }
+.ft-home-tried__allow {
+  flex: none;
+  min-height: 36px;
+  padding: 0 14px;
+  border-radius: 999px;
+  border: 1.5px solid var(--pk-line);
+  background: var(--pk-paper);
+  color: var(--pk-ink);
+  font-family: var(--pk-font-label);
+  font-weight: 600;
+  font-size: 14px;
+  cursor: pointer;
+  box-shadow: 0 2px 0 var(--pk-ledge);
+  transition: background-color var(--ft-state-duration) linear, border-color var(--ft-state-duration) linear, color var(--ft-state-duration) linear;
+}
+.ft-home-tried__allow:hover { background: var(--ft-state-hover-wash); border-color: var(--ft-state-hover-edge); color: var(--ft-state-hover-ink); }
+.ft-home-tried__allow:active { transform: var(--ft-state-press-shift); box-shadow: 0 1px 0 var(--pk-ledge); }
+.ft-home-tried__allow:focus-visible { outline: var(--ft-state-focus-width) solid var(--ft-state-focus-ring); outline-offset: var(--ft-state-focus-offset); }
+.ft-home-tried__allow:disabled { opacity: 0.45; cursor: default; }
+.ft-home-tried__empty { display: flex; align-items: center; gap: 12px; padding: 8px 0; color: var(--pk-muted); font-size: 15px; }
+.ft-home-tried__empty .pk-moment { padding: 0; }
+.ft-home-tried__note { margin: 10px 0 0; font-size: 12px; color: var(--pk-faint); }
+
+/* 5. Quick actions */
+:root[data-theme] body.ft-extension-surface #dashboardView[data-ft-home] .ft-home .ft-home-actions .quick-actions-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 12px;
+}
+:root[data-theme] body.ft-extension-surface #dashboardView[data-ft-home] .ft-home .ft-home-actions .action-card {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 52px;
+  padding: 10px 14px;
+  background: var(--pk-paper) !important;
+  border: 1.5px solid var(--pk-line) !important;
+  border-radius: 16px !important;
+  box-shadow: 0 2px 0 var(--pk-ledge) !important;
+  color: var(--pk-ink) !important;
+  font-family: var(--pk-font-label);
+  font-weight: 600;
+  font-size: 15px;
+  cursor: pointer;
+  transition: background-color var(--ft-state-duration) linear, border-color var(--ft-state-duration) linear !important;
+}
+:root[data-theme] body.ft-extension-surface #dashboardView[data-ft-home] .ft-home .ft-home-actions .action-card .icon {
+  display: grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  background: var(--pk-rose) !important;
+  color: var(--pk-brick) !important;
+}
+#dashboardView[data-ft-home] #quickStartStudyBtn .icon { background: var(--pk-sage) !important; color: var(--pk-sage-ink) !important; }
+#dashboardView[data-ft-home] #quickKidsModeBtn .icon { background: var(--pk-sun-wash) !important; color: var(--pk-sun-ink) !important; }
+:root[data-theme] body.ft-extension-surface #dashboardView[data-ft-home] .ft-home .ft-home-actions .action-card:hover {
+  background: color-mix(in srgb, var(--pk-ink) 4%, var(--pk-paper)) !important;
+  border-color: var(--ft-state-hover-edge) !important;
+}
+:root[data-theme] body.ft-extension-surface #dashboardView[data-ft-home] .ft-home .ft-home-actions .action-card:active { transform: var(--ft-state-press-shift); box-shadow: 0 1px 0 var(--pk-ledge) !important; }
+:root[data-theme] body.ft-extension-surface #dashboardView[data-ft-home] .ft-home .ft-home-actions .action-card:focus-visible {
+  outline: var(--ft-state-focus-width) solid var(--ft-state-focus-ring);
+  outline-offset: var(--ft-state-focus-offset);
+}
+
+/* 6. FilterTube everywhere: the older app cards on paper */
+#dashboardView[data-ft-home] .ft-home-apps__grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.12fr) minmax(0, 1fr);
+  gap: 14px;
+}
+/* Android phone and tablet is the tall card on the left; TV and iPhone stack on the right. */
+#dashboardView[data-ft-home] .ft-home-apps__grid > .dashboard-app-card[data-platform="android"] { grid-row: span 2; }
+:root[data-theme] body.ft-extension-surface #dashboardView[data-ft-home] .ft-home .ft-home-apps .dashboard-app-card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  padding: 18px 18px 16px;
+  overflow: hidden;
+  background: var(--pk-paper) !important;
+  border: 1.5px solid transparent !important;
+  border-image: var(--pk-edge-line) 20 / 18px / 0 round !important;
+  border-radius: 18px !important;
+  box-shadow: 2px 3px 0 0 var(--pk-desk) !important;
+  color: var(--pk-ink) !important;
+  text-decoration: none;
+  transform: none !important;
+  transition: background-color var(--ft-state-duration) linear !important;
+}
+:root[data-theme] body.ft-extension-surface #dashboardView[data-ft-home] .ft-home .ft-home-apps .dashboard-app-card--android { background: color-mix(in srgb, var(--pk-sage) 55%, var(--pk-paper)) !important; }
+:root[data-theme] body.ft-extension-surface #dashboardView[data-ft-home] .ft-home .ft-home-apps .dashboard-app-card--tv { background: color-mix(in srgb, var(--pk-sky) 55%, var(--pk-paper)) !important; }
+:root[data-theme] body.ft-extension-surface #dashboardView[data-ft-home] .ft-home .ft-home-apps .dashboard-app-card--ios { background: color-mix(in srgb, var(--pk-lilac) 55%, var(--pk-paper)) !important; }
+:root[data-theme] body.ft-extension-surface #dashboardView[data-ft-home] .ft-home .ft-home-apps .dashboard-app-card:hover { filter: none !important; box-shadow: 3px 4px 0 0 var(--pk-desk) !important; }
+:root[data-theme] body.ft-extension-surface #dashboardView[data-ft-home] .ft-home .ft-home-apps .dashboard-app-card:hover .dashboard-app-card__cta { text-decoration: underline; text-underline-offset: 3px; }
+:root[data-theme] body.ft-extension-surface #dashboardView[data-ft-home] .ft-home .ft-home-apps .dashboard-app-card:focus-visible { outline: var(--ft-state-focus-width) solid var(--ft-state-focus-ring); outline-offset: var(--ft-state-focus-offset); }
+#dashboardView[data-ft-home] .ft-home-apps .dashboard-app-card__content { display: grid; gap: 6px; position: relative; z-index: 1; max-width: none !important; }
+#dashboardView[data-ft-home] .ft-home-apps .dashboard-app-card__kicker {
+  font-family: var(--pk-font-label);
+  font-size: 13px !important;
+  font-weight: 600;
+  letter-spacing: 0 !important;
+  text-transform: none !important;
+  color: var(--pk-muted) !important;
+}
+#dashboardView[data-ft-home] .ft-home-apps .dashboard-app-card strong {
+  font-family: var(--pk-font-hand) !important;
+  font-weight: 400 !important;
+  font-size: 20px !important;
+  line-height: 1.25 !important;
+  letter-spacing: 0 !important;
+  color: var(--pk-ink) !important;
+}
+#dashboardView[data-ft-home] .ft-home-apps .dashboard-app-card__body { font-size: 14px !important; line-height: 1.5 !important; color: var(--pk-muted) !important; }
+#dashboardView[data-ft-home] .ft-home-apps .dashboard-app-card__cta {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 6px;
+  padding: 0 !important;
+  background: none !important;
+  border: 0 !important;
+  box-shadow: none !important;
+  font-family: var(--pk-font-label);
+  font-weight: 700;
+  font-size: 14px;
+  color: var(--pk-brick) !important;
+}
+#dashboardView[data-ft-home] .ft-home-apps .dashboard-app-card__cta-icon img { width: 18px; height: 18px; }
+
+/* The platform pictures: large, tucked into the lower right corner and cropped by the card's edge, behind the
+   words. The words keep the left of the card (--ft-app-text), the picture the right, so nothing sits under text. */
+:root[data-theme] body.ft-extension-surface #dashboardView[data-ft-home] .ft-home .ft-home-apps .dashboard-app-card {
+  --ft-app-text: 60%;
+  --ft-app-art-w: 44%;
+  --ft-app-tint: var(--pk-sage);
+  min-height: 236px;
+  isolation: isolate;
+}
+:root[data-theme] body.ft-extension-surface #dashboardView[data-ft-home] .ft-home .ft-home-apps .dashboard-app-card--tv { --ft-app-tint: var(--pk-sky); }
+:root[data-theme] body.ft-extension-surface #dashboardView[data-ft-home] .ft-home .ft-home-apps .dashboard-app-card--ios { --ft-app-tint: var(--pk-lilac); }
+:root[data-theme] body.ft-extension-surface #dashboardView[data-ft-home] .ft-home .ft-home-apps .dashboard-app-card[data-platform="android"] {
+  --ft-app-text: 62%;
+  --ft-app-art-w: 58%;
+  min-height: 486px;
+}
+:root[data-theme] body.ft-extension-surface #dashboardView[data-ft-home] .ft-home .ft-home-apps .dashboard-app-card .dashboard-app-card__content {
+  width: var(--ft-app-text) !important;
+  max-width: var(--ft-app-text) !important;
+  flex: 1 1 auto;
+  align-content: start;
+  grid-template-rows: auto auto auto 1fr;
+}
+#dashboardView[data-ft-home] .ft-home-apps .dashboard-app-card__cta { align-self: end; }
+#dashboardView[data-ft-home] .ft-home-apps .dashboard-app-card[data-platform="android"] strong { font-size: 28px !important; }
+#dashboardView[data-ft-home] .ft-home-apps .dashboard-app-card[data-platform="android"] .dashboard-app-card__body { font-size: 15px !important; }
+
+:root[data-theme] body.ft-extension-surface #dashboardView[data-ft-home] .ft-home .ft-home-apps .dashboard-app-card .ft-app-art {
+  position: absolute;
+  z-index: -1;
+  top: auto;
+  left: auto;
+  right: -4%;
+  bottom: -10%;
+  display: block;
+  width: var(--ft-app-art-w);
+  height: auto;
+  aspect-ratio: 1;
+  overflow: visible;
+  border-radius: 0;
+  transform: rotate(6deg);
+  transform-origin: 60% 80%;
+  transition: transform 220ms cubic-bezier(.2, .8, .2, 1);
+  pointer-events: none;
+}
+/* A soft disc of the card's own tint behind the picture, like a spotlight drawn on the paper. */
+:root[data-theme] body.ft-extension-surface #dashboardView[data-ft-home] .ft-home .ft-home-apps .dashboard-app-card .ft-app-art::before {
+  content: "";
+  position: absolute;
+  inset: 4% -6% -6% 4%;
+  border-radius: 50%;
+  background: radial-gradient(closest-side, color-mix(in srgb, var(--ft-app-tint) 78%, var(--pk-ink) 6%) 58%, transparent 100%);
+  opacity: .9;
+}
+:root[data-theme="dark"] body.ft-extension-surface #dashboardView[data-ft-home] .ft-home .ft-home-apps .dashboard-app-card .ft-app-art::before {
+  background: radial-gradient(closest-side, color-mix(in srgb, var(--ft-app-tint) 70%, #ffffff 6%) 60%, transparent 100%);
+}
+:root[data-theme] body.ft-extension-surface #dashboardView[data-ft-home] .ft-home .ft-home-apps .dashboard-app-card .ft-app-art > img {
+  position: relative;
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  object-position: center bottom;
+  border-radius: 0;
+  filter: drop-shadow(0 18px 22px rgba(39, 48, 35, .18));
+}
+:root[data-theme="dark"] body.ft-extension-surface #dashboardView[data-ft-home] .ft-home .ft-home-apps .dashboard-app-card .ft-app-art > img {
+  filter: drop-shadow(0 18px 26px rgba(0, 0, 0, .45)) brightness(.94);
+}
+/* Android: the robot stands tall in the corner, cropped at the knees by the card's bottom edge. */
+:root[data-theme] body.ft-extension-surface #dashboardView[data-ft-home] .ft-home .ft-home-apps .dashboard-app-card[data-platform="android"] .ft-app-art {
+  right: 4%;
+  bottom: -12%;
+  aspect-ratio: 440 / 538;
+  transform: rotate(5deg);
+}
+/* iPhone and iPad: the App Store mark, tilted like a sticker. */
+:root[data-theme] body.ft-extension-surface #dashboardView[data-ft-home] .ft-home .ft-home-apps .dashboard-app-card--ios .ft-app-art {
+  --ft-app-art-w: 42%;
+  right: -9%;
+  bottom: -14%;
+  transform: rotate(-10deg);
+}
+/* Android TV: a TV drawn in CSS; the robot peeks up from the bottom of its screen. */
+:root[data-theme] body.ft-extension-surface #dashboardView[data-ft-home] .ft-home .ft-home-apps .dashboard-app-card--tv .ft-app-art {
+  --ft-app-art-w: 40%;
+  right: -3%;
+  bottom: 6%;
+  aspect-ratio: auto;
+  transform: rotate(-4deg);
+}
+#dashboardView[data-ft-home] .ft-app-tv { position: relative; display: grid; justify-items: center; width: 100%; }
+#dashboardView[data-ft-home] .ft-app-tv__screen {
+  position: relative;
+  display: block;
+  width: 100%;
+  aspect-ratio: 16 / 10;
+  overflow: hidden;
+  border: 9px solid #23272e;
+  border-radius: 16px;
+  background:
+    radial-gradient(120% 90% at 30% 10%, rgba(255, 255, 255, .55), transparent 55%),
+    linear-gradient(170deg, #d9eefb 0%, #a9d6f1 100%);
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .35), 0 14px 22px rgba(30, 40, 52, .2);
+}
+#dashboardView[data-ft-home] .ft-app-tv__screen img {
+  position: absolute;
+  left: 50%;
+  bottom: 0;
+  width: 46%;
+  height: auto;
+  transform: translate(-50%, 34%);
+  filter: drop-shadow(0 6px 8px rgba(39, 48, 35, .2));
+}
+#dashboardView[data-ft-home] .ft-app-tv__stand {
+  display: block;
+  width: 34%;
+  height: 16px;
+  margin-top: -1px;
+  border-radius: 0 0 10px 10px;
+  background: linear-gradient(#2c3139, #1b1f25);
+  clip-path: polygon(18% 0, 82% 0, 100% 100%, 0 100%);
+}
+/* The TV's foot: a short ink bar under the stand. */
+#dashboardView[data-ft-home] .ft-app-tv::after {
+  content: "";
+  display: block;
+  width: 46%;
+  height: 5px;
+  border-radius: 3px;
+  background: #1b1f25;
+}
+:root[data-theme="dark"] #dashboardView[data-ft-home] .ft-app-tv::after { background: #07090c; box-shadow: 0 0 0 1px rgba(255, 255, 255, .08); }
+:root[data-theme="dark"] #dashboardView[data-ft-home] .ft-app-tv__screen {
+  border-color: #07090c;
+  background:
+    radial-gradient(120% 90% at 30% 10%, rgba(255, 255, 255, .18), transparent 55%),
+    linear-gradient(170deg, #2b4a63 0%, #1d3549 100%);
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .08), 0 0 0 1px rgba(255, 255, 255, .1), 0 14px 22px rgba(0, 0, 0, .4);
+}
+:root[data-theme="dark"] #dashboardView[data-ft-home] .ft-app-tv__stand { background: linear-gradient(#11151a, #07090c); box-shadow: 0 0 0 1px rgba(255, 255, 255, .08); }
+
+/* Hover: the picture leans in a little, answering the pointer. */
+:root[data-theme] body.ft-extension-surface #dashboardView[data-ft-home] .ft-home .ft-home-apps .dashboard-app-card:hover .ft-app-art {
+  transform: translateY(-6px) rotate(2deg);
+}
+:root[data-theme] body.ft-extension-surface #dashboardView[data-ft-home] .ft-home .ft-home-apps .dashboard-app-card:active .ft-app-art {
+  transform: translateY(-2px) rotate(3deg) scale(.98);
+}
+:root[data-theme] body.ft-extension-surface #dashboardView[data-ft-home] .ft-home .ft-home-apps .dashboard-app-card:active {
+  transform: var(--ft-state-press-shift) !important;
+  box-shadow: 1px 1px 0 0 var(--pk-desk) !important;
+}
+@media (prefers-reduced-motion: reduce) {
+  :root[data-theme] body.ft-extension-surface #dashboardView[data-ft-home] .ft-home .ft-home-apps .dashboard-app-card .ft-app-art { transition: none; }
+  :root[data-theme] body.ft-extension-surface #dashboardView[data-ft-home] .ft-home .ft-home-apps .dashboard-app-card:is(:hover, :active) .ft-app-art { transform: none; }
+}
+
+/* The Support page's price line, and the support sheet's (js/mascots.js mountSupport). */
+.ft-support-price,
+.pk-support__price { margin: 10px 0 0; font-weight: 600; color: var(--pk-ink); line-height: 1.5; }
+
+/* Help: the note that moved from the old dashboard. */
+.ft-help-structure-note {
+  margin: 0 0 16px;
+  padding: 12px 16px;
+  border-radius: 14px;
+  background: var(--pk-sun-wash);
+  color: var(--pk-sun-ink);
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+/* About: Kriti and Uljhan */
+.ft-about-duo {
+  display: grid;
+  grid-template-columns: 180px minmax(0, 1fr);
+  gap: 24px;
+  align-items: center;
+  margin: 8px 0 20px;
+  padding: 22px 26px;
+  background: var(--pk-paper);
+  border: 1.5px solid transparent;
+  border-image: var(--pk-edge-family) 20 / 18px / 0 round;
+  border-radius: 20px;
+  box-shadow: 2px 3px 0 0 var(--pk-desk);
+}
+.ft-about-duo__picture { display: block; width: 180px; height: auto; }
+/* mountAboutLoop hides the still while the loop shows; display: block above would otherwise keep both. */
+.ft-about-duo__picture[hidden] { display: none; }
+.ft-about-duo__words { display: grid; gap: 10px; max-width: 62ch; }
+.ft-about-duo__title { margin: 0; font-family: var(--pk-font-hand); font-weight: 400; font-size: 26px; color: var(--pk-ink); }
+.ft-about-duo__words p { margin: 0; font-size: 16px; line-height: 1.6; color: var(--pk-ink); }
+.ft-about-duo__words .ft-about-duo__note { font-size: 14px; color: var(--pk-muted); }
+
+@media (max-width: 1100px) {
+  .ft-home-pair { grid-template-columns: minmax(0, 1fr); }
+  #dashboardView[data-ft-home] .ft-home-apps__grid { grid-template-columns: minmax(0, 1fr); }
+  #dashboardView[data-ft-home] .ft-home-apps__grid > .dashboard-app-card[data-platform="android"] { grid-row: auto; }
+  :root[data-theme] body.ft-extension-surface #dashboardView[data-ft-home] .ft-home .ft-home-apps .dashboard-app-card[data-platform="android"] {
+    --ft-app-art-w: 34%;
+    min-height: 300px;
+  }
+}
+@media (max-width: 560px) {
+  /* Narrow: the words take the card's width and the picture shrinks into the corner. */
+  :root[data-theme] body.ft-extension-surface #dashboardView[data-ft-home] .ft-home .ft-home-apps .dashboard-app-card {
+    --ft-app-text: 100%;
+    padding-bottom: 120px;
+  }
+  :root[data-theme] body.ft-extension-surface #dashboardView[data-ft-home] .ft-home .ft-home-apps .dashboard-app-card .ft-app-art { width: 150px; }
+}
+@media (max-width: 760px) {
+  :root[data-theme] body.ft-extension-surface #dashboardView[data-ft-home] .ft-home .ft-dash-stats .stats-grid,
+  :root[data-theme] body.ft-extension-surface #dashboardView[data-ft-home] .ft-home .ft-home-actions .quick-actions-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  :root[data-theme] body.ft-extension-surface #dashboardView[data-ft-home] .ft-home .ft-home-greeting { grid-template-columns: minmax(0, 1fr); }
+  .ft-home-greeting__duo { display: none; }
+  .ft-about-duo { grid-template-columns: minmax(0, 1fr); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .ft-home-study__fill { transition: none; }
+  #dashboardView[data-ft-home] .action-card:active,
+  .ft-home-tried__allow:active { transform: none !important; }
+}
+
+/* Row text keeps to one line each; the count never pushes the label onto two lines. */
+body.ft-extension-surface #sidebarNav .nav-item[data-pk-tint] .nav-text,
+body.ft-extension-surface #sidebarNav .nav-item.nav-item--quiet .nav-text { min-width: 0; flex: 1 1 auto; }
+body.ft-extension-surface #sidebarNav .nav-item[data-pk-tint] .nav-label,
+body.ft-extension-surface #sidebarNav .nav-item[data-pk-tint] .nav-summary {
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+body.ft-extension-surface #sidebarNav .nav-item.nav-item--quiet { height: auto !important; align-items: center; }
+body.ft-extension-surface #sidebarNav .nav-item.nav-item--quiet .nav-text { display: flex !important; flex-direction: column; justify-content: center; height: auto !important; }
+body.ft-extension-surface #sidebarNav .nav-item.nav-item--quiet .nav-quiet-note { line-height: 1.3; }
+
+:root[data-theme] body.ft-extension-surface #dashboardView[data-ft-home] .ft-home .ft-dash-stats .stat-card { align-items: flex-start; text-align: start; }
+:root[data-theme] body.ft-extension-surface #dashboardView[data-ft-home] .ft-home .ft-dash-stats .stat-label { text-align: start !important; }
+
+/* The Main and Kids switch: a compact segmented pair, not two full-width pills. */
+:root[data-theme] body.ft-extension-surface #dashboardView[data-ft-home] .ft-home .ft-dash-status { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px 20px; }
+:root[data-theme] body.ft-extension-surface #dashboardView[data-ft-home] .ft-home .ft-dash-status__profile { flex: 1 1 320px; }
+:root[data-theme] body.ft-extension-surface #dashboardView[data-ft-home] .ft-home .ft-dash-status__source { flex: 0 0 auto; margin: 0 !important; padding: 0 !important; background: none !important; border: 0 !important; }
+:root[data-theme] body.ft-extension-surface #dashboardView[data-ft-home] .ft-home .dashboard-stats-source__buttons { display: inline-flex; gap: 0; padding: 3px; border-radius: 999px; background: var(--pk-track); width: auto !important; }
+:root[data-theme] body.ft-extension-surface #dashboardView[data-ft-home] .ft-home .dashboard-stats-source__buttons .btn-secondary {
+  min-width: 76px; min-height: 34px !important; height: 34px; padding: 0 16px !important;
+  border: 0 !important; border-radius: 999px !important; box-shadow: none !important;
+  background: transparent !important; color: var(--pk-muted) !important; font-size: 14px !important;
+}
+:root[data-theme] body.ft-extension-surface #dashboardView[data-ft-home] .ft-home .dashboard-stats-source__buttons .btn-secondary:hover { color: var(--pk-ink) !important; background: var(--ft-state-hover-wash) !important; }
+:root[data-theme] body.ft-extension-surface #dashboardView[data-ft-home] .ft-home .dashboard-stats-source__buttons .btn-secondary.active {
+  background: var(--pk-paper) !important; color: var(--pk-brick) !important; box-shadow: 0 1px 0 var(--pk-ledge) !important;
+}
+
+/* The profile card: one row (who, then the Main and Kids switch), never stretched. */
+:root[data-theme] body.ft-extension-surface #dashboardView[data-ft-home] .ft-home .ft-home-greeting .ft-dash-status {
+  display: flex !important;
+  grid-template-columns: none !important;
+  min-height: 0 !important;
+  height: auto !important;
+  align-self: start;
+}
+:root[data-theme] body.ft-extension-surface #dashboardView[data-ft-home] .ft-home .ft-dash-status__profile { justify-content: flex-start !important; min-height: 0 !important; }
+:root[data-theme] body.ft-extension-surface #dashboardView[data-ft-home] .ft-home .ft-dash-status__source { width: auto !important; grid-column: auto !important; }
+
+/* The older cards' decorative shapes stay off; the words keep the side of the card the picture leaves free. */
+#dashboardView[data-ft-home] .ft-home-apps .dashboard-app-card::before,
+#dashboardView[data-ft-home] .ft-home-apps .dashboard-app-card::after { display: none !important; content: none !important; }
+:root[data-theme] body.ft-extension-surface #dashboardView[data-ft-home] .ft-home .ft-home-apps .dashboard-app-card__content { width: var(--ft-app-text, auto) !important; max-width: var(--ft-app-text, none) !important; }
+:root[data-theme] body.ft-extension-surface #dashboardView[data-ft-home] .ft-home .ft-home-greeting .ft-dash-status { flex-direction: row !important; }
+:root[data-theme] body.ft-extension-surface #dashboardView[data-ft-home] .ft-home .ft-home-greeting .ft-dash-status__profile { flex: 1 1 18rem !important; height: auto !important; }
+
+/* Critique fixes: small notes read at AA (muted ink, not the faint line colour); Allow is easier to hit. */
+.ft-home-tried__note { color: var(--pk-muted); }
+body.ft-extension-surface #sidebarNav .nav-item.nav-item--quiet .nav-quiet-note { color: var(--pk-muted); }
+.ft-home-tried__allow { min-height: 40px; }
+
+/* The sidebar list is a fixed-height column: rows keep their height (they scroll, never squash). */
+body.ft-extension-surface #sidebarNav .nav-item[data-pk-tint],
+body.ft-extension-surface #sidebarNav .nav-item.nav-item--quiet { flex-shrink: 0 !important; }
+body.ft-extension-surface #sidebarNav .nav-item.nav-item--quiet { min-height: 34px !important; }
+
+/* During a study session (js/shared/effective_mode.js): Home and Filters say Study, in sage. */
+body.ft-extension-surface #sidebarNav .nav-item .nav-study {
+  display: block;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--pk-sage-ink);
+}
+body.ft-extension-surface #sidebarNav .nav-item .nav-study[hidden] { display: none; }
+body.ft-extension-surface #sidebarNav.is-studying .nav-item[data-pk-tint="filters"] .nav-summary,
+body.ft-extension-surface #sidebarNav.is-studying .nav-item[data-pk-tint="home"] .nav-summary { display: none !important; }
+.ft-home-greeting__mode {
+  justify-self: start;
+  margin: -6px 0 12px;
+  padding: 4px 12px;
+  border-radius: 999px;
+  background: var(--pk-sage);
+  color: var(--pk-sage-ink);
+  font-size: 14px;
+  font-weight: 600;
+}
+.ft-home-greeting__mode[hidden] { display: none; }
+
+/* About: why FilterTube exists (the app's about_open_source story), before Kriti and Uljhan. */
+.ft-about-why {
+  display: grid;
+  gap: 12px;
+  margin: 8px 0 16px;
+  padding: 22px 26px;
+  background: var(--pk-paper);
+  border: 1.5px solid transparent;
+  border-image: var(--pk-edge-line) 20 / 18px / 0 round;
+  border-radius: 20px;
+  box-shadow: 2px 3px 0 0 var(--pk-desk);
+}
+.ft-about-why__title { margin: 0; font-family: var(--pk-font-hand); font-weight: 400; font-size: 26px; color: var(--pk-ink); }
+.ft-about-why p { margin: 0; max-width: 68ch; font-size: 16px; line-height: 1.65; color: var(--pk-ink); }
+.ft-about-why__link {
+  justify-self: start;
+  font-family: var(--pk-font-label);
+  font-weight: 700;
+  color: var(--pk-brick);
+  text-decoration: underline;
+  text-decoration-thickness: 1.5px;
+  text-underline-offset: 3px;
+}
+.ft-about-why__link:hover { color: var(--ft-color-brand-primary-hover); }
+.ft-about-why__link:focus-visible { outline: var(--ft-state-focus-width) solid var(--ft-state-focus-ring); outline-offset: var(--ft-state-focus-offset); border-radius: 4px; }
+
+/* ---------------------------------------------------------------------------
+ * Owner polish, 2026-11-18: support line in the top bar, a full-height sidebar
+ * whose rows don't cut words, and one column grid for every Home section.
+ * ------------------------------------------------------------------------- */
+
+body.ft-extension-surface[data-surface="tab-view"] {
+  /* The view's own inset (tab-view.css .view-container): the top bar uses it too, so its edges and
+     the cards' edges line up on every page. */
+  --ft-view-inset: clamp(0.95rem, 1.4vw, 1.1rem);
+  /* One gutter for every Home grid: the stats, the pair, quick actions and the app cards share columns. */
+  --ft-home-gutter: 20px;
+}
+
+/* 1. The top bar: the page title, the support line centred, then the controls. */
+:root[data-theme] body.ft-extension-surface[data-surface="tab-view"] .main-content { container: ft-main / inline-size; }
+:root[data-theme] body.ft-extension-surface[data-surface="tab-view"] .top-bar {
+  margin-inline: var(--ft-view-inset);
+  column-gap: 16px;
+}
+:root[data-theme] body.ft-extension-surface[data-surface="tab-view"] .top-bar #pageTitle { flex: 0 0 auto; max-width: 45%; }
+:root[data-theme] body.ft-extension-surface[data-surface="tab-view"] .top-bar .actions { margin-inline-start: 0; }
+
+:root[data-theme] body.ft-extension-surface[data-surface="tab-view"] .ft-topbar-support {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex: 0 1 auto;
+  min-width: 0;
+  margin: 0;
+  padding: 4px 4px 4px 16px;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--pk-rose) 55%, var(--pk-paper));
+  border: 1.5px solid color-mix(in srgb, var(--pk-brick) 18%, transparent);
+  box-shadow: none;
+}
+.ft-topbar-support .ft-home-support__line {
+  flex: 1 1 auto;
+  min-width: 0;
+  margin: 0;
+  font-family: var(--pk-font-hand);
+  font-size: 16px;
+  line-height: 1.25;
+  color: var(--pk-ink);
+  text-wrap: balance;
+}
+:root[data-theme] body.ft-extension-surface[data-surface="tab-view"] .ft-topbar-support .ft-home-support__kofi {
+  flex: none;
+  min-height: 32px !important;
+  height: auto !important;
+  padding: 0 14px !important;
+  border-radius: 999px !important;
+  font-size: 13px !important;
+  line-height: 32px !important;
+  white-space: nowrap;
+  text-decoration: none;
+}
+/* The Support page carries the same ask in full. */
+body.ft-extension-surface[data-active-view="donate"] .ft-topbar-support { display: none !important; }
+
+/* Not enough room for one line beside the title and controls: the line wraps to two inside the pill.
+   Narrower still: the pill takes its own row under the title, centred, never over the controls. */
+@container ft-main (max-width: 1240px) {
+  .ft-topbar-support .ft-home-support__line { font-size: 15px; }
+}
+@container ft-main (max-width: 900px) {
+  :root[data-theme] body.ft-extension-surface[data-surface="tab-view"] .top-bar { flex-wrap: wrap; row-gap: 10px; }
+  :root[data-theme] body.ft-extension-surface[data-surface="tab-view"] .ft-topbar-support {
+    order: 10;
+    flex: 1 1 100%;
+    justify-content: center;
+  }
+  :root[data-theme] body.ft-extension-surface[data-surface="tab-view"] .ft-topbar-support .ft-home-support__line { flex: 0 1 auto; text-align: center; }
+}
+/* Phones and narrow windows: the top bar is a grid (serene-shell.css); the pill is its last row. */
+@media (max-width: 768px) {
+  :root[data-theme] body.ft-extension-surface[data-surface="tab-view"] .top-bar {
+    grid-template-areas: "toggle title actions" "support support support";
+  }
+  :root[data-theme] body.ft-extension-surface[data-surface="tab-view"] .ft-topbar-support { grid-area: support; }
+}
+@media (max-width: 640px) {
+  body.ft-extension-surface[data-surface="tab-view"] { --ft-view-inset: 0.72rem; }
+  :root[data-theme] body.ft-extension-surface[data-surface="tab-view"] .top-bar {
+    grid-template-areas: "toggle title" "actions actions" "support support";
+  }
+  :root[data-theme] body.ft-extension-surface[data-surface="tab-view"] .ft-topbar-support {
+    padding: 8px 8px 8px 14px;
+    border-radius: 18px;
+    justify-content: space-between;
+  }
+  .ft-topbar-support .ft-home-support__line { text-align: start; }
+}
+
+/* 2. Sidebar: as tall as the window (the list scrolls inside it), a little wider, and rows that wrap
+   their note onto a second line instead of cutting it. */
+@media (min-width: 769px) {
+  :root[data-theme] body.ft-extension-surface[data-surface="tab-view"] .app-container {
+    grid-template-columns: minmax(16.5rem, 18.5rem) minmax(0, 1fr);
+  }
+  :root[data-theme] body.ft-extension-surface[data-surface="tab-view"] .sidebar {
+    align-self: stretch;
+    width: auto;
+    height: auto;
+    max-height: none;
+    padding-inline: 14px;
+  }
+}
+body.ft-extension-surface #sidebarNav .nav-item[data-pk-tint] { height: auto !important; min-height: 48px !important; }
+body.ft-extension-surface #sidebarNav .nav-item[data-pk-tint] .nav-summary {
+  display: -webkit-box !important;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  white-space: normal !important;
+  overflow-wrap: anywhere;
+}
+/* The counts sit on one right edge, whatever the row's words do. */
+body.ft-extension-surface #sidebarNav .nav-item .nav-count { flex: none; min-width: 1.4em; text-align: end; }
+
+/* 3. Home: wider on big windows, every section on one column grid with one gutter. */
+:root[data-theme] body.ft-extension-surface #dashboardView[data-ft-home] .ft-home {
+  max-width: 1480px;
+  gap: var(--ft-home-gutter);
+}
+:root[data-theme] body.ft-extension-surface #dashboardView[data-ft-home] .ft-home .ft-dash-stats .stats-grid,
+:root[data-theme] body.ft-extension-surface #dashboardView[data-ft-home] .ft-home .ft-home-actions .quick-actions-grid,
+#dashboardView[data-ft-home] .ft-home-pair,
+#dashboardView[data-ft-home] .ft-home-apps__grid { gap: var(--ft-home-gutter); }
+/* The app cards split in halves, so their gutter is the pair's and the stats' middle gutter. */
+@media (min-width: 1101px) {
+  #dashboardView[data-ft-home] .ft-home-apps__grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+
+/* Study today and What Uljhan tried today: the same height; each card's action sits on its floor. */
+#dashboardView[data-ft-home] .ft-home-pair { align-items: stretch; }
+#dashboardView[data-ft-home] .ft-home-pair > .ft-home-card { display: flex; flex-direction: column; }
+.ft-home-study__body { display: flex; flex-direction: column; flex: 1 1 auto; }
+.ft-home-study__line { max-width: 62ch; }
+.ft-home-study__actions,
+.ft-home-study__go { margin-top: auto; }
+.ft-home-study__body > .ft-home-study__go { align-self: flex-start; }
+.ft-home-tried__note { margin-top: auto; padding-top: 10px; }
+/* No plan yet: Kriti reads beside the words, so the card holds a picture, not an empty floor. */
+.ft-home-study__setup { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: center; gap: 4px 16px; margin-bottom: 16px; }
+.ft-home-study__setup .pk-moment { padding: 0; justify-self: end; }
+.ft-home-study__setup .ft-home-study__line { margin-bottom: 0; }
+@media (max-width: 560px) {
+  .ft-home-study__setup { grid-template-columns: minmax(0, 1fr); }
+  .ft-home-study__setup .pk-moment { display: none; }
+}
+/* The words start at the card's padding (the content grid was centring its capped column). */
+:root[data-theme] body.ft-extension-surface #dashboardView[data-ft-home] .ft-home .ft-home-apps .dashboard-app-card__content { justify-content: start !important; }
+
+/* A section title sits close to its own cards, further from the section above. */
+:root[data-theme] body.ft-extension-surface #dashboardView[data-ft-home] :is(.ft-home-actions, .ft-home-apps) { margin-top: 6px; row-gap: 0 !important; }
+#dashboardView[data-ft-home] :is(.ft-home-actions, .ft-home-apps) > .ft-home-section-title { margin: 0 0 10px !important; }
+/* Medium windows: quick actions in two columns (labels stay on one line); the middle gutter is still the stats' one. */
+@media (max-width: 1100px) {
+  :root[data-theme] body.ft-extension-surface #dashboardView[data-ft-home] .ft-home .ft-home-actions .quick-actions-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+
+/* "What Uljhan tried today" → Change: the switch that hid it, brought forward with one calm pulse
+   (js/dashboard_home.js revealControl). An overlay, since the rows' own background and shadow are
+   pinned by paperkit-parity.css; only its opacity moves. Reduced motion: it shows, holds, then goes. */
+body.ft-extension-surface .toggle-row.ft-control-spotlight { position: relative; }
+body.ft-extension-surface .toggle-row.ft-control-spotlight::after {
+  content: "";
+  position: absolute;
+  inset: 2px -6px;
+  border-radius: 12px;
+  pointer-events: none;
+  background: color-mix(in srgb, var(--ft-group-ink, var(--pk-sky-ink)) 10%, transparent);
+  box-shadow: inset 0 0 0 2px color-mix(in srgb, var(--ft-group-ink, var(--pk-sky-ink)) 55%, transparent);
+  opacity: 0;
+  animation: ft-control-spotlight 2200ms cubic-bezier(0.22, 1, 0.36, 1) 1 both;
+}
+@keyframes ft-control-spotlight {
+  0% { opacity: 0; }
+  18% { opacity: 1; }
+  60% { opacity: 1; }
+  100% { opacity: 0; }
+}
+@media (prefers-reduced-motion: reduce) {
+  body.ft-extension-surface .toggle-row.ft-control-spotlight::after { animation: none; opacity: 1; }
+}

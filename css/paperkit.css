@@ -21,19 +21,20 @@
 }
 
 :root {
-  /* BrandPalette, light */
-  --pk-canvas: #f6f2eb;
-  --pk-desk: #ece4d9;
-  --pk-paper: #fffcf6;
+  /* BrandPalette, light. The paper sits a little nearer a warm white than the app's #FFFCF6 cream
+     (owner, 2026-11-17: the pages read too yellow on a monitor); ink, brick and the areas are unchanged. */
+  --pk-canvas: #f7f5f1;
+  --pk-desk: #ece7e0;
+  --pk-paper: #fffdfa;
   --pk-ink: #1b1a18;
   --pk-muted: #625f58;
   --pk-faint: #9a9389;
-  --pk-line: #dcd1c2;
-  --pk-track: #e6ddcf;
+  --pk-line: #ddd5ca;
+  --pk-track: #e7e1d8;
   --pk-brick: #a93e31;
-  --pk-on-brick: #fffcf6;
+  --pk-on-brick: #fffdfa;
   --pk-brick-fill: #a93e31;
-  --pk-on-brick-fill: #fffcf6;
+  --pk-on-brick-fill: #fffdfa;
   --pk-rose: #fae8e6;
   --pk-sky: #e9f4fb;
   --pk-sky-ink: #1f5f86;
@@ -302,7 +303,7 @@ body.ft-extension-surface .nav-item.active[data-pk-icon] .nav-icon::after { -web
   line-height: 1;
 }
 
-.ft-avatar--adult { --pk-avatar-ink: var(--pk-ink); }
+/* Android ProfileAvatar: Parent and Adult take the Family area (lilac wash, plum ink), Kids the sun. */
 .ft-avatar--kids { --pk-avatar-wash: var(--pk-sun-wash); --pk-avatar-ink: var(--pk-sun-ink); }
 
 .ft-avatar__ring {
@@ -314,22 +315,22 @@ body.ft-extension-surface .nav-item.active[data-pk-icon] .nav-icon::after { -web
   pointer-events: none;
 }
 
-.ft-avatar__ring circle {
+/* crayon(ink, 1.6dp): round caps and joins, the jitter is in the path itself (crayonRingPath). */
+.ft-avatar__ring path {
   fill: none;
   stroke: var(--pk-avatar-ink);
-  stroke-width: 2.3;
   stroke-linecap: round;
-  /* a closed shape that never quite closes */
-  stroke-dasharray: 104 7;
-  stroke-dashoffset: 12;
-  filter: url(#ftCrayonEdge);
+  stroke-linejoin: round;
 }
 
-.ft-avatar__ring .ft-avatar__ring-second {
-  stroke-width: 1.5;
-  stroke-dasharray: 98 18;
-  stroke-dashoffset: 40;
-  opacity: 0.6;
+/* Parent: the two scribbled loops, tinted with the ink, inset 2% (ProfileAvatarDrawable). */
+.ft-avatar__ring--scribble {
+  inset: 2%;
+  width: auto;
+  height: auto;
+  background: var(--pk-avatar-ink);
+  -webkit-mask: center / contain no-repeat;
+  mask: center / contain no-repeat;
 }
 
 .ft-avatar__initial {
@@ -437,18 +438,19 @@ body .ft-profile-dropdown .ft-profile-dropdown-item[class*="ft-profile-role--"].
   flex: none;
   padding: 3px 9px;
   border-radius: 999px;
-  border: 1px solid color-mix(in srgb, var(--pk-sage-ink) 28%, transparent);
-  background: var(--pk-sage);
-  color: var(--pk-sage-ink);
+  /* Android ProfilePickerRow: "You're here" is a brick-filled pill; PIN is paper with a line. */
+  border: 1px solid var(--pk-brick-fill);
+  background: var(--pk-brick-fill);
+  color: var(--pk-on-brick-fill);
   font-size: 11px;
   font-weight: 700;
   white-space: nowrap;
 }
 
 .ft-profile-status-chip--pin {
-  border-color: color-mix(in srgb, var(--pk-plum) 28%, transparent);
-  background: var(--pk-lilac);
-  color: var(--pk-plum);
+  border-color: var(--pk-line);
+  background: var(--pk-paper);
+  color: var(--pk-muted);
 }
 
 .help-item.ft-profile-row[class*="ft-profile-role--"] {
@@ -665,6 +667,19 @@ body:not(.ft-managed-child-editor-view) .ft-managed-child-global.ft-session-bar 
 
 .ft-session-bar__done:hover { border-color: var(--pk-sun-ink); }
 
+/* A remote session's sync badge (Android ParentMode.syncTone): busy, done or waiting. */
+.ft-session-bar__sync {
+  padding: 1px 8px;
+  border-radius: 999px;
+  border: 1px solid var(--pk-line);
+  font-weight: 700;
+}
+.ft-session-bar__sync.is-busy { background: var(--pk-sky); color: var(--pk-sky-ink); }
+.ft-session-bar__sync.is-done { background: var(--pk-sage); color: var(--pk-sage-ink); }
+.ft-session-bar__sync.is-waiting { background: var(--pk-sun-wash); color: var(--pk-sun-ink); }
+.ft-session-bar.is-slim .ft-session-bar__sync { display: none; }
+.ft-ask-request__space { margin-inline-start: auto; }
+
 .ft-session-bar.is-slim { padding: 6px 8px 6px 10px; }
 .ft-session-bar.is-slim .ft-session-bar__explainer,
 .ft-session-bar.is-slim .ft-session-bar__place { display: none; }
@@ -684,6 +699,8 @@ body:not(.ft-managed-child-editor-view) .ft-managed-child-global.ft-session-bar 
 @media (max-width: 640px) {
   .ft-managed-child-global.ft-session-bar { flex-wrap: wrap; margin: 8px 12px 16px; }
   .ft-session-bar__done { width: 100%; }
+  /* A remote bar stacks the device name above the sync badge so it never truncates (Android 685cf9b23). */
+  .ft-session-bar.is-remote .ft-session-bar__meta { flex-direction: column; align-items: flex-start; }
 }
 
 /* ---------------------------------------------------------------------------
@@ -863,26 +880,6 @@ img[data-character="uljhan"] {
   background-position: center;
   background-repeat: no-repeat;
 }
-
-/* Dashboard hero: the pair stands on the profile card's top edge. The card drops to the hero's
- * foot and keeps room above it, so the pose is never clipped. */
-:root:not([data-ft-companion="off"]) #dashboardView .ft-dash-status.has-duo {
-  position: relative;
-  align-self: end;
-  margin-top: 128px;
-}
-
-.pk-hero-duo {
-  position: absolute;
-  inset-inline-end: 18px;
-  bottom: calc(100% - 3px);
-  z-index: 1;
-  line-height: 0;
-}
-
-.ft-mascot--hero .ft-mascot__image { height: 124px; }
-
-.ft-mascot--hero .ft-mascot__figure { transform-origin: 50% 100%; }
 
 .ft-mascot--hero .ft-mascot__figure.is-hopping { animation: pk-hop 520ms var(--pk-ease-enter); }
 
@@ -1118,6 +1115,9 @@ body.ft-extension-surface[data-surface="popup"] .ft-popup-filter-card {
   margin-inline: 2px;
   border-radius: 16px;
   overflow: hidden;
+  /* The popup's main column is the scroller: the card keeps its full height instead of shrinking
+     into the column and clipping its own list (the third tab ended after "Hide All Comments"). */
+  flex: 0 0 auto;
 }
 
 @keyframes pk-net-in {
@@ -1228,3 +1228,100 @@ body.ft-extension-surface[data-surface="tab-view"] .ft-about-portrait-card img {
   align-self: flex-end;
   pointer-events: none;
 }
+
+/* A wrong PIN (Android PinGateActivity): the field takes the danger edge and a polite line asks again. */
+.ft-modal .ft-modal-error { margin: 6px 0 0; color: var(--pk-brick); font-size: 13px; font-weight: 600; }
+.ft-modal .ft-modal-error[hidden] { display: none; }
+.ft-modal input[aria-invalid="true"] { border-color: var(--pk-brick) !important; }
+
+/* Message dialogs enter at 0.96 with alpha (Android FilterTubeMessageDialog, 4ff67ce1b). */
+.ft-modal-overlay > .ft-modal { animation: pk-dialog-in var(--pk-medium) var(--pk-ease-enter) both; }
+@keyframes pk-dialog-in { from { opacity: 0; transform: scale(0.96); } to { opacity: 1; transform: none; } }
+@media (prefers-reduced-motion: reduce) {
+  .ft-modal-overlay > .ft-modal { animation-name: pk-dialog-fade; }
+  @keyframes pk-dialog-fade { from { opacity: 0; } to { opacity: 1; } }
+}
+
+/* The profile popup grows from the avatar (Android ProfileDropdownPopup, 4ff67ce1b). */
+.ft-profile-dropdown:not([hidden]) { transform-origin: top right; animation: pk-popup-grow var(--pk-short) var(--pk-ease-enter) both; }
+@keyframes pk-popup-grow { from { opacity: 0; transform: scale(0.92); } to { opacity: 1; transform: none; } }
+@media (prefers-reduced-motion: reduce) { .ft-profile-dropdown:not([hidden]) { animation-name: pk-dialog-fade; } }
+
+/* ---------------------------------------------------------------------------
+ * The profile picker as the app draws it (ProfileDropdownPopup, ProfilePickerRow,
+ * ProfilePickerFooter): a "Switch profile" title, rows with a quiet role chip and
+ * what the profile is for, Kriti's "Just you so far" card, then the add and
+ * manage actions.
+ * ------------------------------------------------------------------------- */
+.ft-picker-title { padding: 2px 6px 10px; font-family: var(--pk-font-display); font-size: 14px; color: var(--pk-muted); }
+.ft-profile-dropdown { min-width: 300px; max-width: 380px; max-height: 78vh; }
+.ft-profile-dropdown-group[hidden] { display: none; }
+.ft-profile-dropdown-name { display: flex; align-items: center; flex-wrap: wrap; gap: 6px; }
+.ft-profile-role-chip {
+  display: inline-block; padding: 1px 9px 2px; border-radius: 999px; font-size: 11px; font-weight: 600; line-height: 18px;
+  font-family: var(--pk-font-display); color: var(--pk-ink); background: var(--pk-paper); border: 1px solid var(--pk-line);
+}
+.ft-profile-dropdown-subtitle { white-space: normal; line-height: 1.3; }
+.ft-picker-footer { display: flex; flex-direction: column; gap: 8px; margin-top: 10px; }
+.ft-picker-empty {
+  display: flex; flex-direction: column; align-items: center; gap: 4px; padding: 14px 18px 18px; text-align: center;
+  background: var(--pk-sun-wash); border: 1.5px solid color-mix(in srgb, var(--pk-sun-ink) 28%, transparent); border-radius: 20px;
+  box-shadow: 0 3px 0 var(--pk-ledge);
+}
+.ft-picker-empty__kriti { height: 76px; width: auto; }
+.ft-picker-empty__title { margin: 6px 0 0; font-family: var(--pk-font-hand); font-weight: 400; font-size: 18px; color: var(--pk-ink); }
+.ft-picker-empty__body { margin: 0; font-size: 13px; line-height: 1.4; color: var(--pk-muted); }
+.ft-picker-empty__add { width: 100%; margin-top: 12px; }
+.ft-picker-pill {
+  min-height: 46px; border-radius: 999px; font: 600 14px/1 var(--pk-font-display); cursor: pointer;
+  background: var(--pk-paper); border: 1.5px solid var(--pk-line); color: var(--pk-ink);
+}
+.ft-picker-pill.is-kids { background: var(--pk-sun-wash); color: var(--pk-sun-ink); border-color: color-mix(in srgb, var(--pk-sun-ink) 30%, transparent); }
+.ft-picker-pill.is-adult { color: var(--pk-plum); border-color: color-mix(in srgb, var(--pk-plum) 30%, transparent); }
+.ft-picker-manage { min-height: 44px; border: 0; background: none; font: 600 14px/1 var(--pk-font-display); color: var(--pk-brick); cursor: pointer; }
+.ft-picker-pill:focus-visible, .ft-picker-manage:focus-visible { outline: 2px solid var(--pk-brick); outline-offset: 2px; }
+
+/* In the 400 px popup the picker is a sheet across the popup, never cut at its edge. */
+#popupRoot .ft-profile-dropdown, body.ft-popup .ft-profile-dropdown, #ftProfileDropdownPopup {
+  position: fixed; top: 64px; left: 8px; right: 8px; min-width: 0; max-width: none; transform: none !important; max-height: calc(100vh - 76px);
+}
+
+/* The PIN gate (Android activity_pin_gate): the eyebrow in brick over the card title, the PIN field
+ * centred with wide digits, Unlock across the card and Cancel quietly under it. */
+.ft-modal.is-pin .card-header { display: flex; flex-direction: column; align-items: flex-start; gap: 4px; }
+.ft-modal.is-pin .ft-modal-eyebrow { color: var(--pk-brick) !important; font-family: var(--pk-font-display); font-weight: 600; font-size: 13px; letter-spacing: 0; text-transform: none; }
+.ft-modal.is-pin .ft-modal-title { margin: 0; text-align: start; font-family: var(--pk-font-hand); font-weight: 400; font-size: 1.35rem; }
+.ft-modal.is-pin .text-input { text-align: center; font-size: 1.2rem; letter-spacing: 0.3em; min-height: 52px; }
+.ft-modal.is-pin .text-input::placeholder { letter-spacing: 0; }
+:root body .ft-modal.is-pin .ft-modal-error { text-align: center; color: var(--pk-brick) !important; }
+.ft-modal.is-pin .ft-modal-actions { display: flex; flex-direction: column-reverse; align-items: stretch; gap: 6px; }
+.ft-modal.is-pin .ft-modal-actions .btn-primary { width: 100%; min-height: 52px; }
+:root[data-page-tone] body.ft-extension-surface .ft-modal.is-pin .ft-modal-actions .btn-secondary, .ft-modal.is-pin .ft-modal-actions .btn-secondary { border-color: transparent !important; border: 0 !important; background: none !important; box-shadow: none !important; color: var(--pk-muted) !important; }
+
+/* Dialogs (Android FilterTubeMessageDialog): a paper card, the title over the message, the brick
+ * primary across the card and the secondary under it, both full width. */
+.ft-modal.is-message .card-header { display: flex; flex-direction: column; align-items: flex-start; gap: 4px; }
+.ft-modal.is-message .ft-modal-eyebrow { color: var(--pk-brick) !important; font-family: var(--pk-font-display); font-weight: 600; font-size: 13px; text-transform: none; letter-spacing: 0; }
+.ft-modal.is-message .ft-modal-title { margin: 0; text-align: start; font-family: var(--pk-font-hand); font-weight: 400; font-size: 1.3rem; }
+.ft-modal.is-message .import-export-hint { color: var(--pk-ink); font-size: 15px; line-height: 1.5; }
+.ft-modal.is-message .ft-modal-actions { display: flex; flex-direction: column-reverse; align-items: stretch; gap: 8px; margin-top: 18px; }
+.ft-modal.is-message .ft-modal-actions .btn-primary, .ft-modal.is-message .ft-modal-actions .btn-secondary { width: 100%; min-height: 48px; justify-content: center; }
+
+/* Toasts sit at the bottom centre, as the app's paper toasts do (StudyFocusActivity.paperToast,
+ * NativeToast): a paper card with a crayon edge, never pinned to a corner. */
+.ft-toast {
+  left: 0;
+  right: 0;
+  margin-inline: auto;
+  width: max-content;
+  max-width: min(560px, calc(100vw - 32px));
+  bottom: 16px;
+  background: var(--pk-paper);
+  color: var(--pk-ink);
+  border: 1.5px solid transparent;
+  border-image: var(--pk-edge-line) 20 / 18px / 0 round;
+  border-radius: 16px;
+  box-shadow: 0 3px 0 var(--pk-ledge);
+}
+.ft-toast-error { border-inline-start: 1.5px solid transparent; }
+@media (prefers-reduced-motion: reduce) { .ft-toast { transition: opacity 0.2s ease; transform: none; } }

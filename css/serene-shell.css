@@ -237,47 +237,73 @@ body[data-surface="popup"] .ft-popup-shell {
     backdrop-filter: blur(10px) saturate(116%);
 }
 
-.ft-popup-android-link {
-    display: flex;
+/* FilterTube apps: two compact pills (Android, iPhone) under the popup's controls. */
+.ft-popup-apps {
+    display: grid;
     flex: 0 0 auto;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.45rem;
+    margin: 0.4rem 0.12rem 0.1rem;
+}
+
+.ft-popup-apps__pill {
+    display: flex;
     align-items: center;
-    gap: 0.65rem;
+    gap: 0.5rem;
+    min-width: 0;
     min-height: 44px;
-    margin: 0.35rem 0.12rem 0;
-    padding: 0.3rem 0.65rem 0.3rem 0.3rem;
+    padding: 0.3rem 0.6rem 0.3rem 0.32rem;
     border: 1px solid var(--ft-color-sem-neutral-border);
     border-radius: 0.85rem;
     background: var(--ft-color-bg-surface);
     color: var(--ft-color-text-primary);
-    font-size: 0.78rem;
-    font-weight: 600;
-    line-height: 1.4;
     text-decoration: none;
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
 }
 
-.ft-popup-android-link img {
-    flex: 0 0 48px;
-    width: 48px;
-    height: 36px;
-    object-fit: cover;
-    border-radius: 0.55rem;
+.ft-popup-apps__badge {
+    display: inline-grid;
+    flex: 0 0 32px;
+    place-items: center;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: var(--ft-color-bg-surface);
+    transition: transform 160ms ease-out;
 }
 
-.ft-popup-android-link span {
-    flex: 1;
+.ft-popup-apps__badge img {
+    width: 22px;
+    height: 27px;
+    object-fit: contain;
+}
+
+.ft-popup-apps__text {
+    display: grid;
     min-width: 0;
-    overflow-wrap: anywhere;
+    line-height: 1.2;
 }
 
-.ft-popup-android-link svg {
-    flex: 0 0 16px;
+.ft-popup-apps__text strong,
+.ft-popup-apps__text span {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
 }
 
-.ft-popup-android-link:hover {
-    border-color: var(--ft-color-brand-primary);
+.ft-popup-apps__text strong {
+    font-size: 0.8rem;
+    font-weight: 700;
 }
 
-.ft-popup-android-link:focus-visible {
+.ft-popup-apps__text span {
+    font-size: 0.68rem;
+    font-weight: 500;
+    color: var(--ft-color-text-secondary);
+}
+
+.ft-popup-apps__pill:focus-visible {
     outline: 2px solid var(--ft-color-brand-primary);
     outline-offset: 2px;
 }

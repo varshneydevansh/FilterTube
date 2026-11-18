@@ -33,7 +33,7 @@
             ],
             "exclude_matches": ["*://*.youtube.com/embed/*"],
             "js": [
-                "js/shared/view_count.js",
+                "js/shared/view_count.js", "js/shared/search_suggestions_filter.js", "js/content/search_suggestions_dom.js", "js/shared/feed_guard.js",
                 "js/seed.js"
             ],
             "run_at": "document_start",
@@ -46,7 +46,7 @@
             ],
             "exclude_matches": ["*://*.youtube.com/embed/*"],
             "js": [
-                "js/shared/identity.js", "js/shared/view_count.js", "js/content/admission_overlay.js",
+                "js/shared/identity.js", "js/shared/view_count_isolated.js", "js/content/admission_overlay.js",
                 "js/content/dom_state.js",
                 "js/content/menu.js",
                 "js/content/dom_helpers.js",
@@ -64,8 +64,8 @@
                 "js/content/content_playback_admission.js",
                 "js/content/content_playback_native.js",
                 "js/content/content_playback.js",
-                "js/content/video_notes.js", "js/content/study_overlay.js",
-                "js/content_bridge.js"
+                "js/content/video_notes.js", "js/content/study_overlay.js", "js/shared/paced_fetch.js", "js/shared/channel_search.js", "js/content/channel_search_shelf.js", "js/shared/allowlist_feed.js", "js/content/allowlist_feed_view.js",
+                "js/shared/hidden_log.js", "js/content_bridge.js"
             ],
             "run_at": "document_start",
             "world": "ISOLATED"
@@ -86,7 +86,7 @@
                 "*://*.youtube-nocookie.com/embed/*"
             ],
             "js": [
-                "js/shared/identity.js", "js/shared/view_count.js", "js/content/admission_overlay.js",
+                "js/shared/identity.js", "js/shared/view_count_isolated.js", "js/content/admission_overlay.js",
                 "js/content/external_youtube_guard.js",
                 "js/content/dom_state.js",
                 "js/content/menu.js",
@@ -114,9 +114,22 @@
         },
         {
             "matches": ["https://*.google.com/search*"],
-            "js": ["js/shared/identity.js", "js/shared/view_count.js", "js/content/admission_overlay.js", "js/content/external_youtube_guard.js"],
+            "js": ["js/shared/identity.js", "js/shared/view_count_isolated.js", "js/content/admission_overlay.js", "js/content/external_youtube_guard.js"],
             "run_at": "document_start",
             "world": "ISOLATED"
+        },
+        {
+            "matches": ["*://*.youtube.com/live_chat*", "*://*.youtube.com/live_chat_replay*"],
+            "all_frames": true,
+            "run_at": "document_idle",
+            "world": "MAIN",
+            "js": ["js/content/live_chat_identity.js"]
+        },
+        {
+            "matches": ["*://*.youtube.com/live_chat*", "*://*.youtube.com/live_chat_replay*"],
+            "all_frames": true,
+            "run_at": "document_idle",
+            "js": ["js/shared/identity.js", "js/shared/live_chat_filter.js", "js/content/live_chat_filter.js"]
         }
     ],
     "web_accessible_resources": [
@@ -127,10 +140,11 @@
                 "js/content/content_playback_response.js",
                 "js/filter_logic.js",
                 "js/seed.js",
-                "js/shared/identity.js", "js/shared/view_count.js", "js/content/admission_overlay.js",
+                "js/shared/identity.js", "js/shared/view_count.js",
+                "js/shared/search_suggestions_filter.js", "js/content/search_suggestions_dom.js", "js/shared/feed_guard.js", "js/content/admission_overlay.js",
                 "data/ui_locales/*.json",
                 "assets/images/homepage_hero_day.mp4",
-                "assets/images/mascots/*.webp",
+                "assets/images/mascots/*.webp", "assets/fonts/delius.ttf",
                 "icons/icon-48.png",
                 "icons/file.svg"
             ],

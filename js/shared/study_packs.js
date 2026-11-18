@@ -199,9 +199,81 @@
         return array(catalog?.packs).filter(pack => matchChannel(pack, channelId, handle));
     }
 
+    // ---- Country accent (Android CountryAccent.kt) ------------------------------------------------
+    // Study setup's light country accent: a short crayon stripe in colours from the country's flag
+    // palette (never the flag itself), an optional doodle motif, and one mark colour. Decoration only:
+    // brick stays the only action colour, so a flag red never becomes the mark (the mark is the first
+    // non-red stripe colour, else Study's sage). Every colour clears 3:1 as a mark on paper, the page and
+    // the washed card, light and dark; the card's 6 % wash keeps ink, muted text and brick at 4.5:1.
+
+    /** One crayon colour per theme (0xRRGGBB); `red` keeps it out of the mark slot. */
+    const crayon = (light, dark, red = false) => Object.freeze({ light, dark, red });
+    const GREEN = crayon(0x2F6B45, 0x7DBE93);
+    const RED = crayon(0xB0364A, 0xEE8A93, true);
+    const CRIMSON = crayon(0xA3263A, 0xEF8E98, true);
+    const MAROON = crayon(0x8A2E35, 0xE39A9F, true);
+    const SAFFRON = crayon(0xA8581A, 0xF0A35E);
+    const GOLD = crayon(0x86650F, 0xE5C062);
+    const BLUE = crayon(0x2D5A9E, 0x8DB4EA);
+    const NAVY = crayon(0x2E4C8F, 0x93ACE6);
+    const CHARCOAL = crayon(0x4A4A48, 0xC4C8CC);
+    /** Study's sage (BrandPalette sageMark): the default accent. */
+    const SAGE = crayon(0x3E7D5B, 0x7FB89A);
+    /** BrandPalette paper, light and night. */
+    const PAPER = Object.freeze({ light: 0xFFFCF6, dark: 0x151C24 });
+    const ACCENT_WASH = 0.06;
+    // DoodleKit motifs (STAR_SPARKLE, FLOWER) as the extension's doodles.
+    const STAR = 'star';
+    const FLOWER = 'flower';
+    const ACCENT_TABLE = Object.freeze({
+        IN: [[SAFFRON, NAVY, GREEN]], PK: [[GREEN], STAR], BD: [[GREEN, RED]], NP: [[CRIMSON, NAVY]],
+        LK: [[MAROON, SAFFRON, GREEN]], ID: [[RED]], PH: [[BLUE, RED, GOLD], STAR], NG: [[GREEN]],
+        KE: [[CHARCOAL, RED, GREEN]], EG: [[RED, GOLD, CHARCOAL]], SA: [[GREEN]], AE: [[GREEN, RED, CHARCOAL]],
+        TR: [[RED], STAR], BR: [[GREEN, GOLD, BLUE], STAR], MX: [[GREEN, RED]], ES: [[RED, GOLD]],
+        DE: [[CHARCOAL, RED, GOLD]], FR: [[BLUE, RED]], GB: [[NAVY, RED]], US: [[NAVY, RED], STAR],
+        JP: [[RED], FLOWER], KR: [[RED, BLUE]], VN: [[RED, GOLD], STAR], TH: [[RED, NAVY]]
+    });
+    const ACCENT_CODES = Object.freeze(Object.keys(ACCENT_TABLE));
+
+    /** `base` moved `amount` of the way to `over` (0xRRGGBB). */
+    function blendColor(base, over, amount) {
+        const ch = shift => {
+            const a = (base >> shift) & 0xFF;
+            const b = (over >> shift) & 0xFF;
+            return Math.min(255, Math.max(0, Math.trunc(a + (b - a) * amount)));
+        };
+        return (ch(16) << 16) | (ch(8) << 8) | ch(0);
+    }
+
+    function cssColor(value) { return `#${(value & 0xFFFFFF).toString(16).padStart(6, '0')}`; }
+
+    function makeAccent(code, stripes, motif = null) {
+        const markCrayon = stripes.find(item => !item.red) || SAGE;
+        const tone = night => (night ? 'dark' : 'light');
+        return Object.freeze({
+            code, motif, isDefault: code === null, stripeCrayons: Object.freeze(stripes.slice()),
+            /** The stripe's colours in this theme, left to right (one to three). */
+            stripes: night => stripes.map(item => item[tone(night)]),
+            /** Dots and squiggle: the first non-red stripe colour, else sage. */
+            mark: night => markCrayon[tone(night)],
+            /** The country card's paper with a breath of the mark (6 %). */
+            wash: night => (code === null ? PAPER[tone(night)] : blendColor(PAPER[tone(night)], markCrayon[tone(night)], ACCENT_WASH))
+        });
+    }
+
+    const DEFAULT_ACCENT = makeAccent(null, [SAGE]);
+
+    /** The accent for a country code ("IN", "jp"); a country without an entry, or none, gets sage. */
+    function countryAccent(country) {
+        const code = text(country).toUpperCase();
+        const row = ACCENT_TABLE[code];
+        return row ? makeAccent(code, row[0], row[1] || null) : DEFAULT_ACCENT;
+    }
+
     return Object.freeze({
         CATALOG_PATH, SCHEMA, VERSION, STUDY_KINDS, KIDS_KINDS,
         load, resetCache, parseCatalog, countryFromLocale, isGlobal, forCountry, forTab, kidsPacks, packById, packName,
-        matchChannel, packsForChannel, packVariant, variantName
+        matchChannel, packsForChannel, packVariant, variantName,
+        ACCENT_CODES, DEFAULT_ACCENT, countryAccent, blendColor, cssColor
     });
 }));

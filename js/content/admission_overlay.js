@@ -125,10 +125,10 @@
     // stands by the study card. They follow the Companion setting (Lively plays the sheet once, Quiet
     // shows the still, Off shows no character) and never move with reduced motion.
     const MASCOT_DIR = 'assets/images/mascots/';
-    // Five frames: Uljhan sneaks up, Kriti notices, waves him off, and he hops away (the resting frame).
-    const SHOO_FRAMES = [1, 2, 3, 4, 5].map(index => `duo_shoo_0${index}.webp`);
-    const SHOO_STILL = 'duo_shoo_05.webp';
-    const SHOO_FRAME_MS = 180;
+    // The app's DUO_SHOO (420 ms a frame): Uljhan sneaks up, Kriti waves him off, he hops away, and she
+    // reads on (the resting frame).
+    const SHOO_FRAMES = [1, 2, 3, 4, 5, 6].map(index => `duo_shoo_0${index}.webp`);
+    const SHOO_FRAME_MS = 420;
     let companionMode = 'quiet';
     let companionLoading = null;
 
@@ -172,11 +172,62 @@
         return picture;
     }
 
-    /** The shoo sheet once (Lively, motion allowed), ending on its last frame; otherwise the still. */
+    // The shoo plays at most three times a day (Android MascotStatePolicy.BLOCKED_DAILY_PLAYS, keyed by
+    // the local date); otherwise, and in Quiet, the gate shows Uljhan's shrug still, as the app does.
+    const SHOO_DAILY_PLAYS = 3;
+    const SHOO_CAP_KEY = 'ftMascotCapsV1';
+    const SHOO_REST = 'uljhan_pose_02.webp';
+
+    function admissionLocalDay(date = new Date()) {
+        const pad = value => String(value).padStart(2, '0');
+        return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}`;
+    }
+
+    /** Resolves true when a play is left today, and counts it. */
+    function takeShooPlay() {
+        const local = runtimeAPI?.storage?.local;
+        if (!local?.get || !local?.set) return Promise.resolve(true);
+        return new Promise(resolve => {
+            try {
+                const done = value => {
+                    const caps = value?.[SHOO_CAP_KEY] && typeof value[SHOO_CAP_KEY] === 'object' ? value[SHOO_CAP_KEY] : {};
+                    const today = admissionLocalDay();
+                    const plays = caps.blockedDay === today ? Math.max(0, Number(caps.blockedCount) || 0) : 0;
+                    if (plays >= SHOO_DAILY_PLAYS) { resolve(false); return; }
+                    try { local.set({ [SHOO_CAP_KEY]: { ...caps, blockedDay: today, blockedCount: plays + 1 } }); } catch (e) {}
+                    resolve(true);
+                };
+                const result = local.get(SHOO_CAP_KEY, done);
+                if (result && typeof result.then === 'function') result.then(done, () => resolve(true));
+            } catch (e) { resolve(true); }
+        });
+    }
+
+    function restAdmissionShoo(picture) {
+        const url = admissionMascotUrl(SHOO_REST);
+        if (!url) return;
+        picture.src = url;
+        picture.setAttribute('data-filtertube-admission-mascot', SHOO_REST);
+        admissionOverlayStyle(picture, { height: '112px' });
+    }
+
+    /** The shoo sheet once (Lively, motion allowed, under the daily cap), ending on its last frame;
+     * otherwise Uljhan's shrug still. */
     function playAdmissionShoo(picture) {
         if (!picture || picture.__filtertubeShooPlayed) return;
         picture.__filtertubeShooPlayed = true;
-        if (companionMode !== 'lively' || admissionOverlayPrefersReducedMotion() || typeof root.setTimeout !== 'function') return;
+        if (companionMode !== 'lively' || admissionOverlayPrefersReducedMotion() || typeof root.setTimeout !== 'function') {
+            restAdmissionShoo(picture);
+            return;
+        }
+        takeShooPlay().then(allowed => {
+            if (allowed) runAdmissionShoo(picture);
+            else restAdmissionShoo(picture);
+        });
+    }
+
+    function runAdmissionShoo(picture) {
+        admissionOverlayStyle(picture, { height: '132px' });
         let index = 0;
         const step = () => {
             if (picture.isConnected === false) return;
@@ -184,8 +235,88 @@
             if (url) picture.src = url;
             index += 1;
             if (index < SHOO_FRAMES.length) root.setTimeout(step, SHOO_FRAME_MS);
+            else admissionIdle(picture);
         };
         step();
+    }
+
+    // Idle life on the in-page cards (the app's MascotIdle, as js/mascots.js does on the extension's
+    // pages): a small bob or squash now and then, the first after 6 to 12 s, then 12, 20, 30 s, none
+    // after two minutes. Any interaction on the page wakes it with a fresh budget (one throttled,
+    // passive listener; no sound). Lively only, never with reduced motion.
+    const ADMISSION_IDLE = { firstMin: 6000, firstMax: 12000, gaps: [12000, 20000, 30000], jitter: 0.15, budget: 120000, wakeMs: 1000 };
+    const ADMISSION_WAKE_EVENTS = ['pointerdown', 'keydown', 'wheel', 'scroll', 'touchstart'];
+    const admissionIdleLives = new Set();
+    let admissionWakeInstalled = false;
+    let admissionLastWake = -Infinity;
+
+    function admissionSpring(stiffness, damping, velocity) {
+        const omega = Math.sqrt(stiffness);
+        const decay = damping * omega;
+        const damped = omega * Math.sqrt(1 - damping * damping);
+        const samples = [0];
+        for (let ms = 1000 / 60; ms <= 900; ms += 1000 / 60) samples.push((velocity / damped) * Math.exp(-decay * ms / 1000) * Math.sin(damped * ms / 1000));
+        samples.push(0);
+        return samples;
+    }
+
+    function admissionIdle(picture) {
+        if (!picture || picture.__filtertubeIdle || typeof root.setTimeout !== 'function') return;
+        let timer = 0;
+        let index = 0;
+        let started = Date.now();
+        let pending = false;
+        const may = () => companionMode === 'lively' && !admissionOverlayPrefersReducedMotion();
+        const delay = () => index === 0
+            ? ADMISSION_IDLE.firstMin + (ADMISSION_IDLE.firstMax - ADMISSION_IDLE.firstMin) * Math.random()
+            : ADMISSION_IDLE.gaps[Math.min(index - 1, 2)] * (1 - ADMISSION_IDLE.jitter + 2 * ADMISSION_IDLE.jitter * Math.random());
+        const schedule = () => {
+            root.clearTimeout(timer);
+            pending = false;
+            if (picture.isConnected === false || !may()) return;
+            const wait = delay();
+            if (Date.now() + wait - started > ADMISSION_IDLE.budget) return;
+            pending = true;
+            timer = root.setTimeout(beat, wait);
+        };
+        const beat = () => {
+            pending = false;
+            if (picture.isConnected === false) return;
+            if (document.visibilityState !== 'hidden' && typeof picture.animate === 'function') {
+                const squash = Math.random() < 0.4;
+                const samples = squash ? admissionSpring(700, 0.55, -1) : admissionSpring(800, 0.45, -125);
+                try {
+                    picture.style.transformOrigin = '50% 100%';
+                    picture.animate(samples.map(v => ({ transform: squash ? `scaleY(${(1 + v).toFixed(4)})` : `translateY(${v.toFixed(2)}px)` })),
+                        { duration: Math.round((samples.length - 1) * 1000 / 60), easing: 'linear' });
+                } catch (e) {}
+            }
+            index += 1;
+            schedule();
+        };
+        const life = {
+            picture,
+            wake(now) {
+                started = now;
+                if (!pending) { index = 0; schedule(); }
+            }
+        };
+        picture.__filtertubeIdle = life;
+        admissionIdleLives.add(life);
+        if (!admissionWakeInstalled && typeof document.addEventListener === 'function') {
+            admissionWakeInstalled = true;
+            const onInteraction = () => {
+                const now = Date.now();
+                if (now - admissionLastWake < ADMISSION_IDLE.wakeMs) return;
+                admissionLastWake = now;
+                for (const entry of [...admissionIdleLives]) {
+                    if (entry.picture.isConnected === false) { admissionIdleLives.delete(entry); continue; }
+                    entry.wake(now);
+                }
+            };
+            for (const type of ADMISSION_WAKE_EVENTS) document.addEventListener(type, onInteraction, { passive: true, capture: true });
+        }
+        schedule();
     }
 
     function syncAdmissionMascot(overlay, slot, holder, name, height) {
@@ -205,6 +336,7 @@
             if (!picture) return null;
             holder.appendChild(picture);
             overlay[slot] = picture;
+            if (!SHOO_FRAMES.includes(name)) admissionIdle(picture);
         }
         return picture;
     }
@@ -229,7 +361,7 @@
             display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 'clamp(16px, 4vw, 56px)', overflow: 'hidden',
             pointerEvents: 'auto', userSelect: 'text', whiteSpace: 'normal',
             background: darkTheme ? '#0f141b' : '#f6f2eb', color: darkTheme ? '#edf2f7' : '#1b1a18',
-            font: '400 15px/1.55 "Plus Jakarta Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif'
+            font: '400 15px/1.55 system-ui, Roboto, "Segoe UI", -apple-system, sans-serif'
         });
         removeAdmissionOverlayBackground(overlay);
         if (typeof overlay?.appendChild !== 'function' || typeof document.createElement !== 'function') {
@@ -253,10 +385,10 @@
             const reason = document.createElement('p');
             const owner = document.createElement('p');
             const actions = document.createElement('div');
-            admissionOverlayStyle(status, { margin: '0', color: darkTheme ? '#7fb89a' : '#1F6F6A', font: '700 12px/1.3 "Plus Jakarta Sans", sans-serif', letterSpacing: '.08em', textTransform: 'uppercase' });
-            admissionOverlayStyle(title, { margin: '0', font: '700 clamp(22px, 3.6vw, 32px)/1.15 "Outfit", "Plus Jakarta Sans", sans-serif', color: darkTheme ? '#edf2f7' : '#1b1a18' });
-            admissionOverlayStyle(reason, { margin: '0', font: '500 15px/1.55 "Plus Jakarta Sans", sans-serif' });
-            admissionOverlayStyle(owner, { margin: '0', opacity: '.75', font: '500 13px/1.4 "Plus Jakarta Sans", sans-serif', overflowWrap: 'anywhere' });
+            admissionOverlayStyle(status, { margin: '0', color: darkTheme ? '#7fb89a' : '#1F6F6A', font: '700 12px/1.3 system-ui, Roboto, "Segoe UI", sans-serif', letterSpacing: '0', textTransform: 'none' });
+            admissionOverlayStyle(title, { margin: '0', font: '400 clamp(22px, 3.6vw, 32px)/1.2 "FilterTube Delius", "Outfit", system-ui, sans-serif', color: darkTheme ? '#edf2f7' : '#1b1a18' });
+            admissionOverlayStyle(reason, { margin: '0', font: '500 15px/1.55 system-ui, Roboto, "Segoe UI", sans-serif' });
+            admissionOverlayStyle(owner, { margin: '0', opacity: '.75', font: '500 13px/1.4 system-ui, Roboto, "Segoe UI", sans-serif', overflowWrap: 'anywhere' });
             admissionOverlayStyle(actions, { display: 'flex', gap: '10px', flexWrap: 'wrap', marginTop: '6px' });
             card.append(status, title, reason, owner, actions);
             overlay.appendChild(card);
@@ -266,7 +398,7 @@
         const parts = overlay.__filtertubeStudyParts;
         const offList = kind === 'offList';
         // Kriti points back to the plan (off the list) or holds her mug (a break, the limit, a clock check).
-        const kriti = syncAdmissionMascot(overlay, '__filtertubeStudyMascot', card, offList ? 'kriti_pointing.webp' : 'kriti_mug_06.webp', 132);
+        const kriti = syncAdmissionMascot(overlay, '__filtertubeStudyMascot', card, offList ? 'kriti_pose_08.webp' : 'kriti_mug_06.webp', 132);
         if (kriti) admissionOverlayStyle(kriti, { order: '-1', alignSelf: localeDirection === 'rtl' ? 'flex-start' : 'flex-end', marginBottom: '-6px' });
         parts.status.textContent = localizedAdmissionText('admission.studyStatus', 'Study');
         parts.title.textContent = offList
@@ -286,7 +418,7 @@
             back.textContent = localizedAdmissionText('admission.studyBack', 'Back to study');
             admissionOverlayStyle(back, {
                 padding: '10px 20px', borderRadius: '999px', border: '0', cursor: 'pointer',
-                background: '#1F6F6A', color: '#ffffff', font: '700 14px/1 "Plus Jakarta Sans", sans-serif'
+                background: '#1F6F6A', color: '#ffffff', font: '700 14px/1 system-ui, Roboto, "Segoe UI", sans-serif'
             });
             back.addEventListener('click', event => { event.preventDefault(); event.stopPropagation(); backToStudy(); });
             parts.actions.appendChild(back);
@@ -315,7 +447,24 @@
         } catch (e) { return ''; }
     }
 
+    // The app's hand for titles: the extension's own Delius (SIL OFL), loaded once into this page
+    // from the extension under its own family name, so the site's fonts are never touched.
+    let admissionHandLoaded = false;
+    function loadAdmissionHand() {
+        if (admissionHandLoaded) return;
+        admissionHandLoaded = true;
+        try {
+            const runtimeAPI = typeof browser !== 'undefined' && browser?.runtime ? browser : (typeof chrome !== 'undefined' ? chrome : null);
+            const url = runtimeAPI?.runtime?.getURL?.('assets/fonts/delius.ttf');
+            if (!url || typeof FontFace !== 'function' || !document.fonts) return;
+            const face = new FontFace('FilterTube Delius', `url("${url}")`, { display: 'swap' });
+            document.fonts.add(face);
+            face.load().catch(() => {});
+        } catch (e) {}
+    }
+
     function admissionOverlayStyle(element, styles) {
+        if (styles && typeof styles.font === 'string' && styles.font.includes('FilterTube Delius')) loadAdmissionHand();
         try { if (element?.style) Object.assign(element.style, styles); } catch (e) {}
     }
 
@@ -327,15 +476,173 @@
         try { overlay.__filtertubeAdmissionBackground = null; } catch (e) {}
     }
 
-    function ensureAdmissionOverlayVisuals(overlay, state, message) {
+    // ---- Quiet blocking (settings.quietBlocking) ---------------------------------------------------
+    // A parent can ask for blocks a child does not notice: no brand, no reason, no character, no
+    // "blocked". The check before playback is a plain dark cover with no words, and a blocked video
+    // (or channel page) reads like an ordinary unavailable item with a way back. Only presentation
+    // changes here; the callers' pause and play guards decide exactly as before.
+
+    /** options.quiet wins when given; a redraw without options (locale, companion) keeps the last value. */
+    function resolveAdmissionQuiet(overlay, options) {
+        if (options && typeof options.quiet === 'boolean') return options.quiet;
+        return overlay?.__filtertubeAdmissionQuiet === true;
+    }
+
+    function emptyAdmissionOverlay(overlay) {
+        try {
+            if (typeof overlay.replaceChildren === 'function') { overlay.replaceChildren(); return; }
+        } catch (e) {}
+        try { while (overlay.firstChild) overlay.removeChild(overlay.firstChild); } catch (e) {}
+        try { if (Array.isArray(overlay.children)) overlay.children.slice().forEach(child => overlay.removeChild(child)); } catch (e) {}
+    }
+
+    /** Drops every branded part so the next branded render rebuilds from nothing. */
+    function clearBrandedAdmissionParts(overlay) {
+        if (!overlay) return;
+        removeAdmissionOverlayBackground(overlay);
+        removeAskParent(overlay);
+        emptyAdmissionOverlay(overlay);
+        for (const slot of ['__filtertubeAdmissionPanel', '__filtertubeAdmissionBrand', '__filtertubeAdmissionBrandMark',
+            '__filtertubeAdmissionBrandName', '__filtertubeAdmissionStatus', '__filtertubeAdmissionTitle',
+            '__filtertubeAdmissionReason', '__filtertubeAdmissionScrim', '__filtertubeAdmissionMascot',
+            '__filtertubeChannelBack', '__filtertubeStudyCard', '__filtertubeStudyParts', '__filtertubeStudyMascot']) {
+            try { overlay[slot] = null; } catch (e) {}
+        }
+    }
+
+    function removeQuietAdmissionCover(overlay) {
+        if (!overlay?.__filtertubeQuietCover) return;
+        emptyAdmissionOverlay(overlay);
+        overlay.__filtertubeQuietCover = null;
+        overlay.__filtertubeQuietParts = null;
+        try { overlay.removeAttribute?.('data-filtertube-quiet'); } catch (e) {}
+        try { overlay.removeAttribute?.('aria-busy'); } catch (e) {}
+    }
+
+    /** Back in history when there is somewhere to go, else the site's Home. */
+    function quietGoBack() {
+        try {
+            if (root.history && Number(root.history.length) > 1 && typeof root.history.back === 'function') {
+                root.history.back();
+                return;
+            }
+        } catch (e) {}
+        try { root.location.assign('/'); } catch (e) {}
+    }
+
+    function quietAdmissionTitle(overlay) {
+        return overlay?.__filtertubeAdmissionKind === 'channel'
+            ? localizedAdmissionText('admission.quietChannelTitle', "This channel isn't available")
+            : localizedAdmissionText('admission.quietVideoTitle', "This video isn't available");
+    }
+
+    function renderQuietAdmissionCover(overlay, state) {
+        if (!overlay) return;
+        const blocked = state === 'blocked';
+        const channelPage = overlay.__filtertubeAdmissionKind === 'channel';
+        // Inside the player the cover is player-dark; a channel page follows the page's theme.
+        const dark = channelPage ? admissionOverlayUsesDarkTheme() : true;
+        const ink = dark ? '#e8e8e8' : '#1f1f1f';
+        admissionOverlayStyle(overlay, {
+            position: 'fixed', inset: '0', zIndex: '2147483647', width: '100vw', height: '100vh',
+            boxSizing: 'border-box', display: 'flex', alignItems: 'center', justifyContent: 'center',
+            padding: 'clamp(16px, 4vw, 56px)', overflow: 'hidden', isolation: 'isolate',
+            pointerEvents: 'auto', userSelect: 'none', whiteSpace: 'normal',
+            background: dark ? (blocked ? '#121212' : '#000000') : '#ffffff', color: ink,
+            font: '400 15px/1.5 system-ui, Roboto, "Segoe UI", -apple-system, sans-serif'
+        });
+        const title = blocked ? quietAdmissionTitle(overlay) : '';
+        if (typeof overlay.setAttribute === 'function') {
+            overlay.setAttribute('data-filtertube-quiet', 'true');
+            if (blocked) {
+                overlay.setAttribute('aria-label', title);
+                try { overlay.removeAttribute?.('aria-busy'); } catch (e) {}
+            } else {
+                try { overlay.removeAttribute?.('aria-label'); } catch (e) {}
+                overlay.setAttribute('aria-busy', 'true');
+            }
+        }
+        const canCompose = typeof overlay.appendChild === 'function' && typeof document.createElement === 'function';
+        if (!canCompose) {
+            try { overlay.textContent = title; } catch (e) {}
+            return;
+        }
+        let cover = overlay.__filtertubeQuietCover || null;
+        if (!cover) {
+            clearBrandedAdmissionParts(overlay);
+            cover = document.createElement('section');
+            cover.setAttribute('data-filtertube-quiet-cover', 'true');
+            admissionOverlayStyle(cover, {
+                display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '16px',
+                maxWidth: 'min(420px, 100%)', textAlign: 'center'
+            });
+            const heading = document.createElement('h1');
+            heading.setAttribute('data-filtertube-quiet-title', 'true');
+            admissionOverlayStyle(heading, {
+                margin: '0', font: '500 clamp(16px, 2.4vw, 20px)/1.4 system-ui, Roboto, "Segoe UI", -apple-system, sans-serif',
+                letterSpacing: '0', color: ink
+            });
+            const actions = document.createElement('div');
+            admissionOverlayStyle(actions, { display: 'flex', gap: '10px', justifyContent: 'center' });
+            cover.appendChild(heading);
+            cover.appendChild(actions);
+            overlay.appendChild(cover);
+            overlay.__filtertubeQuietCover = cover;
+            overlay.__filtertubeQuietParts = { heading, actions, back: null };
+        }
+        const parts = overlay.__filtertubeQuietParts;
+        admissionOverlayStyle(cover, { display: blocked ? 'flex' : 'none' });
+        parts.heading.textContent = title;
+        admissionOverlayStyle(parts.heading, { color: ink });
+        let topFrame = true;
+        try { topFrame = root.top === root; } catch (e) { topFrame = false; }
+        // An embedded player cannot leave its host page, so it gets the words only.
+        if (blocked && topFrame) {
+            if (!parts.back) {
+                const back = document.createElement('button');
+                back.type = 'button';
+                back.setAttribute('data-filtertube-quiet-action', 'back');
+                back.addEventListener('click', event => {
+                    event?.preventDefault?.();
+                    event?.stopPropagation?.();
+                    quietGoBack();
+                });
+                parts.actions.appendChild(back);
+                parts.back = back;
+            }
+            parts.back.textContent = localizedAdmissionText('admission.quietBack', 'Go back');
+            admissionOverlayStyle(parts.back, {
+                minHeight: '40px', padding: '0 20px', borderRadius: '999px', cursor: 'pointer',
+                border: `1px solid ${dark ? 'rgba(255,255,255,.35)' : 'rgba(0,0,0,.3)'}`,
+                background: 'transparent', color: ink, font: '500 14px/1 system-ui, Roboto, "Segoe UI", sans-serif'
+            });
+        } else if (parts.back) {
+            try { parts.back.remove(); } catch (e) {}
+            parts.back = null;
+        }
+    }
+
+    function ensureAdmissionOverlayVisuals(overlay, state, message, options) {
+        const quiet = resolveAdmissionQuiet(overlay, options);
+        // Study cards stay as they are: a study plan is chosen, not a hidden block.
+        const studyLine = state === 'blocked' ? studyKind(message) : '';
+        const quietCover = quiet && !studyLine;
         if (overlay) {
+            overlay.__filtertubeAdmissionQuiet = quiet;
             overlay.__filtertubeAdmissionState = state;
             overlay.__filtertubeAdmissionMessage = message;
             applyAdmissionDirection(overlay);
-            if (typeof overlay.setAttribute === 'function') {
+            if (!quietCover && typeof overlay.setAttribute === 'function') {
                 overlay.setAttribute('aria-label', localizedAdmissionMessage(message));
             }
             loadAdmissionLocale(overlay);
+        }
+        if (quietCover) {
+            renderQuietAdmissionCover(overlay, state);
+            return;
+        }
+        removeQuietAdmissionCover(overlay);
+        if (overlay) {
             if (!companionLoading && runtimeAPI?.storage?.local?.get) {
                 // The Companion setting arrives once; redraw so the pose follows it.
                 loadAdmissionCompanion().then(() => {
@@ -345,7 +652,7 @@
                 });
             }
         }
-        const study = state === 'blocked' ? studyKind(message) : '';
+        const study = studyLine;
         if (study) {
             renderStudyCard(overlay, study, message);
             return;
@@ -374,7 +681,7 @@
             pointerEvents: 'auto', userSelect: 'text', whiteSpace: 'normal',
             background: blocked ? blockedBackground : pendingBackground,
             color: blocked ? blockedText : pendingText,
-            font: '400 15px/1.55 "Plus Jakarta Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif'
+            font: '400 15px/1.55 system-ui, Roboto, "Segoe UI", -apple-system, sans-serif'
         });
 
         if (!canCompose) {
@@ -416,7 +723,7 @@
             brandMark.src = runtimeAPI?.runtime?.getURL?.('icons/icon-48.png') || '';
             brandMark.alt = '';
             brandName = document.createElement('span');
-            admissionOverlayStyle(brandName, { color: blocked || darkTheme ? '#f3f6fa' : '#1b1a18', font: '750 16px/1 "Outfit", sans-serif', letterSpacing: '.01em' });
+            admissionOverlayStyle(brandName, { color: blocked || darkTheme ? '#f3f6fa' : '#1b1a18', font: '400 18px/1 "FilterTube Delius", "Outfit", sans-serif', letterSpacing: '0' });
             brandName.textContent = 'FilterTube';
             brand.appendChild(brandMark);
             brand.appendChild(brandName);
@@ -425,14 +732,14 @@
             status.setAttribute('data-filtertube-admission-status', 'true');
             admissionOverlayStyle(status, {
                 margin: '12px 0 0', color: blocked ? '#cfe2d2' : (darkTheme ? '#9aa6b4' : '#827b73'),
-                font: '700 12px/1.35 "Plus Jakarta Sans", sans-serif', letterSpacing: '.08em', textTransform: 'uppercase'
+                font: '700 12px/1.35 system-ui, Roboto, "Segoe UI", sans-serif', letterSpacing: '0', textTransform: 'none'
             });
 
             title = document.createElement('h1');
             title.setAttribute('data-filtertube-admission-title', 'true');
             admissionOverlayStyle(title, {
                 margin: '0', color: blocked ? '#fffaf4' : pendingText,
-                font: '700 clamp(24px, 4vw, 38px)/1.12 "Outfit", "Plus Jakarta Sans", sans-serif', letterSpacing: '-.02em'
+                font: '400 clamp(24px, 4vw, 36px)/1.2 "FilterTube Delius", "Outfit", system-ui, sans-serif', letterSpacing: '0'
             });
 
             reason = document.createElement('p');
@@ -443,7 +750,7 @@
                 borderRight: rtl ? `3px solid ${accentColor}` : 'none',
                 borderRadius: rtl ? '14px 4px 4px 14px' : '4px 14px 14px 4px',
                 background: blocked ? 'rgba(255,255,255,.1)' : (darkTheme ? 'rgba(255,255,255,.06)' : 'rgba(171,68,56,.07)'),
-                color: blocked ? '#fffaf4' : pendingText, font: '650 14px/1.55 "Plus Jakarta Sans", sans-serif',
+                color: blocked ? '#fffaf4' : pendingText, font: '650 14px/1.55 system-ui, Roboto, "Segoe UI", sans-serif',
                 whiteSpace: 'pre-line', overflowWrap: 'anywhere'
             });
 
@@ -525,28 +832,326 @@
         });
         // Kriti shoos Uljhan off a blocked video; the short check before playback has no character.
         const shoo = blocked
-            ? syncAdmissionMascot(overlay, '__filtertubeAdmissionMascot', panel, SHOO_STILL, 132)
+            ? syncAdmissionMascot(overlay, '__filtertubeAdmissionMascot', panel, SHOO_REST, 112)
             : (overlay.__filtertubeAdmissionMascot ? (overlay.__filtertubeAdmissionMascot.remove?.(), overlay.__filtertubeAdmissionMascot = null) : null);
         if (shoo) {
             admissionOverlayStyle(shoo, { order: '-1', alignSelf: 'center', marginBottom: '-4px' });
             if (companionLoading) companionLoading.then(() => playAdmissionShoo(shoo));
             else playAdmissionShoo(shoo);
         }
-        status.textContent = blocked
-            ? localizedAdmissionText('admission.blockedStatus', 'Playback blocked')
-            : localizedAdmissionText('admission.checkingStatus', 'Checking playback');
-        title.textContent = blocked
-            ? localizedAdmissionText('admission.blockedTitle', 'This video is blocked')
-            : localizedAdmissionText('admission.checkingTitle', 'Checking before playback');
+        // A blocked channel page (dom_fallback.js showBlockedChannelPage): the reason as the status,
+        // the channel's name as the title, then the ask and a way back. There is no player here.
+        const channelPage = blocked && overlay.__filtertubeAdmissionKind === 'channel';
+        const channelLines = channelPage ? String(message || '').split('\n') : [];
+        status.textContent = channelPage
+            ? localizedAdmissionMessage(channelLines[0] || '')
+            : (blocked
+                ? localizedAdmissionText('admission.blockedStatus', 'Playback blocked')
+                : localizedAdmissionText('admission.checkingStatus', 'Checking playback'));
+        title.textContent = channelPage
+            ? (channelLines.slice(1).join(' ').trim() || localizedAdmissionMessage(channelLines[0] || ''))
+            : (blocked
+                ? localizedAdmissionText('admission.blockedTitle', 'This video is blocked')
+                : localizedAdmissionText('admission.checkingTitle', 'Checking before playback'));
         reason.textContent = localizedAdmissionMessage(message);
+        admissionOverlayStyle(reason, { display: channelPage ? 'none' : 'block' });
+        if (channelPage) mountChannelBack(overlay, panel, darkTheme);
+        if (blocked) mountAskParent(overlay, panel, darkTheme);
+        else removeAskParent(overlay);
         if (blocked && background?.play && background.paused !== false) {
             try { background.play()?.catch?.(() => {}); } catch (e) {}
         }
     }
 
 
+    // ---- Ask a parent (Android AskParentUi) ---------------------------------------------------------
+    // On a child profile with a parent who can answer, the blocked card offers "Ask to watch": reason
+    // chips, a one-line note, then "Sent to Mum" with Kriti thinking. The ask goes to the background
+    // (js/ask_parent_background.js); nothing plays until a parent answers.
+
+    function askText(key, fallback, values = {}) {
+        return String(localizedAdmissionText(key, fallback)).replace(/\{([a-zA-Z]+)\}/g, (match, name) =>
+            Object.prototype.hasOwnProperty.call(values, name) ? String(values[name]) : match);
+    }
+
+    function askSend(message) {
+        return new Promise(resolve => {
+            try {
+                const maybe = runtimeAPI?.runtime?.sendMessage?.(message, response => {
+                    if (runtimeAPI.runtime.lastError) resolve(null); else resolve(response);
+                });
+                if (maybe && typeof maybe.then === 'function') maybe.then(resolve, () => resolve(null));
+            } catch (e) { resolve(null); }
+        });
+    }
+
+    function removeAskParent(overlay) {
+        const holder = overlay?.__filtertubeAskParent;
+        if (holder) {
+            try { holder.remove(); } catch (e) {}
+            overlay.__filtertubeAskParent = null;
+            overlay.__filtertubeAskParentKey = '';
+        }
+    }
+
+    function askButton(label, primary, dark) {
+        const node = document.createElement('button');
+        node.type = 'button';
+        node.textContent = label;
+        admissionOverlayStyle(node, {
+            minHeight: '44px', padding: '0 18px', borderRadius: '999px', cursor: 'pointer',
+            font: '700 14px/1 system-ui, Roboto, "Segoe UI", sans-serif', letterSpacing: '0',
+            border: primary ? '0' : `1.5px solid ${dark ? '#3a4654' : '#cdbfae'}`,
+            background: primary ? '#ab4438' : 'transparent', color: primary ? '#fffaf4' : (dark ? '#edf2f7' : '#1b1a18')
+        });
+        return node;
+    }
+
+    function askLine(textValue, dark, weight = 500) {
+        const node = document.createElement('p');
+        node.textContent = textValue;
+        admissionOverlayStyle(node, { margin: '0', color: dark ? '#cfd8e2' : '#4a4640', font: `${weight} 14px/1.5 system-ui, Roboto, "Segoe UI", sans-serif` });
+        return node;
+    }
+
+    function waitingLine(state) {
+        const name = state.parentName || askText('askParent.parentFallback', 'Your parent');
+        return state.route === 'same_device'
+            ? askText('askParent.waitingHere', '{name} can answer on this device.', { name })
+            : askText('askParent.waitingRemote', '{name} will see it next time their device connects.', { name });
+    }
+
+    function renderAskSent(holder, state, dark, already) {
+        const name = state.parentName || askText('askParent.parentFallback', 'Your parent');
+        holder.replaceChildren();
+        makeRoomForSheet(holder, false);
+        const row = document.createElement('div');
+        admissionOverlayStyle(row, { display: 'flex', alignItems: 'center', gap: '12px' });
+        const kriti = companionMode === 'off' ? null : createAdmissionMascot('kriti_pose_03.webp', 64);
+        if (kriti) row.appendChild(kriti);
+        const words = document.createElement('div');
+        admissionOverlayStyle(words, { display: 'grid', gap: '4px' });
+        words.appendChild(askLine(already
+            ? askText('askParent.already', 'You already asked for this. Waiting for {name}.', { name })
+            : askText('askParent.sent', 'Sent to {name}', { name }), dark, 700));
+        words.appendChild(askLine(waitingLine(state), dark));
+        row.appendChild(words);
+        // A sage crayon check beside "Sent" (AskParentUi.buildSent), decorative.
+        if (!already && typeof document.createElementNS === 'function') {
+            const ns = 'http://www.w3.org/2000/svg';
+            const check = document.createElementNS(ns, 'svg');
+            check.setAttribute('viewBox', '0 0 28 28');
+            check.setAttribute('width', '28');
+            check.setAttribute('height', '28');
+            check.setAttribute('aria-hidden', 'true');
+            const path = document.createElementNS(ns, 'path');
+            path.setAttribute('d', 'M5 15.5l6 6L23.5 7');
+            path.setAttribute('fill', 'none');
+            path.setAttribute('stroke', dark ? '#7fb89a' : '#28623f');
+            path.setAttribute('stroke-width', '3');
+            path.setAttribute('stroke-linecap', 'round');
+            path.setAttribute('stroke-linejoin', 'round');
+            check.appendChild(path);
+            admissionOverlayStyle(check, { flex: 'none' });
+            row.appendChild(check);
+        }
+        holder.appendChild(row);
+        // OK closes the sent card down to the waiting line (the app's sheet closes the same way).
+        if (!already) {
+            const ok = askButton(askText('askParent.ok', 'OK'), false, dark);
+            ok.addEventListener('click', () => {
+                holder.replaceChildren(askLine(waitingLine(state), dark));
+                admissionOverlayStyle(holder, { padding: '0', background: 'transparent', border: '0' });
+            });
+            const okRow = document.createElement('div');
+            admissionOverlayStyle(okRow, { display: 'flex', justifyContent: 'flex-end', marginTop: '12px' });
+            okRow.appendChild(ok);
+            holder.appendChild(okRow);
+        }
+    }
+
+    function askRefusal(result, state) {
+        const name = state.parentName || askText('askParent.parentFallback', 'Your parent');
+        switch (result?.type) {
+            case 'too_many': return askText('askParent.tooMany', 'You have {count} asks waiting. Wait for an answer first.', { count: 3 });
+            case 'wait': return askText('askParent.wait', 'Wait a little before asking again.');
+            case 'recently_declined': {
+                let time = '';
+                try { time = new Date(result.at).toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' }); } catch (e) {}
+                return askText('askParent.recentlyNo', '{name} said not now. You can ask again at {time}.', { name, time });
+            }
+            case 'asking_off': return askText('askParent.off', 'Asking is turned off.');
+            default: return askText('askParent.noParent', 'No parent is linked yet, so this can\'t be sent.');
+        }
+    }
+
+    /** The card sits inside the player: while the sheet is open the shoo pose steps aside for it. */
+    function makeRoomForSheet(holder, open) {
+        const panel = holder.parentNode;
+        const pose = panel?.querySelector?.('[data-filtertube-admission-mascot]');
+        if (pose) admissionOverlayStyle(pose, { display: open ? 'none' : 'block' });
+    }
+
+    function renderAskSheet(holder, target, state, dark) {
+        const name = state.parentName || askText('askParent.parentFallback', 'Your parent');
+        holder.replaceChildren();
+        makeRoomForSheet(holder, true);
+        // The sheet is sun paper (Android AskParentUi), inside the blocked card.
+        admissionOverlayStyle(holder, { padding: '16px', borderRadius: '18px', background: dark ? '#2c2716' : '#fff3cf',
+            border: `1px solid ${dark ? '#4a4128' : '#ecd9a0'}` });
+        // Kriti with her crayon beside the title (AskParentUi.buildAsk), then what's asked for as a
+        // small washed note: the title, then the channel.
+        const head = document.createElement('div');
+        admissionOverlayStyle(head, { display: 'flex', alignItems: 'center', gap: '12px' });
+        const crayon = companionMode === 'off' ? null : createAdmissionMascot('kriti_crayon.webp', 64);
+        if (crayon) { crayon.removeAttribute('data-filtertube-admission-mascot'); head.appendChild(crayon); }
+        const title = document.createElement('h2');
+        title.textContent = target.kind === 'channel'
+            ? askText('askParent.titleChannel', 'Ask for this channel')
+            : askText('askParent.titleVideo', 'Ask to watch');
+        admissionOverlayStyle(title, { margin: '0', font: '400 22px/1.2 "FilterTube Delius", "Outfit", system-ui, sans-serif', color: dark ? '#f6eccd' : '#1b1a18' });
+        head.appendChild(title);
+        holder.appendChild(head);
+        if (target.title) {
+            const what = document.createElement('div');
+            admissionOverlayStyle(what, { display: 'grid', gap: '2px', padding: '10px 14px 12px', borderRadius: '14px',
+                background: dark ? '#3a3220' : '#fbe7ad', border: `1px solid ${dark ? '#4a4128' : '#e6cf86'}` });
+            const name = askLine(target.title, dark, 700);
+            admissionOverlayStyle(name, { fontSize: '16px', overflow: 'hidden', display: '-webkit-box', webkitLineClamp: '2', webkitBoxOrient: 'vertical' });
+            what.appendChild(name);
+            if (target.kind === 'video' && target.channelName) what.appendChild(askLine(target.channelName, dark));
+            holder.appendChild(what);
+        }
+        holder.appendChild(askLine(askText('askParent.sheetBody', '{name} will see your ask and answer it.', { name }), dark));
+        holder.appendChild(askLine(askText('askParent.why', 'Why do you want it?'), dark, 700));
+        const chips = document.createElement('div');
+        chips.setAttribute('role', 'radiogroup');
+        admissionOverlayStyle(chips, { display: 'flex', flexWrap: 'wrap', gap: '8px' });
+        let reason = '';
+        const chipLabels = { school: ['askParent.reasonSchool', 'For school'], once: ['askParent.reasonOnce', 'Just this once'], other: ['askParent.reasonOther', 'Something else'] };
+        const chipNodes = [];
+        for (const [key, [labelKey, fallback]] of Object.entries(chipLabels)) {
+            const chip = askButton(askText(labelKey, fallback), false, dark);
+            chip.setAttribute('role', 'radio');
+            chip.setAttribute('aria-checked', 'false');
+            chip.addEventListener('click', () => {
+                reason = reason === key ? '' : key;
+                for (const [node, nodeKey] of chipNodes) {
+                    const on = nodeKey === reason;
+                    node.setAttribute('aria-checked', on ? 'true' : 'false');
+                    admissionOverlayStyle(node, { background: on ? (dark ? '#e7c35a' : '#1b1a18') : 'transparent', color: on ? (dark ? '#1b1a18' : '#fffaf4') : (dark ? '#edf2f7' : '#1b1a18') });
+                }
+            });
+            chipNodes.push([chip, key]);
+            chips.appendChild(chip);
+        }
+        holder.appendChild(chips);
+        const note = document.createElement('input');
+        note.type = 'text';
+        note.maxLength = 80;
+        note.placeholder = askText('askParent.noteHint', 'Add a note (optional)');
+        note.setAttribute('aria-label', note.placeholder);
+        admissionOverlayStyle(note, { minHeight: '48px', padding: '0 14px', borderRadius: '14px', boxSizing: 'border-box', width: '100%',
+            border: `1.5px solid ${dark ? '#4a4128' : '#d8c38a'}`, background: dark ? '#151c24' : '#fffcf6', color: dark ? '#edf2f7' : '#1b1a18',
+            font: '500 15px/1.4 system-ui, Roboto, "Segoe UI", sans-serif' });
+        holder.appendChild(note);
+        const status = askLine('', dark);
+        status.setAttribute('role', 'status');
+        const actions = document.createElement('div');
+        admissionOverlayStyle(actions, { display: 'flex', gap: '10px', justifyContent: 'flex-end', flexWrap: 'wrap' });
+        const cancel = askButton(askText('askParent.cancel', 'Not now'), false, dark);
+        const send = askButton(askText('askParent.send', 'Send to {name}', { name }), true, dark);
+        cancel.addEventListener('click', () => renderAskStart(holder, target, state, dark));
+        send.addEventListener('click', async () => {
+            send.disabled = true;
+            const result = await askSend({ action: 'FilterTube_AskParentCreate', target, reason, note: note.value });
+            if (result?.type === 'created') {
+                // The crayon note folds and flies (Android PAPER_FLIP), then "Sent".
+                const still = admissionOverlayPrefersReducedMotion() || typeof holder.animate !== 'function';
+                if (!still) {
+                    // AskParentUi.flyAway: the note folds (scaleY to .28, 220 ms), then flies up and off to
+                    // the side, turning -14 degrees as it fades (420 ms).
+                    const rtl = (holder.ownerDocument?.documentElement?.dir || '') === 'rtl';
+                    const dx = Math.round((holder.offsetWidth || 300) * 0.6) * (rtl ? -1 : 1);
+                    const dy = -Math.round((holder.offsetHeight || 200) * 1.4);
+                    try {
+                        await holder.animate([{ transform: 'none' }, { transform: 'scaleY(.28)' }], { duration: 220, easing: 'cubic-bezier(.4,0,.2,1)', fill: 'forwards' }).finished;
+                        await holder.animate([{ transform: 'scaleY(.28)', opacity: 1 },
+                            { transform: `translate(${dx}px, ${dy}px) rotate(${rtl ? 14 : -14}deg) scale(.22, .16)`, opacity: 0 }],
+                        { duration: 420, easing: 'cubic-bezier(.3,0,.2,1)', fill: 'forwards' }).finished;
+                    } catch (e) {}
+                    try { holder.getAnimations?.().forEach(animation => animation.cancel()); } catch (e) {}
+                }
+                renderAskSent(holder, state, dark, false);
+                return;
+            }
+            if (result?.type === 'already_open') { renderAskSent(holder, state, dark, true); return; }
+            send.disabled = false;
+            status.textContent = askRefusal(result, state);
+        });
+        actions.append(cancel, send);
+        holder.append(status, actions);
+        try { note.focus({ preventScroll: true }); } catch (e) {}
+        try { send.scrollIntoView?.({ block: 'nearest' }); } catch (e) {}
+    }
+
+    function renderAskStart(holder, target, state, dark) {
+        holder.replaceChildren();
+        makeRoomForSheet(holder, false);
+        admissionOverlayStyle(holder, { padding: '0', background: 'transparent', border: '0' });
+        const ask = askButton(target.kind === 'channel'
+            ? askText('askParent.titleChannel', 'Ask for this channel')
+            : askText('askParent.button', 'Ask to watch'), true, dark);
+        ask.setAttribute('data-filtertube-ask-parent', 'true');
+        ask.addEventListener('click', () => renderAskSheet(holder, target, state, dark));
+        holder.appendChild(ask);
+    }
+
+    /** "Back" on a blocked channel page: there is no player to return to, so it goes Home. */
+    function mountChannelBack(overlay, panel, dark) {
+        if (!panel || typeof document.createElement !== 'function' || overlay.__filtertubeChannelBack) return;
+        const back = askButton(askText('askParent.back', 'Back'), false, dark);
+        back.setAttribute('data-filtertube-channel-back', 'true');
+        back.addEventListener('click', () => {
+            try { root.location.assign('/'); } catch (e) {}
+        });
+        const row = document.createElement('div');
+        admissionOverlayStyle(row, { display: 'flex', justifyContent: 'flex-start', order: '10' });
+        row.appendChild(back);
+        panel.appendChild(row);
+        overlay.__filtertubeChannelBack = row;
+    }
+
+    async function mountAskParent(overlay, panel, dark) {
+        const target = root.__filtertubeAskParentTarget;
+        const channelAsk = target?.kind === 'channel' && !!target.channelId;
+        if (!overlay || !panel || (!target?.videoId && !channelAsk) || typeof document.createElement !== 'function') { removeAskParent(overlay); return; }
+        const key = channelAsk ? `c:${target.channelId}|${target.blockedBy}` : `${target.videoId}|${target.blockedBy}`;
+        // One ask card per blocked video or channel; a redraw of the same card keeps it (and its typed note).
+        if (overlay.__filtertubeAskParentKey === key) return;
+        removeAskParent(overlay);
+        overlay.__filtertubeAskParentKey = key;
+        const state = await askSend(channelAsk
+            ? { action: 'FilterTube_AskParentState', channelId: target.channelId }
+            : { action: 'FilterTube_AskParentState', videoId: target.videoId });
+        if (!state?.isChild || overlay.__filtertubeAskParentKey !== key || overlay.__filtertubeAdmissionState !== 'blocked') return;
+        // Quiet blocking turned on while the state was loading: the ask would name the block.
+        if (overlay.__filtertubeAdmissionQuiet === true || overlay.__filtertubeAdmissionPanel !== panel) return;
+        if (!state.canAsk && !state.openFor) return;
+        const holder = document.createElement('div');
+        holder.setAttribute('data-filtertube-ask-parent-holder', 'true');
+        admissionOverlayStyle(holder, { display: 'grid', gap: '12px' });
+        panel.appendChild(holder);
+        overlay.__filtertubeAskParent = holder;
+        if (state.openFor) renderAskSent(holder, state, dark, true);
+        else renderAskStart(holder, target, state, dark);
+    }
+
+
     root.FilterTubeAdmissionOverlay = {
+        // render(overlay, state, message, { quiet }): quiet draws the unbranded cover (settings.quietBlocking).
         render: ensureAdmissionOverlayVisuals,
+        isQuiet: overlay => overlay?.__filtertubeAdmissionQuiet === true,
         clear: removeAdmissionOverlayBackground,
         localizeMessage: localizedAdmissionMessage,
         resolveMessage: resolveAdmissionMessage,
@@ -555,6 +1160,12 @@
         loadLocale: () => loadAdmissionLocale(),
         // For study_overlay.js: the Companion setting (lively, quiet or off) the poses follow.
         loadCompanion: () => loadAdmissionCompanion(),
+        idle: picture => admissionIdle(picture),
+        // For bridge_settings.js (the time-limit screen and the viewing-route gate): a pose, or null
+        // with the Companion Off; the page's theme; the app's hand for titles.
+        pose: (name, height) => (companionMode === 'off' ? null : createAdmissionMascot(name, height)),
+        isDark: () => admissionOverlayUsesDarkTheme(),
+        loadHand: () => loadAdmissionHand(),
         getCompanion: () => companionMode,
         getDirection: () => localeDirection
     };

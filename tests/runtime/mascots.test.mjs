@@ -217,7 +217,7 @@ test('the hidden counter keeps a running total that survives the daily reset', (
     assert.match(bridge, /nextStats\.totalHiddenCount = Math\.max\(0, previousTotal \+ statsTotalHiddenDelta\);\s*statsTotalHiddenDelta = 0;/);
 });
 
-test('mascot images are WebP, Kriti and Uljhan only, none unused, under the 900 KB budget', () => {
+test('mascot images are WebP, Kriti and Uljhan only, none unused, under the 1.3 MB budget', () => {
     const { Mascots } = load();
     const assets = plain(Mascots.ASSETS);
     // Kriti and Uljhan only (aKriti brand library); "duo" sheets show the two together. The counter mark is a doodle.
@@ -238,7 +238,9 @@ test('mascot images are WebP, Kriti and Uljhan only, none unused, under the 900 
     }
     const folder = fs.readdirSync('assets/images/mascots').reduce((sum, name) => sum + fs.statSync(path.join('assets/images/mascots', name)).size, 0);
     assert.equal(folder, total, 'no unused images ship');
-    assert.ok(total < 900 * 1024, `${total} bytes`);
+    // The app's own frames, byte for byte (study-3.6.2 res/drawable-nodpi): every motion the app plays.
+    // 1.3 MB grew to 1.6 MB with Study's perch poses, the pencil tap and the rest-screen stretch (2026-11-17).
+    assert.ok(total < 1600 * 1024, `${total} bytes`);
     for (const forbidden of ['kagaz', 'mohar', 'phoolu', 'bindu_', 'rekha']) {
         assert.equal(fs.readdirSync('assets/images/mascots').some(name => name.includes(forbidden)), false, forbidden);
     }
@@ -250,9 +252,13 @@ test('sounds are off by default; Gentle plays big moments only, Playful adds tap
     assert.equal(Mascots.normalizeSoundMode('LOUD'), 'off');
     assert.equal(await Mascots.loadSoundMode(), 'off', 'nothing stored means off');
     for (const name of Object.keys(plain(Mascots.SOUND_FILES))) assert.equal(Mascots.soundAllowed('off', name), false, name);
-    assert.equal(Mascots.soundAllowed('gentle', 'success'), true);
+    // Gentle is the app's BIG cues only: the stamp, a celebration, the break bell.
+    assert.deepEqual(plain(Mascots.GENTLE_SOUNDS), ['stamp', 'celebrate', 'bell']);
+    assert.equal(Mascots.soundAllowed('gentle', 'stamp'), true);
     assert.equal(Mascots.soundAllowed('gentle', 'celebrate'), true);
+    assert.equal(Mascots.soundAllowed('gentle', 'success'), false, 'Gentle has no small cues');
     assert.equal(Mascots.soundAllowed('gentle', 'select'), false, 'Gentle has no taps');
+    assert.equal(Object.keys(plain(Mascots.SOUND_FILES)).length, 13, 'the app\'s thirteen cues');
     assert.equal(Mascots.soundAllowed('playful', 'select'), true);
     assert.equal(Mascots.soundAllowed('playful', 'nope'), false);
     assert.equal(Mascots.playSound('success'), false, 'off plays nothing');
@@ -264,7 +270,8 @@ test('sounds are off by default; Gentle plays big moments only, Playful adds tap
         assert.ok(fs.existsSync(full), full);
         total += fs.statSync(full).size;
     }
-    assert.ok(total < 64 * 1024, `${total} bytes of sound`);
+    assert.ok(total < 96 * 1024, `${total} bytes of sound`);
+    for (const file of Object.values(plain(Mascots.SOUND_FILES))) assert.ok(fs.statSync(path.join('assets/sounds', file)).size < 8 * 1024, `${file} under 8 KB, as in the app`);
     const options = fs.readFileSync('html/tab-view.html', 'utf8');
     assert.match(options, /<select id="ftUiSounds"[^>]*>\s*<option value="off"[^>]*selected>Off<\/option>\s*<option value="gentle"[^>]*>Gentle<\/option>\s*<option value="playful"[^>]*>Playful<\/option>/);
     assert.match(fs.readFileSync('js/ui_components.js', 'utf8'), /window\.FilterTubeMascots\?\.playSound\?\.\(sound\)/, 'toasts start the optional sound');
@@ -274,12 +281,14 @@ test('moments use Kriti or Uljhan only, and the Companion Off setting leaves the
     const { Mascots } = load();
     const moments = plain(Mascots.MOMENTS);
     for (const [kind, spec] of Object.entries(moments)) {
-        assert.ok(['Kriti', 'Uljhan'].includes(spec.character), kind);
+        // 'Duo' is Kriti and Uljhan together on one picture.
+        assert.ok(['Kriti', 'Uljhan', 'Duo'].includes(spec.character), kind);
         assert.ok(plain(Mascots.ASSETS)[spec.image], `${kind} has art`);
         assert.match(Mascots.stillImage(spec.image), /\.webp$/, `${kind} rests on a still`);
         assert.equal(spec.character === 'Uljhan', /^uljhan/.test(spec.image), `${kind} art matches its character`);
+        assert.equal(spec.character === 'Duo', /^duo/.test(spec.image), `${kind} art matches its pair`);
     }
-    assert.equal(moments.noMatches.character, 'Uljhan', 'nothing found is Uljhan\'s');
+    assert.equal(moments.noMatches.character, 'Duo', 'nothing found: Kriti searches, Uljhan shrugs');
     assert.equal(moments.loading.character, 'Uljhan', 'Uljhan fetches while a list loads');
     assert.equal(moments.break.character, 'Kriti');
     assert.equal(moments.offline.character, 'Uljhan');
@@ -298,18 +307,39 @@ test('sheets play once and rest on their last frame; reduced motion shows only t
     const { Mascots } = load();
     const assets = plain(Mascots.ASSETS);
     for (const [sheet, still] of Object.entries(plain(Mascots.SHEET_STILL))) {
-        assert.ok(Array.isArray(assets[sheet]) && assets[sheet].length >= 5, sheet);
-        assert.equal(still, assets[sheet].length - 1, `${sheet} rests on its last frame`);
-        assert.deepEqual(plain(Mascots.sheetFrames(sheet, false)), assets[sheet].map((_, index) => index));
+        assert.ok(Array.isArray(assets[sheet]) && assets[sheet].length >= 3, sheet);
+        const order = plain(Mascots.MOTIONS[sheet].order);
+        assert.equal(still, order[order.length - 1], `${sheet} rests on the last frame it plays`);
+        assert.deepEqual(plain(Mascots.sheetFrames(sheet, false)), order);
+        assert.ok(order.every(index => index >= 0 && index < assets[sheet].length), sheet);
         assert.deepEqual(plain(Mascots.sheetFrames(sheet, true)), [still]);
         assert.equal(Mascots.stillImage(sheet), assets[sheet][still]);
     }
     assert.deepEqual(plain(Mascots.sheetFrames('nope', false)), []);
-    assert.equal(Mascots.SHEET_FRAME_MS, 180);
+    // The app's StudyMascotView.Motion timings, frame for frame.
+    const timing = Object.fromEntries(Object.entries(plain(Mascots.MOTIONS)).map(([name, motion]) => [name, motion.ms]));
+    assert.deepEqual(timing, { duoSieve: 420, duoShoo: 420, kritiMug: 380, kritiEvening: 420, uljhanFetch: 160, kritiJump: 95, kritiPencil: 300, kritiStretch: 280, uljhanLeaves: 170,
+        kritiOpenNotebook: 260, uljhanWave: 170, uljhanTangle: 420, duoUntangle: 400, duoBackup: 390, duoSearchEmpty: 420,
+        duoSieveLoop: 420, duoMedal: 450, uljhanBounce: 140, kritiBreath: 260, duoSweep: 300, duoHighFive: 300 });
+    // Borrowed sheets play another sheet's frames (KRITI_OPEN_NOTEBOOK: pencil 1-3; the footer wave stays put).
+    assert.deepEqual(plain(Mascots.sheetFrames('kritiOpenNotebook', false)), [0, 1, 2]);
+    assert.equal(Mascots.stillImage('kritiOpenNotebook'), 'kriti_pencil_03.webp');
+    assert.equal(Mascots.stillImage('uljhanWave'), 'uljhan_wave_05.webp');
+    assert.equal(Mascots.MOTIONS.uljhanWave.leaves, undefined);
+    assert.deepEqual(plain(Mascots.MOTIONS.kritiJump.order), [0, 1, 2, 3, 4, 1, 0]);
+    assert.deepEqual(plain(Mascots.MOTIONS.uljhanLeaves.order), [0, 1, 2, 1, 2, 3, 4]);
+    assert.deepEqual(plain(Mascots.MOTIONS.kritiMug.order), [0, 1, 2, 2, 3, 4, 5]);
+    assert.equal(Mascots.MOTIONS.uljhanLeaves.leaves, true);
+    assert.equal(Mascots.sheetFrameMs('duoSieve'), 420);
+    assert.equal(Mascots.SIEVE_FRAME_MS, 180);
     // The gate plays the same shoo sheet in the page (content scripts cannot load this module).
     const gate = fs.readFileSync('js/content/admission_overlay.js', 'utf8');
-    assert.match(gate, /const SHOO_FRAMES = \[1, 2, 3, 4, 5\]\.map\(index => `duo_shoo_0\$\{index\}\.webp`\);/);
-    assert.match(gate, /const SHOO_STILL = 'duo_shoo_05\.webp';/);
+    assert.match(gate, /const SHOO_FRAMES = \[1, 2, 3, 4, 5, 6\]\.map\(index => `duo_shoo_0\$\{index\}\.webp`\);/);
+    // At most three plays a day, then (and in Quiet) Uljhan's shrug still (MascotStatePolicy.BLOCKED_DAILY_PLAYS).
+    assert.match(gate, /const SHOO_DAILY_PLAYS = 3;/);
+    assert.match(gate, /const SHOO_REST = 'uljhan_pose_02\.webp';/);
+    assert.match(gate, /if \(plays >= SHOO_DAILY_PLAYS\) \{ resolve\(false\); return; \}/);
+    assert.match(gate, /const SHOO_FRAME_MS = 420;/);
     assert.match(gate, /companionMode !== 'lively' \|\| admissionOverlayPrefersReducedMotion\(\)/, 'the sheet plays on Lively only, never with reduced motion');
 });
 
@@ -409,16 +439,16 @@ test('the new lines are in every interface catalog and never name the site or an
 
 test('the brand moments are mounted, and the gate, the break and the first-run prompt carry their poses', () => {
     const source = fs.readFileSync('js/mascots.js', 'utf8');
-    for (const mount of ['mountHero(doc);', 'mountSidebar(doc);', 'mountAbout(doc);', 'mountSupport(doc);', 'mountNetwork(doc);', 'watchToasts(doc);', 'mountSessionSaved(doc);', 'watchPopupEmptyLists(doc);']) {
+    for (const mount of ['mountHubPeek(doc);', 'mountSidebar(doc);', 'mountAbout(doc);', 'mountSupport(doc);', 'mountNetwork(doc);', 'watchToasts(doc);', 'mountSessionSaved(doc);', 'watchPopupEmptyLists(doc);']) {
         assert.ok(source.includes(mount), mount);
     }
     assert.match(fs.readFileSync('js/tab-view.js', 'utf8'), /new CustomEvent\('filtertube:parent-session-saved', \{ detail: \{ name: normalizeString\(nextProfile\.name\) \} \}\)/);
     const gate = fs.readFileSync('js/content/admission_overlay.js', 'utf8');
-    assert.match(gate, /offList \? 'kriti_pointing\.webp' : 'kriti_mug_06\.webp'/);
+    assert.match(gate, /offList \? 'kriti_pose_08\.webp' : 'kriti_mug_06\.webp'/);
     assert.match(gate, /companionMode = mode === 'lively' \|\| mode === 'off' \? mode : 'quiet';/);
     const study = fs.readFileSync('js/content/study_overlay.js', 'utf8');
-    assert.match(study, /\{ rest: 'kriti_mug_06\.webp', limit: 'kriti_thumbsup\.webp', unavailable: 'uljhan_shrug\.webp' \}\[kind\]/);
-    assert.match(fs.readFileSync('js/content/first_run_prompt.js', 'utf8'), /assets\/images\/mascots\/kriti_wave\.webp/);
+    assert.match(study, /\{ rest: 'kriti_stretch_01\.webp', limit: 'kriti_thumbsup\.webp', unavailable: 'uljhan_pose_02\.webp' \}\[kind\]/);
+    assert.match(fs.readFileSync('js/content/first_run_prompt.js', 'utf8'), /assets\/images\/mascots\/kriti_pose_01\.webp/);
     for (const manifest of ['manifest.json', 'manifest.chrome.json', 'manifest.firefox.json', 'manifest.opera.json']) {
         const resources = JSON.parse(fs.readFileSync(manifest, 'utf8')).web_accessible_resources.flatMap(entry => entry.resources || entry);
         assert.ok(resources.includes('assets/images/mascots/*.webp'), `${manifest} lets the page load the poses`);
@@ -426,4 +456,418 @@ test('the brand moments are mounted, and the gate, the break and the first-run p
     const css = fs.readFileSync('css/paperkit.css', 'utf8');
     assert.match(css, /@media \(prefers-reduced-motion: reduce\) \{\s*\.ft-mascot--hero \.ft-mascot__figure\.is-hopping,\s*\.pk-net \{ animation: none; \}/);
     assert.match(css, /img\[data-character="uljhan"\] \{\s*background-image: var\(--pk-spot\);/);
+});
+
+test('motion matches the app: springs, the idle rhythm and the loading moments', () => {
+    const { Mascots } = load();
+    // A spring starts from its offset and comes to rest at 0 (SpringAnimation from a start velocity).
+    const bob = plain(Mascots.springSamples(Mascots.SPRINGS.bob, Mascots.IDLE.bobVelocity));
+    assert.equal(bob[0], 0);
+    assert.equal(bob[bob.length - 1], 0);
+    const peak = Math.min(...bob);
+    assert.ok(peak < -1.5 && peak > -4, `the idle bob dips about 2.5 px (${peak})`);
+    const entrance = plain(Mascots.springSamples(Mascots.SPRINGS.mascot, 0, { from: -0.14 }));
+    assert.equal(entrance[0], -0.14);
+    assert.ok(Math.max(...entrance) > 0, 'springMascot overshoots a little');
+    // Idle beats fit the art (MascotIdle.beatsFor).
+    assert.deepEqual(plain(Mascots.idleBeatsFor('uljhan_tangle_03.webp')), ['wiggle', 'bob']);
+    assert.deepEqual(plain(Mascots.idleBeatsFor('uljhan_front.webp')), ['bounce', 'wiggle', 'bob', 'sparkle'], 'standing Uljhan bounces');
+    assert.deepEqual(plain(Mascots.idleBeatsFor('uljhan_pose_06.webp')), ['squash'], 'asleep he only breathes');
+    assert.deepEqual(plain(Mascots.idleBeatsFor('uljhan_bounce_01.webp')), ['wiggle', 'bob', 'hop', 'sparkle']);
+    assert.deepEqual(plain(Mascots.idleBeatsFor('kriti_peek.webp')), ['squash', 'sparkle']);
+    assert.deepEqual(plain(Mascots.idleBeatsFor('kriti_pose_04.webp')), ['bob', 'squash', 'sparkle']);
+    assert.deepEqual(plain(Mascots.idleBeatsFor('duo_sieve_06.webp')), ['bob', 'squash', 'sparkle']);
+    assert.deepEqual(plain(Mascots.idleBeatsFor('kriti_pose_01.webp')), ['breath', 'bob', 'sparkle'], 'standing Kriti breathes');
+    assert.deepEqual(plain(Mascots.idleBeatsFor('kriti_pose_06.webp')), ['bob', 'hop', 'squash', 'sparkle']);
+    // The rhythm: first after 6 to 12 s, then 12, 20 and 30 s (the last repeats), each jittered 15%.
+    assert.equal(Mascots.idleDelay(0, () => 0), 6000);
+    assert.equal(Mascots.idleDelay(0, () => 1), 12000);
+    assert.equal(Mascots.idleDelay(1, () => 0.5), 12000);
+    assert.equal(Mascots.idleDelay(2, () => 0), 17000);
+    assert.equal(Mascots.idleDelay(9, () => 1), 34500);
+    assert.equal(Mascots.IDLE.budget, 120000);
+    // A sparkle at most once per rhythm.
+    assert.equal(Mascots.pickIdleBeat(['bob', 'sparkle'], false, () => 0.01), 'sparkle');
+    assert.equal(Mascots.pickIdleBeat(['bob', 'sparkle'], true, () => 0.01), 'bob');
+    // Loading moments: the duo sieve comes up most; every moment has art that ships.
+    const weights = Object.fromEntries(plain(Mascots.LOADING_WEIGHTS));
+    assert.equal(Math.max(...Object.values(weights)), weights.duoSieve);
+    assert.equal(Mascots.pickLoadingMoment(() => 0), 'duoSieve');
+    assert.equal(Mascots.pickLoadingMoment(() => 0.999), 'kritiLogoTelescope');
+    for (const name of Object.keys(weights)) assert.ok(Mascots.ASSETS[name], name);
+    assert.equal(Mascots.LOADING_REVEAL_MS, 600);
+    assert.equal(Mascots.LOOP_CAP_MS, 30000);
+});
+
+test('sound gates match the app: 400 ms apart, the same cue not within 1.5 s, six a minute', () => {
+    const { Mascots } = load();
+    assert.equal(Mascots.soundGateOpen([], 'pop', 1000), true);
+    assert.equal(Mascots.soundGateOpen([{ name: 'pop', at: 1000 }], 'select', 1300), false);
+    assert.equal(Mascots.soundGateOpen([{ name: 'pop', at: 1000 }], 'select', 1500), true);
+    assert.equal(Mascots.soundGateOpen([{ name: 'pop', at: 1000 }], 'pop', 2000), false);
+    assert.equal(Mascots.soundGateOpen([{ name: 'pop', at: 1000 }], 'pop', 2600), true);
+    const six = Array.from({ length: 6 }, (_, index) => ({ name: `c${index}`, at: index * 1000 }));
+    assert.equal(Mascots.soundGateOpen(six, 'pop', 7000), false);
+    assert.equal(Mascots.soundGateOpen(six, 'pop', 61000), true);
+});
+
+test('the Controls hub, doodles and crayon edges are loaded and their words are in every catalog', () => {
+    const options = fs.readFileSync('html/tab-view.html', 'utf8');
+    const popup = fs.readFileSync('html/popup.html', 'utf8');
+    for (const html of [options, popup]) {
+        assert.match(html, /css\/paperkit-edges\.css/);
+        assert.match(html, /css\/paperkit-parity\.css/);
+        assert.ok(html.indexOf('js/doodles.js') < html.indexOf('js/mascots.js'), 'doodles load before the companions');
+    }
+    assert.match(options, /js\/paperkit_parity\.js/);
+    const parity = fs.readFileSync('js/paperkit_parity.js', 'utf8');
+    const keys = [...parity.matchAll(/\['(pk\.[a-zA-Z.]+)'/g)].map(match => match[1]);
+    assert.ok(keys.length >= 18);
+    const plurals = new Set(['pk.hub.todayHidden', 'pk.hub.countChannels', 'pk.hub.countWords', 'pk.hub.todayRules']);
+    const catalogs = fs.readdirSync('data/ui_locales').filter(name => /^[a-zA-Z-]+\.json$/.test(name) && !name.startsWith('release') && name !== 'targets.json');
+    for (const name of catalogs) {
+        const catalog = JSON.parse(fs.readFileSync(path.join('data/ui_locales', name), 'utf8'));
+        for (const key of keys) {
+            const entry = plurals.has(key) ? `${key}.other` : key;
+            assert.ok(typeof catalog[entry] === 'string' && catalog[entry].trim(), `${name} ${entry}`);
+            assert.doesNotMatch(catalog[entry], /youtube/i, `${name} ${entry} never names the site`);
+        }
+    }
+    // Every crayon icon the hub and sidebar name ships, with its washed (selected) form.
+    for (const icon of ['filtertube_filter', 'hide', 'kids', 'settings', 'timer', 'folder', 'refresh', 'you', 'notifications', 'help', 'info', 'favourite']) {
+        assert.ok(fs.existsSync(`assets/icons/crayon/${icon}.svg`), icon);
+        assert.ok(fs.existsSync(`assets/icons/crayon/${icon}_selected.svg`), `${icon}_selected`);
+    }
+    for (const doodle of ['check', 'underline_swoosh', 'scribble_circle']) assert.ok(fs.existsSync(`assets/images/doodles/${doodle}.webp`), doodle);
+});
+
+test('idle life wakes on any interaction on the page, throttled, with a fresh two-minute budget and no sound', async () => {
+    // Pure rules first.
+    const { Mascots: pure } = load();
+    assert.deepEqual(plain(pure.IDLE_WAKE_EVENTS), ['pointerdown', 'keydown', 'wheel', 'scroll', 'touchstart']);
+    assert.equal(pure.idleWakeDue(-Infinity, 0), true);
+    assert.equal(pure.idleWakeDue(1000, 1500), false, 'throttled to one wake a second');
+    assert.equal(pure.idleWakeDue(1000, 2000), true);
+    assert.deepEqual(plain(pure.idleWake({ pending: false, index: 4, sparkled: true, started: 0 }, 500000)),
+        { pending: false, index: 0, sparkled: false, started: 500000, restart: true });
+    assert.deepEqual(plain(pure.idleWake({ pending: true, index: 2, sparkled: false, started: 0 }, 9000)),
+        { pending: true, index: 2, sparkled: false, started: 9000, restart: false }, 'a waiting beat keeps its time; the budget restarts');
+
+    // Then the page: one passive document listener drives every resting mascot.
+    let clock = 0;
+    let reduced = false;
+    let audio = 0;
+    const timers = [];
+    const listeners = [];
+    const doc = {
+        readyState: 'complete', visibilityState: 'visible',
+        documentElement: { dataset: {} },
+        getElementById: () => null, querySelector: () => null, querySelectorAll: () => [],
+        addEventListener: (type, fn, options) => listeners.push({ type, fn, options })
+    };
+    const context = {
+        Intl, Number, String, Array, Object, Math, JSON, Promise, Set, WeakMap, Map,
+        Date: { now: () => clock },
+        document: doc, innerWidth: 1000, innerHeight: 1000,
+        matchMedia: () => ({ matches: reduced }),
+        Audio: function () { audio += 1; this.play = () => Promise.resolve(); },
+        setTimeout: (fn, ms) => { timers.push({ fn, at: clock + ms }); return timers.length; },
+        clearTimeout: id => { if (timers[id - 1]) timers[id - 1].fn = null; },
+        chrome: { runtime: { getURL: value => value }, storage: { local: { get: (k, cb) => cb({}), set: (i, cb) => cb?.() } } }
+    };
+    vm.createContext(context);
+    vm.runInContext(fs.readFileSync('js/mascots.js', 'utf8'), context);
+    const M = context.FilterTubeMascots;
+    await M.setMode('lively');
+    const pending = () => timers.filter(timer => timer.fn);
+    const runAll = () => { for (let guard = 0; guard < 50 && pending().length; guard++) { const next = pending()[0]; const fn = next.fn; next.fn = null; clock = Math.max(clock, next.at); fn(); } };
+    const picture = {
+        isConnected: true, offsetParent: {}, dataset: {}, style: {}, src: 'kriti_wave.webp',
+        getAttribute: () => 'kriti_wave.webp', getBoundingClientRect: () => ({ top: 10, bottom: 100, left: 10, right: 100 }),
+        addEventListener() {}, animate: () => ({})
+    };
+    M.idleLife(picture);
+    const wakes = listeners.filter(entry => M.IDLE_WAKE_EVENTS.includes(entry.type));
+    assert.deepEqual(wakes.map(entry => entry.type), plain(M.IDLE_WAKE_EVENTS), 'one listener per interaction type, on the document');
+    assert.ok(wakes.every(entry => entry.options?.passive === true), 'passive');
+    assert.equal(pending().length, 1, 'the rhythm starts');
+    runAll();
+    assert.ok(clock >= 60000, `beats ran toward the two-minute budget (${clock})`);
+    assert.equal(pending().length, 0, 'then she rests');
+    const scroll = wakes.find(entry => entry.type === 'scroll').fn;
+    clock += 60000;
+    scroll();
+    assert.equal(pending().length, 1, 'a scroll wakes her with a fresh budget');
+    const wokenAt = clock;
+    assert.ok(pending()[0].at - wokenAt >= 6000 && pending()[0].at - wokenAt <= 12000, 'from her first rest again');
+    clock += 300;
+    wakes.find(entry => entry.type === 'keydown').fn();
+    assert.equal(pending().length, 1, 'throttled: a second interaction within a second changes nothing');
+    assert.equal(audio, 0, 'no sound on an interaction');
+    // Quiet, Off and reduced motion never wake her.
+    runAll();
+    await M.setMode('quiet');
+    runAll();
+    clock += 5000;
+    scroll();
+    assert.equal(pending().length, 0, 'Quiet stays still');
+    await M.setMode('lively');
+    runAll();
+    reduced = true;
+    clock += 5000;
+    scroll();
+    assert.equal(pending().length, 0, 'reduced motion stays still');
+});
+
+test('the in-page cards share the interaction wake', () => {
+    const gate = fs.readFileSync('js/content/admission_overlay.js', 'utf8');
+    assert.match(gate, /const ADMISSION_WAKE_EVENTS = \['pointerdown', 'keydown', 'wheel', 'scroll', 'touchstart'\];/);
+    assert.match(gate, /document\.addEventListener\(type, onInteraction, \{ passive: true, capture: true \}\)/);
+    assert.match(gate, /budget: 120000, wakeMs: 1000/);
+    assert.match(gate, /companionMode === 'lively' && !admissionOverlayPrefersReducedMotion\(\)/);
+    assert.match(gate, /idle: picture => admissionIdle\(picture\)/);
+    assert.match(fs.readFileSync('js/content/study_overlay.js', 'utf8'), /localizer\(\)\?\.idle\?\.\(picture\)/);
+});
+
+test('loading scenes follow LoadingPersonality: Kids, Study, a search and Uljhan\'s fetch-more', () => {
+    const { Mascots } = load();
+    const scenes = plain(Mascots.LOADING_SCENES);
+    assert.deepEqual(Object.keys(scenes).sort(), ['fetch', 'general', 'kids', 'search', 'study']);
+    assert.deepEqual(scenes.kids, [['duoSieve', 4], ['duoShoo', 2], ['kritiJump', 2], ['uljhanWave', 2], ['kritiWave', 2]]);
+    assert.deepEqual(scenes.study, [['duoSieve', 3], ['sieve', 1], ['kritiReading', 1], ['kritiNotebook', 1], ['kritiPencil', 1], ['kritiOpenNotebook', 1]]);
+    for (const [scene, weights] of Object.entries(scenes)) {
+        for (const [name] of weights) assert.ok(Mascots.stillImage(name) || name === 'sieve', `${scene}: ${name} has a still`);
+    }
+    // Fetch-more is Uljhan alone, the fetch most, never the same action twice in a row.
+    assert.ok(scenes.fetch.every(([name]) => /^uljhan/.test(name)));
+    assert.equal(Mascots.pickLoadingMoment(() => 0, 'fetch'), 'uljhanFetch');
+    for (const roll of [0, 0.3, 0.6, 0.99]) assert.notEqual(Mascots.pickLoadingMoment(() => roll, 'fetch', 'uljhanFetch'), 'uljhanFetch');
+    assert.equal(Mascots.pickLoadingMoment(() => 0, 'search'), 'kritiMagnifier');
+    assert.equal(Mascots.pickLoadingMoment(() => 0, 'unknown'), 'duoSieve', 'an unknown scene is the general one');
+    const at = selector => ({ closest: wanted => (wanted.split(', ').includes(selector) ? {} : null) });
+    assert.equal(Mascots.loadingScene(at('.subscriptions-import-inline')), 'fetch');
+    assert.equal(Mascots.loadingScene(at('#studyView')), 'study');
+    assert.equal(Mascots.loadingScene(at('#kidsView')), 'kids');
+    assert.equal(Mascots.loadingScene(at('[role="search"]')), 'search');
+    assert.equal(Mascots.loadingScene({ closest: () => null }), 'general');
+    assert.equal(Mascots.loadingScene(null), 'general');
+});
+
+test('empty lists take the app\'s poses: pointing, reading, a Kids peek, Uljhan for no matches', () => {
+    const { Mascots } = load();
+    assert.equal(Mascots.emptyListPose('keywords'), 'kritiPointing');
+    assert.equal(Mascots.emptyListPose('channels'), 'kritiReading');
+    assert.equal(Mascots.emptyListPose('keywords', { kids: true }), 'kritiPeek');
+    assert.equal(Mascots.emptyListPose('channels', { kids: true }), 'kritiPeek');
+    assert.equal(Mascots.emptyListPose('search', { kids: true }), 'duoSearchEmpty');
+});
+
+test('the popup counter card keeps company: peeking, the duo, a wave, good evening; Off shows none', () => {
+    const { Mascots } = load();
+    const pose = input => plain(Mascots.popupTallyPose(input));
+    assert.equal(Mascots.popupTallyPose({ total: 9, mode: 'off' }), null);
+    assert.equal(pose({ total: 9, listMode: 'whitelist', mode: 'lively' }).art, 'kritiAllow');
+    assert.deepEqual(pose({ total: 0, mode: 'lively', firstToday: true }), { pose: 'waiting', art: 'kritiPeekLow', play: '' });
+    assert.deepEqual(pose({ total: 5, hour: 14, firstToday: true, mode: 'lively' }), { pose: 'shoo', art: 'duoShoo', play: 'duoShoo' });
+    assert.deepEqual(pose({ total: 5, hour: 14, firstToday: true, mode: 'quiet' }), { pose: 'shoo', art: 'duoShoo', play: '' }, 'Quiet keeps the still');
+    assert.deepEqual(pose({ total: 5, hour: 14, firstToday: false, mode: 'lively' }), { pose: 'sieve', art: 'duoSieve', play: '' });
+    assert.deepEqual(pose({ total: 5, hour: 8, firstToday: true, mode: 'lively' }), { pose: 'morning', art: 'kritiWave', play: '' });
+    assert.deepEqual(pose({ total: 5, hour: 21, firstToday: true, mode: 'lively' }), { pose: 'evening', art: 'kritiEvening', play: 'kritiEvening' });
+    assert.equal(pose({ total: 5, hour: 21, firstToday: false, mode: 'lively' }).play, '');
+});
+
+test('support variants play the app\'s motions, and the loop API is there for page cards', () => {
+    const { Mascots } = load();
+    assert.deepEqual(plain(Mascots.SUPPORT_MOTIONS), {
+        sieve: { sheet: 'sieve', times: 3 },
+        onePerson: { sheet: 'kritiPencil', times: 3, restOn: 'kritiNotebook' },
+        evening: { sheet: 'kritiEvening', times: 1 }
+    });
+    assert.equal(typeof Mascots.mountLoop, 'function');
+    assert.equal(Mascots.mountLoop(null, 'duoSieve'), null);
+    const source = fs.readFileSync('js/mascots.js', 'utf8');
+    assert.match(source, /if \(prefersReducedMotion\(\)\) return;\n\s+if \(companionMode !== 'lively'\)/, 'reduced motion keeps the still; Quiet plays once');
+    assert.match(source, /if \(Date\.now\(\) - started > LOOP_CAP_MS\) \{ resting = true; picture\.src = assetUrl\(still\(\)\); idleLife\(picture\); return; \}/, 'Lively loops for 30 s, then rests');
+    assert.match(source, /#aboutView \[data-ft-duo-story\]/, 'About\'s own story section replaces the duo card');
+});
+
+// ---- The 2026-11-18 moments (Android MascotStates, LockedSignView, NativeViewerShellMotion) ----------
+
+test('the locked sign splits the translated line around the time, so every locale keeps its order', () => {
+    const { Mascots } = load();
+    const lines = (template, time) => plain(Mascots.signLines(template, time));
+    assert.deepEqual(lines('Locked until {time}', '5:30 PM'), { lines: ['Locked until', '5:30 PM'], timeIndex: 1 });
+    // Time first (Japanese), time in the middle, a comma before the time.
+    assert.deepEqual(lines('{time}までロック', '17:30'), { lines: ['17:30', 'までロック'], timeIndex: 0 });
+    assert.deepEqual(lines('Bis {time} gesperrt', '17:30'), { lines: ['Bis', '17:30', 'gesperrt'], timeIndex: 1 });
+    assert.deepEqual(lines('Locked, {time}', '9:00'), { lines: ['Locked', '9:00'], timeIndex: 1 });
+    assert.deepEqual(lines('مقفل حتى {time}،', '9:00'), { lines: ['مقفل حتى', '9:00'], timeIndex: 1 });
+    // A catalog without the placeholder still shows the words, then the time.
+    assert.deepEqual(lines('Locked', '9:00'), { lines: ['Locked', '9:00'], timeIndex: 1 });
+    assert.deepEqual(lines('  {time}  ', '9:00'), { lines: ['9:00'], timeIndex: 0 });
+});
+
+test('the sign shrinks every line together until the widest fits; the time is the big line', () => {
+    const { Mascots } = load();
+    const area = plain(Mascots.LOCKED_SIGN);
+    assert.deepEqual([area.left, area.top, area.right, area.bottom], [0.5, 0.646, 0.846, 0.882]);
+    const measure = (text, px) => text.length * px * 0.5;
+    const sign = { lines: ['Locked until', '5:30 PM'], timeIndex: 1 };
+    const size = Mascots.fitSignSize(sign, 60, 40, measure);
+    assert.ok(size > 0);
+    assert.ok(measure('Locked until', size) <= 60);
+    assert.ok(measure('5:30 PM', size * area.timeScale) <= 60);
+    assert.ok((1 + area.timeScale) * area.lineHeight * size <= 40 + 1e-9, 'the lines fit the height');
+    assert.ok(Mascots.fitSignSize(sign, 200, 40, measure) > size, 'more room, bigger words');
+    assert.equal(Mascots.fitSignSize(sign, 0, 40, measure), 0);
+    assert.equal(Mascots.fitSignSize({ lines: [], timeIndex: 0 }, 60, 40, measure), 0);
+});
+
+test('the sign shows the time alone today and the weekday on a later day', () => {
+    const { Mascots } = load();
+    const now = new Date(2026, 10, 18, 9, 0).getTime();
+    assert.doesNotMatch(Mascots.signTime(new Date(2026, 10, 18, 17, 30).getTime(), now, 'en-US'), /Wed|Thu/);
+    assert.match(Mascots.signTime(new Date(2026, 10, 19, 17, 30).getTime(), now, 'en-US'), /Thu/);
+    assert.equal(Mascots.lockedSign(Date.now() + 60000), null, 'no document, no sign');
+});
+
+test('the popup plays a sheet as its first, middle and last frames in 400 ms at most', () => {
+    const { Mascots } = load();
+    assert.deepEqual(plain(Mascots.popupSheet('duoShoo')), { order: [0, 3, 5], ms: 133 }, 'frames 1, 4 and 6');
+    assert.deepEqual(plain(Mascots.popupSheet('uljhanBounce')), { order: [0, 3, 5], ms: 133 });
+    assert.deepEqual(plain(Mascots.popupSheet('uljhanTangle')), { order: [0, 1, 2], ms: 133 });
+    assert.deepEqual(plain(Mascots.popupSheet('duoUntangle')), { order: [0, 1, 2], ms: 133 });
+    assert.deepEqual(plain(Mascots.popupSheet('kritiJump')).order, [0, 4, 0]);
+    for (const sheet of Object.keys(plain(Mascots.MOTIONS))) {
+        const { order, ms } = plain(Mascots.popupSheet(sheet));
+        assert.ok(order.length * ms <= 400, sheet);
+    }
+    assert.deepEqual(plain(Mascots.popupSheet('nope')), { order: [], ms: 0 });
+});
+
+test('offline tangles Uljhan and rests on frame 3; back online Kriti unwinds him', () => {
+    const { Mascots } = load();
+    assert.deepEqual(plain(Mascots.ASSETS.uljhanTangle), ['uljhan_tangle_01.webp', 'uljhan_tangle_02.webp', 'uljhan_tangle_03.webp']);
+    assert.equal(Mascots.stillImage('uljhanTangle'), 'uljhan_tangle_03.webp');
+    assert.equal(Mascots.stillImage('duoUntangle'), 'duo_untangle_03.webp');
+    assert.equal(plain(Mascots.NETWORK_ART).offline, 'uljhanTangle');
+    assert.equal(plain(Mascots.NETWORK_ART).restored, 'duoUntangle');
+    assert.equal(Mascots.MOTIONS.uljhanTangle.ms, 420);
+    assert.deepEqual(plain(Mascots.sheetFrames('uljhanTangle', true)), [2], 'reduced motion: the tangled still');
+    assert.deepEqual(plain(Mascots.idleBeatsFor('uljhan_tangle_03.webp')), ['wiggle', 'bob'], 'tangled, he only wiggles and bobs');
+    const source = fs.readFileSync('js/mascots.js', 'utf8');
+    assert.match(source, /current === 'offline' \? 'uljhanTangle' : current === 'restored' \? 'duoUntangle'/);
+});
+
+test('backup saved plays the duo at most once a day, then falls back', async () => {
+    const { Mascots } = load();
+    assert.equal(Mascots.backupSavedDue(undefined, '2026-11-18'), true);
+    assert.equal(Mascots.backupSavedDue('2026-11-17', '2026-11-18'), true);
+    assert.equal(Mascots.backupSavedDue('2026-11-18', '2026-11-18'), false);
+    assert.equal(Mascots.stillImage('duoBackup'), 'duo_backup_04.webp');
+    assert.equal(await Mascots.backupSaved('ftExportV3Btn'), false, 'no page, no moment');
+    const tabView = fs.readFileSync('js/tab-view.js', 'utf8');
+    assert.equal((tabView.match(/window\.FilterTubeMascots\?\.backupSaved\?\.\('ftExportV3(Encrypted)?Btn'\)/g) || []).length, 2, 'both exports');
+});
+
+test('a search with no results gets Kriti and her magnifier with Uljhan, replayed at most every 10 s', () => {
+    const { Mascots } = load();
+    assert.equal(Mascots.emptyListPose('search'), 'duoSearchEmpty');
+    assert.equal(Mascots.stillImage('duoSearchEmpty'), 'duo_search_empty_04.webp');
+    assert.equal(Mascots.searchEmptyPlays(0, 50000), true);
+    assert.equal(Mascots.searchEmptyPlays(45000, 50000), false, 'typing does not replay it');
+    assert.equal(Mascots.searchEmptyPlays(40000, 50000), true);
+});
+
+test('Self-Control refusals put the locked sign on the toast and the study sheet; the kitchen sieve is gone', () => {
+    assert.match(fs.readFileSync('js/popup.js', 'utf8'), /FilterTubeMascots\?\.lockedToast\?\.\(popupSelfControlSessionState\?\.lockedUntil\)/);
+    assert.match(fs.readFileSync('js/tab-view.js', 'utf8'), /FilterTubeMascots\?\.lockedToast\?\.\(selfControlSessionState\?\.lockedUntil\)/);
+    assert.match(fs.readFileSync('js/study_ui.js', 'utf8'), /FilterTubeMascots\?\.lockedSign\?\.\(sheet\.lockedUntil/);
+    assert.equal(fs.existsSync('assets/images/mascots/kriti_funnel.webp'), false);
+    const { Mascots } = load();
+    assert.equal(Object.hasOwn(plain(Mascots.ASSETS), 'kritiFunnel'), false);
+    assert.equal(Mascots.stillImage(plain(Mascots.SUPPORT_VARIANTS).find(variant => variant.id === 'sieve').image), 'kriti_sieve_05.webp');
+});
+
+// ---- The second 2026-11-18 batch: v3 sieve, medal, bounce, breath, sweep, high five, poses -------------
+
+test('the v3 sieve: eleven frames; played once it is frames 1 to 7, looped it holds like the app', () => {
+    const { Mascots } = load();
+    assert.equal(plain(Mascots.ASSETS.duoSieve).length, 11);
+    assert.equal(Mascots.ASSETS.duoSieve[0], 'duo_sieve_01.webp');
+    assert.equal(Mascots.ASSETS.duoSieve[10], 'duo_sieve_11.webp');
+    assert.deepEqual(plain(Mascots.sheetFrames('duoSieve', false)), [0, 1, 2, 3, 4, 5, 6]);
+    assert.equal(Mascots.stillImage('duoSieve'), 'duo_sieve_07.webp', 'the play-once rests with Uljhan in the funnel');
+    assert.deepEqual(plain(Mascots.sheetFrames('duoSieveLoop', false)), [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10]);
+    assert.equal(Mascots.stillImage('duoSieveLoop'), 'duo_sieve_01.webp', 'the loop rests on frame 1');
+    assert.deepEqual(plain(Mascots.sheetFrames('duoSieveLoop', true)), [0]);
+    assert.deepEqual([...Array(11).keys()].map(index => Mascots.sheetHoldMs('duoSieveLoop', index)),
+        [3200, 420, 300, 300, 360, 700, 700, 420, 300, 360, 600]);
+    assert.equal(Mascots.sheetHoldMs('duoShoo', 2), 420, 'without holds, the frame time');
+    assert.match(fs.readFileSync('js/dashboard_home.js', 'utf8'), /mountLoop\?\.\(duo, 'duoSieveLoop'/, 'the Home greeting loops v3');
+    assert.match(fs.readFileSync('html/tab-view.html', 'utf8'), /mascots\/duo_sieve_01\.webp/);
+});
+
+test('time saved: 1, 10 and 100 hours, once each, Lively only; the running total survives the daily reset', () => {
+    const { Mascots } = load();
+    assert.deepEqual(plain(Mascots.TIME_MILESTONES_HOURS), [1, 10, 100]);
+    const hour = 3600;
+    assert.equal(Mascots.evaluateTimeMilestone(59 * 60, [], 'lively').celebrate, null);
+    const first = Mascots.evaluateTimeMilestone(hour, [], 'lively');
+    assert.equal(first.celebrate, 1);
+    assert.equal(Mascots.evaluateTimeMilestone(2 * hour, first.seen, 'lively').celebrate, null, 'once');
+    const quiet = Mascots.evaluateTimeMilestone(11 * hour, first.seen, 'quiet');
+    assert.equal(quiet.celebrate, null, 'Quiet marks it seen without playing');
+    assert.deepEqual(plain(quiet.seen), [1, 10]);
+    assert.equal(Mascots.evaluateTimeMilestone(200 * hour, [], 'lively').celebrate, 100, 'the highest crossed');
+    assert.equal(Mascots.totalSavedSeconds({ statsBySurface: { main: { totalSavedSeconds: 5000, savedSeconds: 10 }, kids: { savedSeconds: 600 } } }), 5600);
+    assert.equal(Mascots.totalSavedSeconds({ stats: { savedSeconds: 90 } }), 90);
+    assert.equal(Mascots.timeMilestoneLine(1), 'You\u2019ve saved 1 hour so far.');
+    assert.equal(Mascots.timeMilestoneLine(10), 'You\u2019ve saved 10 hours so far.');
+    const bridge = fs.readFileSync('js/content_bridge.js', 'utf8');
+    assert.match(bridge, /statsTotalSavedDelta \+= secondsSaved;/);
+    assert.match(bridge, /statsTotalSavedDelta -= savedTime;/);
+    assert.match(bridge, /nextStats\.totalSavedSeconds = Math\.max\(0, previousSaved \+ statsTotalSavedDelta\);\s*statsTotalSavedDelta = 0;/);
+    const directory = 'data/ui_locales';
+    for (const { code } of JSON.parse(fs.readFileSync(path.join(directory, 'targets.json'), 'utf8')).locales) {
+        const catalog = JSON.parse(fs.readFileSync(path.join(directory, `${code}.json`), 'utf8'));
+        for (const key of ['mascot.timeSaved.one', 'mascot.timeSaved.other']) {
+            assert.match(catalog[key] || '', /\{count\}/, `${code}: ${key}`);
+            assert.doesNotMatch(catalog[key], /youtube/i);
+        }
+    }
+});
+
+test('a removal that empties a list gets the sweep within 2.5 s; a sync gets the high five', () => {
+    const { Mascots } = load();
+    assert.equal(Mascots.sweepAfterRemoval(0, 1000), false);
+    assert.equal(Mascots.sweepAfterRemoval(1000, 3000), true);
+    assert.equal(Mascots.sweepAfterRemoval(1000, 4000), false);
+    assert.equal(Mascots.stillImage('duoSweep'), 'duo_sweep_06.webp');
+    assert.equal(Mascots.stillImage('duoHighFive'), 'duo_high_five_06.webp');
+    const tabView = fs.readFileSync('js/tab-view.js', 'utf8');
+    assert.equal((tabView.match(/toast\.dataset\.ftMascot = 'highfive'/g) || []).length, 3, 'managed, Internet Pickup and Home Pickup updates');
+    assert.match(tabView, /subscriptionsImportNoChannels[^\n]*\n[^\n]*toast\.dataset\.ftMascot = 'shrug'/, 'nothing to import: Uljhan shrugs');
+});
+
+test('the pose registry names every 2026-11-18 pose, and each moment uses the right one', () => {
+    const { Mascots } = load();
+    const assets = plain(Mascots.ASSETS);
+    const poses = plain(Mascots.POSES);
+    assert.deepEqual(Object.keys(poses.kriti), ['wave', 'cheer', 'think', 'read', 'sleepy', 'proud', 'shh', 'point']);
+    assert.deepEqual(Object.keys(poses.uljhan), ['peek', 'shrug', 'knotted', 'hop', 'tiptoe', 'asleep']);
+    assert.deepEqual(Object.values(poses.kriti).map(key => assets[key]), [1, 2, 3, 4, 5, 6, 7, 8].map(index => `kriti_pose_0${index}.webp`));
+    assert.deepEqual(Object.values(poses.uljhan).map(key => assets[key]), [1, 2, 3, 4, 5, 6].map(index => `uljhan_pose_0${index}.webp`));
+    const moments = plain(Mascots.MOMENTS);
+    assert.equal(moments.error.image, 'uljhanKnotted');
+    assert.equal(moments.empty.image, 'uljhanPeek');
+    assert.equal(moments.resting.image, 'uljhanAsleep');
+    assert.equal(moments.slow.image, 'uljhanTiptoe');
+    assert.equal(plain(Mascots.NETWORK_ART).slow, 'uljhanTiptoe');
+    assert.match(fs.readFileSync('js/dashboard_home.js', 'utf8'), /moment\?\.\('resting', \{ height: 56 \}\)/, 'nothing got past: Uljhan asleep');
+    assert.match(fs.readFileSync('js/study_ui.js', 'utf8'), /pose: 'kritiSleepy'/, 'late at night Kriti is sleepy');
+    const source = fs.readFileSync('js/mascots.js', 'utf8');
+    assert.match(source, /return 'kritiShh';/, 'in a focus round: shh');
+    assert.match(source, /image\(ASSETS\.uljhanKnotted, 'pk-toast-art', 36\)/, 'errors: knotted');
+    assert.match(source, /image\(ASSETS\.uljhanPeek, 'pk-popup-peek', 48\)/, 'an empty popup list: Uljhan peeks');
 });

@@ -16,6 +16,31 @@
     }
     window.filterTubeSeedHasRun = true;
 
+    // Firefox injects seed with a script tag (bridge_injection.js): the search suggestions filter comes
+    // in beside it from the same folder. Chromium and Opera load it from the manifest, before seed.
+    try {
+        const seedSrc = document.currentScript && document.currentScript.src;
+        if (!window.FilterTubeSearchSuggestions && seedSrc && /\/js\/seed\.js(?:\?.*)?$/.test(seedSrc)) {
+            const tag = document.createElement('script');
+            tag.src = seedSrc.replace(/\/js\/seed\.js(?:\?.*)?$/, '/js/shared/search_suggestions_filter.js');
+            // The dropdown safety net needs the filter first.
+            tag.onload = () => {
+                const dom = document.createElement('script');
+                dom.src = seedSrc.replace(/\/js\/seed\.js(?:\?.*)?$/, '/js/content/search_suggestions_dom.js');
+                dom.onload = () => { try { window.__filtertubeStartSuggestionDom?.(); } catch (e) { } };
+                (document.head || document.documentElement).appendChild(dom);
+            };
+            (document.head || document.documentElement).appendChild(tag);
+        }
+        // The empty-feed guard and rule-change check (js/shared/feed_guard.js), loaded the same way.
+        if (!window.FilterTubeFeedGuard && seedSrc && /\/js\/seed\.js(?:\?.*)?$/.test(seedSrc)) {
+            const feedTag = document.createElement('script');
+            feedTag.src = seedSrc.replace(/\/js\/seed\.js(?:\?.*)?$/, '/js/shared/feed_guard.js');
+            (document.head || document.documentElement).appendChild(feedTag);
+        }
+    } catch (e) {
+    }
+
     // Global flags and state
     window.ftSeedInitialized = false;
     
@@ -1526,6 +1551,94 @@
         });
     }
 
+    // ============================================================================
+    // EMPTY FEED GUARD AND LIVE RULE CHANGES (js/shared/feed_guard.js)
+    // ============================================================================
+    // A feed page or continuation that loses every card to the rules counts as empty; after
+    // MAX_EMPTY_AUTO_LOADS in a row on one route its continuation is removed so the page stops
+    // asking for more (Android NativeMainContinuationAutoLoadGuard), and the isolated world is told
+    // through attributes on <html> (it shows the allow-list feed or a calm state). Cards hidden here
+    // are counted per route so a looser rule change can bring them back.
+    let feedGuard = null;
+    let feedGuardRoute = '';
+    let routeJsonHidden = 0;
+
+    function currentRouteKey() {
+        try { return `${location.pathname}${location.search}`; } catch (e) { return ''; }
+    }
+
+    function shouldGuardFeedPayload(dataName) {
+        const api = window.FilterTubeFeedGuard;
+        return Boolean(api && typeof api.countFeedItems === 'function' && api.isGuardedPayload(dataName));
+    }
+
+    function setFeedSignal(name, value) {
+        try {
+            const rootEl = document.documentElement;
+            if (!rootEl) return;
+            if (value === null || value === undefined) rootEl.removeAttribute(name);
+            else rootEl.setAttribute(name, String(value));
+        } catch (e) {
+        }
+    }
+
+    function guardEmptyFeed(result, cardsBefore, dataName) {
+        try {
+            const api = window.FilterTubeFeedGuard;
+            if (!feedGuard) feedGuard = api.createContinuationGuard({ max: api.MAX_EMPTY_AUTO_LOADS });
+            const routeKey = currentRouteKey();
+            if (routeKey !== feedGuardRoute) {
+                feedGuardRoute = routeKey;
+                routeJsonHidden = 0;
+                setFeedSignal('data-filtertube-feed-empty', null);
+                setFeedSignal('data-filtertube-feed-exhausted', null);
+            }
+            const cardsAfter = api.countFeedItems(result).cards;
+            routeJsonHidden += Math.max(0, cardsBefore - cardsAfter);
+            setFeedSignal('data-filtertube-json-hidden', routeJsonHidden || null);
+            const verdict = feedGuard.observe({ routeKey, before: cardsBefore, after: cardsAfter });
+            if (!verdict.empty) {
+                if (cardsAfter > 0) setFeedSignal('data-filtertube-feed-empty', null);
+                return;
+            }
+            setFeedSignal('data-filtertube-feed-empty', `${verdict.streak}:${routeKey}`);
+            if (verdict.exhausted) {
+                const removed = api.stripContinuations(result);
+                seedDebugLog(`🛑 ${dataName}: ${verdict.streak} fully hidden feed loads in a row; removed ${removed} continuation(s)`);
+                setFeedSignal('data-filtertube-feed-exhausted', `${cachedSettings?.listMode === 'whitelist' ? 'allow' : 'block'}:${routeKey}`);
+            }
+        } catch (e) {
+            seedDebugLog('⚠️ Empty-feed guard failed:', e);
+        }
+    }
+
+    /**
+     * Rules that may show something hidden before (study ended, a rule removed, allow list added to,
+     * the list switched back to the block list) bring the hidden cards back: cards removed from the
+     * page's data can't be put back, so a feed page that lost cards at the data level loads again.
+     * Watch pages are never reloaded (the video keeps playing; the rail updates on the next page).
+     */
+    let pendingRuleRefresh = 0;
+    function refreshAfterLooserRules(previous, next) {
+        try {
+            const api = window.FilterTubeFeedGuard;
+            if (!api || !previous || !next) return;
+            if (api.classifyRuleChange(previous, next) !== 'loosen') return;
+            if (api.isPlayerPath(location.pathname)) return;
+            const builtFeedShown = document.documentElement?.hasAttribute('data-filtertube-built-feed');
+            const hiddenHere = feedGuardRoute === currentRouteKey() ? routeJsonHidden : 0;
+            if (hiddenHere <= 0 && !builtFeedShown) return;
+            if (pendingRuleRefresh) return;
+            seedDebugLog('🔁 Looser rules: reloading the page\'s data to bring hidden items back');
+            setFeedSignal('data-filtertube-rules-loosened', String(Date.now()));
+            pendingRuleRefresh = window.setTimeout(() => {
+                pendingRuleRefresh = 0;
+                try { location.reload(); } catch (e) { }
+            }, 350);
+        } catch (e) {
+        }
+    }
+
     function processWithEngine(data, dataName) {
         if (!data) {
             seedDebugLog(`⚠️ No data to process for ${dataName}`);
@@ -1607,7 +1720,10 @@
                 const debugStatsEnabled = isSeedDebugEnabled();
                 const startedAt = debugStatsEnabled ? Date.now() : 0;
                 const originalSize = debugStatsEnabled ? JSON.stringify(data).length : 0;
+                const guarded = shouldGuardFeedPayload(dataName);
+                const cardsBefore = guarded ? window.FilterTubeFeedGuard.countFeedItems(data).cards : 0;
                 const result = window.FilterTubeEngine.processData(data, cachedSettings, dataName);
+                if (guarded) guardEmptyFeed(result, cardsBefore, dataName);
                 const newSize = debugStatsEnabled ? JSON.stringify(result).length : 0;
                 
                 seedDebugLog(`✅ Successfully processed ${dataName} with engine`);
@@ -1956,6 +2072,127 @@
         return new Response(stream, { status: response.status, statusText: response.statusText, headers });
     }
 
+    // ------------------------------------------------------------------------
+    // Search suggestions (js/shared/search_suggestions_filter.js), three layers:
+    // the fetch/XHR response text, the JSONP callback (window.google.ac.h) and,
+    // in the isolated world, the dropdown itself (content/search_suggestions_dom.js).
+    // Before settings arrive nothing is known, so suggestions wait briefly and
+    // then stay empty (fail closed for allow lists, Study and Kids).
+    // ------------------------------------------------------------------------
+    const SUGGESTION_SETTINGS_WAIT_MS = 1500;
+
+    function suggestionKidsHost() {
+        return /(^|\.)youtubekids\.com$/i.test(String(document.location?.hostname || ''));
+    }
+
+    /** Resolves once settings are known, or with null after a short wait. */
+    function suggestionSettingsReady() {
+        if (cachedSettings) return Promise.resolve(cachedSettings);
+        return new Promise(resolve => {
+            const startedAt = Date.now();
+            const poll = () => {
+                if (cachedSettings) resolve(cachedSettings);
+                else if (Date.now() - startedAt >= SUGGESTION_SETTINGS_WAIT_MS) resolve(null);
+                else setTimeout(poll, 50);
+            };
+            setTimeout(poll, 50);
+        });
+    }
+
+    /** The suggestion text under the settings (null settings: fail closed, no suggestions). */
+    function filterSuggestionText(raw, suggestions, settings) {
+        if (!settings) return suggestions.filterResponseText(raw, null, { failClosed: true });
+        if (settings.enabled === false) return raw;
+        return suggestions.filterResponseText(raw, settings, { kids: suggestionKidsHost() });
+    }
+
+    /** The suggestion response with blocked (or, in allow mode, unallowed) suggestions taken out. */
+    function filterSuggestionResponse(response, suggestions) {
+        try {
+            if (!response || !response.ok) return response;
+            return Promise.all([response.clone().text(), suggestionSettingsReady()]).then(([raw, settings]) => {
+                const filtered = filterSuggestionText(raw, suggestions, settings);
+                if (filtered === raw) return response;
+                const headers = new Headers(response.headers);
+                headers.delete('content-length');
+                headers.delete('content-encoding');
+                return new Response(filtered, { status: response.status, statusText: response.statusText, headers });
+            }).catch(() => response);
+        } catch (e) {
+            return response;
+        }
+    }
+
+    /** The JSONP callback's payload under the settings; the call waits for settings when needed. */
+    function wrapSuggestionCallback(original) {
+        if (typeof original !== 'function' || original.__filtertubeSuggestionWrapped) return original;
+        const wrapped = function (payload, ...rest) {
+            const suggestions = window.FilterTubeSearchSuggestions;
+            const deliver = (settings) => {
+                let next = payload;
+                try {
+                    if (suggestions && Array.isArray(payload)) {
+                        if (!settings) next = suggestions.emptyPayload(payload);
+                        else if (settings.enabled !== false) {
+                            const rules = suggestions.compile(settings, { kids: suggestionKidsHost() });
+                            if (suggestions.hasWork(rules)) next = suggestions.filterPayload(payload, rules).payload;
+                        }
+                    }
+                } catch (e) {
+                    next = payload;
+                }
+                return original.call(this, next, ...rest);
+            };
+            if (cachedSettings || !suggestions) return deliver(cachedSettings);
+            suggestionSettingsReady().then(deliver);
+            return undefined;
+        };
+        try { Object.defineProperty(wrapped, '__filtertubeSuggestionWrapped', { value: true }); } catch (e) { }
+        return wrapped;
+    }
+
+    /** The dropdown safety net (content/search_suggestions_dom.js), in this world, on these settings. */
+    let suggestionDomStarted = false;
+    function startSuggestionDom() {
+        try {
+            const dom = window.FilterTubeSearchSuggestionsDom;
+            if (suggestionDomStarted || !dom || typeof dom.watch !== 'function' || !window.MutationObserver) return;
+            suggestionDomStarted = true;
+            dom.watch({ window, document, settings: () => cachedSettings });
+        } catch (e) {
+        }
+    }
+    // Firefox loads the module after seed (see the top of this file) and starts it from there.
+    try { Object.defineProperty(window, '__filtertubeStartSuggestionDom', { value: startSuggestionDom, configurable: true }); } catch (e) { }
+
+    /** Traps window.google -> google.ac -> h before the site's script defines them. */
+    function setupSuggestionCallbackTrap() {
+        const trapProperty = (owner, key, onValue) => {
+            try {
+                const existing = Object.getOwnPropertyDescriptor(owner, key);
+                if (existing && !existing.configurable) return;
+                let current = existing ? existing.value ?? existing.get?.call(owner) : undefined;
+                if (current !== undefined) current = onValue(current);
+                Object.defineProperty(owner, key, {
+                    configurable: true,
+                    enumerable: true,
+                    get() { return current; },
+                    set(value) { current = onValue(value); }
+                });
+            } catch (e) {
+            }
+        };
+        trapProperty(window, 'google', google => {
+            if (google && typeof google === 'object') {
+                trapProperty(google, 'ac', ac => {
+                    if (ac && typeof ac === 'object') trapProperty(ac, 'h', wrapSuggestionCallback);
+                    return ac;
+                });
+            }
+            return google;
+        });
+    }
+
     function setupFetchInterception() {
         const fetchEndpoints = [
             '/youtubei/v1/search',
@@ -1980,6 +2217,12 @@
         window.fetch = function(resource, init) {
             const url = resource instanceof Request ? resource.url : resource;
             const urlStr = typeof url === 'string' ? url : String(url || '');
+
+            // The search box's suggestions (JSONP text) under the active rules (search_suggestions_filter.js).
+            const suggestions = window.FilterTubeSearchSuggestions;
+            if (suggestions && suggestions.isSuggestionUrl(urlStr)) {
+                return originalFetch.apply(this, arguments).then(response => filterSuggestionResponse(response, suggestions));
+            }
 
             if (!fetchEndpoints.some(endpoint => urlStr.includes(endpoint))) {
                 return originalFetch.apply(this, arguments);
@@ -2114,11 +2357,32 @@
                 return wrapped;
             };
 
+            // Suggestions over XHR: the text is filtered in place (no settings yet: none shown).
+            const processSuggestionXhr = (xhr) => {
+                xhr.__filtertube_responseProcessed = true;
+                const suggestions = window.FilterTubeSearchSuggestions;
+                const responseType = xhr.responseType || '';
+                if (!suggestions || (responseType !== '' && responseType !== 'text')) return;
+                const status = Number(xhr.status || 0);
+                if (status && status >= 400) return;
+                const protoResponseTextDesc = Object.getOwnPropertyDescriptor(proto, 'responseText');
+                const raw = protoResponseTextDesc?.get ? protoResponseTextDesc.get.call(xhr) : xhr.responseText;
+                if (typeof raw !== 'string' || !raw) return;
+                const filtered = filterSuggestionText(raw, suggestions, cachedSettings);
+                if (filtered === raw) return;
+                Object.defineProperty(xhr, 'responseText', { configurable: true, get: () => filtered });
+                Object.defineProperty(xhr, 'response', { configurable: true, get: () => filtered });
+            };
+
             const ensureXhrResponseProcessed = (xhr) => {
                 try {
                     if (!xhr || xhr.__filtertube_responseProcessed) return;
                     if (!xhr.__filtertube_shouldProcessXhr) return;
                     if (xhr.readyState !== 4) return;
+                    if (xhr.__filtertube_suggestXhr) {
+                        processSuggestionXhr(xhr);
+                        return;
+                    }
                     if (!cachedSettings) return;
                     if (cachedSettings.enabled === false) return;
 
@@ -2234,7 +2498,8 @@
                     this.__filtertube_url = url;
                     const urlStr = typeof url === 'string' ? url : String(url || '');
                     const dataName = `xhr:${getPathname(urlStr)}`;
-                    this.__filtertube_shouldProcessXhr = Boolean(
+                    this.__filtertube_suggestXhr = Boolean(window.FilterTubeSearchSuggestions?.isSuggestionUrl(urlStr));
+                    this.__filtertube_shouldProcessXhr = this.__filtertube_suggestXhr || Boolean(
                         urlStr
                         && xhrEndpoints.some(endpoint => urlStr.includes(endpoint))
                         && !shouldBypassYouTubeiNetworkResponse(dataName)
@@ -2250,11 +2515,11 @@
                     const rawUrl = this.__filtertube_url;
                     const urlStr = typeof rawUrl === 'string' ? rawUrl : String(rawUrl || '');
                     const dataName = `xhr:${getPathname(urlStr)}`;
-                    if (
+                    if (this.__filtertube_suggestXhr || (
                         urlStr
                         && xhrEndpoints.some(endpoint => urlStr.includes(endpoint))
                         && !shouldBypassYouTubeiNetworkResponse(dataName)
-                    ) {
+                    )) {
                         this.__filtertube_shouldProcessXhr = true;
                         this.__filtertube_responseProcessed = false;
                         const xhr = this;
@@ -2309,7 +2574,9 @@
             hideAllShorts: newSettings.hideAllShorts
         });
         
+        const previousSettings = cachedSettings;
         cachedSettings = newSettings;
+        refreshAfterLooserRules(previousSettings, newSettings);
         syncAdVoidRuntime();
         if (isOriginalAudioPreferenceEnabled()) {
             scheduleOriginalAudioPreference(true);
@@ -2462,6 +2729,8 @@
     establishDataHooks();
     
     // Set up fetch interception
+    setupSuggestionCallbackTrap();
+    startSuggestionDom();
     setupFetchInterception();
 
     setupXhrInterception();

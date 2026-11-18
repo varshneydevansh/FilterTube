@@ -4,20 +4,22 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>FilterTube Dashboard</title>
+    <title>FilterTube · Controls</title>
     <link rel="stylesheet" href="../css/design_tokens.css">
     <link rel="stylesheet" href="../css/components.css">
     <link rel="stylesheet" href="../css/tab-view.css">
     <link rel="stylesheet" href="../css/serene-shell.css">
-    <link
-        href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@1,400;1,500;1,600&family=JetBrains+Mono:wght@500;700&family=Outfit:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap"
-        rel="stylesheet">
     <link rel="stylesheet" href="../css/device-auto-sync.css">
     <link rel="stylesheet" href="../css/page-tones.css">
     <link rel="stylesheet" href="../css/dashboard-studio.css">
     <link rel="stylesheet" href="../css/study.css">
     <link rel="stylesheet" href="../css/mascots.css">
     <link rel="stylesheet" href="../css/paperkit.css">
+    <link rel="stylesheet" href="../css/paperkit-edges.css">
+    <link rel="stylesheet" href="../css/paperkit-parity.css">
+    <link rel="stylesheet" href="../css/paperkit-states.css">
+    <link rel="stylesheet" href="../css/dashboard-home.css">
+    <link rel="stylesheet" href="../css/content-control-tints.css">
 </head>
 
 <body>
@@ -31,7 +33,7 @@
             </a>
 
             <ul class="nav-list">
-                <li data-pk-icon="home" class="nav-item active" tabindex="0" data-tab="dashboard">
+                <li data-pk-icon="home" class="nav-item active" tabindex="0" data-tab="dashboard" data-pk-tint="home">
                     <span class="nav-icon">
                         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
                             stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -41,10 +43,10 @@
                             <rect x="3" y="14" width="7" height="7"></rect>
                         </svg>
                     </span>
-                    <span class="nav-text"><span class="nav-label" data-ft-i18n="navigation.dashboard">Dashboard</span><span class="nav-summary" aria-hidden="true"></span><span class="nav-lock" hidden></span></span>
+                    <span class="nav-text"><span class="nav-label" data-ft-i18n="home.nav.title">Home</span><span class="nav-summary" aria-hidden="true"></span><span class="nav-lock" hidden></span></span>
                 </li>
                 <li class="nav-divider" role="separator" aria-hidden="true"></li>
-                <li data-pk-icon="filter" class="nav-item" tabindex="0" data-tab="filters">
+                <li data-pk-icon="filter" class="nav-item" tabindex="0" data-tab="filters" data-pk-tint="filters">
                     <span class="nav-icon">
                         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
                             stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -53,7 +55,7 @@
                     </span>
                     <span class="nav-text"><span class="nav-label" data-ft-i18n="navigation.filters">Filters</span><span class="nav-summary" aria-hidden="true"></span><span class="nav-lock" hidden></span></span>
                 </li>
-                <li data-pk-icon="hide" class="nav-item nav-item--sub" tabindex="0" data-tab="filters" data-nav-id="content" data-nav-target="content">
+                <li data-pk-icon="hide" class="nav-item nav-item--sub" tabindex="0" data-tab="filters" data-nav-id="content" data-nav-target="content" data-pk-tint="content">
                     <span class="nav-icon">
                         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
                             stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -78,7 +80,7 @@
                     </span>
                     <span class="nav-text"><span class="nav-label">Semantic ML</span><span class="nav-summary" aria-hidden="true"></span><span class="nav-lock" hidden></span></span>
                 </li>
-                <li data-pk-icon="kids" class="nav-item" tabindex="0" data-tab="kids">
+                <li data-pk-icon="kids" class="nav-item" tabindex="0" data-tab="kids" data-pk-tint="kids">
                     <span class="nav-icon">
                         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
                             stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -92,7 +94,7 @@
                     <span class="nav-text"><span class="nav-label" data-ft-i18n="navigation.kids">Kids Mode</span><span class="nav-summary" aria-hidden="true"></span><span class="nav-lock" hidden></span></span>
                 </li>
                 <li class="nav-divider" role="separator" aria-hidden="true"></li>
-                <li data-pk-icon="settings" class="nav-item" tabindex="0" data-tab="settings">
+                <li data-pk-icon="settings" class="nav-item" tabindex="0" data-tab="settings" data-pk-tint="plain">
                     <span class="nav-icon">
                         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
                             stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -104,7 +106,7 @@
                     </span>
                     <span class="nav-text"><span class="nav-label" data-ft-i18n="navigation.settings">Settings</span><span class="nav-summary" aria-hidden="true"></span><span class="nav-lock" hidden></span></span>
                 </li>
-                <li data-pk-icon="timer" class="nav-item nav-item--sub" tabindex="0" data-tab="settings" data-nav-id="timeLimits" data-nav-target="selfControl">
+                <li data-pk-icon="timer" class="nav-item nav-item--sub" tabindex="0" data-tab="study" data-nav-id="timeLimits" data-pk-tint="study">
                     <span class="nav-icon">
                         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
                             stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -114,7 +116,7 @@
                     </span>
                     <span class="nav-text"><span class="nav-label" data-ft-i18n="study.nav.title">Study and focus</span><span class="nav-summary" aria-hidden="true"></span><span class="nav-lock" hidden></span></span>
                 </li>
-                <li data-pk-icon="folder" class="nav-item nav-item--sub" tabindex="0" data-tab="settings" data-nav-id="backup" data-nav-target="importExport">
+                <li data-pk-icon="folder" class="nav-item nav-item--sub" tabindex="0" data-tab="settings" data-nav-id="backup" data-nav-target="importExport" data-pk-tint="plain">
                     <span class="nav-icon">
                         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
                             stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -126,7 +128,7 @@
                     <span class="nav-text"><span class="nav-label" data-ft-i18n="controls.tile.backup">Backup &amp; restore</span><span class="nav-summary" aria-hidden="true"></span><span class="nav-lock" hidden></span></span>
                 </li>
                 <li class="nav-divider" role="separator" aria-hidden="true"></li>
-                <li data-pk-icon="link" class="nav-item" tabindex="0" data-tab="sync">
+                <li data-pk-icon="link" class="nav-item" tabindex="0" data-tab="sync" data-pk-tint="family">
                     <span class="nav-icon">
                         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
                             stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -138,7 +140,7 @@
                     </span>
                     <span class="nav-text"><span class="nav-label" data-ft-i18n="navigation.sync">Accounts &amp; Sync</span><span class="nav-summary" aria-hidden="true"></span><span class="nav-lock" hidden></span></span>
                 </li>
-                <li data-pk-icon="you" class="nav-item nav-item--sub" tabindex="0" data-tab="sync" data-nav-id="profiles" data-nav-target="profiles">
+                <li data-pk-icon="you" class="nav-item nav-item--sub" tabindex="0" data-tab="sync" data-nav-id="profiles" data-nav-target="profiles" data-pk-tint="plain">
                     <span class="nav-icon">
                         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
                             stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -151,7 +153,7 @@
                     <span class="nav-text"><span class="nav-label" data-ft-i18n="controls.tile.profiles">Profiles &amp; PIN</span><span class="nav-summary" aria-hidden="true"></span><span class="nav-lock" hidden></span></span>
                 </li>
                 <li class="nav-divider" role="separator" aria-hidden="true"></li>
-                <li data-pk-icon="notifications" class="nav-item" tabindex="0" data-tab="whatsnew">
+                <li data-pk-icon="notifications" class="nav-item nav-item--quiet" tabindex="0" data-tab="whatsnew">
                     <span class="nav-icon">
                         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
                             stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -166,7 +168,7 @@
                     </span>
                     <span class="nav-text"><span class="nav-label" data-ft-i18n="navigation.whatsNew">What’s New</span><span class="nav-summary" aria-hidden="true"></span><span class="nav-lock" hidden></span></span>
                 </li>
-                <li data-pk-icon="help" class="nav-item" tabindex="0" data-tab="help">
+                <li data-pk-icon="help" class="nav-item nav-item--quiet" tabindex="0" data-tab="help">
                     <span class="nav-icon">
                         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
                             stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -177,7 +179,7 @@
                     </span>
                     <span class="nav-text"><span class="nav-label" data-ft-i18n="navigation.help">Help</span><span class="nav-summary" aria-hidden="true"></span><span class="nav-lock" hidden></span></span>
                 </li>
-                <li data-pk-icon="info" class="nav-item" tabindex="0" data-tab="about">
+                <li data-pk-icon="info" class="nav-item nav-item--quiet" tabindex="0" data-tab="about">
                     <span class="nav-icon">
                         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
                             stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -186,9 +188,9 @@
                             <path d="M19 4h2v6"></path>
                         </svg>
                     </span>
-                    <span class="nav-text"><span class="nav-label" data-ft-i18n="navigation.about">About</span><span class="nav-summary" aria-hidden="true"></span><span class="nav-lock" hidden></span></span>
+                    <span class="nav-text"><span class="nav-label" data-ft-i18n="navigation.about">About</span><span class="nav-quiet-note" data-ft-i18n="home.nav.aboutNote">Kriti and Uljhan</span><span class="nav-summary" aria-hidden="true"></span><span class="nav-lock" hidden></span></span>
                 </li>
-                <li data-pk-icon="favourite" class="nav-item" tabindex="0" data-tab="donate">
+                <li data-pk-icon="favourite" class="nav-item nav-item--quiet" tabindex="0" data-tab="donate">
                     <span class="nav-icon">
                         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
                             stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -218,7 +220,11 @@
                         <line x1="3" y1="18" x2="21" y2="18"></line>
                     </svg>
                 </button>
-                <h1 id="pageTitle">Dashboard</h1>
+                <h1 id="pageTitle">Home</h1>
+                <section class="ft-topbar-support ft-home-support" aria-labelledby="ftHomeSupportLine">
+                    <p id="ftHomeSupportLine" class="ft-home-support__line" data-ft-i18n="home.support.line">Even $1 a month keeps FilterTube going. About $10 a year works too.</p>
+                    <a class="btn-primary ft-home-support__kofi" href="https://ko-fi.com/filtertube" target="_blank" rel="noreferrer" data-ft-i18n="home.support.kofi">Support on Ko-fi</a>
+                </section>
                 <div class="actions">
                     <div id="ftProfileMenuTab" class="ft-profile-menu">
                         <button id="ftProfileBadgeBtnTab" class="ft-profile-badge" type="button" aria-haspopup="listbox" aria-expanded="false" title="Active profile"></button>
@@ -239,179 +245,102 @@
             <div id="viewContainer" class="view-container">
 
                 <!-- Dashboard View -->
-                <div id="dashboardView" class="view-section active">
-                    <div class="view-shell view-shell--dashboard dashboard-shell ft-dash">
-                        <section class="view-hero dashboard-hero ft-dash-hero" aria-labelledby="ftDashHeroTitle">
-                            <div class="view-hero__copy ft-dash-hero__copy">
-                                <p class="view-hero__eyebrow">FilterTube control center</p>
-                                <h2 id="ftDashHeroTitle" class="view-hero__title">Keep viewing calmer for your household.</h2>
-                                <p class="view-hero__body">See what FilterTube is doing, switch between Main and Kids rules, and open the controls parents use most.</p>
-                                <div class="view-hero__meta" aria-label="Current playback protection">
-                                    <span class="view-meta-pill">Ad-free playback</span>
-                                    <span class="view-meta-pill">On by default</span>
-                                    <span class="view-meta-pill">Main + Kids</span>
-                                    <span class="view-meta-pill">Blocklist + Whitelist</span>
-                                </div>
-                                <p class="ft-dash-hero__note">If filtering stops working, please tell the developer by email, GitHub, or a video comment. It usually means the site changed its page structure.</p>
-                            </div>
-                            <aside class="ft-dash-status" aria-label="Active profile" data-ft-i18n-aria-label="controls.header.label">
-                                <div class="ft-dash-status__profile">
-                                    <span class="ft-dash-status__avatar" id="ftDashProfileAvatar" aria-hidden="true"></span>
-                                    <span class="ft-dash-status__who">
-                                        <span class="ft-dash-status__label" data-ft-i18n="controls.header.label">Active profile</span>
-                                        <strong class="ft-dash-status__name" id="ftDashProfileName"></strong>
-                                        <span class="ft-dash-status__mode"><span class="ft-dash-status__pulse" aria-hidden="true"></span><span id="ftDashProfileMode"></span></span>
-                                    </span>
-                                    <button id="ftDashSwitchProfile" class="ft-dash-status__switch" type="button" data-ft-i18n="managedOverlay.switch.action">Switch profile</button>
-                                </div>
-                                <div class="dashboard-stats-source ft-dash-status__source" role="group" data-ft-i18n-aria-label="dashboard.stats.surface" aria-label="Stats for">
-                                    <div id="dashboardStatsSourceLabel" class="dashboard-stats-source__label" hidden></div>
-                                    <div class="dashboard-stats-source__buttons">
-                                        <button id="dashboardStatsMainBtn" class="btn-secondary" type="button">Main</button>
-                                        <button id="dashboardStatsKidsBtn" class="btn-secondary" type="button">Kids</button>
+                <div id="dashboardView" class="view-section active" data-ft-home>
+                    <div class="view-shell view-shell--dashboard dashboard-shell ft-dash ft-home">
+                        <section class="ft-dash-hero ft-home-greeting" aria-labelledby="ftHomeHello">
+                            <div class="ft-home-greeting__words">
+                                <h2 id="ftHomeHello" class="ft-home-greeting__hello"></h2>
+                                <p id="ftHomeKept" class="ft-home-greeting__kept" aria-live="polite"></p>
+                                <aside class="ft-dash-status" aria-label="Active profile" data-ft-i18n-aria-label="controls.header.label">
+                                    <div class="ft-dash-status__profile">
+                                        <span class="ft-dash-status__avatar" id="ftDashProfileAvatar" aria-hidden="true"></span>
+                                        <span class="ft-dash-status__who">
+                                            <span class="ft-dash-status__label" data-ft-i18n="controls.header.label">Active profile</span>
+                                            <strong class="ft-dash-status__name" id="ftDashProfileName"></strong>
+                                            <span class="ft-dash-status__mode"><span class="ft-dash-status__pulse" aria-hidden="true"></span><span id="ftDashProfileMode"></span></span>
+                                        </span>
+                                        <button id="ftDashSwitchProfile" class="ft-dash-status__switch" type="button" data-ft-i18n="managedOverlay.switch.action">Switch profile</button>
                                     </div>
-                                </div>
-                                <a class="btn-primary android-closed-testing-invite__mail dashboard-android-testing-cta ft-dash-status__cta" href="https://play.google.com/store/apps/details?id=com.filtertube.app" target="_blank" rel="noreferrer">Open FilterTube on Google Play</a>
-                            </aside>
+                                    <div class="dashboard-stats-source ft-dash-status__source" role="group" data-ft-i18n-aria-label="dashboard.stats.surface" aria-label="Stats for">
+                                        <div id="dashboardStatsSourceLabel" class="dashboard-stats-source__label" hidden></div>
+                                        <div class="dashboard-stats-source__buttons">
+                                            <button id="dashboardStatsMainBtn" class="btn-secondary" type="button">Main</button>
+                                            <button id="dashboardStatsKidsBtn" class="btn-secondary" type="button">Kids</button>
+                                        </div>
+                                    </div>
+                                </aside>
+                            </div>
+                            <div id="ftHomeDuo" class="ft-home-greeting__duo" aria-hidden="true"></div>
                         </section>
 
-                        <section class="dashboard-metrics ft-dash-stats" aria-labelledby="dashboardStatsTitle">
+                        <section class="dashboard-metrics ft-dash-stats ft-home-stats" aria-labelledby="dashboardStatsTitle">
                             <h2 id="dashboardStatsTitle" class="ft-dash-sr-only" data-ft-i18n="dashboard.stats.title">Today</h2>
                             <div class="stats-grid">
-                                <div class="stat-card">
-                                    <span class="stat-card__icon" aria-hidden="true"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94"></path><path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19"></path><path d="M14.12 14.12a3 3 0 1 1-4.24-4.24"></path><path d="M1 1l22 22"></path></svg></span>
+                                <div class="stat-card" data-stat="hidden">
                                     <div class="stat-value" id="statHiddenToday">0</div>
-                                    <div class="stat-label">Content Hidden Today</div>
+                                    <div class="stat-label" data-ft-i18n="home.stats.hidden">Hidden today</div>
                                 </div>
-                                <div class="stat-card">
-                                    <span class="stat-card__icon" aria-hidden="true"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7V4h16v3"></path><path d="M9 20h6"></path><path d="M12 4v16"></path></svg></span>
-                                    <div class="stat-value" id="statActiveKeywords">0</div>
-                                    <div class="stat-label">Active Keywords</div>
-                                </div>
-                                <div class="stat-card">
-                                    <span class="stat-card__icon" aria-hidden="true"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 3H2l8 9.46V19l4 2v-8.54L22 3z"></path></svg></span>
-                                    <div class="stat-value" id="statFilteredChannels">0</div>
-                                    <div class="stat-label">Filtered Channels</div>
-                                </div>
-                                <div class="stat-card" title="Total duration of all videos hidden by your filters">
-                                    <span class="stat-card__icon" aria-hidden="true"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22a10 10 0 1 0 0-20 10 10 0 0 0 0 20z"></path><path d="M12 6v6l4 2"></path></svg></span>
+                                <div class="stat-card" data-stat="saved">
                                     <div class="stat-value" id="statSavedTime">0m</div>
-                                    <div class="stat-label">Est. Time Saved</div>
+                                    <div class="stat-label" data-ft-i18n="home.stats.saved">Time saved</div>
+                                </div>
+                                <div class="stat-card" data-stat="words">
+                                    <div class="stat-value" id="statActiveKeywords">0</div>
+                                    <div class="stat-label" data-ft-i18n="home.stats.words">Words</div>
+                                </div>
+                                <div class="stat-card" data-stat="channels">
+                                    <div class="stat-value" id="statFilteredChannels">0</div>
+                                    <div class="stat-label" data-ft-i18n="home.stats.channels">Channels</div>
                                 </div>
                             </div>
                         </section>
 
-                        <section class="dashboard-actions">
-                            <div class="section-header">
-                                <h2>Quick Actions</h2>
-                                <p class="section-header__body">Jump into the changes people make most often when a feed starts drifting.</p>
-                            </div>
+                        <div class="ft-home-pair">
+                            <section class="ft-home-card ft-home-study" id="ftHomeStudy" aria-labelledby="ftHomeStudyTitle">
+                                <h2 id="ftHomeStudyTitle" class="ft-home-card__title" data-ft-i18n="home.study.title">Study today</h2>
+                                <div class="ft-home-study__body" id="ftHomeStudyBody"></div>
+                            </section>
+
+                            <section class="ft-home-card ft-home-tried" id="ftHomeTried" aria-labelledby="ftHomeTriedTitle">
+                                <h2 id="ftHomeTriedTitle" class="ft-home-card__title" data-ft-i18n="home.tried.title">What Uljhan tried today</h2>
+                                <ul class="ft-home-tried__list" id="ftHomeTriedList"></ul>
+                                <p class="ft-home-tried__note" data-ft-i18n="home.tried.note">Kept on this device only, the last 30.</p>
+                            </section>
+                        </div>
+
+                        <section class="dashboard-actions ft-home-actions" aria-labelledby="ftHomeActionsTitle">
+                            <h2 id="ftHomeActionsTitle" class="ft-home-section-title" data-ft-i18n="home.quick.title">Quick actions</h2>
                             <div class="quick-actions-grid">
-                                <button class="action-card" id="quickAddKeywordBtn">
-                                    <span class="icon">
-                                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                                            stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
-                                            <polyline points="17 8 12 3 7 8"></polyline>
-                                            <line x1="12" y1="3" x2="12" y2="15"></line>
-                                        </svg>
+                                <button class="action-card" id="quickAddKeywordBtn" type="button">
+                                    <span class="icon" aria-hidden="true">
+                                        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7V4h16v3"></path><path d="M9 20h6"></path><path d="M12 4v16"></path></svg>
                                     </span>
-                                    <span class="label">Add Keyword</span>
+                                    <span class="label" data-ft-i18n="home.quick.addWord">Add word</span>
                                 </button>
-
-                                <button class="action-card" id="quickAddChannelBtn">
-                                    <span class="icon">
-                                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                                            stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
-                                            <circle cx="12" cy="7" r="4"></circle>
-                                        </svg>
+                                <button class="action-card" id="quickAddChannelBtn" type="button">
+                                    <span class="icon" aria-hidden="true">
+                                        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
                                     </span>
-                                    <span class="label">Add Channel</span>
+                                    <span class="label" data-ft-i18n="home.quick.addChannel">Add channel</span>
                                 </button>
-                                <button class="action-card" id="quickContentControlsBtn">
-                                    <span class="icon">
-                                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                                            stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                            <rect x="3" y="4" width="18" height="16" rx="2" ry="2"></rect>
-                                            <path d="M7 8h10"></path>
-                                            <path d="M7 12h6"></path>
-                                            <path d="M7 16h8"></path>
-                                        </svg>
+                                <button class="action-card" id="quickStartStudyBtn" type="button">
+                                    <span class="icon" aria-hidden="true">
+                                        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22a10 10 0 1 0 0-20 10 10 0 0 0 0 20z"></path><path d="M12 6v6l4 2"></path></svg>
                                     </span>
-                                    <span class="label">Content Controls</span>
+                                    <span class="label" data-ft-i18n="home.quick.startStudy">Start study</span>
                                 </button>
-                                <button class="action-card" id="quickKidsModeBtn">
-                                    <span class="icon">
-                                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                                            stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                            <path d="M4.5 9.5V4a2 2 0 0 1 2-2h11a2 2 0 0 1 2 2v5.5"></path>
-                                            <path d="M2 20v-5h20v5"></path>
-                                            <path d="M12 15v5"></path>
-                                            <path d="M6 15v5"></path>
-                                            <path d="M18 15v5"></path>
-                                        </svg>
+                                <button class="action-card" id="quickKidsModeBtn" type="button">
+                                    <span class="icon" aria-hidden="true">
+                                        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4.5 9.5V4a2 2 0 0 1 2-2h11a2 2 0 0 1 2 2v5.5"></path><path d="M2 20v-5h20v5"></path><path d="M12 15v5"></path><path d="M6 15v5"></path><path d="M18 15v5"></path></svg>
                                     </span>
-                                    <span class="label">Toggle Kids Mode</span>
+                                    <span class="label" data-ft-i18n="home.quick.kids">Kids mode</span>
                                 </button>
                             </div>
                         </section>
 
-                        <section class="dashboard-app-release ft-dash-apps" aria-labelledby="dashboardAppsTitle">
-                            <div class="ft-dash-apps__head">
-                                <p class="view-hero__eyebrow" data-ft-i18n="apps.title">FilterTube apps</p>
-                                <h2 id="dashboardAppsTitle" class="ft-dash-apps__title" data-ft-i18n="apps.heading">FilterTube for Android phones, tablets and Android TV is on Google Play, from one listing.</h2>
-                            </div>
-                            <div class="dashboard-app-release__grid ft-dash-apps__grid" id="ftControlCenterApps"></div>
-                        </section>
-
-                        <section class="dashboard-app-preview" aria-labelledby="dashboardAppPreviewTitle">
-                            <div class="dashboard-app-preview__copy">
-                                <p class="view-hero__eyebrow">App preview video</p>
-                                <h2 id="dashboardAppPreviewTitle" class="dashboard-app-preview__title">See FilterTube’s mobile experience.</h2>
-                                <p class="dashboard-app-preview__body">Press play for a quick look at the calmer app experience with no adverts built for phones, tablets, and TV.</p>
-                                <a class="dashboard-app-preview__link" href="https://www.youtube.com/watch?v=SHvSICSMHL4" target="_blank" rel="noreferrer">
-                                    <span>Open video on the video site</span>
-                                    <span aria-hidden="true">↗</span>
-                                </a>
-                            </div>
-                            <a
-                                class="dashboard-app-preview__player"
-                                href="https://www.youtube.com/watch?v=SHvSICSMHL4"
-                                target="_blank"
-                                rel="noreferrer"
-                                aria-label="Play the FilterTube mobile app preview on the video site">
-                                <img
-                                    src="https://i.ytimg.com/vi/SHvSICSMHL4/maxresdefault.jpg"
-                                    alt="FilterTube mobile app preview video thumbnail">
-                                <span class="dashboard-app-preview__play" aria-hidden="true">
-                                    <svg viewBox="0 0 24 24" focusable="false">
-                                        <path d="M9 7.6v8.8L16 12 9 7.6Z"></path>
-                                    </svg>
-                                </span>
-                                <span class="dashboard-app-preview__watch">Watch app preview</span>
-                            </a>
-                        </section>
-
-                        <section class="dashboard-support" aria-label="Support FilterTube">
-                            <div class="card donate-promo-card">
-                                <div class="card-body">
-                                    <div class="donate-promo-content">
-                                        <div class="donate-promo-icon">
-                                            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                                                stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                                <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78L12 21.23l8.84-8.84a5.5 5.5 0 0 0 0-7.78z"></path>
-                                            </svg>
-                                        </div>
-                                        <div class="donate-promo-text">
-                                            <h3>Support FilterTube</h3>
-                                            <p>Keep FilterTube moving across desktop, mobile, tablet, and TV without turning privacy into a tradeoff.<br>
-                                            Support helps fund maintenance, new surfaces, and the next calm control tools.</p>
-                                        </div>
-                                        <button id="dashboardDonateBtn" class="btn-primary donate-promo-btn">Support the build</button>
-                                    </div>
-                                </div>
-                            </div>
+                        <section class="ft-home-apps" aria-labelledby="ftHomeAppsTitle">
+                            <h2 id="ftHomeAppsTitle" class="ft-home-section-title" data-ft-i18n="home.apps.title">FilterTube everywhere</h2>
+                            <div class="dashboard-app-release__grid ft-home-apps__grid" id="ftControlCenterApps"></div>
                         </section>
 
                         <section class="dashboard-local-playlists" id="dashboardLocalPlaylists" aria-labelledby="dashboardLocalPlaylistsTitle" hidden>
@@ -478,30 +407,11 @@
                 <!-- Kids Mode View -->
                 <div id="kidsView" class="view-section">
                     <div class="view-shell view-shell--kids kids-shell">
-                        <section class="view-hero kids-hero">
-                            <div class="kids-header">
-                                <div class="kids-header-title">
-                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                                        stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                        <path d="M4.5 9.5V4a2 2 0 0 1 2-2h11a2 2 0 0 1 2 2v5.5"></path>
-                                        <path d="M2 20v-5h20v5"></path>
-                                        <path d="M12 15v5"></path>
-                                        <path d="M6 15v5"></path>
-                                        <path d="M18 15v5"></path>
-                                        <circle cx="12" cy="10" r="2" fill="currentColor" stroke="none"></circle>
-                                        <circle cx="6" cy="10" r="2" fill="currentColor" stroke="none"></circle>
-                                        <circle cx="18" cy="10" r="2" fill="currentColor" stroke="none"></circle>
-                                    </svg>
-                                    <span>Kids Filters</span>
-                                </div>
-                                <p class="kids-header-desc">Keep the youngest surface calmer with the same profile-aware control system, tuned for family-safe viewing.</p>
-                            </div>
-                        </section>
                         <section class="card kids-yt-profiles" id="kidsYouTubeProfiles" aria-labelledby="kidsYouTubeProfilesTitle">
                             <div class="card-header kids-yt-profiles__header">
                                 <div>
-                                    <h3 id="kidsYouTubeProfilesTitle">YouTube Kids profiles</h3>
-                                    <p class="kids-yt-profiles__help">Your children's profiles on youtubekids.com. Link a FilterTube profile to one, and switching to that profile picks that child on YouTube Kids.</p>
+                                    <h3 id="kidsYouTubeProfilesTitle" data-ft-i18n="kids.siteProfiles.title">Children's profiles on the Kids site</h3>
+                                    <p class="kids-yt-profiles__help" data-ft-i18n="kids.siteProfiles.help">Your children's profiles on youtubekids.com. Link a FilterTube profile to one, and switching to that profile picks that child on the Kids site.</p>
                                 </div>
                                 <button type="button" class="btn-secondary" id="kidsYouTubeProfilesLoad">Show profiles</button>
                             </div>
@@ -517,6 +427,13 @@
                 </div>
 
                 <!-- Settings View -->
+                <div id="studyView" class="view-section">
+                    <!-- Study and focus (Android StudyFocusActivity): its own page, painted by study_ui.js. -->
+                    <section id="ftStudyCard" class="ft-study-card ft-study-page" aria-label="Study and focus" data-ft-i18n-aria-label="study.nav.title">
+                        <div id="ftStudyDashboard"></div>
+                    </section>
+                </div>
+
                 <div id="settingsView" class="view-section">
                     <div class="view-shell view-shell--settings settings-shell">
                         <section class="view-hero settings-hero">
@@ -534,19 +451,7 @@
 
                         <div class="settings-grid">
                             <div class="settings-core">
-                                <div id="ftStudyCard" class="card settings-card settings-card--featured ft-study-card" aria-labelledby="ftStudyCardTitle">
-                                    <div class="card-header">
-                                        <div>
-                                            <p class="ft-self-control-card__eyebrow" data-ft-i18n="study.card.eyebrow">Study mode</p>
-                                            <h3 id="ftStudyCardTitle" data-ft-i18n="study.nav.title">Study and focus</h3>
-                                        </div>
-                                    </div>
-                                    <div class="card-body settings-card__body">
-                                        <p class="import-export-summary" data-ft-i18n="study.card.summary">Pick a study pack and a time. During study only videos from your plan show and play, and your block list still applies.</p>
-                                        <div id="ftStudyDashboard" aria-live="polite"></div>
-                                    </div>
-                                </div>
-                                <div class="card settings-card settings-card--featured ft-self-control-card">
+                                <div id="ftSelfControlCard" class="card settings-card settings-card--featured ft-self-control-card">
                                     <div class="card-header">
                                         <div>
                                             <p class="ft-self-control-card__eyebrow">Voluntary focus protection</p>
@@ -1146,28 +1051,28 @@
 
                         <div id="familyDeviceUpdatesCard" class="card settings-card settings-card--featured nanah-sync-card" tabindex="-1">
                             <div class="card-header">
-                                <h3>My Devices &amp; Family</h3>
+                                <h3 data-ft-i18n="sync.connect.title">Connect a device</h3>
                             </div>
                             <div class="card-body settings-card__body">
                                 <div class="nanah-sync-shell">
                                     <div class="nanah-sync-intro">
                                         <div class="nanah-device-compass-stage" aria-label="Choose a device">
-                                            <div class="nanah-device-compass-stage__heading">
+                                            <div class="nanah-device-compass-stage__heading" hidden>
                                                 <span id="ftNanahMapEyebrow" hidden>Family device map</span>
                                                 <strong id="ftNanahMapTitle">Choose a device to update</strong>
                                                 <small id="ftNanahMapDetail">Choose a device, review its profile, then send.</small>
                                             </div>
                                             <div class="nanah-device-compass" aria-label="Family Devices map for pairing and verified updates">
-                                                <div class="nanah-device-toolbar" aria-label="Connect a device">
-                                                    <button id="ftNanahAddDeviceBtn" class="btn-primary" type="button" data-family-device-focus-fallback>Add with code or QR</button>
-                                                    <button id="ftNanahShowNearbyBtn" class="btn-secondary" type="button" aria-pressed="false">Receive nearby</button>
-                                                    <button id="ftNanahFindNearbyBtn" class="btn-secondary" type="button">Find nearby</button>
+                                                <!-- Android SettingsSectionActivity.addNearbyDevicesCard: "Your devices", what tapping does, the
+                                                     relay disclosure, the device list, then the nearby buttons (the desktop helper here). -->
+                                                <div class="nanah-your-devices">
+                                                    <h4 class="nanah-your-devices__title" data-ft-i18n="sync.devices.title">Your devices</h4>
+                                                    <p class="nanah-device-discovery-note" data-ft-i18n="sync.devices.body">Tap a device to sync with it. Nearby devices use your Wi-Fi; paired devices elsewhere connect over the internet, end-to-end encrypted. New devices pair after you match the safety phrase on both screens.</p>
+                                                    <!-- Android sync_relay_disclosure: what the internet path sees, said where pairing starts. -->
+                                                <p class="nanah-device-discovery-note nanah-relay-disclosure" data-ft-i18n="sync.relayDisclosure">Internet sync uses a small relay run by FilterTube's developer to connect your devices. It can't read what you sync, which is end-to-end encrypted. It sees a device ID, your IP address and when you sync. Google's STUN server helps find a connection route and also sees your IP address. Nearby sync uses neither.</p>
                                                 </div>
-                                                <p class="nanah-device-discovery-note">Nearby needs the optional helper on both computers. Code or QR works across the internet while both devices are open.</p>
                                                 <div class="nanah-device-radar">
-                                                    <div class="nanah-device-radar__rings" aria-hidden="true"><i></i><i></i><i></i></div>
-                                                    <div class="nanah-device-compass__center">
-                                                        <div class="nanah-device-compass__hub-mark" aria-hidden="true"><i></i></div>
+                                                    <div class="nanah-device-compass__center" hidden>
                                                         <span id="ftNanahMapCenterEyebrow">This device</span>
                                                         <strong id="ftNanahMapCenterTitle">This device</strong>
                                                         <small id="ftNanahMapCenterDetail">Choose rules here, then send.</small>
@@ -1176,7 +1081,13 @@
                                                     <div id="ftNanahTrustedDeviceStrip" class="nanah-device-compass__trusted-strip" aria-label="Verified devices" hidden></div>
                                                     <div id="ftNanahHomeBridgePresenceRow" class="nanah-device-compass__presence-row" aria-live="polite" hidden></div>
                                                 </div>
-                                                <div id="ftNanahDeviceCompassRule" class="nanah-device-compass__rule">Pair a new device with a code or QR, then match the safety phrase.</div>
+                                                <div class="nanah-device-toolbar" aria-label="Connect a device">
+                                                    <button id="ftNanahAddDeviceBtn" class="btn-primary" type="button" hidden data-family-device-focus-fallback>Add with code or QR</button>
+                                                    <button id="ftNanahShowNearbyBtn" class="btn-secondary" type="button" aria-pressed="false">Receive nearby</button>
+                                                    <button id="ftNanahFindNearbyBtn" class="btn-secondary" type="button">Find nearby</button>
+                                                </div>
+                                                <p class="nanah-device-discovery-note">Nearby needs the optional helper on both computers. Code or QR works across the internet while both devices are open.</p>
+                                                <div id="ftNanahDeviceCompassRule" class="nanah-device-compass__rule" hidden>Pair a new device with a code or QR, then match the safety phrase.</div>
                                                 <div id="ftNanahDeviceSelectionPreview" class="nanah-device-compass__selection-preview" aria-live="polite" hidden>
                                                     <span>Next step</span>
                                                     <strong>Choose a device</strong>
@@ -1187,7 +1098,6 @@
                                                         <button id="ftNanahDeviceSourceBtn" class="btn-secondary" type="button" hidden>Choose rules profile</button>
                                                     </div>
                                                 </div>
-                                                <section id="ftDeviceAutoSync" aria-label="Peer-to-peer Auto-sync"></section>
                                                 <p id="ftNanahAdvancedStatus" class="nanah-advanced-status" aria-live="polite" hidden></p>
                                                 <details class="nanah-device-help nanah-device-help--compact">
                                                     <summary>Advanced connection options</summary>
@@ -1326,7 +1236,7 @@
                                         <span id="ftNanahChildBannerBody"></span>
                                     </div>
 
-                                    <details id="ftNanahPairingDetails" class="nanah-pairing-details">
+                                    <details id="ftNanahPairingDetails" class="nanah-pairing-details nanah-pairing-details--page" open>
                                         <summary class="nanah-pairing-details__summary" data-filtertube-help="Open this when you are ready to pair a device, type a code, scan a QR, send the reviewed update, or inspect trusted-device details.">
                                             <span>
                                                 <strong>Connect a device</strong>
@@ -1476,27 +1386,6 @@
                                                         <button id="ftNanahTrustBtn" class="btn-secondary" type="button" disabled data-filtertube-help="Save parent trust only for devices that should keep receiving approved updates for a protected profile.">Save Trust</button>
                                                         <button id="ftNanahEndSessionBtn" class="btn-secondary" type="button" disabled data-filtertube-help="Close this pairing session. It does not remove existing rules or saved trusted-device links.">End Session</button>
                                                     </div>
-<div id="ftNanahJoinControls">
-                                                <label class="nanah-sync-field" data-filtertube-help="Type the short code shown on the other device, then verify the same safety phrase on both screens.">
-                                                    <span>Enter pairing code</span>
-                                                    <div class="nanah-sync-join-row">
-                                                        <input id="ftNanahJoinCode" class="text-input nanah-sync-code-input" type="text" maxlength="8" placeholder="ABCD" />
-                                                        <button id="ftNanahJoinBtn" class="btn-secondary" type="button" data-filtertube-help="Join the live pairing session from the other device. Nothing applies until the phrase is confirmed.">Join Session</button>
-                                                    </div>
-                                                </label>
-
-                                                <div class="nanah-qr-actions">
-                                                    <button id="ftNanahScanQrBtn" class="btn-secondary" type="button">Scan QR</button>
-                                                    <button id="ftNanahReadQrImageBtn" class="btn-secondary" type="button">Read QR image</button>
-                                                    <input id="ftNanahQrImageInput" type="file" accept="image/png,image/jpeg,image/webp" hidden />
-                                                </div>
-                                                </div>
-<div id="ftNanahQrReader" class="nanah-qr-reader" hidden>
-                                                    <video id="ftNanahQrVideo" hidden autoplay muted playsinline aria-label="Pairing QR camera preview"></video>
-                                                    <canvas id="ftNanahQrReaderCanvas" hidden></canvas>
-                                                    <p id="ftNanahQrReaderStatus" role="status">Point the camera at the pairing QR on your other device.</p>
-                                                    <button id="ftNanahQrStopBtn" class="btn-secondary" type="button">Close scanner</button>
-                                                </div>
 <div class="nanah-sync-panel__stack nanah-sync-panel__stack--status">
                                                     <div class="nanah-sync-status" id="ftNanahStatusCard">
                                                         <div class="nanah-sync-status__headline">
@@ -1564,19 +1453,40 @@
                                         <div class="nanah-sync-panel nanah-sync-panel--join">
                                             <div class="nanah-sync-panel__header">
                                                 <div>
-                                                    <span class="nanah-sync-panel__eyebrow" data-filtertube-help="Use this side when another device already created a pairing code or QR.">Other device</span>
-                                                    <h4 class="nanah-sync-panel__title" data-filtertube-help="Join the code from the other device. Rules do not apply until the safety phrase is confirmed.">Connect the other device</h4>
-                                                    <p class="nanah-sync-panel__body" data-filtertube-help="The code only connects devices. It does not give permission to change rules until both sides verify the same phrase.">Type the code from the other device or scan its QR. Nothing applies until both devices show the same phrase.</p>
+                                                    <span class="nanah-sync-panel__eyebrow" data-ft-i18n="sync.join.eyebrow">Join another device</span>
+                                                    <h4 class="nanah-sync-panel__title" data-ft-i18n="sync.join.title">Enter pairing code</h4>
+                                                    <p class="nanah-sync-panel__body" data-ft-i18n="sync.join.body">Create a code or enter one from your other device.</p>
                                                 </div>
-                                                <span class="nanah-sync-panel__badge" data-filtertube-help="This device is joining a session started somewhere else.">Pair here</span>
                                             </div>
 
                                             <div class="nanah-sync-stack">
+<div id="ftNanahJoinControls">
+                                                <label class="nanah-sync-field" data-filtertube-help="Type the short code shown on the other device, then verify the same safety phrase on both screens.">
+                                                    <span>Enter pairing code</span>
+                                                    <div class="nanah-sync-join-row">
+                                                        <input id="ftNanahJoinCode" class="text-input nanah-sync-code-input" type="text" maxlength="8" placeholder="ABCD" />
+                                                        <button id="ftNanahJoinBtn" class="btn-secondary" type="button" data-filtertube-help="Join the live pairing session from the other device. Nothing applies until the phrase is confirmed.">Join Session</button>
+                                                    </div>
+                                                </label>
+
+                                                <div class="nanah-qr-actions">
+                                                    <button id="ftNanahScanQrBtn" class="btn-secondary" type="button">Scan QR</button>
+                                                    <button id="ftNanahReadQrImageBtn" class="btn-secondary" type="button">Read QR image</button>
+                                                    <input id="ftNanahQrImageInput" type="file" accept="image/png,image/jpeg,image/webp" hidden />
+                                                </div>
+                                                </div>
 
 
 
 
-                                                <details id="ftNanahPairUriRow" class="nanah-pairing-secondary">
+
+                                                <div id="ftNanahQrReader" class="nanah-qr-reader" hidden>
+                                                    <video id="ftNanahQrVideo" hidden autoplay muted playsinline aria-label="Pairing QR camera preview"></video>
+                                                    <canvas id="ftNanahQrReaderCanvas" hidden></canvas>
+                                                    <p id="ftNanahQrReaderStatus" role="status">Point the camera at the pairing QR on your other device.</p>
+                                                    <button id="ftNanahQrStopBtn" class="btn-secondary" type="button">Close scanner</button>
+                                                </div>
+<details id="ftNanahPairUriRow" class="nanah-pairing-secondary">
                                                     <summary>Copy pairing link</summary>
                                                 <div class="nanah-sync-link-row">
                                                     <input id="ftNanahPairUri" class="text-input" type="text" readonly placeholder="Pairing URI will appear here" data-filtertube-help="This link contains pairing information only. The other device still has to verify the same safety phrase." />
@@ -1604,7 +1514,20 @@
                                             </details>
                                         </div>
                                     </div>
+                                    
+                                    <!-- Android createNanahFlowRow and createNanahPrinciplesBlock. -->
+                                    <div class="nanah-flow-steps">
+                                        <article class="nanah-flow-step"><span data-ft-i18n="sync.step.one">Step 1</span><strong data-ft-i18n="sync.step.pair">Pair</strong><small data-ft-i18n="sync.step.pairBody">Create a short code on one device and join from the other device.</small></article>
+                                        <article class="nanah-flow-step"><span data-ft-i18n="sync.step.two">Step 2</span><strong data-ft-i18n="sync.step.verify">Verify</strong><small data-ft-i18n="sync.step.verifyBody">Confirm the exact same safety phrase on both devices before anything applies.</small></article>
+                                        <article class="nanah-flow-step"><span data-ft-i18n="sync.step.three">Step 3</span><strong data-ft-i18n="sync.step.send">Send</strong><small data-ft-i18n="sync.step.sendBody">Send the reviewed update now. Saved trust and pickup stay in Advanced.</small></article>
+                                    </div>
+                                    <div class="nanah-trust-notes">
+                                        <h5 data-ft-i18n="sync.notes.title">Privacy and trust notes</h5>
+                                        <article class="nanah-flow-step"><span data-ft-i18n="sync.notes.relayTitle">What the relay sees</span><strong data-ft-i18n="sync.notes.relayLead">Connection setup only</strong><small data-ft-i18n="sync.notes.relayBody">The relay is just the meeting place that helps both devices find each other.</small></article>
+                                        <article class="nanah-flow-step"><span data-ft-i18n="sync.notes.trustTitle">What trust means</span><strong data-ft-i18n="sync.notes.trustLead">Remembered policy</strong><small data-ft-i18n="sync.notes.trustBody">Trust remembers the approved relationship, target, scope, and saved-update choice. Network pickup still needs a configured provider and local validation.</small></article>
+                                    </div>
                                     </details>
+                                    <section id="ftDeviceAutoSync" aria-label="Peer-to-peer Auto-sync"></section>
                                 </div>
                             </div>
                         </div>
@@ -1699,6 +1622,8 @@
                                 <p class="view-hero__body">Use this page to decide what to click first, how keyword matching works, and where profiles, backups, imports, and device updates belong.</p>
                             </div>
                         </section>
+
+                        <p class="ft-help-structure-note" data-ft-i18n="help.structureNote">If filtering stops working, please tell the developer by email, on GitHub or in a video comment. It usually means the video site changed its page layout.</p>
 
                         <div class="help-toolbar">
                             <div class="card help-toolbar-card">
@@ -1946,7 +1871,7 @@
                                 </div>
                                 <div class="card-body">
                                     <div class="help-page-map" aria-label="FilterTube page map">
-                                        <div><strong>Dashboard</strong><span>See status and the buttons parents use most.</span></div>
+                                        <div><strong>Controls</strong><span>See status and the buttons parents use most.</span></div>
                                         <div><strong>Filters</strong><span>Block words, channels, comments, clips, and other surfaces.</span></div>
                                         <div><strong>Kids Mode</strong><span>Manage Kids rules separately.</span></div>
                                     <div><strong>Settings</strong><span>Start a Self-Control Session, back up, restore, or import rule lists safely.</span></div>
@@ -2220,7 +2145,7 @@
                                                     <li>Parent/account or Master PIN controls rule edits, allowed viewing spaces, time limits, backups, trusted-link policy, and settings.</li>
                                                     <li>Parents can set or remove a protected profile’s switching PIN from the parent/account profile row after parent/account unlock.</li>
                                                     <li>Use <strong>Lock Admin Session</strong> in Security when you want temporary parent/admin unlocks to end immediately on this dashboard.</li>
-                                                    <li>Opening receive-only Accounts &amp; Sync with a protected-profile PIN does not unlock Dashboard, Filters, Kids Mode, Settings, or parent controls after you return to the viewing surface.</li>
+                                                    <li>Opening receive-only Accounts &amp; Sync with a protected-profile PIN does not unlock Controls, Filters, Kids Mode, Settings, or parent controls after you return to the viewing surface.</li>
                                                     <li>Unlock is per-session in both Popup and New Tab.</li>
                                                 </ul>
                                             </div>
@@ -2620,7 +2545,7 @@
                                         </div>
                                         <div class="help-item">
                                             <div class="help-item-title">Where parents edit protected rules</div>
-                                            <div class="help-item-body">Open Accounts &amp; Sync from the parent/account profile and use the protected profile row's Edit Rules button. A banner stays visible while you edit that protected profile's Dashboard, Filters, Kids Mode, Settings, and Accounts &amp; Sync surfaces.</div>
+                                            <div class="help-item-body">Open Accounts &amp; Sync from the parent/account profile and use the protected profile row's Edit Rules button. A banner stays visible while you edit that protected profile's Controls, Filters, Kids Mode, Settings, and Accounts &amp; Sync surfaces.</div>
                                         </div>
                                         <div class="help-item">
                                             <div class="help-item-title">Allowed viewing spaces</div>
@@ -2764,6 +2689,23 @@
                             </figure>
                         </section>
 
+                        <section class="ft-about-why" aria-labelledby="ftAboutWhyTitle">
+                            <h3 id="ftAboutWhyTitle" class="ft-about-why__title" data-ft-i18n="about.why.title">Why FilterTube exists</h3>
+                            <p data-ft-i18n="about.why.body">In 2020 a parent asked the video platform's help forum a simple question: how do I block videos by keyword? The answer was that you can't. More than 2,500 parents said they had the same question, and they kept asking for years until the thread was locked. I was asking too. Then in 2023 a parent asked me directly whether I could do something, because his child wouldn't stop crying. I couldn't stop myself from building it. FilterTube started there: filters by word and channel for every family, then a calm Kids space, then Sangeet, so music could stay calm too.</p>
+                            <a class="ft-about-why__link" href="https://support.google.com/youtubekids/thread/54509605/how-to-block-videos-by-keyword-or-tag?hl=en" target="_blank" rel="noopener noreferrer" data-ft-i18n="about.why.link">Read the thread</a>
+                        </section>
+
+                        <section class="ft-about-duo" data-ft-duo-story aria-labelledby="ftAboutDuoTitle">
+                            <div class="ft-about-duo__art" aria-hidden="true">
+                                <img class="ft-about-duo__picture" src="../assets/images/mascots/duo_sieve_01.webp" alt="" width="180" height="200">
+                            </div>
+                            <div class="ft-about-duo__words">
+                                <h3 id="ftAboutDuoTitle" class="ft-about-duo__title" data-ft-i18n="about.duo.title">Kriti and Uljhan</h3>
+                                <p data-ft-i18n="about.duo.kriti">Kriti is my sister. Growing up, she looked out for me and kept me safe. She stands for care and protection, and FilterTube tries to give that same care to everyone who uses it.</p>
+                                <p data-ft-i18n="about.duo.uljhan">Uljhan means tangle, or confusion, in Hindi. He isn't evil. He's the clutter and distraction we'd rather not see, and Kriti helps clear him away.</p>
+                            </div>
+                        </section>
+
                         <div class="ft-about-feature-grid">
                             <a class="ft-about-video-card" href="https://www.youtube.com/watch?v=CA87pRNugT0" target="_blank" rel="noreferrer">
                                 <span class="ft-about-eyebrow">Personal video</span>
@@ -2869,11 +2811,19 @@
     <script src="../js/state_manager.js"></script>
     <script src="../js/render_engine.js"></script>
     <script src="../js/ui_localization.js"></script>
+    <script src="../js/doodles.js"></script>
     <script src="../js/mascots.js"></script>
+    <script src="../js/paperkit_parity.js"></script>
+    <script src="../js/shared/hidden_log.js"></script>
+    <script src="../js/dashboard_home.js"></script>
     <script src="../js/ui_static_copy_capture.js"></script>
     <script src="../js/ui-shell/tab-view-decor.js"></script>
     <script src="../js/shared/study_packs.js"></script>
+    <script src="../js/shared/study_setup.js"></script>
+    <script src="../js/parent_mode.js"></script>
     <script src="../js/shared/study_engine.js"></script>
+    <script src="../js/shared/study_plan_drag.js"></script>
+    <script src="../js/shared/effective_mode.js"></script>
     <script src="../js/study_ui.js"></script>
     <script src="../js/managed_parent_command_center.js"></script>
     <script src="../js/family_device_navigation.js"></script>

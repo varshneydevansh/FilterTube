@@ -837,6 +837,7 @@ function renderFilterTubeMenuEntries({ dropdown, newMenuList, oldMenuList, chann
                     : filterTubeCollaboratorGroupLabel(collaboratorCount)
             });
         }
+        injectStudySkipMenuItem(dropdown, videoCard, channelInfo);
         forceDropdownResize(dropdown);
         return;
     }
@@ -856,7 +857,72 @@ function renderFilterTubeMenuEntries({ dropdown, newMenuList, oldMenuList, chann
     } else if (containers.oldMenuList) {
         injectIntoOldMenu(containers.oldMenuList, channelInfo, videoCard, null, singleChannelInjectionOptions);
     }
+    injectStudySkipMenuItem(dropdown, videoCard, channelInfo);
     forceDropdownResize(dropdown);
+}
+
+/**
+ * "Skip this video" in a card's menu while a study round runs (Android: the card menu's Skip during
+ * study, StudyRuntime.skipVideo). It sits under the FilterTube entry, hides that video for this profile
+ * from then on and never unblocks anything, so a child may use it.
+ */
+function injectStudySkipMenuItem(dropdown, videoCard, channelInfo) {
+    try {
+        const settings = typeof currentSettings !== 'undefined' ? currentSettings : null;
+        if (!dropdown || settings?.study?.state !== 'STUDY') return;
+        const videoId = String(channelInfo?.videoId || videoCard?.getAttribute?.('data-filtertube-video-id')
+            || (typeof extractVideoIdFromCard === 'function' ? extractVideoIdFromCard(videoCard) : '') || '').trim();
+        if (!/^[A-Za-z0-9_-]{11}$/.test(videoId)) return;
+        const items = Array.from(dropdown.querySelectorAll('.filtertube-block-channel-item'));
+        items.filter(node => node.classList?.contains('filtertube-study-skip-item')).forEach(node => node.remove());
+        const anchor = items.filter(node => !node.classList?.contains('filtertube-study-skip-item')).pop();
+        if (!anchor || !anchor.parentNode) return;
+        const item = document.createElement(String(anchor.tagName || 'div').toLowerCase());
+        item.className = `${anchor.className} filtertube-study-skip-item`;
+        item.setAttribute('role', 'menuitem');
+        item.setAttribute('tabindex', '0');
+        item.setAttribute('data-filtertube-study-skip', videoId);
+        const inner = anchor.firstElementChild;
+        const row = document.createElement(inner ? String(inner.tagName).toLowerCase() : 'div');
+        row.className = inner?.className || 'filtertube-menu-item';
+        row.style.display = 'flex';
+        row.style.alignItems = 'center';
+        row.style.gap = '12px';
+        const icon = document.createElement('span');
+        icon.setAttribute('aria-hidden', 'true');
+        icon.style.cssText = 'display:flex;align-items:center;justify-content:center;width:24px;height:24px;flex-shrink:0;';
+        icon.appendChild(createFilterTubeIconElement());
+        const label = document.createElement('span');
+        label.className = 'filtertube-menu-title filtertube-study-skip-label';
+        label.textContent = filterTubeContentMenuText('study.skipVideo', 'Skip this video');
+        row.append(icon, label);
+        item.appendChild(row);
+        let busy = false;
+        const skip = async event => {
+            event?.preventDefault?.();
+            event?.stopImmediatePropagation?.();
+            event?.stopPropagation?.();
+            if (busy) return;
+            busy = true;
+            let response = null;
+            try {
+                response = await browserAPI_BRIDGE.runtime.sendMessage({ action: 'FilterTube_StudySkipVideo', videoId });
+            } catch (e) {
+            }
+            busy = false;
+            if (response?.ok !== true) return;
+            try {
+                videoCard?.setAttribute?.('data-filtertube-study-skipped', 'true');
+                if (videoCard?.style) videoCard.style.display = 'none';
+            } catch (e) {
+            }
+            try { forceCloseDropdown(dropdown); } catch (e) { }
+        };
+        item.addEventListener('click', skip, true);
+        item.addEventListener('keydown', event => { if (event.key === 'Enter' || event.key === ' ') skip(event); });
+        anchor.parentNode.insertBefore(item, anchor.nextSibling);
+    } catch (e) {
+    }
 }
 
 function updateInjectedMenuChannelName(dropdown, channelInfo) {
@@ -1022,12 +1088,48 @@ function refreshActiveCollaborationMenu(videoId, collaborators, options = {}) {
 let statsCountToday = 0;
 // Hidden since the last write; flushStatsToStorage adds it to the stored running total (totalHiddenCount).
 let statsTotalHiddenDelta = 0;
+// Seconds saved since the last write; flushStatsToStorage adds it to the running total (totalSavedSeconds),
+// which the time-saved milestones read (the daily savedSeconds resets each day).
+let statsTotalSavedDelta = 0;
 let statsTotalSeconds = 0; // Track total seconds saved instead of using multiplier
 let statsLastDate = new Date().toDateString();
 let statsInitialized = false;
 let statsSaveScheduled = false;
 let statsSaveInFlight = false;
 let statsSavePending = false;
+// "What Uljhan tried today" (js/shared/hidden_log.js): entries waiting for the next stats write.
+let pendingHiddenLog = [];
+
+/** One hidden-log entry for a counted hide: the card's title, channel, video and which rule hid it. */
+function hiddenLogEntryFor(element, title, reason) {
+    const Log = globalThis.FilterTubeHiddenLog;
+    if (!Log || !element) return null;
+    try {
+        const settings = globalThis.currentSettings || {};
+        const link = element.querySelector('a[href*="/watch?"], a[href*="/shorts/"]');
+        const channelEl = element.querySelector('#channel-name a, ytd-channel-name a, .ytd-channel-name a, a[href^="/@"]');
+        const handle = element.getAttribute('data-filtertube-channel-handle') || '';
+        const channelId = element.getAttribute('data-filtertube-channel-id') || '';
+        const blocked = Array.isArray(settings.filterChannels) && settings.filterChannels.some(row => {
+            const value = typeof row === 'string' ? row : (row?.id || row?.handle || '');
+            const key = String(value || '').toLowerCase();
+            return !!key && (key === handle.toLowerCase() || key === channelId.toLowerCase());
+        });
+        return Log.entry({
+            at: Date.now(),
+            title,
+            videoId: Log.videoIdFromHref(link?.getAttribute('href') || ''),
+            channel: channelEl?.textContent || '',
+            channelId,
+            handle,
+            reason: Log.classify(reason, { listMode: settings.listMode, channelBlocked: blocked }),
+            control: typeof Log.controlFromReason === 'function' ? Log.controlFromReason(reason) : '',
+            surface: getStatsSurfaceKey() === 'kids' ? 'kids' : 'main'
+        });
+    } catch (e) {
+        return null;
+    }
+}
 
 function getStatsSurfaceKey() {
     try {
@@ -4662,7 +4764,7 @@ function estimateTimeSaved(contentType, duration = null) {
  * Increment hidden stats when content is hidden
  * @param {HTMLElement} element - The hidden element
  */
-function incrementHiddenStats(element) {
+function incrementHiddenStats(element, reason = '') {
     const today = new Date().toDateString();
 
     if (today !== statsLastDate) {
@@ -4717,9 +4819,12 @@ function incrementHiddenStats(element) {
         statsCountToday++;
         statsTotalHiddenDelta++;
         statsTotalSeconds += secondsSaved;
+        statsTotalSavedDelta += secondsSaved;
 
         if (element) {
             element.setAttribute('data-filtertube-time-saved', secondsSaved.toString());
+            const logged = hiddenLogEntryFor(element, title, reason);
+            if (logged) pendingHiddenLog = [...pendingHiddenLog, logged].slice(-30);
         }
 
         if (window.__filtertubeDebug === true) {
@@ -4746,6 +4851,7 @@ function decrementHiddenStats(element) {
         statsCountToday = Math.max(0, statsCountToday - 1);
         statsTotalHiddenDelta--;
         statsTotalSeconds = Math.max(0, statsTotalSeconds - savedTime);
+        statsTotalSavedDelta -= savedTime;
 
         // Remove the attribute
         if (element) {
@@ -4792,7 +4898,10 @@ function flushStatsToStorage() {
     };
 
     try {
-        chrome.storage.local.get(['stats', 'statsBySurface'], (result) => {
+        const logKey = globalThis.FilterTubeHiddenLog?.KEY;
+        const logItems = pendingHiddenLog;
+        pendingHiddenLog = [];
+        chrome.storage.local.get(logKey && logItems.length ? ['stats', 'statsBySurface', logKey] : ['stats', 'statsBySurface'], (result) => {
             const safeResult = result && typeof result === 'object' ? result : {};
             const existingBySurface = (safeResult.statsBySurface && typeof safeResult.statsBySurface === 'object' && !Array.isArray(safeResult.statsBySurface))
                 ? safeResult.statsBySurface
@@ -4808,6 +4917,11 @@ function flushStatsToStorage() {
                 : Math.max(0, Number(previousEntry.hiddenCount) || 0);
             nextStats.totalHiddenCount = Math.max(0, previousTotal + statsTotalHiddenDelta);
             statsTotalHiddenDelta = 0;
+            const previousSaved = Number.isFinite(Number(previousEntry.totalSavedSeconds))
+                ? Number(previousEntry.totalSavedSeconds)
+                : Math.max(0, Number(previousEntry.savedSeconds) || 0);
+            nextStats.totalSavedSeconds = Math.max(0, previousSaved + statsTotalSavedDelta);
+            statsTotalSavedDelta = 0;
 
             const statsBySurface = {
                 ...existingBySurface,
@@ -4815,6 +4929,7 @@ function flushStatsToStorage() {
             };
 
             const payload = { statsBySurface };
+            if (logKey && logItems.length) payload[logKey] = globalThis.FilterTubeHiddenLog.push(safeResult[logKey], logItems);
 
             // Back-compat: keep `stats` in sync for main.
             if (surface === 'main') {
@@ -13510,6 +13625,59 @@ function isCommentContextTag(tagName) {
     return COMMENT_CONTEXT_TAGS.has(String(tagName || '').toLowerCase());
 }
 
+/**
+ * "Comments from X hidden · Undo" (Android NativeOverlayCommentsSheetUi hiddenAuthorStrip): a quiet strip
+ * where the comment was. Undo takes the block back (the background allows it for its own recent blocks)
+ * and the author's comments come back.
+ */
+function showCommentAuthorHiddenNote(commentTarget, channelInfo) {
+    if (!commentTarget || !commentTarget.parentNode || typeof document === 'undefined') return null;
+    const channelKey = String(channelInfo?.id || channelInfo?.handle || '').trim();
+    if (!channelKey) return null;
+    const label = String(channelInfo?.name || channelInfo?.handleDisplay || channelInfo?.handle || channelKey).trim().slice(0, 80);
+    const previous = commentTarget.previousElementSibling;
+    if (previous?.getAttribute?.('data-filtertube-comment-note') === channelKey) return previous;
+    const dark = document.documentElement?.hasAttribute?.('dark') || document.documentElement?.getAttribute?.('data-theme') === 'dark';
+    const note = document.createElement('div');
+    note.setAttribute('data-filtertube-comment-note', channelKey);
+    note.setAttribute('role', 'status');
+    note.style.cssText = [
+        'display:flex', 'align-items:center', 'gap:8px', 'min-height:44px', 'margin:8px 0', 'padding:4px 4px 4px 14px',
+        'box-sizing:border-box', 'border-radius:14px', `border:1px solid ${dark ? '#3a4654' : '#dcd1c2'}`,
+        `background:${dark ? '#151c24' : '#fffcf6'}`, 'font:400 14px/1.4 Roboto, Arial, sans-serif'
+    ].join(';');
+    const words = document.createElement('span');
+    words.style.cssText = `flex:1;min-width:0;color:${dark ? '#b8c3ce' : '#625f58'};overflow:hidden;text-overflow:ellipsis;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical`;
+    words.textContent = filterTubeContentMenuText('content.comments.authorHidden', 'Comments from {name} hidden', { name: label });
+    const undo = document.createElement('button');
+    undo.type = 'button';
+    undo.textContent = filterTubeContentMenuText('content.comments.undo', 'Undo');
+    undo.style.cssText = `min-width:64px;min-height:40px;padding:0 12px;border:0;border-radius:999px;background:transparent;cursor:pointer;font:700 14px/1 Roboto, Arial, sans-serif;color:${dark ? '#e0796b' : '#ab4438'}`;
+    undo.addEventListener('click', () => {
+        undo.disabled = true;
+        browserAPI_BRIDGE.runtime.sendMessage({ type: 'undoCommentAuthorBlock', channelKey }, async response => {
+            if (!response?.success) { undo.disabled = false; return; }
+            note.remove();
+            try {
+                const refreshed = await requestSettingsFromBackground({ forceRefresh: true });
+                if (refreshed?.success && refreshed.settings) currentSettings = refreshed.settings;
+                document.querySelectorAll('[data-filtertube-hidden]').forEach(element => {
+                    if (element.closest?.('ytd-comments, ytm-comment-section-renderer, #comments')) {
+                        element.style.display = '';
+                        element.classList.remove('filtertube-hidden');
+                        element.removeAttribute('data-filtertube-hidden');
+                    }
+                });
+                applyDOMFallback(currentSettings, { forceReprocess: true, preserveScroll: true });
+            } catch (e) {
+            }
+        });
+    });
+    note.append(words, undo);
+    commentTarget.parentNode.insertBefore(note, commentTarget);
+    return note;
+}
+
 function resolveCommentHideTarget(node) {
     if (!node || !(node instanceof Element)) return node;
     return node.closest('ytd-comment-thread-renderer, ytm-comment-thread-renderer')
@@ -14820,6 +14988,11 @@ async function handleBlockChannelClick(channelInfo, menuItem, filterAll = false,
             applyDOMFallback(refreshedSettings || currentSettings, { forceReprocess: true, preserveScroll: true });
         } catch (domError) {
             console.warn('FilterTube: DOM fallback re-run failed after blocking channel', domError);
+        }
+
+        // "Comments from X hidden · Undo" takes the blocked comment's place (Android NativeCommentsHiddenNote).
+        if (isCommentContextBlock && videoCard) {
+            try { showCommentAuthorHiddenNote(resolveCommentHideTarget(videoCard), channelInfo); } catch (e) { }
         }
 
         // Enrich all Shorts on the page with channel info so they can be matched to the blocked channel

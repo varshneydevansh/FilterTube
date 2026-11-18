@@ -981,6 +981,7 @@ function appendMinimumViewsControls(rows, prefix, scheduleSave) {
     row.className = 'toggle-row';
     row.setAttribute('data-ft-control-row', 'true');
     row.setAttribute('data-ft-search', 'minimum views video popularity filter');
+    row.setAttribute('data-ft-control', 'views');
     const info = document.createElement('div');
     info.className = 'toggle-info';
     const title = document.createElement('label');
@@ -1295,6 +1296,8 @@ function initializeFiltersTabs() {
         const groupEl = document.createElement('div');
         groupEl.setAttribute('data-ft-control-group', 'true');
         groupEl.setAttribute('data-ft-group-title', group?.title || '');
+        // Each group wears its own tint (css/content-control-tints.css), as in the popup.
+        groupEl.setAttribute('data-ft-group-id', group?.id || '');
         groupEl.className = 'content-control-group';
         applyControlGroupTheme(groupEl, group?.accentColor);
 
@@ -1323,6 +1326,7 @@ function initializeFiltersTabs() {
             row.className = 'toggle-row';
             row.setAttribute('data-ft-control-row', 'true');
             row.setAttribute('data-ft-search', `${control.title || ''} ${control.description || ''}`.toLowerCase());
+            if (control.control) row.setAttribute('data-ft-control', control.control);
             if (control.description) {
                 row.setAttribute('title', control.description);
             }
@@ -1396,6 +1400,7 @@ function initializeFiltersTabs() {
     durationRow.className = 'toggle-row';
     durationRow.setAttribute('data-ft-control-row', 'true');
     durationRow.setAttribute('data-ft-search', 'duration filter');
+    durationRow.setAttribute('data-ft-control', 'duration');
 
     const durationInfo = document.createElement('div');
     durationInfo.className = 'toggle-info';
@@ -1483,6 +1488,7 @@ function initializeFiltersTabs() {
     uploadDateRow.className = 'toggle-row';
     uploadDateRow.setAttribute('data-ft-control-row', 'true');
     uploadDateRow.setAttribute('data-ft-search', 'upload date filter');
+    uploadDateRow.setAttribute('data-ft-control', 'uploadDate');
 
     const uploadDateInfo = document.createElement('div');
     uploadDateInfo.className = 'toggle-info';
@@ -1663,6 +1669,7 @@ function initializeFiltersTabs() {
     categoryMainRow.className = 'toggle-row';
     categoryMainRow.setAttribute('data-ft-control-row', 'true');
     categoryMainRow.setAttribute('data-ft-search', 'category filter');
+    categoryMainRow.setAttribute('data-ft-control', 'category');
 
     const categoryMainInfo = document.createElement('div');
     categoryMainInfo.className = 'toggle-info';
@@ -1995,7 +2002,7 @@ function initializeFiltersTabs() {
     languageFiltersSection.innerHTML = `
         <div class="content-control-group__header"><div class="content-control-group__title"><span data-ft-tabview-i18n="popup.languageFilters">Language Filters</span> <span class="ft-experimental-badge" data-ft-tabview-i18n="popup.experimental">Experimental</span></div></div>
         <div class="content-control-group__rows">
-            <div class="toggle-row" data-ft-control-row="true" data-ft-search="language spoken audio filter">
+            <div class="toggle-row" data-ft-control-row="true" data-ft-control="language" data-ft-search="language spoken audio filter">
                 <div class="toggle-info">
                     <div class="toggle-title" data-ft-tabview-i18n="popup.spokenLanguage">Spoken Language Filter</div>
                     <div class="toggle-description" data-ft-tabview-i18n="popup.languageDescription">Uses YouTube's original/default audio evidence; auto-dubbed alternatives do not change the source language.</div>
@@ -2595,6 +2602,9 @@ function initializeFiltersTabs() {
         applyLanguageFiltersToUI(state.languageFilters || {});
     }, 100);
 
+    // Undo after a removal, as the app's PaperUndoBar.
+    UIComponents.attachRemovalUndo?.(StateManager);
+
     StateManager.subscribe((eventType, data) => {
         if (eventType === 'contentFiltersUpdated') {
             if (window.__filtertubeIsManagedChildEditFor?.('main') === true) {
@@ -2946,6 +2956,7 @@ function initializeKidsTabs() {
     kidsDurationRow.className = 'toggle-row';
     kidsDurationRow.setAttribute('data-ft-control-row', 'true');
     kidsDurationRow.setAttribute('data-ft-search', 'duration filter');
+    kidsDurationRow.setAttribute('data-ft-control', 'duration');
 
     const kidsDurationInfo = document.createElement('div');
     kidsDurationInfo.className = 'toggle-info';
@@ -3022,6 +3033,7 @@ function initializeKidsTabs() {
     kidsUploadDateRow.className = 'toggle-row';
     kidsUploadDateRow.setAttribute('data-ft-control-row', 'true');
     kidsUploadDateRow.setAttribute('data-ft-search', 'upload date filter');
+    kidsUploadDateRow.setAttribute('data-ft-control', 'uploadDate');
 
     const kidsUploadDateInfo = document.createElement('div');
     kidsUploadDateInfo.className = 'toggle-info';
@@ -3199,6 +3211,7 @@ function initializeKidsTabs() {
     kidsCategoryMainRow.className = 'toggle-row';
     kidsCategoryMainRow.setAttribute('data-ft-control-row', 'true');
     kidsCategoryMainRow.setAttribute('data-ft-search', 'category filter');
+    kidsCategoryMainRow.setAttribute('data-ft-control', 'category');
 
     const kidsCategoryInfo = document.createElement('div');
     kidsCategoryInfo.className = 'toggle-info';
@@ -3987,6 +4000,7 @@ function resolveRequestedView() {
         'semantic': 'semantic',
         'kids': 'kids',
         'settings': 'settings',
+        'study': 'study',
         'sync': 'sync',
         'nanah': 'sync',
         'nanahsync': 'sync',
@@ -4015,6 +4029,10 @@ function handleNavigationIntent() {
     }
     try {
         const flow = (new URLSearchParams(window.location.search || '').get('flow') || '').toLowerCase();
+        if (['create-kids', 'create-adult', 'profiles'].includes(flow)) {
+            // From the popup's profile picker (Android ProfilePickerFooter).
+            setTimeout(() => window.FilterTubeOpenProfilesFlow?.(flow), 400);
+        }
         if (flow === 'switch-profile' && ftProfileBadgeBtnTab) {
             requestAnimationFrame(() => {
                 ftProfileBadgeBtnTab.focus();
@@ -4736,8 +4754,10 @@ document.addEventListener('DOMContentLoaded', async () => {
     let lockGateEl = null;
 
     const LOCK_ALLOWED_VIEWS = new Set(['help', 'whatsnew', 'about', 'donate']);
-    const SELF_CONTROL_ALLOWED_VIEWS = new Set(['settings', ...LOCK_ALLOWED_VIEWS]);
-    const CHILD_ALLOWED_VIEWS = new Set([...LOCK_ALLOWED_VIEWS, 'sync']);
+    // Study shows during a Self-Control Session ("Locked until ...") and to a child, read-only: the
+    // background refuses every change a child or a lock can't make (Android StudyFocusActivity roles).
+    const SELF_CONTROL_ALLOWED_VIEWS = new Set(['settings', 'study', ...LOCK_ALLOWED_VIEWS]);
+    const CHILD_ALLOWED_VIEWS = new Set([...LOCK_ALLOWED_VIEWS, 'sync', 'study']);
     const MANAGED_TIME_LIMIT_SCHEMA = 'filtertube_managed_time_limit';
     const MANAGED_LOCAL_EDIT_POLICY_SCHEMA = 'filtertube_managed_local_edit_policy';
     const MANAGED_ACTION_HISTORY_SCHEMA = 'filtertube_managed_action_history';
@@ -5456,6 +5476,17 @@ document.addEventListener('DOMContentLoaded', async () => {
         );
         importSubscriptionsNotice.classList.add(`subscriptions-import-inline--${nextTone}`);
         importSubscriptionsNotice.classList.toggle('is-loading', subscriptionsImportState.inProgress === true);
+        // Fetching page after page of followed channels is a load-more: Uljhan's fetch (Android
+        // UljhanLoadMore), held while pages keep coming and gone when the import stops.
+        let fetchMoment = importSubscriptionsNotice.querySelector(':scope > .pk-moment--loading');
+        if (subscriptionsImportState.inProgress === true) {
+            if (!fetchMoment) {
+                fetchMoment = window.FilterTubeMascots?.moment?.('loading', { height: 56 }) || null;
+                if (fetchMoment) importSubscriptionsNotice.insertBefore(fetchMoment, importSubscriptionsNotice.firstChild);
+            }
+        } else if (fetchMoment) {
+            fetchMoment.remove();
+        }
         importSubscriptionsNotice.setAttribute('aria-busy', subscriptionsImportState.inProgress === true ? 'true' : 'false');
 
         const message = tabViewDisplayCopy(normalizeString(subscriptionsImportState.message), SUBSCRIPTION_IMPORT_COPY_LOOKUP);
@@ -6934,9 +6965,13 @@ document.addEventListener('DOMContentLoaded', async () => {
             nameEl.className = 'ft-profile-dropdown-name';
             nameEl.textContent = getProfileName(profilesV4, id);
 
+            // Android ProfilePickerRow: the name with a quiet role chip, then what the profile is for.
+            const role = id === 'default' ? 'parent' : (isChild ? 'kids' : 'adult');
+            const kit = window.UIComponents;
+            if (kit?.profileRoleChip) nameEl.appendChild(kit.profileRoleChip(role, tabViewUiText));
             const subtitleEl = document.createElement('div');
             subtitleEl.className = 'ft-profile-dropdown-subtitle';
-            subtitleEl.textContent = buildProfileSubtitle(profilesV4, id);
+            subtitleEl.textContent = kit?.profileAboutLine ? kit.profileAboutLine(role, tabViewUiText) : buildProfileSubtitle(profilesV4, id);
 
             meta.appendChild(nameEl);
             meta.appendChild(subtitleEl);
@@ -6964,8 +6999,14 @@ document.addEventListener('DOMContentLoaded', async () => {
         };
 
         const accountIds = getAccountIds(profilesV4);
+        const pickerTitle = document.createElement('div');
+        pickerTitle.className = 'ft-picker-title';
+        pickerTitle.setAttribute('role', 'presentation');
+        pickerTitle.textContent = tabViewUiText('profiles.popupTitle', 'Switch profile');
+        ftProfileDropdownTab.appendChild(pickerTitle);
         accountIds.forEach((accountId, idx) => {
             const header = document.createElement('div');
+            if (accountIds.length < 2) header.hidden = true;
             header.className = 'ft-profile-dropdown-group';
             header.setAttribute('role', 'presentation');
             setTabViewLocalizedCopy(
@@ -6989,8 +7030,32 @@ document.addEventListener('DOMContentLoaded', async () => {
             }
         });
 
+        // The picker's footer (Android ProfilePickerFooter): the existing create buttons and their gate.
+        const activeRole = current === 'default' ? 'parent' : (getProfileType(profilesV4, current) === 'child' ? 'kids' : 'adult');
+        const mascots = window.FilterTubeMascots;
+        const footer = window.UIComponents?.profilePickerFooter?.({
+            count: Object.keys(safeObject(root.profiles)).length, role: activeRole, selfControl: isSelfControlSessionActive(), t: tabViewUiText,
+            kritiSrc: mascots?.showsCharacters?.(mascots.mode) ? `../assets/images/mascots/${mascots.stillImage('kritiWave')}` : '',
+            onAddKids: () => { closeProfileDropdownTab(); openProfilesFlow('create-kids'); },
+            onAddAdult: ftCreateAccountBtn ? () => { closeProfileDropdownTab(); openProfilesFlow('create-adult'); } : null,
+            onManage: () => { closeProfileDropdownTab(); openProfilesFlow('profiles'); }
+        });
+        if (footer) ftProfileDropdownTab.appendChild(footer);
+
         positionProfileDropdownTab();
     }
+
+    /** Profiles & PIN, and optionally its create flow (the same buttons and gates as the page). */
+    function openProfilesFlow(flow) {
+        if (typeof window.switchView === 'function') window.switchView('sync');
+        requestAnimationFrame(() => {
+            const card = document.getElementById('ftProfilesManager')?.closest('.settings-card') || document.getElementById('ftProfilesManager');
+            card?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            if (flow === 'create-kids' && ftCreateChildBtn && !ftCreateChildBtn.disabled) ftCreateChildBtn.click();
+            if (flow === 'create-adult' && ftCreateAccountBtn && !ftCreateAccountBtn.disabled) ftCreateAccountBtn.click();
+        });
+    }
+    window.FilterTubeOpenProfilesFlow = openProfilesFlow;
 
     function updateAutoBackupPolicyControls() {
         try {
@@ -9179,6 +9244,11 @@ document.addEventListener('DOMContentLoaded', async () => {
         updateStats();
         // The session bar confirms the save in the child's name (js/mascots.js draws it).
         try { document.dispatchEvent(new CustomEvent('filtertube:parent-session-saved', { detail: { name: normalizeString(nextProfile.name) } })); } catch (e) { }
+        // A change in the session waits for the next send ("Will send to Aarav's tablet").
+        if (parentSessionSync && parentSessionSync.state.childId === normalizeString(profileId)) {
+            parentSessionSync.recordChange();
+            renderManagedChildGlobalBanner();
+        }
         return true;
     }
 
@@ -9228,6 +9298,18 @@ document.addEventListener('DOMContentLoaded', async () => {
     const PARENT_SESSION_TICK_MS = 30 * 1000;
     let parentSessionTimer = 0;
     let parentSessionConnectedFor = '';
+    // Android ParentModeSession: what Accounts & Sync reported for the managed child, and changes since.
+    let parentSessionSync = null;
+
+    /** Accounts & Sync reports a remote session's state (Android 9af03736d hook 1); null clears a live one. */
+    function reportParentSessionSync(value, deviceLabel = '') {
+        const Mode = window.FilterTubeParentMode;
+        const childId = normalizeString(managedChildEdit?.profileId);
+        if (!Mode || !childId || !parentSessionSync) return;
+        if (value) parentSessionSync.report(childId, value, deviceLabel);
+        else parentSessionSync.clearLive(childId);
+        renderManagedChildGlobalBanner();
+    }
     let parentSessionScrollBound = false;
 
     function parentSessionReducedMotion() {
@@ -9364,11 +9446,40 @@ document.addEventListener('DOMContentLoaded', async () => {
         meta.className = 'ft-session-bar__meta';
         const place = document.createElement('span');
         place.className = 'ft-session-bar__place';
-        setTabViewLocalizedCopy(place, 'textContent', 'parentMode.hereBrowser', 'In this browser');
+        // A remote session (Android ParentMode.Origin.REMOTE): the child's device and a live sync badge.
+        const Mode = window.FilterTubeParentMode;
+        const remote = Mode ? Mode.remoteLinkFor(childId, safeArray(nanahTrustedLinks).map(link => normalizeNanahTrustedLink(link)).filter(Boolean)) : null;
+        if (Mode && (!parentSessionSync || parentSessionSync.state.childId !== childId)) parentSessionSync = Mode.createSession(childId);
+        let badgeNode = null;
+        if (remote) {
+            const deviceLabel = normalizeString(remote.deviceLabel) || tabViewUiText('parentMode.remoteDeviceFallback', '{name}’s device', { name: childName });
+            place.textContent = deviceLabel;
+            const online = navigator.onLine !== false;
+            const state = parentSessionSync.badge(online);
+            badgeNode = document.createElement('span');
+            badgeNode.className = `ft-session-bar__sync is-${Mode.syncTone(state)}`;
+            badgeNode.setAttribute('role', 'status');
+            const savedTo = parentSessionSync.state.savedTo || deviceLabel;
+            badgeNode.textContent = {
+                connecting: tabViewUiText('parentMode.sync.connecting', 'Connecting…'),
+                connected: tabViewUiText('parentMode.sync.connected', 'Connected'),
+                sending: tabViewUiText('parentMode.sync.sending', 'Sending…'),
+                saved: tabViewUiText('parentMode.sync.savedTo', 'Saved to {device}', { device: savedTo }),
+                upToDate: tabViewUiText('parentMode.sync.upToDate', 'Up to date'),
+                waiting: tabViewUiText('parentMode.sync.waiting', 'Will send to {device}', { device: deviceLabel }),
+                offline: tabViewUiText('parentMode.sync.offline', 'Offline, changes will sync')
+            }[state] || '';
+            banner.classList.add('is-remote');
+        } else {
+            setTabViewLocalizedCopy(place, 'textContent', 'parentMode.hereBrowser', 'In this browser');
+            banner.classList.remove('is-remote');
+        }
         const clock = document.createElement('span');
         clock.className = 'ft-session-bar__clock';
         clock.textContent = parentSessionClockText(managedChildEdit.startedAt);
-        meta.append(place, clock);
+        meta.append(place);
+        if (badgeNode) meta.append(badgeNode);
+        meta.append(clock);
         copy.append(title, explainer, meta);
 
         const doneBtn = document.createElement('button');
@@ -15344,6 +15455,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 canEnableWhitelist: false
             });
             UIComponents.showToast(tabViewUiText('dashboard.toast.subscriptionsImportNoChannels', 'No followed channels found'), 'info');
+            { const toast = document.querySelector('.ft-toast'); if (toast) toast.dataset.ftMascot = 'shrug'; }
             return;
         }
 
@@ -15529,7 +15641,28 @@ document.addEventListener('DOMContentLoaded', async () => {
         lockGateEl = gate;
     }
 
-    async function showPromptModal({ eyebrow = '', title, message, placeholder = '', inputType = 'text', confirmText = 'Confirm', cancelText = 'Cancel', initialValue = '' }) {
+    /**
+     * A wrong PIN (Android 4ff67ce1b PinGateMotion): the field shakes 0, -10, 10, -7, 7, -3, 0 px over
+     * 320 ms (still with reduced motion), the polite line says "That PIN didn't work. Try again.", and
+     * the field clears for the next try. No sound and no mascot on a PIN gate.
+     */
+    function rejectPinInput(input, line, text) {
+        line.textContent = text;
+        line.hidden = false;
+        input.value = '';
+        input.setAttribute('aria-invalid', 'true');
+        input.addEventListener('input', () => input.removeAttribute('aria-invalid'), { once: true });
+        try {
+            const still = window.matchMedia?.('(prefers-reduced-motion: reduce)')?.matches === true;
+            if (!still && typeof input.animate === 'function') {
+                input.animate([0, -10, 10, -7, 7, -3, 0].map(x => ({ transform: `translateX(${x}px)` })), { duration: 320, easing: 'ease-out' });
+            }
+        } catch (e) {
+        }
+        try { input.focus(); } catch (e) { }
+    }
+
+    async function showPromptModal({ eyebrow = '', title, message, placeholder = '', inputType = 'text', confirmText = 'Confirm', cancelText = 'Cancel', initialValue = '', check = null }) {
         return new Promise((resolve) => {
             const overlay = document.createElement('div');
             overlay.className = 'ft-modal-overlay';
@@ -15563,9 +15696,26 @@ document.addEventListener('DOMContentLoaded', async () => {
             const input = document.createElement('input');
             input.className = 'text-input';
             input.type = inputType;
+            // A PIN (Android PinGateActivity): eyebrow over the title, the digits centred, Unlock across
+            // the card with Cancel under it, the "Try again" line in the danger ink.
+            if (inputType === 'password') {
+                card.classList.add('is-pin');
+                card.setAttribute('role', 'dialog');
+                card.setAttribute('aria-modal', 'true');
+                input.inputMode = 'numeric';
+                input.autocomplete = 'off';
+                input.setAttribute('aria-label', placeholder || title);
+            }
             input.placeholder = placeholder;
             input.value = initialValue;
             body.appendChild(input);
+            // A wrong answer's line, read politely (the PIN gate's "Try again").
+            const errorLine = document.createElement('p');
+            errorLine.className = 'ft-modal-error';
+            errorLine.setAttribute('role', 'status');
+            errorLine.setAttribute('aria-live', 'polite');
+            errorLine.hidden = true;
+            body.appendChild(errorLine);
 
             const actions = document.createElement('div');
             actions.className = 'ft-modal-actions';
@@ -15593,7 +15743,15 @@ document.addEventListener('DOMContentLoaded', async () => {
             };
 
             cancelBtn.addEventListener('click', () => closeWith(null));
-            okBtn.addEventListener('click', () => closeWith(input.value));
+            okBtn.addEventListener('click', async () => {
+                if (typeof check !== 'function') { closeWith(input.value); return; }
+                okBtn.disabled = true;
+                const result = await Promise.resolve(check(input.value)).catch(() => ({ ok: false, close: true }));
+                okBtn.disabled = false;
+                if (result?.ok) closeWith(input.value);
+                else if (result?.close) closeWith(null);
+                else rejectPinInput(input, errorLine, result?.message || tabViewUiText('people.pinTryAgain', "That PIN didn't work. Try again."));
+            });
 
             input.addEventListener('keydown', (e) => {
                 if (e.key === 'Enter') {
@@ -15754,7 +15912,11 @@ document.addEventListener('DOMContentLoaded', async () => {
             overlay.className = 'ft-modal-overlay';
 
             const card = document.createElement('div');
-            card.className = 'card ft-modal';
+            // Android FilterTubeMessageDialog: title over the message, the brick primary across the card,
+            // the secondary under it.
+            card.className = 'card ft-modal is-message';
+            card.setAttribute('role', 'alertdialog');
+            card.setAttribute('aria-modal', 'true');
 
             const header = document.createElement('div');
             header.className = 'card-header';
@@ -16214,6 +16376,11 @@ document.addEventListener('DOMContentLoaded', async () => {
         return isActiveChildNanahProfile();
     }
 
+    /**
+     * Inside a child, rules from another device merge only after the managing parent's own PIN, every time
+     * (Android 3c204e3fe requestChildNanahParentAuthority): a recent unlock for another action never
+     * carries over.
+     */
     async function ensureChildNanahParentAuthorityUnlocked() {
         if (!isNanahChildReceiveOnly()) return true;
         const io = window.FilterTubeIO || {};
@@ -16221,7 +16388,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (!profilesV4) return true;
         const childId = normalizeString(profilesV4.activeProfileId) || activeProfileId || 'default';
         const parentId = getParentAccountId(profilesV4, childId) || 'default';
-        const ok = await ensureProfileUnlocked(profilesV4, parentId);
+        const ok = await ensureProfileUnlocked(profilesV4, parentId, { everyTime: true });
         if (!ok) {
             UIComponents.showToast(tabViewUiText('dashboard.sync.toast.parentApprovalRequiredForNewSource', 'Parent approval is required before this protected profile can trust or apply a new sync source.'), 'error');
             return false;
@@ -22896,6 +23063,9 @@ document.addEventListener('DOMContentLoaded', async () => {
             providerMissingCount: 0,
             noLinkCount: 0
         };
+        // The managed child in a parent session, when this send carries its rules: the bar says "Sending…".
+        const sessionChildSent = allowedTargets.includes(normalizeString(managedChildEdit?.profileId)) ? normalizeString(managedChildEdit.profileId) : '';
+        if (sessionChildSent) reportParentSessionSync(window.FilterTubeParentMode?.SYNC.SENDING);
 
         for (const targetId of allowedTargets) {
             const targetProfile = safeObject(profiles[targetId]);
@@ -23056,6 +23226,16 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
 
         await loadNanahTrustedLinks();
+        // The session bar: "Saved to <device>" when a send to the managed child landed; a failure or a
+        // pickup-queued update never leaves "Sending…" behind.
+        if (sessionChildSent) {
+            if (summary.liveSentCount > 0 || summary.localNetworkDeliveredCount > 0) {
+                const sentLink = getNanahSourceManagedLinksForTargetProfile(sessionChildSent, normalizedScope)[0];
+                reportParentSessionSync(window.FilterTubeParentMode?.SYNC.SAVED_TO_DEVICE, normalizeString(sentLink?.deviceLabel));
+            } else {
+                reportParentSessionSync(null);
+            }
+        }
         if (summary.mailboxUploadedCount > 0) {
             await checkNanahManagedMailboxServerHealth({ reason: 'post_parent_push', silent: true });
         }
@@ -24811,6 +24991,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             ftNanahStrategy.dispatchEvent(new Event('change', { bubbles: true }));
         }
 
+        if (!(await ensureInternetSyncConsent())) return null;
         const client = await createNanahClient();
         nanahSessionState.stage = 'hosting';
         nanahSessionState.code = '';
@@ -25889,6 +26070,8 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 
     async function resetNanahSession(closeClient = false, options = {}) {
+        // A closed link never leaves a live "Connecting…" or "Connected" on the session bar.
+        try { reportParentSessionSync(null); } catch (e) { }
         if (closeClient && nanahClient) {
             try {
                 await nanahClient.close();
@@ -25926,6 +26109,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             return null;
         }
         if (nanahClient) await resetNanahSession(true);
+        reportParentSessionSync(window.FilterTubeParentMode?.SYNC.CONNECTING);
         if (intentTitle) {
             setNanahFamilyDeviceIntent({
                 title: intentTitle,
@@ -25940,6 +26124,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             });
         }
         setNanahSessionNotice(null);
+        if (!(await ensureInternetSyncConsent())) return null;
         const client = await createNanahClient();
         nanahSessionState.stage = 'hosting';
         nanahSessionState.code = '';
@@ -25963,6 +26148,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     async function joinNanahSessionWithCode(rawCode, { source = 'join-button' } = {}) {
         const code = extractNanahCodeFromInput(rawCode);
         if (code.length < 4) throw new Error('Enter the 4-character pairing code first');
+        reportParentSessionSync(window.FilterTubeParentMode?.SYNC.CONNECTING);
         const existingCode = normalizeNanahCode(nanahSessionState.code);
         if (nanahClient && existingCode && existingCode === code) {
             throw new Error('This device is already using that pairing code');
@@ -25976,6 +26162,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             });
         }
         setNanahSessionNotice(null);
+        if (!(await ensureInternetSyncConsent())) return null;
         const client = await createNanahClient();
         nanahSessionState.code = code;
         nanahSessionState.pairUri = buildNanahPairUri(code);
@@ -26065,6 +26252,23 @@ document.addEventListener('DOMContentLoaded', async () => {
             && normalizeString(nanahSessionState.remoteProfile?.profileId) === sourceProfileId) {
             await client.send({ schema: 'filtertube.managed-auto-sync-ready', version: 1, linkIds });
         }
+    }
+
+    /**
+     * Ask a parent over Nanah: one `study_family` message ({reports, asks, signed}), the same message the
+     * Android and iOS apps send, only to a device that advertised filtertube.study.v1. The background
+     * builds it (and signs answers with this device's Family key); this page only sends it.
+     */
+    async function sendNanahAskParentFamily() {
+        const client = nanahClient;
+        if (!client || !nanahSessionState.connected || !nanahSessionState.sasConfirmed) return;
+        const remote = safeObject(nanahSessionState.remoteDevice);
+        const built = await sendRuntimeMessage({ action: 'FilterTube_AskParentNanahOutbox', remote: {
+            deviceId: normalizeString(remote.deviceId), capabilities: safeArray(remote.capabilities)
+        } });
+        if (!built?.message || client !== nanahClient) return;
+        await client.send(built.message);
+        await sendRuntimeMessage({ action: 'FilterTube_AskParentNanahSent', sentByLink: safeObject(built.sentByLink) });
     }
 
     async function sendNanahHelloEnvelope(force = false) {
@@ -26383,6 +26587,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             stale_pairing: 'This saved pairing is stale. Re-pair this device.',
             trusted_link_quarantined: 'This saved trust link is quarantined and needs parent review.',
             locked_trusted_updates_not_allowed: 'This protected profile is not allowed to receive saved parent updates yet.',
+            self_control_active: 'A Self-Control session is running on this device. The update applies after it ends.',
             managed_apply_unavailable: 'FilterTube cannot apply this managed update here.',
             managed_mailbox_apply_unavailable: 'FilterTube cannot apply this Internet Pickup update here.',
             managed_local_network_apply_unavailable: 'FilterTube cannot apply this Home Pickup update here.',
@@ -26442,10 +26647,16 @@ document.addEventListener('DOMContentLoaded', async () => {
             if (result.accepted === true && result.applied !== false) {
                 await refreshFilterTubeUiAfterNanahImport();
                 UIComponents.showToast(tabViewUiText('dashboard.sync.toast.managedPolicyApplied', 'Applied managed {scope} update', { scope: normalizeString(validation.scope) || 'policy' }), 'success');
+                { const toast = globalThis.document?.querySelector?.('.ft-toast'); if (toast) toast.dataset.ftMascot = 'highfive'; } // a sync landed: the duo high-fives
                 return;
             }
             if (result.accepted === true && result.decision === 'idempotent_same_hash') {
                 UIComponents.showToast(tabViewUiText('dashboard.sync.toast.managedPolicyAlreadyAccepted', 'Managed policy already matches the last accepted revision'), 'info');
+                return;
+            }
+            if (result.reason === 'self_control_active') {
+                // Waits for the Self-Control session to end (Android refuses the write while one runs).
+                UIComponents.showToast(formatManagedNanahBlockedReason(result.reason), 'info');
                 return;
             }
             UIComponents.showToast(tabViewUiText('dashboard.sync.toast.managedPolicyRejected', 'Managed policy rejected: {reason}', { reason: formatManagedNanahBlockedReason(result.reason, 'apply failed') }), 'error');
@@ -26504,10 +26715,16 @@ document.addEventListener('DOMContentLoaded', async () => {
             if (result.accepted === true && result.applied !== false) {
                 await refreshFilterTubeUiAfterNanahImport();
                 UIComponents.showToast(tabViewUiText('dashboard.sync.toast.internetPickupApplied', 'Applied Internet Pickup {scope} update', { scope: normalizeString(validation.scope) || 'policy' }), 'success');
+                { const toast = globalThis.document?.querySelector?.('.ft-toast'); if (toast) toast.dataset.ftMascot = 'highfive'; } // a sync landed: the duo high-fives
                 return result;
             }
             if (result.accepted === true && result.decision === 'idempotent_same_hash') {
                 UIComponents.showToast(tabViewUiText('dashboard.sync.toast.internetPickupUpdateAlreadyAccepted', 'Internet Pickup update already matches the last accepted revision'), 'info');
+                return result;
+            }
+            if (result.reason === 'self_control_active') {
+                // Waits for the Self-Control session to end (Android refuses the write while one runs).
+                UIComponents.showToast(formatManagedNanahBlockedReason(result.reason), 'info');
                 return result;
             }
             UIComponents.showToast(tabViewUiText('dashboard.sync.toast.internetPickupUpdateRejected', 'Internet Pickup update rejected: {reason}', { reason: formatManagedNanahBlockedReason(result.reason, 'apply failed') }), 'error');
@@ -26573,10 +26790,16 @@ document.addEventListener('DOMContentLoaded', async () => {
             if (result.accepted === true && result.applied !== false) {
                 await refreshFilterTubeUiAfterNanahImport();
                 UIComponents.showToast(tabViewUiText('dashboard.sync.toast.homePickupApplied', 'Applied Home Pickup {scope} update', { scope: normalizeString(validation.scope) || 'policy' }), 'success');
+                { const toast = globalThis.document?.querySelector?.('.ft-toast'); if (toast) toast.dataset.ftMascot = 'highfive'; } // a sync landed: the duo high-fives
                 return result;
             }
             if (result.accepted === true && result.decision === 'idempotent_same_hash') {
                 UIComponents.showToast(tabViewUiText('dashboard.sync.toast.homePickupUpdateAlreadyAccepted', 'Home Pickup update already matches the last accepted revision'), 'info');
+                return result;
+            }
+            if (result.reason === 'self_control_active') {
+                // Waits for the Self-Control session to end (Android refuses the write while one runs).
+                UIComponents.showToast(formatManagedNanahBlockedReason(result.reason), 'info');
                 return result;
             }
             UIComponents.showToast(tabViewUiText('dashboard.sync.toast.homePickupUpdateRejected', 'Home Pickup update rejected: {reason}', { reason: formatManagedNanahBlockedReason(result.reason, 'apply failed') }), 'error');
@@ -27215,6 +27438,8 @@ document.addEventListener('DOMContentLoaded', async () => {
             const trustedLink = getNanahCurrentTrustedLink();
             const approved = await ensureNanahTrustedReconnectApproved(trustedLink, { closeOnDecline: true });
             if (approved) {
+                // Ask a parent: this device's open asks and the answers waiting for that child.
+                void sendNanahAskParentFamily().catch(() => {});
                 if (typeof sendNanahAutoSyncReadiness === 'function') await sendNanahAutoSyncReadiness();
                 const targetProfile = normalizeNanahTargetProfileContext(nanahSessionState.remoteTargetProfile);
                 await markNanahTrustedLinkUsed(safeObject(root.device).deviceId, {
@@ -27222,6 +27447,18 @@ document.addEventListener('DOMContentLoaded', async () => {
                     localRole: getNanahRole(),
                     remoteRole: normalizeString(nanahSessionState.remoteRole)
                 });
+            }
+            return;
+        }
+        if (root.t === 'study_family') {
+            // Ask a parent (Android AskParentService.receiveAsks / applySigned): the background checks
+            // the link, the signature and the ask; this page only carries the message.
+            const remoteDeviceId = normalizeString(nanahSessionState.remoteDevice?.deviceId);
+            if (remoteDeviceId) {
+                const result = await sendRuntimeMessage({ action: 'FilterTube_AskParentNanahReceive', remoteDeviceId, message: {
+                    asks: safeArray(root.asks).slice(0, 12), signed: safeArray(root.signed).slice(0, 20)
+                } });
+                if (result?.fresh > 0) void renderAskParentInbox();
             }
             return;
         }
@@ -27290,6 +27527,29 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (root.t === 'control_proposal' || root.t === 'app_sync') {
             await handleNanahIncomingProposal(root);
         }
+    }
+
+    // Internet sync goes through the developer's signaling relay and a STUN server (Android
+    // InternetSyncRelayConsent): the first use asks once, device-wide, with Continue / Not now.
+    const INTERNET_SYNC_CONSENT_KEY = 'ftInternetSyncConsentV1';
+    async function ensureInternetSyncConsent() {
+        try {
+            const items = await new Promise(resolve => chrome.storage.local.get([INTERNET_SYNC_CONSENT_KEY], resolve));
+            if (items?.[INTERNET_SYNC_CONSENT_KEY]?.accepted === true) return true;
+        } catch (e) {
+        }
+        const accepted = await showConfirmModal({
+            title: tabViewUiText('sync.relay.title', 'Sync over the internet?'),
+            message: tabViewUiText('sync.relay.body', "Internet sync uses a small relay run by FilterTube's developer to connect your devices. It can't read what you sync, which is end-to-end encrypted. It sees a device ID, your IP address and when you sync. Google's STUN server helps find a connection route and also sees your IP address. Nearby sync uses neither."),
+            confirmText: tabViewUiText('sync.relay.continue', 'Continue'),
+            cancelText: tabViewUiText('sync.relay.notNow', 'Not now')
+        });
+        if (!accepted) return false;
+        try {
+            await new Promise(resolve => chrome.storage.local.set({ [INTERNET_SYNC_CONSENT_KEY]: { accepted: true, at: Date.now() } }, resolve));
+        } catch (e) {
+        }
+        return true;
     }
 
     async function createNanahClient() {
@@ -27594,7 +27854,9 @@ document.addEventListener('DOMContentLoaded', async () => {
             }
             return isCurrentNanahManagedTrustSession(trustSession);
         } });
-        UIComponents.showToast(linkType === 'managed_link' ? 'Managed link saved' : 'Trusted peer saved', 'success');
+        // Pairing ends with Kriti's jump (Android 4ff67ce1b); a peer link reads "Paired. Plans now sync both ways."
+        UIComponents.showToast(linkType === 'managed_link' ? 'Managed link saved' : tabViewUiText('people.paired', 'Paired. Plans now sync both ways.'), 'success');
+        { const toast = document.querySelector('.ft-toast'); if (toast) toast.dataset.ftMascot = 'jump'; }
         updateNanahUi();
     }
 
@@ -27639,7 +27901,8 @@ document.addEventListener('DOMContentLoaded', async () => {
     async function ensureProfileUnlocked(profilesV4, profileId, options = {}) {
         await syncSessionUnlockStateFromBackground();
         if (!isProfileLocked(profilesV4, profileId)) return true;
-        if (isProfileUnlockSessionValid.check(profileId, options)) return true;
+        // everyTime: the PIN is asked whatever unlock is still fresh (a child merging Nearby rules).
+        if (options.everyTime !== true && isProfileUnlockSessionValid.check(profileId, options)) return true;
 
         const verifier = profileId === 'default'
             ? extractMasterPinVerifier(profilesV4)
@@ -27651,27 +27914,29 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
 
         const copy = getProfileAccessCopy(profilesV4, profileId);
+        // A wrong PIN shakes the field and asks again in place (Android PinGateActivity); only the
+        // attempt limit closes the gate.
         const pin = await showPromptModal({
             eyebrow: copy.eyebrow,
             title: copy.title,
             message: copy.message,
             placeholder: copy.placeholder,
             inputType: 'password',
-            confirmText: tabViewUiText('profileAccess.unlockButton', 'Unlock')
+            confirmText: tabViewUiText('profileAccess.unlockButton', 'Unlock'),
+            check: async value => {
+                const entered = normalizeString(value);
+                if (!entered) return { ok: false };
+                if (await verifyPin(entered, verifier)) return { ok: true };
+                const failedAttempt = await recordManagedAdminUnlockFailure(profileId, profilesV4);
+                if (failedAttempt.rateLimited) {
+                    UIComponents.showToast(tabViewUiText('dashboard.toast.pinRateLimited', 'Too many incorrect PIN attempts. Try again later.'), 'error');
+                    return { ok: false, close: true };
+                }
+                return { ok: false };
+            }
         });
         const normalized = normalizeString(pin);
         if (!normalized) return false;
-        const ok = await verifyPin(normalized, verifier);
-        if (!ok) {
-            const failedAttempt = await recordManagedAdminUnlockFailure(profileId, profilesV4);
-            UIComponents.showToast(
-                failedAttempt.rateLimited
-                    ? tabViewUiText('dashboard.toast.pinRateLimited', 'Too many incorrect PIN attempts. Try again later.')
-                    : tabViewUiText('dashboard.toast.pinIncorrect', 'Incorrect PIN'),
-                'error'
-            );
-            return false;
-        }
 
         await clearManagedAdminUnlockFailures(profileId);
         markProfileUnlockSession.run(profileId);
@@ -27699,13 +27964,13 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 
     function kidsYouTubeStatusText(status, profiles) {
-        if (status === 'loading') return tabViewUiText('kids.youtubeProfiles.loading', 'Reading your YouTube Kids profiles…');
+        if (status === 'loading') return tabViewUiText('kids.youtubeProfiles.loading', 'Reading your children\'s profiles on the Kids site…');
         if (status === 'no_tab') return tabViewUiText('kids.youtubeProfiles.noTab', 'Open youtubekids.com, or select Show profiles to read them.');
-        if (status === 'signed_out') return tabViewUiText('kids.youtubeProfiles.signedOut', 'Sign in to YouTube Kids on youtubekids.com first.');
-        if (status === 'ok' && !profiles.length) return tabViewUiText('kids.youtubeProfiles.none', 'No YouTube Kids profiles yet. Add one on youtubekids.com.');
+        if (status === 'signed_out') return tabViewUiText('kids.youtubeProfiles.signedOut', 'Sign in on youtubekids.com first.');
+        if (status === 'ok' && !profiles.length) return tabViewUiText('kids.youtubeProfiles.none', 'No children\'s profiles yet. Add one on youtubekids.com.');
         if (status === 'ok') return '';
         if (!status) return '';
-        return tabViewUiText('kids.youtubeProfiles.failed', 'YouTube Kids profiles could not be read. Try again.');
+        return tabViewUiText('kids.youtubeProfiles.failed', 'The Kids site profiles could not be read. Try again.');
     }
 
     async function loadKidsYouTubeProfiles({ openIfNeeded = false } = {}) {
@@ -27741,7 +28006,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         const pendingSetup = Number(kidsYouTubeProfilesState.roster?.hiddenForOnboarding) || 0;
         statusEl.textContent = [kidsYouTubeStatusText(kidsYouTubeProfilesState.status, profiles),
             kidsYouTubeProfilesState.status === 'ok' && pendingSetup
-                ? tabViewUiText('kids.youtubeProfiles.pendingSetup', '{count} more profiles still need setup in YouTube Kids.', { count: pendingSetup })
+                ? tabViewUiText('kids.youtubeProfiles.pendingSetup', '{count} more profiles still need setup on the Kids site.', { count: pendingSetup })
                 : ''].filter(Boolean).join(' ');
 
         tilesEl.replaceChildren(...profiles.map(kid => {
@@ -27774,7 +28039,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             watch.type = 'button'; watch.className = 'btn-secondary kids-yt-profiles__watch';
             watch.textContent = kid.selected ? tabViewUiText('kids.youtubeProfiles.watchingButton', 'Watching') : tabViewUiText('kids.youtubeProfiles.watchButton', 'Watch as {name}', { name: kid.displayName });
             watch.disabled = kid.selected || decision !== 'allowed' || kidsYouTubeProfilesState.busy;
-            if (decision === 'linked') watch.title = tabViewUiText('kids.youtubeProfiles.lockedLinked', '{profile} is linked to another YouTube Kids profile. Change it here as the parent.', { profile: getProfileName(root, actorId) });
+            if (decision === 'linked') watch.title = tabViewUiText('kids.youtubeProfiles.lockedLinked', '{profile} is linked to another Kids site profile. Change it here as the parent.', { profile: getProfileName(root, actorId) });
             if (decision === 'child') watch.title = tabViewUiText('kids.youtubeProfiles.lockedChild', 'Ask a parent to choose who is watching.');
             watch.addEventListener('click', () => switchKidsYouTubeProfile(kid));
             tile.append(name, meta, watch);
@@ -27785,7 +28050,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (contract.profileType(root, actorId) === 'child') {
             const note = document.createElement('p');
             note.className = 'kids-yt-profiles__note';
-            note.textContent = tabViewUiText('kids.youtubeProfiles.parentOnly', 'Only a parent can link YouTube Kids profiles.');
+            note.textContent = tabViewUiText('kids.youtubeProfiles.parentOnly', 'Only a parent can link Kids site profiles.');
             linksEl.appendChild(note);
             return;
         }
@@ -27807,7 +28072,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             if (profiles.length) {
                 const select = document.createElement('select');
                 select.className = 'select-input kids-yt-profiles__select';
-                select.setAttribute('aria-label', tabViewUiText('kids.youtubeProfiles.selectLabel', 'YouTube Kids profile for {profile}', { profile: getProfileName(root, profileId) }));
+                select.setAttribute('aria-label', tabViewUiText('kids.youtubeProfiles.selectLabel', 'Kids site profile for {profile}', { profile: getProfileName(root, profileId) }));
                 for (const kid of profiles) {
                     const option = document.createElement('option');
                     option.value = kid.personaKey; option.textContent = kid.displayName;
@@ -27861,14 +28126,14 @@ document.addEventListener('DOMContentLoaded', async () => {
         row.append(label, who, change);
         const note = document.createElement('p');
         note.className = 'kids-yt-profiles__note';
-        note.textContent = tabViewUiText('kids.youtubeProfiles.parentNote', "YouTube Kids parents are Google accounts; brand accounts can't own YouTube Kids profiles. Change opens YouTube Kids' own account chooser and only changes YouTube Kids.");
+        note.textContent = tabViewUiText('kids.youtubeProfiles.parentNote', "Kids site parents are Google accounts; brand accounts can't own children's profiles there. Change opens the Kids site's own account chooser and only changes the Kids site.");
         host.append(row, note);
         if (contract.linkedParentDecision(links, actorId, parent.parentKey) === 'switch_needed') {
             const link = contract.linkFor(links, actorId);
             const banner = document.createElement('div');
             banner.className = 'kids-yt-profiles__parent-banner';
             const text = document.createElement('span');
-            text.textContent = tabViewUiText('kids.youtubeProfiles.parentMismatch', "{profile}'s YouTube Kids profile ({kid}) is in {parent}'s account.",
+            text.textContent = tabViewUiText('kids.youtubeProfiles.parentMismatch', "{profile}'s Kids site profile ({kid}) is in {parent}'s account.",
                 { profile: getProfileName(root, actorId), kid: link.displayName, parent: link.parentName });
             const apply = document.createElement('button');
             apply.type = 'button'; apply.className = 'btn-primary';
@@ -27882,15 +28147,15 @@ document.addEventListener('DOMContentLoaded', async () => {
     async function startKidsYouTubeParentSwitch(mode) {
         const result = await sendRuntimeMessage({ action: 'FilterTube_KidsParentSwitch', mode });
         if (result?.ok && result.status === 'already_current') {
-            UIComponents.showToast(tabViewUiText('kids.youtubeProfiles.parentAlready', 'YouTube Kids already uses that parent account.'), 'info');
+            UIComponents.showToast(tabViewUiText('kids.youtubeProfiles.parentAlready', 'The Kids site already uses that parent account.'), 'info');
         } else if (result?.ok) {
             UIComponents.showToast(tabViewUiText('kids.youtubeProfiles.parentChooser', 'Choose the parent account in the youtubekids.com tab. Google may ask you to confirm.'), 'info');
         } else {
             UIComponents.showToast(result?.error === 'child'
-                ? tabViewUiText('kids.youtubeProfiles.parentOnlyChange', 'Only a parent can change the YouTube Kids parent account.')
+                ? tabViewUiText('kids.youtubeProfiles.parentOnlyChange', 'Only a parent can change the Kids site parent account.')
                 : result?.error === 'locked'
                     ? tabViewUiText('kids.youtubeProfiles.unlockFirst', 'Unlock this profile first.')
-                    : tabViewUiText('kids.youtubeProfiles.parentFailed', 'YouTube Kids could not start its sign-in. Open youtubekids.com and try again.'), 'error');
+                    : tabViewUiText('kids.youtubeProfiles.parentFailed', 'The Kids site could not start its sign-in. Open youtubekids.com and try again.'), 'error');
         }
     }
 
@@ -27902,7 +28167,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         const fresh = await io.loadProfilesV4();
         const actorId = normalizeString(fresh?.activeProfileId) || 'default';
         if (contract.parentChangeDecision(fresh, actorId) !== 'allowed') {
-            UIComponents.showToast(tabViewUiText('kids.youtubeProfiles.parentOnlyChange', 'Only a parent can change the YouTube Kids parent account.'), 'error');
+            UIComponents.showToast(tabViewUiText('kids.youtubeProfiles.parentOnlyChange', 'Only a parent can change the Kids site parent account.'), 'error');
             return;
         }
         if (isProfileLocked(fresh, actorId) && !(await ensureProfileUnlocked(fresh, actorId, { sensitiveAction: true }))) return;
@@ -27935,7 +28200,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         kidsYouTubeProfilesState.promptedParent = marker;
         const choice = await showChoiceModal({
             title: tabViewUiText('kids.youtubeProfiles.parentPromptTitle', 'Switch parent account?'),
-            message: tabViewUiText('kids.youtubeProfiles.parentPromptMessage', "{profile} uses {kid}, which is in {parent}'s YouTube Kids account. YouTube Kids is using {current}.",
+            message: tabViewUiText('kids.youtubeProfiles.parentPromptMessage', "{profile} uses {kid}, which is in {parent}'s Kids site account. The Kids site is using {current}.",
                 { profile: getProfileName(root, actorId), kid: link.displayName, parent: link.parentName, current: parent.displayName }),
             choices: [{ value: 'switch', label: tabViewUiText('kids.youtubeProfiles.parentSwitchTo', 'Switch to {parent}', { parent: link.parentName }), recommended: true }],
             cancelText: tabViewUiText('kids.youtubeProfiles.parentNotNow', 'Not now')
@@ -27946,7 +28211,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     async function switchKidsYouTubeProfile(kid) {
         const result = await sendRuntimeMessage({ action: 'FilterTube_KidsProfilesSwitch', personaKey: kid.personaKey });
         if (result?.ok) {
-            UIComponents.showToast(tabViewUiText('kids.youtubeProfiles.switched', 'YouTube Kids is switching to {name}.', { name: kid.displayName }), 'success');
+            UIComponents.showToast(tabViewUiText('kids.youtubeProfiles.switched', 'The Kids site is switching to {name}.', { name: kid.displayName }), 'success');
             setTimeout(() => loadKidsYouTubeProfiles(), 2500);
             return;
         }
@@ -27955,7 +28220,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             ? tabViewUiText('kids.youtubeProfiles.lockedChild', 'Ask a parent to choose who is watching.')
             : reason === 'locked'
                 ? tabViewUiText('kids.youtubeProfiles.unlockFirst', 'Unlock this profile first.')
-                : tabViewUiText('kids.youtubeProfiles.switchFailed', 'YouTube Kids could not switch profiles. Open youtubekids.com and try again.'), 'error');
+                : tabViewUiText('kids.youtubeProfiles.switchFailed', 'The Kids site could not switch profiles. Open youtubekids.com and try again.'), 'error');
     }
 
     /** Link or unlink a FilterTube profile: parent context only, PIN required, fresh PIN entry. */
@@ -27968,7 +28233,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         const decision = contract.linkDecision(fresh, actorId, profileId);
         if (decision !== 'allowed') {
             UIComponents.showToast(decision === 'child'
-                ? tabViewUiText('kids.youtubeProfiles.parentOnly', 'Only a parent can link YouTube Kids profiles.')
+                ? tabViewUiText('kids.youtubeProfiles.parentOnly', 'Only a parent can link Kids site profiles.')
                 : tabViewUiText('family.profileManager.switchParentToEdit', 'Switch to the master or parent account to edit this protected profile'), 'error');
             return;
         }
@@ -27995,7 +28260,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
         kidsYouTubeProfilesState.root = await io.loadProfilesV4();
         UIComponents.showToast(kid
-            ? tabViewUiText('kids.youtubeProfiles.linked', '{profile} now uses {kid} on YouTube Kids.', { profile: getProfileName(latest, profileId), kid: kid.displayName })
+            ? tabViewUiText('kids.youtubeProfiles.linked', '{profile} now uses {kid} on the Kids site.', { profile: getProfileName(latest, profileId), kid: kid.displayName })
             : tabViewUiText('kids.youtubeProfiles.unlinked', 'Link removed.'), 'success');
         renderKidsYouTubeProfiles();
     }
@@ -28007,9 +28272,9 @@ document.addEventListener('DOMContentLoaded', async () => {
             const outcome = String(message.outcome || '');
             const name = String(message.parentName || '');
             const copy = {
-                SWITCHED: [tabViewUiText('kids.youtubeProfiles.parentSwitched', 'YouTube Kids now uses {parent}.', { parent: name }), 'success'],
-                UNCHANGED: [tabViewUiText('kids.youtubeProfiles.parentUnchanged', 'YouTube Kids kept the same parent account.'), 'info'],
-                OTHER_ACCOUNT: [tabViewUiText('kids.youtubeProfiles.parentOther', 'YouTube Kids now uses {parent}, not the linked account.', { parent: name }), 'warning'],
+                SWITCHED: [tabViewUiText('kids.youtubeProfiles.parentSwitched', 'The Kids site now uses {parent}.', { parent: name }), 'success'],
+                UNCHANGED: [tabViewUiText('kids.youtubeProfiles.parentUnchanged', 'The Kids site kept the same parent account.'), 'info'],
+                OTHER_ACCOUNT: [tabViewUiText('kids.youtubeProfiles.parentOther', 'The Kids site now uses {parent}, not the linked account.', { parent: name }), 'warning'],
                 REJECTED: [tabViewUiText('kids.youtubeProfiles.parentRejected', "Google didn't allow this sign-in."), 'error']
             }[outcome] || [tabViewUiText('kids.youtubeProfiles.parentStopped', 'The parent account switch did not finish.'), 'warning'];
             UIComponents.showToast(copy[0], copy[1]);
@@ -28108,6 +28373,330 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
     }
 
+    // ---- Ask a parent: the parent's Requests (Android AskParentInboxActivity) ------------------------
+    // Open asks from children on this device and on linked devices, with Allow once, Always allow this
+    // channel and Not now, an optional kind reply, and "Let Aarav ask". The background checks the
+    // parent's authority and a fresh PIN for every answer.
+    let askParentInboxHost = null;
+
+    async function askParentWithFreshPin(message) {
+        const first = await sendRuntimeMessage(message);
+        if (first?.type !== 'parent_unlock_required' || !first.parentId) return first;
+        const pin = normalizeString(await showPromptModal({
+            title: tabViewUiText('study.parent.unlockTitle', 'Parent Controls'),
+            message: tabViewUiText('study.parent.unlockBody', 'This profile is PIN-protected. Enter its PIN to continue.'),
+            placeholder: tabViewUiText('study.parent.enterPin', 'Enter PIN'),
+            inputType: 'password',
+            confirmText: tabViewUiText('study.parent.unlock', 'Unlock')
+        }));
+        if (!pin) return { ok: false, type: 'cancelled' };
+        const auth = await sendRuntimeMessage({ action: 'FilterTube_SessionPinAuth', profileId: first.parentId, pin });
+        if (auth?.ok !== true) {
+            UIComponents.showToast(auth?.reason === 'rate_limited'
+                ? tabViewUiText('dashboard.toast.pinRateLimited', 'Too many incorrect PIN attempts. Try again later.')
+                : tabViewUiText('study.switch.pinWrong', "That PIN didn't work. Try again."), 'error');
+            return { ok: false, type: 'pin_wrong' };
+        }
+        return sendRuntimeMessage(message);
+    }
+
+    function askParentTime(value) {
+        try { return new Date(value).toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' }); } catch (e) { return ''; }
+    }
+
+    /**
+     * A child's "Ask for time" (Android StudyFamilyActivity.addRequests): "Aarav asks for 20 more minutes",
+     * the reason, when it was asked and until when it waits, then "Give 20 min" and "Not now". For a
+     * child on another device the signed grant goes at the next connection.
+     */
+    function renderAskParentTimeRequest(item, list) {
+        const card = document.createElement('article');
+        card.className = 'ft-ask-request is-time';
+        const heading = document.createElement('div');
+        heading.className = 'ft-ask-request__title';
+        heading.textContent = tabViewUiText('askParent.cardTimeAsk', '{name} asks for {minutes} more minutes', { name: item.childName, minutes: item.minutes });
+        card.appendChild(heading);
+        const meta = document.createElement('div');
+        meta.className = 'ft-ask-request__meta';
+        meta.textContent = tabViewUiText('study.family.requestTime', 'Asked at {asked} · Open until {ends}', { asked: askParentTime(item.createdAt), ends: askParentTime(item.expiresAt) });
+        card.appendChild(meta);
+        if (item.reason) {
+            const note = document.createElement('p');
+            note.className = 'ft-ask-request__note';
+            note.textContent = tabViewUiText('askParent.cardNote', '“{note}”', { note: item.reason });
+            card.appendChild(note);
+        }
+        const actions = document.createElement('div');
+        actions.className = 'ft-ask-request__actions';
+        const decide = async grant => {
+            actions.querySelectorAll('button').forEach(node => { node.disabled = true; });
+            const result = await askParentWithFreshPin({ action: 'FilterTube_AskParentTimeAnswer', requestId: item.id, linkId: item.linkId || '', grant });
+            if (!result?.ok) {
+                actions.querySelectorAll('button').forEach(node => { node.disabled = false; });
+                if (result?.type === 'not_allowed') UIComponents.showToast(tabViewUiText('askParent.needsParent', 'Switch to a parent profile to answer requests.'), 'error');
+                return;
+            }
+            card.replaceChildren();
+            card.classList.add('is-answered');
+            const done = document.createElement('div');
+            done.className = 'ft-ask-request__done';
+            if (grant && window.FilterTubeDoodles?.check) {
+                const check = window.FilterTubeDoodles.check({ size: 22 });
+                if (check) done.appendChild(check);
+            }
+            const said = document.createElement('span');
+            said.textContent = grant
+                ? tabViewUiText('study.family.gave', 'Gave {minutes} min', { minutes: item.minutes })
+                : tabViewUiText('study.family.declined', 'Said not now');
+            done.appendChild(said);
+            card.appendChild(done);
+            if (result.sendsLater) {
+                const later = document.createElement('p');
+                later.className = 'ft-ask-request__meta';
+                later.textContent = tabViewUiText('study.family.sendsLater', 'It reaches {name}\'s device when they connect.', { name: item.childName });
+                card.appendChild(later);
+            }
+        };
+        const give = document.createElement('button');
+        give.type = 'button';
+        give.className = 'btn-primary';
+        give.textContent = tabViewUiText('study.family.give', 'Give {minutes} min', { minutes: item.minutes });
+        give.addEventListener('click', () => decide(true));
+        const no = document.createElement('button');
+        no.type = 'button';
+        no.className = 'btn-secondary';
+        no.textContent = tabViewUiText('askParent.notNow', 'Not now');
+        no.addEventListener('click', () => decide(false));
+        actions.append(give, no);
+        const space = askParentSpaceButton(item);
+        if (space) actions.appendChild(space);
+        card.appendChild(actions);
+        list.appendChild(card);
+    }
+
+    /**
+     * Ask a parent › "Open Aarav's space" (Android 5b9b8d079 AskParentSessionEntry): the same gate as
+     * Manage rules (a fresh, sensitive unlock of the parent's own profile; the parent stays active), then
+     * the child's space as a parent-mode session. A linked child device opens through the local child its
+     * Family link sends; with no local child the button isn't offered.
+     */
+    function askParentSpaceButton(item) {
+        const Mode = window.FilterTubeParentMode;
+        const links = safeArray(nanahTrustedLinks).map(link => normalizeNanahTrustedLink(link)).filter(Boolean);
+        const target = Mode ? Mode.spaceTarget(item.linkId ? '' : (item.childProfileId || ''), item.linkId || '', links) : null;
+        const profiles = safeObject(safeObject(profilesV4Cache).profiles);
+        if (!target || !profiles[target]) return null;
+        const open = document.createElement('button');
+        open.type = 'button';
+        open.className = 'btn-secondary ft-ask-request__space';
+        open.textContent = tabViewUiText('askParent.openSpace', 'Open {name}’s space', { name: normalizeString(profiles[target].name) || item.childName });
+        open.addEventListener('click', () => { void startManagedChildEdit(target, ''); });
+        return open;
+    }
+
+    function renderAskParentRequest(item, list) {
+        if (item.kind === 'time') { renderAskParentTimeRequest(item, list); return; }
+        const card = document.createElement('article');
+        card.className = 'ft-ask-request';
+        const heading = document.createElement('div');
+        heading.className = 'ft-ask-request__title';
+        heading.textContent = item.kind === 'channel'
+            ? tabViewUiText('askParent.cardChannel', '{name} asks for the channel “{title}”', { name: item.childName, title: item.title })
+            : tabViewUiText('askParent.cardVideo', '{name} asks to watch “{title}”', { name: item.childName, title: item.title });
+        card.appendChild(heading);
+        const meta = document.createElement('div');
+        meta.className = 'ft-ask-request__meta';
+        const parts = [];
+        if (item.kind === 'video' && item.channelName) parts.push(tabViewUiText('askParent.cardBy', 'by {name}', { name: item.channelName }));
+        // Android AskParentUi.requestCard: who asks for what, by whom, the reason as a note badge, the
+        // child's note in italics, then when it was asked and when it ends.
+        if (parts.length) { meta.textContent = parts.join(' · '); card.appendChild(meta); }
+        const reasons = { school: ['askParent.reasonSchool', 'For school'], once: ['askParent.reasonOnce', 'Just this once'], other: ['askParent.reasonOther', 'Something else'] };
+        if (reasons[item.reason]) {
+            const badge = document.createElement('span');
+            badge.className = 'ft-ask-request__reason';
+            badge.textContent = tabViewUiText(reasons[item.reason][0], reasons[item.reason][1]);
+            card.appendChild(badge);
+        }
+        if (item.note) {
+            const note = document.createElement('p');
+            note.className = 'ft-ask-request__note';
+            note.textContent = tabViewUiText('askParent.cardNote', '“{note}”', { note: item.note });
+            card.appendChild(note);
+        }
+        const when = document.createElement('div');
+        when.className = 'ft-ask-request__meta';
+        when.textContent = tabViewUiText('askParent.cardTime', 'Asked at {asked} · ends at {ends}', { asked: askParentTime(item.createdAt), ends: askParentTime(item.expiresAt) });
+        card.appendChild(when);
+        // Not now opens a one-line kind reply in place (no second dialog), with its own Send.
+        const reply = document.createElement('input');
+        reply.type = 'text';
+        reply.className = 'text-input ft-ask-request__reply';
+        reply.maxLength = 120;
+        reply.placeholder = tabViewUiText('askParent.replyHint', 'Add a kind reply (optional)');
+        reply.setAttribute('aria-label', reply.placeholder);
+        reply.hidden = true;
+        const actions = document.createElement('div');
+        actions.className = 'ft-ask-request__actions';
+        const decide = async decision => {
+            actions.querySelectorAll('button').forEach(button => { button.disabled = true; });
+            const result = await askParentWithFreshPin({ action: 'FilterTube_AskParentAnswer', askId: item.id, linkId: item.linkId || '', decision, reply: reply.value });
+            if (!result?.ok) {
+                actions.querySelectorAll('button').forEach(button => { button.disabled = false; });
+                if (result?.type === 'channel_failed') UIComponents.showToast(tabViewUiText('askParent.channelFailed', 'Couldn’t save the channel rule. Try again, or change it in Controls.'), 'error');
+                else if (result?.type === 'not_allowed') UIComponents.showToast(tabViewUiText('askParent.needsParent', 'Switch to a parent profile to answer requests.'), 'error');
+                return;
+            }
+            // The card collapses to "You said yes", with a drawn check (Android AskParentUi).
+            card.replaceChildren();
+            card.classList.add('is-answered');
+            const done = document.createElement('div');
+            done.className = 'ft-ask-request__done';
+            const said = document.createElement('span');
+            said.textContent = decision === 'no'
+                ? tabViewUiText('askParent.saidNo', 'You said not now.')
+                : tabViewUiText('askParent.saidYes', 'You said yes.');
+            if (decision !== 'no' && window.FilterTubeDoodles?.check) {
+                const check = window.FilterTubeDoodles.check({ size: 22 });
+                if (check) done.appendChild(check);
+            }
+            done.appendChild(said);
+            card.appendChild(done);
+            if (result.sendsLater) {
+                const later = document.createElement('p');
+                later.className = 'ft-ask-request__meta';
+                later.textContent = tabViewUiText('askParent.sendsLater', 'Sends next time {name} connects.', { name: item.deviceLabel || item.childName });
+                card.appendChild(later);
+            }
+        };
+        const button = (label, className, decision) => {
+            const node = document.createElement('button');
+            node.type = 'button';
+            node.className = className;
+            node.textContent = label;
+            node.addEventListener('click', () => decide(decision));
+            actions.appendChild(node);
+        };
+        if (item.kind === 'video') button(tabViewUiText('askParent.allowOnce', 'Allow once'), 'btn-primary ft-ask-request__wide', 'once');
+        if (item.channelId && (item.kind === 'channel' || item.blockedBy === 'channel')) {
+            button(tabViewUiText('askParent.allowChannel', 'Always allow this channel'), `${item.kind === 'channel' ? 'btn-primary' : 'btn-secondary'} ft-ask-request__wide`, 'channel');
+        }
+        const row = document.createElement('div');
+        row.className = 'ft-ask-request__row';
+        const notNow = document.createElement('button');
+        notNow.type = 'button';
+        notNow.className = 'ft-link-button';
+        notNow.textContent = tabViewUiText('askParent.notNow', 'Not now');
+        const send = document.createElement('button');
+        send.type = 'button';
+        send.className = 'btn-secondary ft-ask-request__send';
+        send.textContent = tabViewUiText('askParent.sendReply', 'Send');
+        send.hidden = true;
+        notNow.addEventListener('click', () => {
+            if (!reply.hidden) { decide('no'); return; }
+            reply.hidden = false;
+            send.hidden = false;
+            try { reply.focus(); } catch (e) { }
+        });
+        send.addEventListener('click', () => decide('no'));
+        row.appendChild(notNow);
+        const space = askParentSpaceButton(item);
+        if (space) { space.className = 'ft-link-button ft-ask-request__space'; row.appendChild(space); }
+        actions.appendChild(row);
+        card.appendChild(actions);
+        card.append(reply, send);
+        list.appendChild(card);
+    }
+
+    /** The hub's "Requests" row with the count (Android ASK_A_PARENT §9.4), straight to the answers. */
+    function renderAskParentHubRow(count) {
+        const hub = document.querySelector('#dashboardView .ft-dash');
+        let row = document.getElementById('ftAskParentHubRow');
+        if (!hub || !count) { row?.remove(); return; }
+        if (!row) {
+            row = document.createElement('section');
+            row.id = 'ftAskParentHubRow';
+            row.className = 'ft-ask-hub-row';
+            const words = document.createElement('span');
+            words.className = 'ft-ask-hub-row__words';
+            const open = document.createElement('button');
+            open.type = 'button';
+            open.className = 'btn-primary';
+            open.textContent = tabViewUiText('askParent.answer', 'Answer');
+            open.addEventListener('click', () => {
+                document.querySelector('.nav-item[data-nav-id="profiles"]')?.click();
+                setTimeout(() => document.querySelector('[data-ask-parent-inbox]')?.scrollIntoView({ block: 'start', behavior: 'smooth' }), 250);
+            });
+            row.append(words, open);
+            const hero = hub.querySelector('.ft-dash-hero');
+            if (hero?.nextSibling) hub.insertBefore(row, hero.nextSibling); else hub.prepend(row);
+        }
+        row.querySelector('.ft-ask-hub-row__words').textContent = `${tabViewUiText('askParent.inboxTitle', 'Requests')} · ${count}`;
+    }
+
+    async function renderAskParentInbox(host = askParentInboxHost) {
+        if (!host || !host.isConnected) return;
+        askParentInboxHost = host;
+        const data = await sendRuntimeMessage({ action: 'FilterTube_AskParentInbox' });
+        const children = [...safeArray(data?.children), ...safeArray(data?.remoteChildren)];
+        if (!data?.isParent || !children.length) { host.hidden = true; host.replaceChildren(); renderAskParentHubRow(0); return; }
+        const requests = [...safeArray(data.here), ...safeArray(data.remote), ...safeArray(data.timeHere), ...safeArray(data.timeRemote)]
+            .sort((a, b) => (a.createdAt || 0) - (b.createdAt || 0));
+        renderAskParentHubRow(requests.length);
+        host.hidden = false;
+        host.className = 'help-item ft-ask-inbox';
+        const title = document.createElement('div');
+        title.className = 'help-item-title';
+        title.textContent = requests.length
+            ? `${tabViewUiText('askParent.inboxTitle', 'Requests')} · ${requests.length}`
+            : tabViewUiText('askParent.inboxTitle', 'Requests');
+        const list = document.createElement('div');
+        list.className = 'ft-ask-inbox__list';
+        if (!requests.length) {
+            const empty = document.createElement('p');
+            empty.className = 'help-item-body';
+            empty.textContent = tabViewUiText('askParent.inboxEmpty', 'No requests right now.');
+            list.appendChild(empty);
+        }
+        requests.forEach(item => renderAskParentRequest(item, list));
+        const switches = document.createElement('div');
+        switches.className = 'ft-ask-inbox__switches';
+        children.forEach(child => {
+            const label = document.createElement('label');
+            label.className = 'ft-ask-inbox__switch';
+            const box = document.createElement('input');
+            box.type = 'checkbox';
+            box.checked = child.askingOff !== true;
+            const words = document.createElement('span');
+            words.textContent = tabViewUiText('askParent.askingSwitch', 'Let {name} ask', { name: child.name });
+            words.title = tabViewUiText('askParent.askingSwitchBody', '{name} can ask to watch blocked videos. Nothing changes until you answer.', { name: child.name });
+            box.addEventListener('change', async () => {
+                const result = await askParentWithFreshPin({ action: 'FilterTube_AskParentSetAsking', childId: child.id || '', linkId: child.linkId || '', on: box.checked });
+                if (!result?.ok) box.checked = !box.checked;
+                else void renderAskParentInbox(host);
+            });
+            label.append(box, words);
+            switches.appendChild(label);
+        });
+        // A linked child's device that stopped reporting may have been reset or had FilterTube removed
+        // (Android StudyFamilyActivity, StudyReportFreshness).
+        const stopped = safeArray(data.remoteChildren).filter(child => Number.isFinite(child.stoppedSince)).map(child => {
+            const notice = document.createElement('div');
+            notice.className = 'ft-ask-inbox__stopped';
+            notice.setAttribute('role', 'status');
+            const head = document.createElement('strong');
+            head.textContent = tabViewUiText('study.family.stopped', '{name}\'s device stopped reporting', { name: child.name });
+            const body = document.createElement('p');
+            body.className = 'help-item-body';
+            let when = '';
+            try { when = new Date(child.stoppedSince).toLocaleString(undefined, { weekday: 'short', day: 'numeric', month: 'short', hour: 'numeric', minute: '2-digit' }); } catch (e) { }
+            body.textContent = tabViewUiText('study.family.stoppedBody', 'Last report {time}. If the device was reset or FilterTube was removed, its study plan is gone too. Pair again to send it.', { time: when });
+            notice.append(head, body);
+            return notice;
+        });
+        host.replaceChildren(...stopped, title, list, switches);
+    }
+
     function renderProfilesManager(profilesV4) {
         if (!ftProfilesManager) return;
         const root = safeObject(profilesV4);
@@ -28119,6 +28708,12 @@ document.addEventListener('DOMContentLoaded', async () => {
             .map(element => element.dataset.profileOptionsId));
         const familyToolsOpen = ftProfilesManager.querySelector?.('details[data-family-profile-tools]')?.open === true;
         ftProfilesManager.innerHTML = '';
+        // Ask a parent: the Requests a parent answers come first.
+        const askParentInbox = document.createElement('section');
+        askParentInbox.hidden = true;
+        askParentInbox.dataset.askParentInbox = 'true';
+        ftProfilesManager.appendChild(askParentInbox);
+        void renderAskParentInbox(askParentInbox);
 
         const ids = [];
         getAccountIds(profilesV4).forEach(accountId => ids.push(accountId, ...getChildrenForAccount(profilesV4, accountId)));
@@ -28783,16 +29378,78 @@ document.addEventListener('DOMContentLoaded', async () => {
         renderProfilesManager(profilesV4Cache);
     });
 
+
+    // Switching profile during study (Android StudySwitchGate): the background decides, and reverts any
+    // switch it didn't allow; this asks for the parent's PIN or says why switching waits.
+    async function passStudySwitchGate(targetId) {
+        let decision = null;
+        try {
+            const response = await sendRuntimeMessage({ action: 'FilterTube_StudySwitchDecision', targetProfileId: targetId });
+            decision = response?.ok ? response.decision : null;
+        } catch (e) {
+            decision = null;
+        }
+        if (!decision || decision.kind === 'allowed') return true;
+        const timeLabel = Number.isFinite(decision.endsAt) && decision.endsAt > Date.now()
+            ? new Date(decision.endsAt).toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' })
+            : '';
+        if (decision.kind === 'needs_parent_pin' && decision.parentHasPin) {
+            const pin = await showPromptModal({
+                title: tabViewUiText('study.switch.pausedTitle', 'Profile switching is paused'),
+                message: decision.parentName
+                    ? tabViewUiText('study.switch.parentBody', '{name} can switch now with their PIN.', { name: decision.parentName })
+                    : tabViewUiText('study.switch.parentBodyGeneric', 'A parent can switch now with their PIN.'),
+                placeholder: 'PIN',
+                inputType: 'password',
+                confirmText: tabViewUiText('study.switch.withPin', 'Switch')
+            });
+            const normalized = normalizeString(pin);
+            if (!normalized) return false;
+            const auth = await sendRuntimeMessage({ action: 'FilterTube_StudySwitchAuthorize', targetProfileId: targetId, pin: normalized });
+            if (auth?.ok === true) return true;
+            UIComponents.showToast(auth?.reason === 'rate_limited'
+                ? tabViewUiText('dashboard.toast.pinRateLimited', 'Too many incorrect PIN attempts. Try again later.')
+                : tabViewUiText('study.switch.pinWrong', "That PIN didn't work. Try again."), 'error');
+            return false;
+        }
+        if (decision.kind === 'end_gentle_first') {
+            // Android StudySwitchGate: "End and switch" ends the session after its 30-second pause,
+            // then switches. The other profile's own PIN is typed now; the background switches later.
+            const endAndSwitch = await showConfirmModal({
+                title: tabViewUiText('study.switch.gentleTitle', 'Switch profile?'),
+                message: tabViewUiText('study.switch.gentleBody', 'Your study session ends first. You can still cancel during a 30-second pause.'),
+                confirmText: tabViewUiText('study.switch.end', 'End and switch'),
+                cancelText: tabViewUiText('study.switch.keep', 'Keep studying')
+            });
+            if (!endAndSwitch) return false;
+            const io = window.FilterTubeIO || {};
+            const profilesV4 = typeof io.loadProfilesV4 === 'function' ? await io.loadProfilesV4() : null;
+            if (!profilesV4 || !(await ensureProfileUnlocked(profilesV4, targetId))) return false;
+            const ending = await sendRuntimeMessage({ action: 'FilterTube_StudyEndGentleThenSwitch', targetProfileId: targetId });
+            UIComponents.showToast(ending?.ok
+                ? tabViewUiText('study.switch.ending', 'Your session ends in 30 seconds. The profile switches then.')
+                : tabViewUiText('study.error.generic', 'That didn\'t save. Try again.'), ending?.ok ? 'info' : 'error');
+            return false;
+        }
+        UIComponents.showToast(timeLabel
+            ? tabViewUiText('study.switch.locked', 'Other profiles open after {time}.', { time: timeLabel })
+            : tabViewUiText('study.switch.lockedNoTime', 'Other profiles open after study.'), 'error');
+        return false;
+    }
+
     async function switchToProfile(nextProfileId) {
         if (isHandlingProfileSwitch) return;
         if (isSelfControlSessionActive()) {
             UIComponents.showToast(tabViewUiText('family.profileManager.switchingLocked', 'Profile switching is locked for {remaining}', {
                 remaining: formatSelfControlRemaining(selfControlSessionState.remainingSeconds)
             }), 'error');
+            // Kriti holds the "Locked until <time>" sign beside the words (a still; Companion Off: words only).
+            window.FilterTubeMascots?.lockedToast?.(selfControlSessionState?.lockedUntil);
             return;
         }
         const targetId = normalizeString(nextProfileId);
         if (!targetId) return;
+        if (!(await passStudySwitchGate(targetId))) return;
 
         isHandlingProfileSwitch = true;
         try {
@@ -28827,7 +29484,11 @@ document.addEventListener('DOMContentLoaded', async () => {
             await refreshProfilesUI();
             void runNanahManagedBackgroundSync({ reason: 'profile_switch' });
             updateStats();
-            UIComponents.showToast(tabViewUiText('popup.profile.switched', 'Profile switched'), 'success');
+            // The switch moment, once the switch has landed (Android ProfileSwitchMoment): Kriti waves at most
+            // three times a day, else the crayon check.
+            const switchedName = normalizeString(safeObject(safeObject(profilesV4Cache?.profiles)[targetId] || profiles?.[targetId]).name);
+            if (window.FilterTubeMascots?.profileSwitched && switchedName) window.FilterTubeMascots.profileSwitched(switchedName, (m, k) => UIComponents.showToast(m, k));
+            else UIComponents.showToast(tabViewUiText('popup.profile.switched', 'Profile switched'), 'success');
         } catch (e) {
             console.warn('Tab-View: profile switch failed', e);
             UIComponents.showToast(tabViewUiText('popup.profile.switchFailed', 'Failed to switch profile'), 'error');
@@ -29346,6 +30007,8 @@ document.addEventListener('DOMContentLoaded', async () => {
                     : tabViewUiText('dashboard.backup.toast.exportedToDownloadsFolder', 'Exported JSON to Downloads/FilterTube Export/'),
                 'success'
             );
+            // Backup saved: Kriti stamps a check and Uljhan claps beside the button, once a day.
+            window.FilterTubeMascots?.backupSaved?.('ftExportV3Btn');
         } catch (e) {
             UIComponents.showToast(tabViewUiText('dashboard.backup.toast.exportFailed', 'Export failed'), 'error');
             console.error('Export V3 failed', e);
@@ -29432,14 +30095,31 @@ document.addEventListener('DOMContentLoaded', async () => {
                         : tabViewUiText('dashboard.backup.toast.encryptedExportedToDownloadsFolder', 'Exported encrypted JSON to Downloads/FilterTube Export/')),
                 'success'
             );
+            window.FilterTubeMascots?.backupSaved?.('ftExportV3EncryptedBtn');
         } catch (e) {
             UIComponents.showToast(tabViewUiText('dashboard.backup.toast.encryptedExportFailed', 'Encrypted export failed'), 'error');
             console.error('Export encrypted failed', e);
         }
     }
 
+    // "Restore after study" (Android StudyRestoreGate): a backup restore waits while a study round, a
+    // Locked session or a clock hold runs on the active profile.
+    async function studyHoldsRestore() {
+        try {
+            const state = await sendRuntimeMessage({ action: 'FilterTube_StudyGetState' });
+            if (!state?.ok || !state.study) return false;
+            const running = state.state === 'STUDY' || state.state === 'BREAK';
+            if (!running && state.lockMode !== 'locked' && state.clockHold !== true) return false;
+            UIComponents.showToast(`${tabViewUiText('study.restore.title', 'Restore after study')}. ${tabViewUiText('study.restore.body', 'Restoring now would replace your study plan.')}`, 'error');
+            return true;
+        } catch (e) {
+            return false;
+        }
+    }
+
     async function runImportV3FromFile(file) {
         if (!file) return;
+        if (await studyHoldsRestore()) return;
         if (!ensureNonChildAdminAction(tabViewUiText(
             'dashboard.backup.protected.importBlocked',
             'Protected profiles cannot import backups from this surface.'
@@ -29829,8 +30509,9 @@ document.addEventListener('DOMContentLoaded', async () => {
                         'Import verified and trusted-device recovery data restored'
                     )
                     : tabViewUiText('dashboard.backup.import.verified', 'Import verified');
+                // Restore ends on the done toast (Android 4ff67ce1b): "Everything's back in place."
                 UIComponents.showToast(
-                    `${importStatus}. ${metadataNotice}`,
+                    `${tabViewUiText('people.restoreDone', 'Everything\'s back in place.')} ${importStatus}. ${metadataNotice}`,
                     'success'
                 );
             }
@@ -30034,6 +30715,11 @@ document.addEventListener('DOMContentLoaded', async () => {
                 ftNanahShowNearbyBtn.disabled = false;
             }
         });
+    }
+    // Connect a device is the page's own section (Android's Connect page): the pairing card stays open.
+    if (ftNanahPairingDetails) {
+        ftNanahPairingDetails.open = true;
+        ftNanahPairingDetails.addEventListener('toggle', () => { if (!ftNanahPairingDetails.open) ftNanahPairingDetails.open = true; });
     }
     if (ftNanahAddDeviceBtn) {
         ftNanahAddDeviceBtn.addEventListener('click', () => {
@@ -30725,6 +31411,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                     if (confirmed !== 'confirm') return;
                     await nanahClient.confirmSas();
                     nanahSessionState.sasConfirmed = true;
+                    reportParentSessionSync(window.FilterTubeParentMode?.SYNC.CONNECTED);
                     void sendNanahHelloEnvelope(true).then(() => sendNanahAutoSyncReadiness()).catch(() => {});
                     void deviceAutoSync?.run({ wake: true }).catch(() => {});
                     updateNanahUi();
@@ -32472,6 +33159,72 @@ document.addEventListener('DOMContentLoaded', async () => {
         renderManagedChildEditorBanner();
     }
 
+    // The effective mode (js/shared/effective_mode.js): during study the header pill says "Study" in sage
+    // and opens the Study page; it changes back by itself when the session ends.
+    // var without a value: the page can draw the pill before these lines run (no temporal dead zone),
+    // and reaching them later must not reset a load already started.
+    var tabStudyState;
+    var tabStudyLoad;
+    var tabStudyTimer;
+    var tabStudyAsked;
+    function refreshTabStudyState() {
+        tabStudyAsked = true;
+        if (tabStudyLoad) return tabStudyLoad;
+        tabStudyLoad = (async () => {
+            try {
+                const resp = await sendRuntimeMessage({ action: 'FilterTube_StudyGetState' });
+                tabStudyState = resp && resp.ok !== false ? resp : null;
+            } catch (e) {
+                tabStudyState = null;
+            }
+            tabStudyLoad = null;
+            renderListModeControls();
+            try { if (lastDashboardProfileCardData) renderDashboardProfileCard(lastDashboardProfileCardData); } catch (e) { }
+            if (tabStudyTimer) clearTimeout(tabStudyTimer);
+            const at = [tabStudyState?.until, tabStudyState?.next?.at].map(Number).filter(value => Number.isFinite(value) && value > Date.now());
+            if (at.length) tabStudyTimer = setTimeout(refreshTabStudyState, Math.min(Math.min(...at) - Date.now() + 500, 10 * 60 * 1000));
+        })();
+        return tabStudyLoad;
+    }
+    try {
+        const storageApi = (typeof chrome !== 'undefined' && chrome.storage) || (typeof browser !== 'undefined' && browser.storage);
+        storageApi?.onChanged?.addListener?.((changes, area) => {
+            if (area === 'local' && (changes.ftStudyRuntimeV1 || changes.ftProfilesV4)) refreshTabStudyState();
+        });
+    } catch (e) {
+    }
+
+    function renderStudyModePill(container, effective) {
+        const text = window.FilterTubeEffectiveMode?.effectiveModeText?.(effective, (key, fallback, values) => tabViewUiText(key, fallback, values),
+            at => new Date(at).toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' }));
+        if (!text) return false;
+        const pill = document.createElement('div');
+        pill.className = 'exact-toggle active ft-list-mode-pill ft-list-mode-pill--study';
+        pill.dataset.effectiveMode = 'study';
+        const icon = document.createElement('span');
+        icon.className = 'ft-list-mode-pill__icon';
+        icon.setAttribute('aria-hidden', 'true');
+        icon.innerHTML = '<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="13" r="8"/><path d="M12 9v4l2 2M9 2h6"/></svg>';
+        const label = document.createElement('span');
+        label.textContent = text.label;
+        pill.append(icon, label);
+        pill.title = text.title;
+        pill.setAttribute('aria-label', text.title);
+        pill.setAttribute('role', 'link');
+        pill.setAttribute('tabindex', '0');
+        const open = () => {
+            const row = document.querySelector('.nav-item[data-tab="study"]');
+            if (row) row.click();
+            else window.location.hash = '#study';
+        };
+        pill.addEventListener('click', open);
+        pill.addEventListener('keydown', event => {
+            if (event.key === 'Enter' || event.key === ' ') { event.preventDefault(); open(); }
+        });
+        container.appendChild(pill);
+        return true;
+    }
+
     function renderListModeControls() {
         const state = StateManager.getState();
         if (!ftTopBarListModeControlsTab) return;
@@ -32490,6 +33243,9 @@ document.addEventListener('DOMContentLoaded', async () => {
         })();
 
         ftTopBarListModeControlsTab.innerHTML = '';
+        if (!tabStudyAsked) refreshTabStudyState();
+        const studyEffective = window.FilterTubeEffectiveMode?.effectiveModeFor?.(currentMode, tabStudyState, Date.now());
+        if (studyEffective?.mode === 'study' && renderStudyModePill(ftTopBarListModeControlsTab, studyEffective)) return;
 
         const toggle = document.createElement('div');
         toggle.className = [
@@ -32594,6 +33350,11 @@ document.addEventListener('DOMContentLoaded', async () => {
                 }
 
                 if (!resp || resp.ok !== true) {
+                    // During study the list mode is the plan's: the app's loosening sheet says why.
+                    if (resp?.error === 'study_loosening' && window.FilterTubeStudyUi?.showLooseningNotice?.(resp.notice)) {
+                        renderListModeControls();
+                        return;
+                    }
                     UIComponents.showToast(tabViewUiText('popup.listMode.updateFailed', 'Failed to update list mode'), 'error');
                     renderListModeControls();
                     return;
@@ -32692,19 +33453,22 @@ document.addEventListener('DOMContentLoaded', async () => {
     const FILTERTUBE_PLAY_LISTING = 'https://play.google.com/store/apps/details?id=com.filtertube.app';
     // One Google Play listing covers phone, tablet and TV. Flip a platform's status here when it ships.
     const FILTERTUBE_APP_PLATFORMS = Object.freeze([
-        { id: 'android', status: 'available', variant: 'android', icon: '../assets/images/Android_icon.png', href: FILTERTUBE_PLAY_LISTING,
+        { id: 'android', status: 'available', variant: 'android', icon: '../assets/images/Android_icon.png', art: '../assets/images/apps/android_robot.webp', href: FILTERTUBE_PLAY_LISTING,
             kicker: ['apps.android.kicker', 'Android phone and tablet'],
             body: ['apps.android.body', 'The complete custom Main and Kids viewing experience, more feature-rich than the direct APK.'],
             cta: ['apps.android.cta', 'Install from Google Play'] },
-        { id: 'android-tv', status: 'available', variant: 'tv', icon: '../assets/images/Android_icon.png', href: FILTERTUBE_PLAY_LISTING,
+        { id: 'android-tv', status: 'available', variant: 'tv', icon: '../assets/images/Android_icon.png', art: '../assets/images/apps/android_robot.webp', href: FILTERTUBE_PLAY_LISTING,
             kicker: ['apps.tv.kicker', 'Android TV'],
             body: ['apps.tv.body', 'The same Google Play listing, installed on your Android TV.'],
             cta: ['apps.android.cta', 'Install from Google Play'] },
-        { id: 'ios', status: 'coming_soon', variant: 'ios', icon: '../assets/images/App_Store_transparent.png', href: 'https://www.filtertube.in/downloads',
+        // Apple is having trouble on their end with the developer account, so the App Store release will
+        // take a while. Until then the iPhone and iPad app is sideloaded, SideStore preferred (AltStore also
+        // works), with the guide at filtertube.in/ios.
+        { id: 'ios', status: 'coming_soon', variant: 'ios', icon: '../assets/images/App_Store_transparent.png', art: '../assets/images/apps/app_store_mark.webp', href: 'https://filtertube.in/ios',
             kicker: ['apps.ios.kicker', 'iPhone and iPad'],
-            title: ['apps.ios.title', 'Final build and testing alignment'],
-            body: ['apps.ios.body', 'The native Apple build is being finalized. Apple Developer account access is delaying TestFlight availability and will be resolved as soon as possible.'],
-            cta: ['apps.ios.cta', 'View status'], ctaWhileComingSoon: true }
+            title: ['apps.ios.sideloadTitle', 'Install it with SideStore'],
+            body: ['apps.ios.sideloadBody', 'Apple is having trouble on their end with the developer account, so the App Store version will take a while. Until then, SideStore is the best way we\u2019ve found to install FilterTube, and AltStore works too. The step-by-step guide shows you how.'],
+            cta: ['apps.ios.sideloadCta', 'Open the iPhone guide'], ctaWhileComingSoon: true }
     ]);
     let controlCenterAppsRendered = false;
     let controlCenterSelectedRow = 'dashboard';
@@ -32736,6 +33500,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         return {
             state, main, kids, hidden, devices, contentOn,
             profiles: Object.keys(safeObject(profilesV4Cache?.profiles)).length || 1,
+            activeName: normalizeString(safeObject(profilesV4Cache?.profiles)[normalizeString(activeProfileId) || 'default']?.name),
             mainMode: state.mode === 'whitelist' ? 'whitelist' : 'blocklist',
             kidsMode: state.kids?.mode === 'whitelist' ? 'whitelist' : 'blocklist',
             autoBackup: state.autoBackupEnabled === true,
@@ -32744,6 +33509,14 @@ document.addEventListener('DOMContentLoaded', async () => {
         };
     }
 
+    /** A count line with its plural form (key.one / key.other / key.<category>). */
+    function controlCenterPlural(key, count, fallbackOne, fallbackOther, values = {}) {
+        let category = count === 1 ? 'one' : 'other';
+        try { category = new Intl.PluralRules(document.documentElement.lang || navigator.language || 'en').select(count); } catch (e) { }
+        return tabViewUiText(`${key}.${category}`, count === 1 ? fallbackOne : fallbackOther, { count, ...values });
+    }
+
+    /** The Controls tile lines (Android DashboardActivity.controlCenterTileText). */
     function controlCenterSummary(id, data) {
         const rules = counts => tabViewUiText('controls.summary.rules', 'Channels: {channels} · Keywords: {keywords}',
             { channels: counts.channelCount || 0, keywords: counts.keywordCount || 0 });
@@ -32753,23 +33526,24 @@ document.addEventListener('DOMContentLoaded', async () => {
             case 'content': return tabViewUiText('controls.summary.contentOn', 'Turned on: {count}', { count: data.contentOn });
             case 'timeLimits': return data.selfControl
                 ? tabViewUiText('controls.summary.selfControlLeft', 'Self-Control: {remaining}', { remaining: data.selfControl })
-                : tabViewUiText('family.commandCenter.detail.off', 'Off');
-            case 'backup': return data.autoBackup ? tabViewUiText('controls.summary.autoBackupOn', 'Auto backup on') : tabViewUiText('controls.summary.autoBackupOff', 'Auto backup off');
-            case 'profiles': return tabViewUiText('controls.summary.profiles', 'Profiles: {count}', { count: data.profiles });
-            case 'kids': return tabViewUiText('controls.summary.kids', '{mode} · Channels: {channels}',
-                { mode: controlCenterModeLabel(data.kidsMode), channels: data.kids.channelCount || 0 });
+                : tabViewUiText('controls.summary.selfControlOff', 'Self-Control is off');
+            case 'backup': return data.autoBackup ? tabViewUiText('controls.summary.backupOn', 'Automatic backup is on') : tabViewUiText('controls.summary.backupOff', 'Automatic backup is off');
+            case 'profiles': return data.activeName
+                ? controlCenterPlural('controls.summary.profileCount', data.profiles, '{name} · {count} profile', '{name} · {count} profiles', { name: data.activeName })
+                : tabViewUiText('controls.summary.profiles', 'Profiles: {count}', { count: data.profiles });
+            // Kids reads like Filters (the profile pill names the mode): "No rules yet", or its counts.
+            case 'kids': return (data.kids.channelCount || 0) + (data.kids.keywordCount || 0)
+                ? rules(data.kids) : tabViewUiText('pk.hub.noRules', 'No rules yet');
             case 'settings': return data.selfControl
                 ? tabViewUiText('controls.summary.selfControlLeft', 'Self-Control: {remaining}', { remaining: data.selfControl })
                 : (data.autoBackup ? tabViewUiText('controls.summary.autoBackupOn', 'Auto backup on') : tabViewUiText('controls.summary.autoBackupOff', 'Auto backup off'));
             case 'sync': return data.devices
-                ? (data.devices === 1
-                    ? tabViewUiText('family.commandCenter.trustMap.oneVerifiedDevice', '{count} verified device', { count: 1 })
-                    : tabViewUiText('family.commandCenter.trustMap.manyVerifiedDevices', '{count} verified devices', { count: data.devices }))
-                : tabViewUiText('controls.summary.noDevices', 'No devices yet');
+                ? controlCenterPlural('controls.summary.trustedDevices', data.devices, '{count} trusted device', '{count} trusted devices')
+                : tabViewUiText('controls.summary.noSavedDevices', 'No saved devices. Pair with a code or QR.');
             case 'whatsnew': return data.version ? tabViewUiText('controls.summary.version', 'Version {version}', { version: data.version }) : '';
-            case 'help': return tabViewUiText('controls.summary.help', 'Guides and answers');
-            case 'about': return tabViewUiText('controls.summary.about', 'Who builds FilterTube');
-            case 'donate': return tabViewUiText('controls.summary.support', 'Optional support');
+            case 'help': return tabViewUiText('controls.summary.helpTips', 'Guides and filter tips');
+            case 'about': return tabViewUiText('controls.summary.aboutLinks', 'Version, links and licences');
+            case 'donate': return tabViewUiText('controls.summary.supportBuild', 'Support the build');
             default: return '';
         }
     }
@@ -32778,10 +33552,36 @@ document.addEventListener('DOMContentLoaded', async () => {
     function revealControlCenterTarget(target) {
         const scrollTo = node => node && requestAnimationFrame(() => node.scrollIntoView({ behavior: 'smooth', block: 'start' }));
         if (target === 'content') document.querySelector('#filtersView [data-tab-id="content"]')?.click();
-        if (target === 'selfControl') scrollTo(document.getElementById('ftStudyCard') || document.querySelector('#settingsView .ft-self-control-card'));
+        if (target === 'selfControl') scrollTo(document.getElementById('ftSelfControlCard') || document.querySelector('#settingsView .ft-self-control-card'));
         if (target === 'importExport') scrollTo(document.getElementById('ftImportExportCard'));
         if (target === 'profiles') scrollTo(document.getElementById('ftProfilesManager')?.closest('.settings-card'));
     }
+
+    // The Study page's links (Android StudyFocusActivity): Self-Control lives in Settings, and a
+    // child's plan in the Family command centre.
+    window.FilterTubeOpenSelfControl = () => {
+        if (typeof window.switchView === 'function') window.switchView('settings');
+        revealControlCenterTarget('selfControl');
+    };
+    window.FilterTubeOpenStudyFamily = childId => {
+        if (typeof window.switchView === 'function') window.switchView('sync');
+        requestAnimationFrame(() => {
+            const row = Array.from(document.querySelectorAll('.ft-study-parent__child')).find(node => node.dataset.childId === String(childId));
+            if (!row) return;
+            const tools = row.closest('details.ft-family-profile-tools');
+            if (tools) tools.open = true;
+            row.open = true;
+            row.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        });
+    };
+    window.FilterTubeStudyChildren = () => {
+        const profilesV4 = profilesV4Cache;
+        if (!profilesV4) return [];
+        const activeId = normalizeString(activeProfileId) || 'default';
+        return getChildrenForAccount(profilesV4, activeId)
+            .filter(childId => getProfileType(profilesV4, childId) === 'child' && canActiveProfileManageProfile(profilesV4, childId))
+            .map(childId => ({ id: childId, name: getProfileName(profilesV4, childId), plan: profilesV4.profiles?.[childId]?.study?.plan || null }));
+    };
 
     async function openControlCenterDestination(view) {
         if (resolveViewAccess(view).reason === 'locked' && resolveViewAccess(view).viewId !== view) {
@@ -32827,19 +33627,20 @@ document.addEventListener('DOMContentLoaded', async () => {
                 cta.append(icon, label);
                 content.appendChild(cta);
             }
+            // The platform at a glance: a large picture tucked into the card's lower corner, behind the words.
             const art = document.createElement('span');
-            art.className = 'dashboard-app-card__art'; art.setAttribute('aria-hidden', 'true');
+            art.className = `dashboard-app-card__art ft-app-art ft-app-art--${platform.variant}`; art.setAttribute('aria-hidden', 'true');
+            const artImg = document.createElement('img'); artImg.src = platform.art || platform.icon; artImg.alt = '';
+            artImg.decoding = 'async'; artImg.loading = 'lazy';
             if (platform.variant === 'tv') {
-                // A TV showing FilterTube, drawn in CSS: no extra image asset.
-                art.classList.add('ft-tv-art');
-                const screen = document.createElement('span'); screen.className = 'ft-tv-art__screen';
-                const logo = document.createElement('img'); logo.src = '../icons/icon-128.png'; logo.alt = '';
-                const bar = document.createElement('span'); bar.className = 'ft-tv-art__bar';
-                screen.append(logo, bar);
-                const stand = document.createElement('span'); stand.className = 'ft-tv-art__stand';
-                art.append(screen, stand);
+                // A TV drawn in CSS, the Android robot peeking up from its screen.
+                const tv = document.createElement('span'); tv.className = 'ft-app-tv';
+                const screen = document.createElement('span'); screen.className = 'ft-app-tv__screen';
+                screen.appendChild(artImg);
+                const stand = document.createElement('span'); stand.className = 'ft-app-tv__stand';
+                tv.append(screen, stand);
+                art.appendChild(tv);
             } else {
-                const artImg = document.createElement('img'); artImg.src = platform.icon; artImg.alt = '';
                 art.appendChild(artImg);
             }
             card.append(content, art);
@@ -32889,12 +33690,22 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (name) name.textContent = root.profiles ? getProfileName(root, activeProfileId) : '';
         if (mode) {
             const kidsSurface = dashboardStatsSurface === 'kids';
+            const ownMode = kidsSurface ? data.kidsMode : data.mainMode;
+            // During a study round or break Main runs on the plan's allow list: say Study, as the pill does.
+            let modeLabel = controlCenterModeLabel(ownMode);
+            try {
+                const effective = window.FilterTubeEffectiveMode?.effectiveModeFor?.(ownMode, tabStudyState, Date.now());
+                if (!kidsSurface && effective?.mode === 'study') modeLabel = tabViewUiText('study.pill.label', 'Study');
+            } catch (e) {
+            }
             mode.textContent = tabViewUiText('controls.header.surfaceMode', '{surface} · {mode}', {
                 surface: kidsSurface ? tabViewUiText('family.commandCenter.surface.kids', 'Kids') : tabViewUiText('family.commandCenter.surface.main', 'Main'),
-                mode: controlCenterModeLabel(kidsSurface ? data.kidsMode : data.mainMode)
+                mode: modeLabel
             });
         }
+        lastDashboardProfileCardData = data;
     }
+    var lastDashboardProfileCardData;
 
     (function installControlCenter() {
         document.getElementById('ftDashSwitchProfile')?.addEventListener('click', () => {
@@ -32942,8 +33753,8 @@ document.addEventListener('DOMContentLoaded', async () => {
         setInterval(() => { if (isSelfControlSessionActive()) renderControlCenter(); }, 30000);
     })();
 
-    let dashboardStatsSurface = 'main';
-    let dashboardStatsRotationTimer = 0;
+    var dashboardStatsSurface = 'main'; // var: the profile card can draw before this line runs
+    var dashboardStatsRotationTimer = 0; // var: read by listeners that can run before this line
     let dashboardStatsUserOverride = false;
 
     function getDashboardSurfaceStats(surface, state) {
@@ -34043,11 +34854,12 @@ function setupNavigation() {
         // The page title is the section's own nav label, from the same catalog key (it used to stay
         // English outside the first pages, and About kept the previous page's title).
         const titles = {
-            'dashboard': ['navigation.dashboard', 'Dashboard'],
+            'dashboard': ['home.nav.title', 'Home'],
             'filters': ['navigation.filters', 'Filters'],
             'semantic': ['', 'Semantic ML'],
             'kids': ['navigation.kids', 'Kids Mode'],
             'settings': ['navigation.settings', 'Settings'],
+            'study': ['study.nav.title', 'Study and focus'],
             'sync': ['navigation.sync', 'Accounts & Sync'],
             'whatsnew': ['navigation.whatsNew', 'What’s New'],
             'help': ['navigation.help', 'Help'],
@@ -34059,6 +34871,8 @@ function setupNavigation() {
             const [titleKey, titleFallback] = titles[effectiveViewId];
             if (titleKey) setTabViewLocalizedCopy(pageTitle, 'textContent', titleKey, titleFallback);
             else pageTitle.textContent = titleFallback;
+            // The browser tab names the page too ("FilterTube · Controls"), never the old "Dashboard".
+            try { document.title = `FilterTube · ${pageTitle.textContent}`; } catch (e) { }
         }
 
         try {
@@ -34079,6 +34893,11 @@ function setupNavigation() {
 
     // Make switchView globally accessible for quick actions
     window.switchView = switchView;
+    // The first page is Controls until a route says otherwise: its title in the chosen language.
+    if (pageTitle && document.getElementById('dashboardView')?.classList.contains('active')) {
+        setTabViewLocalizedCopy(pageTitle, 'textContent', 'home.nav.title', 'Home');
+        try { document.title = `FilterTube · ${pageTitle.textContent}`; } catch (e) { }
+    }
 }
 
 // ============================================================================

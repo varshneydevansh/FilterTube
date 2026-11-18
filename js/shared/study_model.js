@@ -272,7 +272,8 @@
      * - progress takes the larger value per device and per day, whatever the strategy;
      * - the running lock is never copied: this device keeps its own (or none). Only Move account
      *   (carryLock) brings the other device's lock and saved list mode;
-     * - a plan a parent set here, and its break mode, stay unless carryLock.
+     * - a plan a parent set here, its break mode, its round and break lengths and "Pack channels only"
+     *   stay unless carryLock; otherwise an incoming "Pack channels only" wins when it is set.
      */
     function mergeStudy(local, incoming, { strategy = 'merge', carryLock = false, now = Date.now() } = {}) {
         const mine = normalizeStudy(local);
@@ -289,14 +290,18 @@
     function mergeStudyValues(mine, theirs, { strategy, carryLock }) {
         const replace = strategy === 'replace';
         const parentPlan = !!(mine.plan && mine.plan.setByParentId) && !carryLock;
-        return {
+        // "Pack channels only" is a parent's setting too (Android StudyMerge, e64d74490): under a parent's
+        // plan it stays the parent's; otherwise the incoming value wins when it is set.
+        const packChannelsOnly = parentPlan ? mine.packChannelsOnly : (theirs.packChannelsOnly ?? mine.packChannelsOnly);
+        const merged = {
             ...extras(mine, KNOWN.study),
             ...extras(theirs, KNOWN.study),
             version: Math.max(mine.version, theirs.version),
             activePackIds: replace ? theirs.activePackIds
                 : Array.from(new Set([...mine.activePackIds, ...theirs.activePackIds])).slice(0, MAX_PACKS),
             packEdits: replace ? theirs.packEdits : mergePackEdits(mine.packEdits, theirs.packEdits),
-            focus: theirs.focus,
+            // Round and break lengths belong with the plan: a sync can't stretch a parent's breaks (ce156df15).
+            focus: parentPlan ? mine.focus : theirs.focus,
             plan: parentPlan ? mine.plan : (replace ? theirs.plan : (theirs.plan || mine.plan)),
             lock: carryLock ? theirs.lock : mine.lock,
             savedListMode: carryLock ? (theirs.savedListMode || mine.savedListMode) : (mine.savedListMode || theirs.savedListMode),
@@ -304,6 +309,9 @@
             progress: mergeProgress(mine.progress, theirs.progress),
             weekView: theirs.weekView ?? mine.weekView
         };
+        if (typeof packChannelsOnly === 'boolean') merged.packChannelsOnly = packChannelsOnly;
+        else delete merged.packChannelsOnly;
+        return merged;
     }
 
     /** A parent's lock: set by a parent with a window ({startsAt, endsAt}). */
@@ -370,14 +378,15 @@
      * than that parent may only tighten study. `lockActive(lock)` defaults to "a parent's lock that
      * hasn't reached its end".
      */
-    function tightenAllowed(beforeValue, afterValue, { now = Date.now(), lockActive = null } = {}) {
+    function tightenAllowed(beforeValue, afterValue, { now = Date.now(), lockActive = null, held = false } = {}) {
         const before = normalizeStudy(beforeValue);
         if (!before) return true;
         const parentPlan = !!text(object(before.plan).setByParentId);
         const parentLock = typeof lockActive === 'function'
             ? lockActive(before.lock) === true
             : isParentLock(before.lock) && now < Number(before.lock.endsAt);
-        if (!parentPlan && !parentLock) return true;
+        // `held`: a round or a hold runs now (Android StudyRuntime.holdsLoosening), whoever set it.
+        if (!parentPlan && !parentLock && !held) return true;
         const after = normalizeStudy(afterValue);
         if (!after) return false;
         if (parentLock) {
@@ -479,12 +488,104 @@
         return { ...normalizeStudy(value), lock: null };
     }
 
+    // ---- Loosening while study holds a profile (Android StudyRuleLoosening, StudyLoosening.sheet) ----------
+
+    /** A rule row's identity: UC id, else handle, else name (Android StudyRuleLoosening.channelKeys). */
+    function ruleChannelKeys(rows) {
+        const keys = new Set();
+        for (const row of array(rows)) {
+            if (isObject(row) && row.managedListPaused === true) continue;
+            if (typeof row === 'string') { const key = channelKey(row); if (key) keys.add(key); continue; }
+            const ref = object(row);
+            const id = text(ref.channelId) || (CHANNEL_ID.test(text(ref.id)) ? text(ref.id) : '');
+            const handle = text(ref.handle || ref.canonicalHandle);
+            const name = text(ref.name);
+            if (id) keys.add(`id:${id}`);
+            else if (handle) keys.add(`h:${handle.replace(/^@/, '').toLowerCase()}`);
+            else if (name) keys.add(`n:${name.toLowerCase()}`);
+        }
+        return keys;
+    }
+
+    function wordKeys(rows) {
+        return new Set(array(rows).map(row => topicKey(typeof row === 'string' ? row : object(row).word)).filter(Boolean));
+    }
+
+    function videoKeys(rows) {
+        return new Set(array(rows).map(row => text(typeof row === 'string' ? row : object(row).videoId || object(row).id)).filter(Boolean));
+    }
+
+    function covers(big, small) {
+        for (const key of small) if (!big.has(key)) return false;
+        return true;
+    }
+
+    /**
+     * Does going from `before` to `after` (two profiles) loosen the rules? A port of Android
+     * StudyRuleLoosening.loosens: the master switch off, Hide Shorts or Hide comments off, a blocked
+     * channel, word or video removed, an allowed channel or video added, on Main or on Kids. The owner
+     * adds: an allow list switched back to the block list. Stricter changes are never loosening.
+     */
+    function ruleLoosens(before, after) {
+        const b = object(before);
+        const a = object(after);
+        const s0 = object(b.settings);
+        const s1 = object(a.settings);
+        if (s0.enabled !== false && s1.enabled === false) return true;
+        if (s0.hideShorts === true && s1.hideShorts !== true) return true;
+        if (s0.hideComments === true && s1.hideComments !== true) return true;
+        if (s0.hideAllComments === true && s1.hideAllComments !== true) return true;
+        const m0 = object(b.main);
+        const m1 = object(a.main);
+        if (text(m0.mode) === 'whitelist' && text(m1.mode) !== 'whitelist') return true;
+        if (!covers(ruleChannelKeys(m1.channels), ruleChannelKeys(m0.channels))) return true;
+        if (!covers(wordKeys(m1.keywords), wordKeys(m0.keywords))) return true;
+        if (!covers(videoKeys(m1.blockedVideoIds || m1.videoIds), videoKeys(m0.blockedVideoIds || m0.videoIds))) return true;
+        if (!covers(ruleChannelKeys(m0.whitelistChannels), ruleChannelKeys(m1.whitelistChannels))) return true;
+        if (!covers(videoKeys(m0.allowedVideoIds), videoKeys(m1.allowedVideoIds))) return true;
+        const k0 = object(b.kids);
+        const k1 = object(a.kids);
+        if (text(k0.mode) === 'whitelist' && text(k1.mode) !== 'whitelist') return true;
+        if (!covers(ruleChannelKeys(k1.blockedChannels), ruleChannelKeys(k0.blockedChannels))) return true;
+        if (!covers(wordKeys(k1.blockedKeywords), wordKeys(k0.blockedKeywords))) return true;
+        if (!covers(ruleChannelKeys(k0.whitelistChannels), ruleChannelKeys(k1.whitelistChannels))) return true;
+        if (!covers(videoKeys(k0.videoIds), videoKeys(k1.videoIds))) return true;
+        return false;
+    }
+
+    /**
+     * Which sheet a refused loosening gets (Android StudyLoosening.sheet): 'parent' while a parent's plan
+     * or lock holds and the editor isn't that parent, 'locked' for a Locked session, 'gentle' while a
+     * Gentle session runs; null lets the change through.
+     */
+    function looseningSheetKind({ parentHolds = false, activeIsSetter = false, lockMode = null, running = false } = {}) {
+        if (parentHolds && !activeIsSetter) return 'parent';
+        if (parentHolds) return null;
+        if (lockMode === 'locked') return 'locked';
+        if (lockMode === 'gentle' && running) return 'gentle';
+        return null;
+    }
+
+    /** The rules a held profile keeps: its held settings, Main and Kids over the rest of `current`. */
+    function withHeldRules(current, held) {
+        const value = object(current);
+        const rules = object(held);
+        return { ...value, settings: clone(rules.settings), main: clone(rules.main), kids: clone(rules.kids) };
+    }
+
+    /** The rule parts of a profile, as held at a point in time. */
+    function ruleSnapshot(profile) {
+        const value = object(profile);
+        return { settings: clone(object(value.settings)), main: clone(object(value.main)), kids: clone(object(value.kids)) };
+    }
+
     return Object.freeze({
         VERSION, PROFILE_KEY, CAPABILITY, MANAGED_SCOPES, TAG_PREFIX, DEFAULT_FOCUS, FOCUS_LIMITS, DAYS,
         BREAK_REST, BREAK_NORMAL, SAVED_LIST_MODES,
         normalizeStudy, createStudy, weekViewEnabled, mergeStudy, mergeProgress, mergePackEdits, withoutLock,
         tightenAllowed, isParentLock, musicAllowed,
         channelKey, topicKey, isPackId, packIdOfTag, packIdsFromTags, profileStudy,
-        ruleLayers, withRuleLayering, validateForSync
+        ruleLayers, withRuleLayering, validateForSync,
+        ruleLoosens, looseningSheetKind, withHeldRules, ruleSnapshot
     });
 }));

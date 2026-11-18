@@ -1,0 +1,761 @@
+android_file	kind	ext_files	match	note
+apps/android/app/src/main/AndroidManifest.xml	other	n/a	n/a	build or manifest
+apps/android/app/src/main/assets/extension_shell/data/release_notes.json	asset	data/release_notes.json	shared	the app bundles this extension file (ledger.mjs shared)
+apps/android/app/src/main/assets/filtertube_nanah/device_auto_sync.js	asset	js/device_auto_sync.js	shared	the app bundles this extension file (ledger.mjs shared)
+apps/android/app/src/main/assets/filtertube_nanah/nanah_managed_live_policy.js	asset	js/nanah_managed_live_policy.js	shared	the app bundles this extension file (ledger.mjs shared)
+apps/android/app/src/main/assets/filtertube_nanah/nanah_sync_adapter.js	asset	js/nanah_sync_adapter.js	shared	the app bundles this extension file (ledger.mjs shared)
+apps/android/app/src/main/assets/filtertube_nanah/personal_auto_sync_runtime.js	asset	js/personal_auto_sync_runtime.js	shared	the app bundles this extension file (ledger.mjs shared)
+apps/android/app/src/main/assets/filtertube_nanah/personal_sync.js	asset	js/personal_sync.js	shared	the app bundles this extension file (ledger.mjs shared)
+apps/android/app/src/main/assets/filtertube_nanah/shared/study_model.js	asset	js/shared/study_model.js	shared	the app bundles this extension file (ledger.mjs shared)
+apps/android/app/src/main/assets/filtertube_nanah_engine.html	asset	n/a	n/a	Android-only asset (native bridge or WebView host)
+apps/android/app/src/main/assets/filtertube_runtime_full.js	asset	js/seed.js;js/shared/identity.js;js/filter_logic.js;js/content/*.js;js/content_bridge.js;js/injector.js;js/layout.js	shared	built from the extension sources (ledger.mjs shared compares each section)
+apps/android/app/src/main/assets/study/packs-v1.json	asset	data/study/packs-v1.json	shared	the app bundles this extension file (ledger.mjs shared)
+apps/android/app/src/main/java/com/filtertube/app/AndroidWebSurfaceAdapter.kt	kotlin	n/a	n/a	Android platform plumbing (app icon, updates, WebView host, threading, deep links, insets)
+apps/android/app/src/main/java/com/filtertube/app/AppIconChoice.kt	kotlin	n/a	n/a	Android platform plumbing (app icon, updates, WebView host, threading, deep links, insets)
+apps/android/app/src/main/java/com/filtertube/app/AppIconPicker.kt	kotlin	n/a	n/a	Android platform plumbing (app icon, updates, WebView host, threading, deep links, insets)
+apps/android/app/src/main/java/com/filtertube/app/AppPreferences.kt	kotlin	js/nanah_sync_adapter.js	cited	named in 1 extension file(s)
+apps/android/app/src/main/java/com/filtertube/app/AskParent.kt	kotlin	js/shared/ask_parent.js	cited	named in 1 extension file(s)
+apps/android/app/src/main/java/com/filtertube/app/AskParentActivities.kt	kotlin	js/tab-view.js;js/popup.js;js/content/admission_overlay.js	known	paired by hand in derive-file-map.mjs KNOWN_KOTLIN; check before trusting
+apps/android/app/src/main/java/com/filtertube/app/AskParentService.kt	kotlin	js/ask_parent_background.js;js/background.js;js/tab-view.js	cited	named in 3 extension file(s)
+apps/android/app/src/main/java/com/filtertube/app/AskParentUi.kt	kotlin	css/paperkit-parity.css;js/content/admission_overlay.js;js/nanah_pairing_ui.js;js/tab-view.js	cited	named in 4 extension file(s)
+apps/android/app/src/main/java/com/filtertube/app/BrandPalette.kt	kotlin	css/paperkit-parity.css;css/paperkit.css;js/shared/study_engine.js;js/shared/study_packs.js	cited	named in 4 extension file(s)
+apps/android/app/src/main/java/com/filtertube/app/ChannelAdapter.kt	kotlin	js/render_engine.js;js/tab-view.js;css/paperkit-parity.css	known	paired by hand in derive-file-map.mjs KNOWN_KOTLIN; check before trusting
+apps/android/app/src/main/java/com/filtertube/app/ChannelAddSheet.kt	kotlin	js/render_engine.js;js/tab-view.js;css/paperkit-parity.css	known	paired by hand in derive-file-map.mjs KNOWN_KOTLIN; check before trusting
+apps/android/app/src/main/java/com/filtertube/app/ChannelsFragment.kt	kotlin	js/render_engine.js;js/tab-view.js;css/paperkit-parity.css	known	paired by hand in derive-file-map.mjs KNOWN_KOTLIN; check before trusting
+apps/android/app/src/main/java/com/filtertube/app/ChildActorWriteGuard.kt	kotlin	js/background.js	known	paired by hand in derive-file-map.mjs KNOWN_KOTLIN; check before trusting
+apps/android/app/src/main/java/com/filtertube/app/ContentControlsAdapter.kt	kotlin	js/content_controls_catalog.js;js/tab-view.js;css/paperkit-parity.css	known	paired by hand in derive-file-map.mjs KNOWN_KOTLIN; check before trusting
+apps/android/app/src/main/java/com/filtertube/app/ContentControlsFragment.kt	kotlin	js/content_controls_catalog.js;js/tab-view.js;css/paperkit-parity.css	known	paired by hand in derive-file-map.mjs KNOWN_KOTLIN; check before trusting
+apps/android/app/src/main/java/com/filtertube/app/ControlCenterModel.kt	kotlin	html/tab-view.html;css/paperkit-parity.css;js/paperkit_parity.js	known	paired by hand in derive-file-map.mjs KNOWN_KOTLIN; check before trusting
+apps/android/app/src/main/java/com/filtertube/app/ControlsDoodles.kt	kotlin	html/tab-view.html;css/paperkit-parity.css;js/paperkit_parity.js	known	paired by hand in derive-file-map.mjs KNOWN_KOTLIN; check before trusting
+apps/android/app/src/main/java/com/filtertube/app/ControlsFilterForm.kt	kotlin	html/tab-view.html;css/paperkit-parity.css;js/paperkit_parity.js	known	paired by hand in derive-file-map.mjs KNOWN_KOTLIN; check before trusting
+apps/android/app/src/main/java/com/filtertube/app/ControlsFiltersChrome.kt	kotlin	html/tab-view.html;css/paperkit-parity.css;js/paperkit_parity.js	known	paired by hand in derive-file-map.mjs KNOWN_KOTLIN; check before trusting
+apps/android/app/src/main/java/com/filtertube/app/ControlsPaper.kt	kotlin	css/paperkit-parity.css;js/paperkit_parity.js	cited	named in 2 extension file(s)
+apps/android/app/src/main/java/com/filtertube/app/ControlsSheetTheme.kt	kotlin	html/tab-view.html;css/paperkit-parity.css;js/paperkit_parity.js	known	paired by hand in derive-file-map.mjs KNOWN_KOTLIN; check before trusting
+apps/android/app/src/main/java/com/filtertube/app/ControlsV2Models.kt	kotlin	html/tab-view.html;css/paperkit-parity.css;js/paperkit_parity.js	known	paired by hand in derive-file-map.mjs KNOWN_KOTLIN; check before trusting
+apps/android/app/src/main/java/com/filtertube/app/CountryAccent.kt	kotlin	css/study.css;js/shared/study_packs.js;js/study_ui.js	cited	named in 3 extension file(s)
+apps/android/app/src/main/java/com/filtertube/app/DashboardActivity.kt	kotlin	html/tab-view.html;css/paperkit-parity.css	audit	EXTENSION_ANDROID_PARITY_AUDIT_2026-11-16.md
+apps/android/app/src/main/java/com/filtertube/app/DebugNativeOwnedKidsAccountHost.kt	kotlin	n/a	n/a	debug builds and screenshot fixtures
+apps/android/app/src/main/java/com/filtertube/app/DebugNativeOwnedKidsAccountSheetHost.kt	kotlin	n/a	n/a	debug builds and screenshot fixtures
+apps/android/app/src/main/java/com/filtertube/app/DebugNativeOwnedKidsActivity.kt	kotlin	n/a	n/a	debug builds and screenshot fixtures
+apps/android/app/src/main/java/com/filtertube/app/DebugNativeOwnedKidsAmbientHost.kt	kotlin	n/a	n/a	the app's own player
+apps/android/app/src/main/java/com/filtertube/app/DebugNativeOwnedKidsCaptionHost.kt	kotlin	n/a	n/a	the app's own player
+apps/android/app/src/main/java/com/filtertube/app/DebugNativeOwnedKidsChannelHost.kt	kotlin	n/a	n/a	debug builds and screenshot fixtures
+apps/android/app/src/main/java/com/filtertube/app/DebugNativeOwnedKidsCommentsHost.kt	kotlin	n/a	n/a	debug builds and screenshot fixtures
+apps/android/app/src/main/java/com/filtertube/app/DebugNativeOwnedKidsCompactHeightHost.kt	kotlin	n/a	n/a	debug builds and screenshot fixtures
+apps/android/app/src/main/java/com/filtertube/app/DebugNativeOwnedKidsHistoryHost.kt	kotlin	n/a	n/a	debug builds and screenshot fixtures
+apps/android/app/src/main/java/com/filtertube/app/DebugNativeOwnedKidsLiveChatRowHost.kt	kotlin	n/a	n/a	debug builds and screenshot fixtures
+apps/android/app/src/main/java/com/filtertube/app/DebugNativeOwnedKidsLocalPlaylistHost.kt	kotlin	n/a	n/a	local media and downloads
+apps/android/app/src/main/java/com/filtertube/app/DebugNativeOwnedKidsMotionHost.kt	kotlin	n/a	n/a	debug builds and screenshot fixtures
+apps/android/app/src/main/java/com/filtertube/app/DebugNativeOwnedKidsMusicHost.kt	kotlin	n/a	n/a	Sangeet, the app's music space
+apps/android/app/src/main/java/com/filtertube/app/DebugNativeOwnedKidsNetworkHost.kt	kotlin	n/a	n/a	debug builds and screenshot fixtures
+apps/android/app/src/main/java/com/filtertube/app/DebugNativeOwnedKidsOfflineHost.kt	kotlin	n/a	n/a	local media and downloads
+apps/android/app/src/main/java/com/filtertube/app/DebugNativeOwnedKidsPlayerGesturesHost.kt	kotlin	n/a	n/a	the app's own player
+apps/android/app/src/main/java/com/filtertube/app/DebugNativeOwnedKidsPlaylistHost.kt	kotlin	n/a	n/a	debug builds and screenshot fixtures
+apps/android/app/src/main/java/com/filtertube/app/DebugNativeOwnedKidsPlaylistV2Host.kt	kotlin	n/a	n/a	debug builds and screenshot fixtures
+apps/android/app/src/main/java/com/filtertube/app/DebugNativeOwnedKidsProfilePickerHost.kt	kotlin	n/a	n/a	debug builds and screenshot fixtures
+apps/android/app/src/main/java/com/filtertube/app/DebugNativeOwnedKidsProviderSetup.kt	kotlin	n/a	n/a	debug builds and screenshot fixtures
+apps/android/app/src/main/java/com/filtertube/app/DebugNativeOwnedKidsSearchHost.kt	kotlin	n/a	n/a	debug builds and screenshot fixtures
+apps/android/app/src/main/java/com/filtertube/app/DebugNativeOwnedKidsSettingsHost.kt	kotlin	n/a	n/a	debug builds and screenshot fixtures
+apps/android/app/src/main/java/com/filtertube/app/DebugNativeOwnedKidsStudyHost.kt	kotlin	n/a	n/a	debug builds and screenshot fixtures
+apps/android/app/src/main/java/com/filtertube/app/DebugNativeOwnedMainObservedPayloads.kt	kotlin	n/a	n/a	debug builds and screenshot fixtures
+apps/android/app/src/main/java/com/filtertube/app/DirectUpdateSettings.kt	kotlin	n/a	n/a	Android platform plumbing (app icon, updates, WebView host, threading, deep links, insets)
+apps/android/app/src/main/java/com/filtertube/app/DoodleKit.kt	kotlin	js/doodles.js;js/mascots.js;js/paperkit_parity.js;js/shared/study_packs.js	cited	named in 4 extension file(s)
+apps/android/app/src/main/java/com/filtertube/app/FilterPayloadCompiler.kt	kotlin	js/background.js;js/content/dom_fallback.js;js/settings_shared.js;js/shared/identity.js	cited	named in 4 extension file(s)
+apps/android/app/src/main/java/com/filtertube/app/FilterRemovalUndo.kt	kotlin	js/state_manager.js;js/ui_components.js	cited	named in 2 extension file(s)
+apps/android/app/src/main/java/com/filtertube/app/FilterRowAnimator.kt	kotlin	js/ui_components.js	audit	EXTENSION_ANDROID_PARITY_AUDIT_2026-11-16.md
+apps/android/app/src/main/java/com/filtertube/app/FilterTubeApplication.kt	kotlin	n/a	n/a	Android platform plumbing (app icon, updates, WebView host, threading, deep links, insets)
+apps/android/app/src/main/java/com/filtertube/app/FilterTubeLog.kt	kotlin	n/a	n/a	Android platform plumbing (app icon, updates, WebView host, threading, deep links, insets)
+apps/android/app/src/main/java/com/filtertube/app/FilterTubeMessageDialog.kt	kotlin	css/paperkit.css	cited	named in 1 extension file(s)
+apps/android/app/src/main/java/com/filtertube/app/FiltersActivity.kt	kotlin	css/paperkit-parity.css	cited	named in 1 extension file(s)
+apps/android/app/src/main/java/com/filtertube/app/FiltersTabletLayout.kt	kotlin	html/tab-view.html;css/paperkit-parity.css;js/paperkit_parity.js	known	paired by hand in derive-file-map.mjs KNOWN_KOTLIN; check before trusting
+apps/android/app/src/main/java/com/filtertube/app/FirstFilterMoment.kt	kotlin	js/mascots.js	cited	named in 1 extension file(s)
+apps/android/app/src/main/java/com/filtertube/app/FirstInstallWelcomePlan.kt	kotlin	css/paperkit-parity.css;js/mascots.js	cited	named in 2 extension file(s)
+apps/android/app/src/main/java/com/filtertube/app/IconKit.kt	kotlin	assets/icons/crayon/*.svg;scripts/export-crayon-icons.mjs	known	paired by hand in derive-file-map.mjs KNOWN_KOTLIN; check before trusting
+apps/android/app/src/main/java/com/filtertube/app/InternetSyncRelayConsent.kt	kotlin	js/tab-view.js	cited	named in 1 extension file(s)
+apps/android/app/src/main/java/com/filtertube/app/KeywordAdapter.kt	kotlin	js/render_engine.js;js/tab-view.js;css/paperkit-parity.css	known	paired by hand in derive-file-map.mjs KNOWN_KOTLIN; check before trusting
+apps/android/app/src/main/java/com/filtertube/app/KeywordsFragment.kt	kotlin	js/render_engine.js;js/tab-view.js;css/paperkit-parity.css	known	paired by hand in derive-file-map.mjs KNOWN_KOTLIN; check before trusting
+apps/android/app/src/main/java/com/filtertube/app/KidsAllowedShelfHost.kt	kotlin	n/a	n/a	the app's native Kids viewer
+apps/android/app/src/main/java/com/filtertube/app/KidsExitAndPinningHost.kt	kotlin	n/a	n/a	the app's native Kids viewer
+apps/android/app/src/main/java/com/filtertube/app/KidsOfflineViewerHost.kt	kotlin	n/a	n/a	local media and downloads
+apps/android/app/src/main/java/com/filtertube/app/KidsParentActionGate.kt	kotlin	n/a	n/a	the app's native Kids viewer
+apps/android/app/src/main/java/com/filtertube/app/KidsParentProviderActivity.kt	kotlin	n/a	n/a	the app's native Kids viewer
+apps/android/app/src/main/java/com/filtertube/app/KidsStudyTimeHost.kt	kotlin	js/content/study_overlay.js	cited	named in 1 extension file(s)
+apps/android/app/src/main/java/com/filtertube/app/KidsThirdPartyCookiePolicy.kt	kotlin	n/a	n/a	Android platform plumbing (app icon, updates, WebView host, threading, deep links, insets)
+apps/android/app/src/main/java/com/filtertube/app/KidsViewerMotion.kt	kotlin	n/a	n/a	the app's native Kids viewer
+apps/android/app/src/main/java/com/filtertube/app/KidsYouTubeParentAccountUi.kt	kotlin	n/a	n/a	the app's native Kids viewer
+apps/android/app/src/main/java/com/filtertube/app/LauncherActivity.kt	kotlin	js/mascots.js	cited	named in 1 extension file(s)
+apps/android/app/src/main/java/com/filtertube/app/LoadingPersonality.kt	kotlin	js/mascots.js	cited	named in 1 extension file(s)
+apps/android/app/src/main/java/com/filtertube/app/LoadingPersonalityViews.kt	kotlin	js/mascots.js;css/mascots.css	known	paired by hand in derive-file-map.mjs KNOWN_KOTLIN; check before trusting
+apps/android/app/src/main/java/com/filtertube/app/LocalMediaLibraryActivity.kt	kotlin	n/a	n/a	local media and downloads
+apps/android/app/src/main/java/com/filtertube/app/LocalMediaPlayerActivity.kt	kotlin	n/a	n/a	local media and downloads
+apps/android/app/src/main/java/com/filtertube/app/LocalMediaVideoAdapter.kt	kotlin	n/a	n/a	local media and downloads
+apps/android/app/src/main/java/com/filtertube/app/MainYouTubeSessionActivity.kt	kotlin	n/a	n/a	the app's native viewer (the extension filters the site's own pages)
+apps/android/app/src/main/java/com/filtertube/app/ManagedAppTimeBudgetSession.kt	kotlin	n/a	n/a	Android platform plumbing (app icon, updates, WebView host, threading, deep links, insets)
+apps/android/app/src/main/java/com/filtertube/app/ManagedTimeBudgetLockOverlay.kt	kotlin	n/a	n/a	Android platform plumbing (app icon, updates, WebView host, threading, deep links, insets)
+apps/android/app/src/main/java/com/filtertube/app/ManagedWebViewActivity.kt	kotlin	n/a	n/a	Android platform plumbing (app icon, updates, WebView host, threading, deep links, insets)
+apps/android/app/src/main/java/com/filtertube/app/MascotIdleInteraction.kt	kotlin	js/mascots.js;css/mascots.css	known	paired by hand in derive-file-map.mjs KNOWN_KOTLIN; check before trusting
+apps/android/app/src/main/java/com/filtertube/app/MascotMoments.kt	kotlin	js/mascots.js	audit	EXTENSION_ANDROID_PARITY_AUDIT_2026-11-16.md
+apps/android/app/src/main/java/com/filtertube/app/MascotStage.kt	kotlin	js/mascots.js;css/mascots.css	known	paired by hand in derive-file-map.mjs KNOWN_KOTLIN; check before trusting
+apps/android/app/src/main/java/com/filtertube/app/MascotStates.kt	kotlin	js/content/admission_overlay.js;js/mascots.js	audit	EXTENSION_ANDROID_PARITY_AUDIT_2026-11-16.md
+apps/android/app/src/main/java/com/filtertube/app/NanahManagedReceiveStore.kt	kotlin	js/nanah_sync_adapter.js;js/nanah_managed_open_sync.js;js/device_auto_sync_ui.js	known	paired by hand in derive-file-map.mjs KNOWN_KOTLIN; check before trusting
+apps/android/app/src/main/java/com/filtertube/app/NanahPairLink.kt	kotlin	n/a	n/a	Android platform plumbing (app icon, updates, WebView host, threading, deep links, insets)
+apps/android/app/src/main/java/com/filtertube/app/NanahWebEngine.kt	kotlin	n/a	n/a	Android platform plumbing (app icon, updates, WebView host, threading, deep links, insets)
+apps/android/app/src/main/java/com/filtertube/app/NativeAudioNowPlayingView.kt	kotlin	n/a	n/a	the app's own player
+apps/android/app/src/main/java/com/filtertube/app/NativeControlCenterView.kt	kotlin	css/paperkit-parity.css;js/paperkit_parity.js	cited	named in 2 extension file(s)
+apps/android/app/src/main/java/com/filtertube/app/NativeControlsLayout.kt	kotlin	html/tab-view.html;css/paperkit-parity.css;js/paperkit_parity.js	known	paired by hand in derive-file-map.mjs KNOWN_KOTLIN; check before trusting
+apps/android/app/src/main/java/com/filtertube/app/NativeControlsTwoPane.kt	kotlin	html/tab-view.html;css/paperkit-parity.css;js/paperkit_parity.js	known	paired by hand in derive-file-map.mjs KNOWN_KOTLIN; check before trusting
+apps/android/app/src/main/java/com/filtertube/app/NativeFocusDecoration.kt	kotlin	n/a	n/a	Android platform plumbing (app icon, updates, WebView host, threading, deep links, insets)
+apps/android/app/src/main/java/com/filtertube/app/NativeHeroBackground.kt	kotlin	css/paperkit-parity.css	cited	named in 1 extension file(s)
+apps/android/app/src/main/java/com/filtertube/app/NativeImageViewer.kt	kotlin	n/a	n/a	the app's native viewer (the extension filters the site's own pages)
+apps/android/app/src/main/java/com/filtertube/app/NativeKidsLearningLoader.kt	kotlin	js/shared/study_engine.js;js/content/study_overlay.js	audit	EXTENSION_ANDROID_PARITY_AUDIT_2026-11-16.md
+apps/android/app/src/main/java/com/filtertube/app/NativeLocalPlaylistLibraryDialog.kt	kotlin	n/a	n/a	local media and downloads
+apps/android/app/src/main/java/com/filtertube/app/NativeLocalPlaylistPolicy.kt	kotlin	n/a	n/a	local media and downloads
+apps/android/app/src/main/java/com/filtertube/app/NativeLocalPlaylistSavePanel.kt	kotlin	n/a	n/a	local media and downloads
+apps/android/app/src/main/java/com/filtertube/app/NativeLocalPlaylists.kt	kotlin	js/shared/local_playlists.js	cited	named in 1 extension file(s)
+apps/android/app/src/main/java/com/filtertube/app/NativeMainAmbientGlowDrawable.kt	kotlin	n/a	n/a	the app's own player
+apps/android/app/src/main/java/com/filtertube/app/NativeMainBrowseSaveActions.kt	kotlin	n/a	n/a	the app's native viewer (the extension filters the site's own pages)
+apps/android/app/src/main/java/com/filtertube/app/NativeMainCaptionAppearanceView.kt	kotlin	n/a	n/a	the app's own player
+apps/android/app/src/main/java/com/filtertube/app/NativeMainCardActionControlsUi.kt	kotlin	n/a	n/a	the app's native viewer (the extension filters the site's own pages)
+apps/android/app/src/main/java/com/filtertube/app/NativeMainCardGroups.kt	kotlin	n/a	n/a	the app's native viewer (the extension filters the site's own pages)
+apps/android/app/src/main/java/com/filtertube/app/NativeMainCardMenuUi.kt	kotlin	n/a	n/a	the app's native viewer (the extension filters the site's own pages)
+apps/android/app/src/main/java/com/filtertube/app/NativeMainChannelFormUi.kt	kotlin	n/a	n/a	the app's native viewer (the extension filters the site's own pages)
+apps/android/app/src/main/java/com/filtertube/app/NativeMainChannelIdentityUi.kt	kotlin	n/a	n/a	the app's native viewer (the extension filters the site's own pages)
+apps/android/app/src/main/java/com/filtertube/app/NativeMainChannelLayoutView.kt	kotlin	n/a	n/a	the app's native viewer (the extension filters the site's own pages)
+apps/android/app/src/main/java/com/filtertube/app/NativeMainChannelSearchView.kt	kotlin	n/a	n/a	the app's native viewer (the extension filters the site's own pages)
+apps/android/app/src/main/java/com/filtertube/app/NativeMainChannelSortView.kt	kotlin	n/a	n/a	the app's native viewer (the extension filters the site's own pages)
+apps/android/app/src/main/java/com/filtertube/app/NativeMainChapterBrowserView.kt	kotlin	n/a	n/a	the app's own player
+apps/android/app/src/main/java/com/filtertube/app/NativeMainChapterShortcutView.kt	kotlin	n/a	n/a	the app's own player
+apps/android/app/src/main/java/com/filtertube/app/NativeMainCommentControls.kt	kotlin	n/a	n/a	the app's native viewer (the extension filters the site's own pages)
+apps/android/app/src/main/java/com/filtertube/app/NativeMainCommunityTools.kt	kotlin	n/a	n/a	the app's native viewer (the extension filters the site's own pages)
+apps/android/app/src/main/java/com/filtertube/app/NativeMainContinueWatchingMenu.kt	kotlin	n/a	n/a	the app's native viewer (the extension filters the site's own pages)
+apps/android/app/src/main/java/com/filtertube/app/NativeMainContinueWatchingUi.kt	kotlin	n/a	n/a	the app's native viewer (the extension filters the site's own pages)
+apps/android/app/src/main/java/com/filtertube/app/NativeMainDescriptionTimeLinkifier.kt	kotlin	n/a	n/a	the app's native viewer (the extension filters the site's own pages)
+apps/android/app/src/main/java/com/filtertube/app/NativeMainHistoryFindPresentation.kt	kotlin	n/a	n/a	the app's native viewer (the extension filters the site's own pages)
+apps/android/app/src/main/java/com/filtertube/app/NativeMainIntegrationPreferences.kt	kotlin	n/a	n/a	the app's native viewer (the extension filters the site's own pages)
+apps/android/app/src/main/java/com/filtertube/app/NativeMainKeywordFormUi.kt	kotlin	n/a	n/a	the app's native viewer (the extension filters the site's own pages)
+apps/android/app/src/main/java/com/filtertube/app/NativeMainLiveChatReader.kt	kotlin	n/a	n/a	the app's native viewer (the extension filters the site's own pages)
+apps/android/app/src/main/java/com/filtertube/app/NativeMainLiveChatView.kt	kotlin	n/a	n/a	the app's native viewer (the extension filters the site's own pages)
+apps/android/app/src/main/java/com/filtertube/app/NativeMainMusicArtistUi.kt	kotlin	n/a	n/a	Sangeet, the app's music space
+apps/android/app/src/main/java/com/filtertube/app/NativeMainMusicArtworkCardUi.kt	kotlin	n/a	n/a	Sangeet, the app's music space
+apps/android/app/src/main/java/com/filtertube/app/NativeMainMusicCollectionProgressUi.kt	kotlin	n/a	n/a	Sangeet, the app's music space
+apps/android/app/src/main/java/com/filtertube/app/NativeMainMusicCollectionToolsUi.kt	kotlin	n/a	n/a	Sangeet, the app's music space
+apps/android/app/src/main/java/com/filtertube/app/NativeMainMusicDiscoveryUi.kt	kotlin	n/a	n/a	Sangeet, the app's music space
+apps/android/app/src/main/java/com/filtertube/app/NativeMainMusicLyricsUi.kt	kotlin	n/a	n/a	Sangeet, the app's music space
+apps/android/app/src/main/java/com/filtertube/app/NativeMainMusicMiniBar.kt	kotlin	n/a	n/a	Sangeet, the app's music space
+apps/android/app/src/main/java/com/filtertube/app/NativeMainMusicTrackRowUi.kt	kotlin	n/a	n/a	Sangeet, the app's music space
+apps/android/app/src/main/java/com/filtertube/app/NativeMainNotesIndexDialog.kt	kotlin	n/a	n/a	the app's native viewer (the extension filters the site's own pages)
+apps/android/app/src/main/java/com/filtertube/app/NativeMainOfflinePlaylist.kt	kotlin	n/a	n/a	local media and downloads
+apps/android/app/src/main/java/com/filtertube/app/NativeMainOverlayDisplayUi.kt	kotlin	n/a	n/a	the app's native viewer (the extension filters the site's own pages)
+apps/android/app/src/main/java/com/filtertube/app/NativeMainPlaybackOptionsView.kt	kotlin	n/a	n/a	the app's own player
+apps/android/app/src/main/java/com/filtertube/app/NativeMainPlaybackSpeedView.kt	kotlin	n/a	n/a	the app's own player
+apps/android/app/src/main/java/com/filtertube/app/NativeMainPlaylistCreateView.kt	kotlin	n/a	n/a	the app's native viewer (the extension filters the site's own pages)
+apps/android/app/src/main/java/com/filtertube/app/NativeMainPlaylistLibraryView.kt	kotlin	n/a	n/a	the app's native viewer (the extension filters the site's own pages)
+apps/android/app/src/main/java/com/filtertube/app/NativeMainPlaylistOrderView.kt	kotlin	n/a	n/a	the app's native viewer (the extension filters the site's own pages)
+apps/android/app/src/main/java/com/filtertube/app/NativeMainPlaylistPage.kt	kotlin	n/a	n/a	the app's native viewer (the extension filters the site's own pages)
+apps/android/app/src/main/java/com/filtertube/app/NativeMainPlaylistSaveView.kt	kotlin	n/a	n/a	the app's native viewer (the extension filters the site's own pages)
+apps/android/app/src/main/java/com/filtertube/app/NativeMainRuleFilterSheet.kt	kotlin	css/paperkit-parity.css;js/paperkit_parity.js	cited	named in 2 extension file(s)
+apps/android/app/src/main/java/com/filtertube/app/NativeMainScenicStyle.kt	kotlin	n/a	n/a	the app's native viewer (the extension filters the site's own pages)
+apps/android/app/src/main/java/com/filtertube/app/NativeMainSearchArtistHeaderUi.kt	kotlin	n/a	n/a	the app's native viewer (the extension filters the site's own pages)
+apps/android/app/src/main/java/com/filtertube/app/NativeMainSearchChipsView.kt	kotlin	n/a	n/a	the app's native viewer (the extension filters the site's own pages)
+apps/android/app/src/main/java/com/filtertube/app/NativeMainSearchChoicePolicy.kt	kotlin	n/a	n/a	the app's native viewer (the extension filters the site's own pages)
+apps/android/app/src/main/java/com/filtertube/app/NativeMainSearchOptionsDialog.kt	kotlin	n/a	n/a	the app's native viewer (the extension filters the site's own pages)
+apps/android/app/src/main/java/com/filtertube/app/NativeMainSearchResultType.kt	kotlin	n/a	n/a	the app's native viewer (the extension filters the site's own pages)
+apps/android/app/src/main/java/com/filtertube/app/NativeMainSettingsFindUi.kt	kotlin	n/a	n/a	the app's native viewer (the extension filters the site's own pages)
+apps/android/app/src/main/java/com/filtertube/app/NativeMainStudyHomeProvider.kt	kotlin	n/a	n/a	the app's native viewer (the extension filters the site's own pages)
+apps/android/app/src/main/java/com/filtertube/app/NativeMainSurfaceActionChipStyle.kt	kotlin	n/a	n/a	the app's native viewer (the extension filters the site's own pages)
+apps/android/app/src/main/java/com/filtertube/app/NativeMainTopicChipStyle.kt	kotlin	n/a	n/a	the app's native viewer (the extension filters the site's own pages)
+apps/android/app/src/main/java/com/filtertube/app/NativeMainTranscriptDialog.kt	kotlin	n/a	n/a	the app's native viewer (the extension filters the site's own pages)
+apps/android/app/src/main/java/com/filtertube/app/NativeMainTranscriptView.kt	kotlin	n/a	n/a	the app's native viewer (the extension filters the site's own pages)
+apps/android/app/src/main/java/com/filtertube/app/NativeMainVideoDownloadService.kt	kotlin	n/a	n/a	local media and downloads
+apps/android/app/src/main/java/com/filtertube/app/NativeMainWatchEngagementDisplayText.kt	kotlin	n/a	n/a	the app's native viewer (the extension filters the site's own pages)
+apps/android/app/src/main/java/com/filtertube/app/NativeMainWatchRecommendationChipsView.kt	kotlin	n/a	n/a	the app's native viewer (the extension filters the site's own pages)
+apps/android/app/src/main/java/com/filtertube/app/NativeMainWatchScrollPlayerPresentation.kt	kotlin	n/a	n/a	the app's own player
+apps/android/app/src/main/java/com/filtertube/app/NativeMainWidgets.kt	kotlin	n/a	n/a	the app's native viewer (the extension filters the site's own pages)
+apps/android/app/src/main/java/com/filtertube/app/NativeMainYouLibraryNavigation.kt	kotlin	n/a	n/a	the app's native viewer (the extension filters the site's own pages)
+apps/android/app/src/main/java/com/filtertube/app/NativeMainYouLibraryNavigationView.kt	kotlin	n/a	n/a	the app's native viewer (the extension filters the site's own pages)
+apps/android/app/src/main/java/com/filtertube/app/NativeManagedOfflineCollectionLibraryPanel.kt	kotlin	n/a	n/a	local media and downloads
+apps/android/app/src/main/java/com/filtertube/app/NativeManagedOfflineDownloadsActivity.kt	kotlin	n/a	n/a	local media and downloads
+apps/android/app/src/main/java/com/filtertube/app/NativeManagedOfflineLibraryPanel.kt	kotlin	n/a	n/a	local media and downloads
+apps/android/app/src/main/java/com/filtertube/app/NativeManagedOfflineMusicCollectionPageParser.kt	kotlin	n/a	n/a	Sangeet, the app's music space
+apps/android/app/src/main/java/com/filtertube/app/NativeManagedOfflinePlaceholderTitle.kt	kotlin	n/a	n/a	local media and downloads
+apps/android/app/src/main/java/com/filtertube/app/NativeManagedOfflinePlayerActivity.kt	kotlin	n/a	n/a	local media and downloads
+apps/android/app/src/main/java/com/filtertube/app/NativeManagedOfflinePlaylistDiscovery.kt	kotlin	n/a	n/a	local media and downloads
+apps/android/app/src/main/java/com/filtertube/app/NativeManagedOfflinePlaylistPageParser.kt	kotlin	n/a	n/a	local media and downloads
+apps/android/app/src/main/java/com/filtertube/app/NativeManagedOfflinePlaylistSaveDialog.kt	kotlin	n/a	n/a	local media and downloads
+apps/android/app/src/main/java/com/filtertube/app/NativeManagedOfflinePlaylistSavePolicy.kt	kotlin	n/a	n/a	local media and downloads
+apps/android/app/src/main/java/com/filtertube/app/NativeManagedOfflineQueuePreparationDialog.kt	kotlin	n/a	n/a	local media and downloads
+apps/android/app/src/main/java/com/filtertube/app/NativeManagedOfflineSaveDialog.kt	kotlin	n/a	n/a	local media and downloads
+apps/android/app/src/main/java/com/filtertube/app/NativeManagedOfflineScheduler.kt	kotlin	n/a	n/a	local media and downloads
+apps/android/app/src/main/java/com/filtertube/app/NativeManagedOfflineStreamSelection.kt	kotlin	n/a	n/a	local media and downloads
+apps/android/app/src/main/java/com/filtertube/app/NativeMotion.kt	kotlin	css/paperkit.css;js/doodles.js;js/mascots.js	cited	named in 3 extension file(s)
+apps/android/app/src/main/java/com/filtertube/app/NativeMusicLabels.kt	kotlin	n/a	n/a	Sangeet, the app's music space
+apps/android/app/src/main/java/com/filtertube/app/NativeMusicWorld.kt	kotlin	n/a	n/a	Sangeet, the app's music space
+apps/android/app/src/main/java/com/filtertube/app/NativeOverlayCommentsSheetUi.kt	kotlin	js/content_bridge.js	cited	named in 1 extension file(s)
+apps/android/app/src/main/java/com/filtertube/app/NativeOverlayDescriptionSheetUi.kt	kotlin	n/a	n/a	the app's native viewer (the extension filters the site's own pages)
+apps/android/app/src/main/java/com/filtertube/app/NativeOverlayLocalHistoryUi.kt	kotlin	n/a	n/a	the app's native viewer (the extension filters the site's own pages)
+apps/android/app/src/main/java/com/filtertube/app/NativeOverlayRegistry.kt	kotlin	n/a	n/a	the app's native viewer (the extension filters the site's own pages)
+apps/android/app/src/main/java/com/filtertube/app/NativeOwnedAppOwnedDisplayMessage.kt	kotlin	n/a	n/a	the app's native viewer (the extension filters the site's own pages)
+apps/android/app/src/main/java/com/filtertube/app/NativeOwnedBlockKind.kt	kotlin	n/a	n/a	the app's native viewer (the extension filters the site's own pages)
+apps/android/app/src/main/java/com/filtertube/app/NativeOwnedFilterDecider.kt	kotlin	js/background.js;js/content/dom_fallback.js;js/filter_logic.js;js/shared/identity.js;js/shared/live_chat_filter.js	cited	named in 5 extension file(s)
+apps/android/app/src/main/java/com/filtertube/app/NativeOwnedMainCardBoundaryAction.kt	kotlin	n/a	n/a	the app's native viewer (the extension filters the site's own pages)
+apps/android/app/src/main/java/com/filtertube/app/NativeOwnedMainChromePageTitlePolicy.kt	kotlin	n/a	n/a	the app's native viewer (the extension filters the site's own pages)
+apps/android/app/src/main/java/com/filtertube/app/NativeOwnedMainContinuationRedrawPlan.kt	kotlin	n/a	n/a	the app's native viewer (the extension filters the site's own pages)
+apps/android/app/src/main/java/com/filtertube/app/NativeOwnedMainHomeRecoveryState.kt	kotlin	n/a	n/a	the app's native viewer (the extension filters the site's own pages)
+apps/android/app/src/main/java/com/filtertube/app/NativeOwnedMainInitialAccountRecovery.kt	kotlin	n/a	n/a	the app's native viewer (the extension filters the site's own pages)
+apps/android/app/src/main/java/com/filtertube/app/NativeOwnedMainObservedPublicProvider.kt	kotlin	n/a	n/a	the app's native viewer (the extension filters the site's own pages)
+apps/android/app/src/main/java/com/filtertube/app/NativeOwnedMainPlaybackService.kt	kotlin	n/a	n/a	the app's own player
+apps/android/app/src/main/java/com/filtertube/app/NativeOwnedMainPublicWebProvider.kt	kotlin	n/a	n/a	the app's native viewer (the extension filters the site's own pages)
+apps/android/app/src/main/java/com/filtertube/app/NativeOwnedMainRouteLoadPolicy.kt	kotlin	n/a	n/a	the app's native viewer (the extension filters the site's own pages)
+apps/android/app/src/main/java/com/filtertube/app/NativeOwnedMainShell.kt	kotlin	n/a	n/a	the app's native viewer (the extension filters the site's own pages)
+apps/android/app/src/main/java/com/filtertube/app/NativeOwnedMainSurfaceModel.kt	kotlin	n/a	n/a	the app's native viewer (the extension filters the site's own pages)
+apps/android/app/src/main/java/com/filtertube/app/NativeOwnedMainYouTubeMediaSourceResolver.kt	kotlin	n/a	n/a	the app's native viewer (the extension filters the site's own pages)
+apps/android/app/src/main/java/com/filtertube/app/NativeOwnedManagedSurfaceActionPlan.kt	kotlin	n/a	n/a	the app's native viewer (the extension filters the site's own pages)
+apps/android/app/src/main/java/com/filtertube/app/NativeOwnedManagedSurfaceRenderTree.kt	kotlin	n/a	n/a	the app's native viewer (the extension filters the site's own pages)
+apps/android/app/src/main/java/com/filtertube/app/NativeOwnedManagedSurfaceViewState.kt	kotlin	n/a	n/a	the app's native viewer (the extension filters the site's own pages)
+apps/android/app/src/main/java/com/filtertube/app/NativeOwnedRecoveryPresentationPlan.kt	kotlin	n/a	n/a	the app's native viewer (the extension filters the site's own pages)
+apps/android/app/src/main/java/com/filtertube/app/NativeOwnedSurfaceContracts.kt	kotlin	n/a	n/a	the app's native viewer (the extension filters the site's own pages)
+apps/android/app/src/main/java/com/filtertube/app/NativeOwnedSurfaceOverlayFactory.kt	kotlin	n/a	n/a	the app's native viewer (the extension filters the site's own pages)
+apps/android/app/src/main/java/com/filtertube/app/NativeOwnedSurfacePresentation.kt	kotlin	n/a	n/a	the app's native viewer (the extension filters the site's own pages)
+apps/android/app/src/main/java/com/filtertube/app/NativeOwnedSurfaceProviderRegistry.kt	kotlin	n/a	n/a	the app's native viewer (the extension filters the site's own pages)
+apps/android/app/src/main/java/com/filtertube/app/NativeOwnedSyncStatus.kt	kotlin	n/a	n/a	the app's native viewer (the extension filters the site's own pages)
+apps/android/app/src/main/java/com/filtertube/app/NativePlayerChildLock.kt	kotlin	n/a	n/a	the app's own player
+apps/android/app/src/main/java/com/filtertube/app/NativeSidePanel.kt	kotlin	n/a	n/a	the app's native Home, side panel or sign-in (the site owns these in a browser)
+apps/android/app/src/main/java/com/filtertube/app/NativeUiText.kt	kotlin	n/a	n/a	Android string-resource helper
+apps/android/app/src/main/java/com/filtertube/app/NativeViewerAccountUi.kt	kotlin	n/a	n/a	the app's native viewer (the extension filters the site's own pages)
+apps/android/app/src/main/java/com/filtertube/app/NativeViewerNightGuard.kt	kotlin	n/a	n/a	the app's native viewer (the extension filters the site's own pages)
+apps/android/app/src/main/java/com/filtertube/app/NativeViewerShellMotion.kt	kotlin	n/a	n/a	the app's native viewer (the extension filters the site's own pages)
+apps/android/app/src/main/java/com/filtertube/app/NativeViewerV2Copy.kt	kotlin	n/a	n/a	the app's native viewer (the extension filters the site's own pages)
+apps/android/app/src/main/java/com/filtertube/app/NativeViewerV2FixturePreview.kt	kotlin	n/a	n/a	the app's native viewer (the extension filters the site's own pages)
+apps/android/app/src/main/java/com/filtertube/app/NativeViewerV2Style.kt	kotlin	n/a	n/a	the app's native viewer (the extension filters the site's own pages)
+apps/android/app/src/main/java/com/filtertube/app/NearbyTransferActivity.kt	kotlin	n/a	n/a	Android platform plumbing (app icon, updates, WebView host, threading, deep links, insets)
+apps/android/app/src/main/java/com/filtertube/app/NearbyUi.kt	kotlin	n/a	n/a	Android platform plumbing (app icon, updates, WebView host, threading, deep links, insets)
+apps/android/app/src/main/java/com/filtertube/app/OffPlatformLinkPolicy.kt	kotlin	n/a	n/a	Android platform plumbing (app icon, updates, WebView host, threading, deep links, insets)
+apps/android/app/src/main/java/com/filtertube/app/PaperKit.kt	kotlin	css/paperkit-parity.css;css/paperkit.css;js/content/admission_overlay.js	cited	named in 3 extension file(s)
+apps/android/app/src/main/java/com/filtertube/app/PaperUndoBar.kt	kotlin	css/paperkit-parity.css;js/popup.js;js/state_manager.js;js/tab-view.js;js/ui_components.js	cited	named in 5 extension file(s)
+apps/android/app/src/main/java/com/filtertube/app/ParentMode.kt	kotlin	css/paperkit.css;js/parent_mode.js;js/tab-view.js	cited	named in 3 extension file(s)
+apps/android/app/src/main/java/com/filtertube/app/ParentModeChrome.kt	kotlin	css/study.css;js/study_background.js;js/study_ui.js	cited	named in 3 extension file(s)
+apps/android/app/src/main/java/com/filtertube/app/PendingNanahSyncReview.kt	kotlin	js/nanah_sync_adapter.js;js/nanah_managed_open_sync.js;js/device_auto_sync_ui.js	known	paired by hand in derive-file-map.mjs KNOWN_KOTLIN; check before trusting
+apps/android/app/src/main/java/com/filtertube/app/PinCheck.kt	kotlin	n/a	n/a	Android platform plumbing (app icon, updates, WebView host, threading, deep links, insets)
+apps/android/app/src/main/java/com/filtertube/app/PinGateActivity.kt	kotlin	css/paperkit.css;js/popup.js;js/tab-view.js	cited	named in 3 extension file(s)
+apps/android/app/src/main/java/com/filtertube/app/PlatformCountNeutralizer.kt	kotlin	n/a	n/a	rewrites counts on the app's native screens; the extension never rewrites the site's page
+apps/android/app/src/main/java/com/filtertube/app/PlatformLabelNeutralizer.kt	kotlin	js/ui_components.js	cited	named in 1 extension file(s)
+apps/android/app/src/main/java/com/filtertube/app/ProfileAvatar.kt	kotlin	js/ui_components.js	cited	named in 1 extension file(s)
+apps/android/app/src/main/java/com/filtertube/app/ProfileCreateFlow.kt	kotlin	js/tab-view.js;js/popup.js;js/ui_components.js	known	paired by hand in derive-file-map.mjs KNOWN_KOTLIN; check before trusting
+apps/android/app/src/main/java/com/filtertube/app/ProfileCreateSheet.kt	kotlin	js/tab-view.js	cited	named in 1 extension file(s)
+apps/android/app/src/main/java/com/filtertube/app/ProfileDropdownPopup.kt	kotlin	css/paperkit.css	cited	named in 1 extension file(s)
+apps/android/app/src/main/java/com/filtertube/app/ProfileModels.kt	kotlin	js/settings_shared.js;js/background.js	known	paired by hand in derive-file-map.mjs KNOWN_KOTLIN; check before trusting
+apps/android/app/src/main/java/com/filtertube/app/ProfilePickerFooter.kt	kotlin	js/tab-view.js;js/popup.js;js/ui_components.js	known	paired by hand in derive-file-map.mjs KNOWN_KOTLIN; check before trusting
+apps/android/app/src/main/java/com/filtertube/app/ProfilePickerRow.kt	kotlin	js/tab-view.js;js/popup.js;js/ui_components.js	known	paired by hand in derive-file-map.mjs KNOWN_KOTLIN; check before trusting
+apps/android/app/src/main/java/com/filtertube/app/ProfilePolicyGate.kt	kotlin	js/background.js	known	paired by hand in derive-file-map.mjs KNOWN_KOTLIN; check before trusting
+apps/android/app/src/main/java/com/filtertube/app/ProfileRepository.kt	kotlin	js/settings_shared.js;js/background.js	known	paired by hand in derive-file-map.mjs KNOWN_KOTLIN; check before trusting
+apps/android/app/src/main/java/com/filtertube/app/ProfileRouteAccess.kt	kotlin	js/security_manager.js;js/background.js	known	paired by hand in derive-file-map.mjs KNOWN_KOTLIN; check before trusting
+apps/android/app/src/main/java/com/filtertube/app/ProfileVisuals.kt	kotlin	js/tab-view.js;js/popup.js;js/ui_components.js	known	paired by hand in derive-file-map.mjs KNOWN_KOTLIN; check before trusting
+apps/android/app/src/main/java/com/filtertube/app/PullRefreshStage.kt	kotlin	n/a	n/a	the app's native viewer (the extension filters the site's own pages)
+apps/android/app/src/main/java/com/filtertube/app/RollingCounterView.kt	kotlin	css/paperkit-parity.css;js/paperkit_parity.js	cited	named in 2 extension file(s)
+apps/android/app/src/main/java/com/filtertube/app/SafeWebLogUrl.kt	kotlin	n/a	n/a	Android platform plumbing (app icon, updates, WebView host, threading, deep links, insets)
+apps/android/app/src/main/java/com/filtertube/app/SeasonalIcon.kt	kotlin	n/a	n/a	Android platform plumbing (app icon, updates, WebView host, threading, deep links, insets)
+apps/android/app/src/main/java/com/filtertube/app/SelfControlSessionCoordinator.kt	kotlin	js/background.js	known	paired by hand in derive-file-map.mjs KNOWN_KOTLIN; check before trusting
+apps/android/app/src/main/java/com/filtertube/app/SettingsSectionActivity.kt	kotlin	js/tab-view.js;data/release_notes.js	audit	EXTENSION_ANDROID_PARITY_AUDIT_2026-11-16.md
+apps/android/app/src/main/java/com/filtertube/app/SheetChoreography.kt	kotlin	js/mascots.js;css/mascots.css	known	paired by hand in derive-file-map.mjs KNOWN_KOTLIN; check before trusting
+apps/android/app/src/main/java/com/filtertube/app/StudyAddChannelSheet.kt	kotlin	js/study_ui.js	cited	named in 1 extension file(s)
+apps/android/app/src/main/java/com/filtertube/app/StudyChannelAvatars.kt	kotlin	js/background.js;js/study_ui.js	cited	named in 2 extension file(s)
+apps/android/app/src/main/java/com/filtertube/app/StudyClock.kt	kotlin	js/shared/study_engine.js	cited	named in 1 extension file(s)
+apps/android/app/src/main/java/com/filtertube/app/StudyClockGuard.kt	kotlin	js/shared/study_clock_guard.js;js/study_background.js	cited	named in 2 extension file(s)
+apps/android/app/src/main/java/com/filtertube/app/StudyDashboardActivity.kt	kotlin	js/study_ui.js;css/study.css	known	paired by hand in derive-file-map.mjs KNOWN_KOTLIN; check before trusting
+apps/android/app/src/main/java/com/filtertube/app/StudyDayPlannerView.kt	kotlin	js/study_ui.js;css/study.css	known	paired by hand in derive-file-map.mjs KNOWN_KOTLIN; check before trusting
+apps/android/app/src/main/java/com/filtertube/app/StudyDayRingView.kt	kotlin	css/study.css;js/study_ui.js	cited	named in 2 extension file(s)
+apps/android/app/src/main/java/com/filtertube/app/StudyFamily.kt	kotlin	js/shared/ask_parent.js	cited	named in 1 extension file(s)
+apps/android/app/src/main/java/com/filtertube/app/StudyFamilyActivity.kt	kotlin	css/paperkit-parity.css;js/tab-view.js	cited	named in 2 extension file(s)
+apps/android/app/src/main/java/com/filtertube/app/StudyFamilyScopes.kt	kotlin	js/nanah_managed_live_policy.js	cited	named in 1 extension file(s)
+apps/android/app/src/main/java/com/filtertube/app/StudyFamilyService.kt	kotlin	js/ask_parent_background.js	cited	named in 1 extension file(s)
+apps/android/app/src/main/java/com/filtertube/app/StudyFamilyStore.kt	kotlin	js/ask_parent_background.js	cited	named in 1 extension file(s)
+apps/android/app/src/main/java/com/filtertube/app/StudyFamilyUi.kt	kotlin	css/study.css;js/nanah_pairing_ui.js;js/study_ui.js	cited	named in 3 extension file(s)
+apps/android/app/src/main/java/com/filtertube/app/StudyFeedMix.kt	kotlin	js/study_ui.js;css/study.css	known	paired by hand in derive-file-map.mjs KNOWN_KOTLIN; check before trusting
+apps/android/app/src/main/java/com/filtertube/app/StudyFocusActivity.kt	kotlin	css/study.css;js/study_ui.js	cited	named in 2 extension file(s)
+apps/android/app/src/main/java/com/filtertube/app/StudyHomeFeed.kt	kotlin	js/shared/study_engine.js	cited	named in 1 extension file(s)
+apps/android/app/src/main/java/com/filtertube/app/StudyHomeHost.kt	kotlin	js/study_ui.js;css/study.css	known	paired by hand in derive-file-map.mjs KNOWN_KOTLIN; check before trusting
+apps/android/app/src/main/java/com/filtertube/app/StudyHomeModels.kt	kotlin	js/study_ui.js;css/study.css	known	paired by hand in derive-file-map.mjs KNOWN_KOTLIN; check before trusting
+apps/android/app/src/main/java/com/filtertube/app/StudyKidsSpace.kt	kotlin	js/content/study_overlay.js;js/shared/study_engine.js	cited	named in 2 extension file(s)
+apps/android/app/src/main/java/com/filtertube/app/StudyLooseningSheet.kt	kotlin	css/study.css	cited	named in 1 extension file(s)
+apps/android/app/src/main/java/com/filtertube/app/StudyMascotView.kt	kotlin	js/mascots.js	cited	named in 1 extension file(s)
+apps/android/app/src/main/java/com/filtertube/app/StudyMerge.kt	kotlin	js/io_manager.js;js/shared/study_model.js	cited	named in 2 extension file(s)
+apps/android/app/src/main/java/com/filtertube/app/StudyModels.kt	kotlin	js/shared/study_model.js	cited	named in 1 extension file(s)
+apps/android/app/src/main/java/com/filtertube/app/StudyMusicQueueSkip.kt	kotlin	js/study_ui.js;css/study.css	known	paired by hand in derive-file-map.mjs KNOWN_KOTLIN; check before trusting
+apps/android/app/src/main/java/com/filtertube/app/StudyPackCatalog.kt	kotlin	js/shared/study_engine.js;js/shared/study_packs.js	cited	named in 2 extension file(s)
+apps/android/app/src/main/java/com/filtertube/app/StudyPageRules.kt	kotlin	js/shared/study_engine.js	cited	named in 1 extension file(s)
+apps/android/app/src/main/java/com/filtertube/app/StudyPagesHost.kt	kotlin	js/content/study_overlay.js;js/popup.js	known	paired by hand in derive-file-map.mjs KNOWN_KOTLIN; check before trusting
+apps/android/app/src/main/java/com/filtertube/app/StudyPaper.kt	kotlin	css/paperkit-parity.css	cited	named in 1 extension file(s)
+apps/android/app/src/main/java/com/filtertube/app/StudyPlanBarView.kt	kotlin	js/study_ui.js;css/study.css	known	paired by hand in derive-file-map.mjs KNOWN_KOTLIN; check before trusting
+apps/android/app/src/main/java/com/filtertube/app/StudyPlannerModel.kt	kotlin	js/study_ui.js;css/study.css	known	paired by hand in derive-file-map.mjs KNOWN_KOTLIN; check before trusting
+apps/android/app/src/main/java/com/filtertube/app/StudyProfileSwitch.kt	kotlin	js/background.js;js/study_background.js	cited	named in 2 extension file(s)
+apps/android/app/src/main/java/com/filtertube/app/StudyRemote.kt	kotlin	js/study_ui.js;css/study.css	known	paired by hand in derive-file-map.mjs KNOWN_KOTLIN; check before trusting
+apps/android/app/src/main/java/com/filtertube/app/StudyRemoteUi.kt	kotlin	js/study_ui.js;css/study.css	known	paired by hand in derive-file-map.mjs KNOWN_KOTLIN; check before trusting
+apps/android/app/src/main/java/com/filtertube/app/StudyRestActivity.kt	kotlin	js/content/study_overlay.js	cited	named in 1 extension file(s)
+apps/android/app/src/main/java/com/filtertube/app/StudyRules.kt	kotlin	js/filter_logic.js;js/content/dom_fallback.js;js/shared/study_engine.js	audit	EXTENSION_ANDROID_PARITY_AUDIT_2026-11-16.md
+apps/android/app/src/main/java/com/filtertube/app/StudyRuntime.kt	kotlin	js/background.js;js/content_bridge.js;js/shared/study_model.js;js/study_background.js	cited	named in 4 extension file(s)
+apps/android/app/src/main/java/com/filtertube/app/StudyRuntimeStore.kt	kotlin	js/study_background.js	cited	named in 1 extension file(s)
+apps/android/app/src/main/java/com/filtertube/app/StudySearch.kt	kotlin	js/shared/study_engine.js	known	paired by hand in derive-file-map.mjs KNOWN_KOTLIN; check before trusting
+apps/android/app/src/main/java/com/filtertube/app/StudySearchExplainer.kt	kotlin	css/study.css;js/shared/study_engine.js;js/study_ui.js	cited	named in 3 extension file(s)
+apps/android/app/src/main/java/com/filtertube/app/StudySessionEnds.kt	kotlin	js/shared/study_engine.js;js/study_background.js	cited	named in 2 extension file(s)
+apps/android/app/src/main/java/com/filtertube/app/StudySessionModels.kt	kotlin	js/content/study_overlay.js;js/popup.js	known	paired by hand in derive-file-map.mjs KNOWN_KOTLIN; check before trusting
+apps/android/app/src/main/java/com/filtertube/app/StudySessionStripHost.kt	kotlin	js/content/study_overlay.js;js/popup.js	known	paired by hand in derive-file-map.mjs KNOWN_KOTLIN; check before trusting
+apps/android/app/src/main/java/com/filtertube/app/StudySessionViews.kt	kotlin	js/content/study_overlay.js;js/popup.js	known	paired by hand in derive-file-map.mjs KNOWN_KOTLIN; check before trusting
+apps/android/app/src/main/java/com/filtertube/app/StudySetupActivity.kt	kotlin	css/study.css;js/shared/study_setup.js;js/study_background.js;js/study_ui.js	cited	named in 4 extension file(s)
+apps/android/app/src/main/java/com/filtertube/app/StudySetupGroups.kt	kotlin	js/shared/study_setup.js	cited	named in 1 extension file(s)
+apps/android/app/src/main/java/com/filtertube/app/StudySetupViews.kt	kotlin	css/study.css;js/study_ui.js	cited	named in 2 extension file(s)
+apps/android/app/src/main/java/com/filtertube/app/StudyStateTheme.kt	kotlin	css/study.css;js/shared/study_engine.js;js/study_ui.js	cited	named in 3 extension file(s)
+apps/android/app/src/main/java/com/filtertube/app/StudySuggestions.kt	kotlin	js/shared/study_engine.js	cited	named in 1 extension file(s)
+apps/android/app/src/main/java/com/filtertube/app/StudySwitchGate.kt	kotlin	js/popup.js;js/study_background.js;js/tab-view.js	cited	named in 3 extension file(s)
+apps/android/app/src/main/java/com/filtertube/app/StudyUi.kt	kotlin	js/study_ui.js;css/study.css	known	paired by hand in derive-file-map.mjs KNOWN_KOTLIN; check before trusting
+apps/android/app/src/main/java/com/filtertube/app/StudyUiModels.kt	kotlin	js/study_ui.js;css/study.css	known	paired by hand in derive-file-map.mjs KNOWN_KOTLIN; check before trusting
+apps/android/app/src/main/java/com/filtertube/app/StudyWatchOverlay.kt	kotlin	js/content/study_overlay.js;js/study_background.js	cited	named in 2 extension file(s)
+apps/android/app/src/main/java/com/filtertube/app/SubscriptionsImportActivity.kt	kotlin	n/a	n/a	Android platform plumbing (app icon, updates, WebView host, threading, deep links, insets)
+apps/android/app/src/main/java/com/filtertube/app/SupportOfferSheet.kt	kotlin	js/mascots.js	cited	named in 1 extension file(s)
+apps/android/app/src/main/java/com/filtertube/app/SupportSheetVariants.kt	kotlin	js/mascots.js	cited	named in 1 extension file(s)
+apps/android/app/src/main/java/com/filtertube/app/SyncRuntimeState.kt	kotlin	js/nanah_sync_adapter.js;js/nanah_managed_open_sync.js;js/device_auto_sync_ui.js	known	paired by hand in derive-file-map.mjs KNOWN_KOTLIN; check before trusting
+apps/android/app/src/main/java/com/filtertube/app/ThemedSurface.kt	kotlin	n/a	n/a	Android platform plumbing (app icon, updates, WebView host, threading, deep links, insets)
+apps/android/app/src/main/java/com/filtertube/app/TvCapability.kt	kotlin	n/a	n/a	Android TV
+apps/android/app/src/main/java/com/filtertube/app/TvCapabilityCard.kt	kotlin	n/a	n/a	Android TV
+apps/android/app/src/main/java/com/filtertube/app/UiSound.kt	kotlin	js/mascots.js	cited	named in 1 extension file(s)
+apps/android/app/src/main/java/com/filtertube/app/UljhanLoadMore.kt	kotlin	n/a	n/a	the app's native viewer (the extension filters the site's own pages)
+apps/android/app/src/main/java/com/filtertube/app/UljhanLoadMoreViews.kt	kotlin	n/a	n/a	the app's native viewer (the extension filters the site's own pages)
+apps/android/app/src/main/java/com/filtertube/app/YouTubeAccountCentre.kt	kotlin	n/a	n/a	the app's native viewer (the extension filters the site's own pages)
+apps/android/app/src/main/java/com/filtertube/app/YouTubeAccountsActivity.kt	kotlin	n/a	n/a	the app's native viewer (the extension filters the site's own pages)
+apps/android/app/src/main/java/com/filtertube/app/YouTubeSignIn.kt	kotlin	n/a	n/a	the app's native Home, side panel or sign-in (the site owns these in a browser)
+apps/android/app/src/main/java/com/filtertube/app/dark/channel-scroll-yes.png	other	n/a	n/a	build or manifest
+apps/android/app/src/main/java/com/filtertube/app/dark/channel-yes.png	other	n/a	n/a	build or manifest
+apps/android/app/src/main/java/com/filtertube/app/dark/home-scroll-yes.png	other	n/a	n/a	build or manifest
+apps/android/app/src/main/java/com/filtertube/app/dark/home-scroll2-yes.png	other	n/a	n/a	build or manifest
+apps/android/app/src/main/java/com/filtertube/app/dark/home-yes.png	other	n/a	n/a	build or manifest
+apps/android/app/src/main/java/com/filtertube/app/dark/search-results-yes.png	other	n/a	n/a	build or manifest
+apps/android/app/src/main/java/com/filtertube/app/dark/search-yes.png	other	n/a	n/a	build or manifest
+apps/android/app/src/main/java/com/filtertube/app/dark/subscriptions-yes.png	other	n/a	n/a	build or manifest
+apps/android/app/src/main/java/com/filtertube/app/dark/watch-scroll-yes.png	other	n/a	n/a	build or manifest
+apps/android/app/src/main/java/com/filtertube/app/dark/watch-yes.png	other	n/a	n/a	build or manifest
+apps/android/app/src/main/java/com/filtertube/app/dark/you-yes.png	other	n/a	n/a	build or manifest
+apps/android/app/src/main/java/com/filtertube/app/light/channel-no.png	other	n/a	n/a	build or manifest
+apps/android/app/src/main/java/com/filtertube/app/light/channel-scroll-no.png	other	n/a	n/a	build or manifest
+apps/android/app/src/main/java/com/filtertube/app/light/home-no.png	other	n/a	n/a	build or manifest
+apps/android/app/src/main/java/com/filtertube/app/light/home-scroll-no.png	other	n/a	n/a	build or manifest
+apps/android/app/src/main/java/com/filtertube/app/light/home-scroll2-no.png	other	n/a	n/a	build or manifest
+apps/android/app/src/main/java/com/filtertube/app/light/search-no.png	other	n/a	n/a	build or manifest
+apps/android/app/src/main/java/com/filtertube/app/light/search-results-no.png	other	n/a	n/a	build or manifest
+apps/android/app/src/main/java/com/filtertube/app/light/subscriptions-no.png	other	n/a	n/a	build or manifest
+apps/android/app/src/main/java/com/filtertube/app/light/watch-no.png	other	n/a	n/a	build or manifest
+apps/android/app/src/main/java/com/filtertube/app/light/watch-scroll-no.png	other	n/a	n/a	build or manifest
+apps/android/app/src/main/java/com/filtertube/app/light/you-no.png	other	n/a	n/a	build or manifest
+apps/android/app/src/main/java/com/filtertube/app/tv/DebugNativeOwnedKidsTvHost.kt	kotlin	n/a	n/a	Android TV
+apps/android/app/src/main/java/com/filtertube/app/tv/NativeTvBrowseShell.kt	kotlin	n/a	n/a	Android TV
+apps/android/app/src/main/java/com/filtertube/app/tv/NativeTvFocusOutlineDrawable.kt	kotlin	n/a	n/a	Android TV
+apps/android/app/src/main/java/com/filtertube/app/tv/NativeTvHomeRowHost.kt	kotlin	n/a	n/a	Android TV
+apps/android/app/src/main/java/com/filtertube/app/tv/NativeTvHomeShelfPlan.kt	kotlin	n/a	n/a	Android TV
+apps/android/app/src/main/res/color/filtertube_outlined_button_stroke.xml	other	n/a	n/a	build or manifest
+apps/android/app/src/main/res/color/filtertube_outlined_button_text.xml	other	n/a	n/a	build or manifest
+apps/android/app/src/main/res/drawable-nodpi/doodle_arrows_1.webp	drawable	none (gap)	none	doodle not in assets/images/doodles yet
+apps/android/app/src/main/res/drawable-nodpi/doodle_arrows_2.webp	drawable	none (gap)	none	doodle not in assets/images/doodles yet
+apps/android/app/src/main/res/drawable-nodpi/doodle_bubble_1.webp	drawable	assets/images/doodles/bubble.webp	assets	
+apps/android/app/src/main/res/drawable-nodpi/doodle_bubble_2.webp	drawable	assets/images/doodles/bubble.webp	assets	
+apps/android/app/src/main/res/drawable-nodpi/doodle_check.webp	drawable	assets/images/doodles/check.webp	assets	
+apps/android/app/src/main/res/drawable-nodpi/doodle_checkbox_1.webp	drawable	none (gap)	none	doodle not in assets/images/doodles yet
+apps/android/app/src/main/res/drawable-nodpi/doodle_checkbox_2.webp	drawable	none (gap)	none	doodle not in assets/images/doodles yet
+apps/android/app/src/main/res/drawable-nodpi/doodle_circle_1.webp	drawable	none (gap)	none	doodle not in assets/images/doodles yet
+apps/android/app/src/main/res/drawable-nodpi/doodle_circle_2.webp	drawable	none (gap)	none	doodle not in assets/images/doodles yet
+apps/android/app/src/main/res/drawable-nodpi/doodle_clip_1.webp	drawable	assets/images/doodles/clip.webp	assets	
+apps/android/app/src/main/res/drawable-nodpi/doodle_clip_2.webp	drawable	assets/images/doodles/clip.webp	assets	
+apps/android/app/src/main/res/drawable-nodpi/doodle_clouds_1.webp	drawable	none (gap)	none	doodle not in assets/images/doodles yet
+apps/android/app/src/main/res/drawable-nodpi/doodle_clouds_2.webp	drawable	none (gap)	none	doodle not in assets/images/doodles yet
+apps/android/app/src/main/res/drawable-nodpi/doodle_corner_1.webp	drawable	none (gap)	none	doodle not in assets/images/doodles yet
+apps/android/app/src/main/res/drawable-nodpi/doodle_corner_2.webp	drawable	none (gap)	none	doodle not in assets/images/doodles yet
+apps/android/app/src/main/res/drawable-nodpi/doodle_crayon_1.webp	drawable	assets/images/doodles/crayon.webp	assets	
+apps/android/app/src/main/res/drawable-nodpi/doodle_crayon_2.webp	drawable	assets/images/doodles/crayon.webp	assets	
+apps/android/app/src/main/res/drawable-nodpi/doodle_eyes_1.webp	drawable	none (gap)	none	doodle not in assets/images/doodles yet
+apps/android/app/src/main/res/drawable-nodpi/doodle_flowers_1.webp	drawable	none (gap)	none	doodle not in assets/images/doodles yet
+apps/android/app/src/main/res/drawable-nodpi/doodle_flowers_2.webp	drawable	none (gap)	none	doodle not in assets/images/doodles yet
+apps/android/app/src/main/res/drawable-nodpi/doodle_fuzzy_1.webp	drawable	none (gap)	none	doodle not in assets/images/doodles yet
+apps/android/app/src/main/res/drawable-nodpi/doodle_fuzzy_2.webp	drawable	none (gap)	none	doodle not in assets/images/doodles yet
+apps/android/app/src/main/res/drawable-nodpi/doodle_heart.webp	drawable	assets/images/doodles/heart.webp	assets	
+apps/android/app/src/main/res/drawable-nodpi/doodle_heart_1.webp	drawable	assets/images/doodles/heart.webp	assets	
+apps/android/app/src/main/res/drawable-nodpi/doodle_heart_2.webp	drawable	assets/images/doodles/heart.webp	assets	
+apps/android/app/src/main/res/drawable-nodpi/doodle_heart_rays.webp	drawable	none (gap)	none	doodle not in assets/images/doodles yet
+apps/android/app/src/main/res/drawable-nodpi/doodle_magnifier_1.webp	drawable	assets/images/doodles/magnifier.webp	assets	
+apps/android/app/src/main/res/drawable-nodpi/doodle_magnifier_2.webp	drawable	assets/images/doodles/magnifier.webp	assets	
+apps/android/app/src/main/res/drawable-nodpi/doodle_page_1.webp	drawable	none (gap)	none	doodle not in assets/images/doodles yet
+apps/android/app/src/main/res/drawable-nodpi/doodle_page_2.webp	drawable	none (gap)	none	doodle not in assets/images/doodles yet
+apps/android/app/src/main/res/drawable-nodpi/doodle_page_3.webp	drawable	none (gap)	none	doodle not in assets/images/doodles yet
+apps/android/app/src/main/res/drawable-nodpi/doodle_question_1.webp	drawable	none (gap)	none	doodle not in assets/images/doodles yet
+apps/android/app/src/main/res/drawable-nodpi/doodle_question_2.webp	drawable	none (gap)	none	doodle not in assets/images/doodles yet
+apps/android/app/src/main/res/drawable-nodpi/doodle_scribble_circle.webp	drawable	assets/images/doodles/scribble_circle.webp	assets	
+apps/android/app/src/main/res/drawable-nodpi/doodle_sparkle.webp	drawable	assets/images/doodles/sparkle.webp	assets	
+apps/android/app/src/main/res/drawable-nodpi/doodle_stamp_1.webp	drawable	assets/images/doodles/stamp.webp	assets	
+apps/android/app/src/main/res/drawable-nodpi/doodle_stamp_2.webp	drawable	assets/images/doodles/stamp.webp	assets	
+apps/android/app/src/main/res/drawable-nodpi/doodle_stamp_3.webp	drawable	assets/images/doodles/stamp.webp	assets	
+apps/android/app/src/main/res/drawable-nodpi/doodle_star.webp	drawable	assets/images/doodles/star.webp	assets	
+apps/android/app/src/main/res/drawable-nodpi/doodle_stars_1.webp	drawable	none (gap)	none	doodle not in assets/images/doodles yet
+apps/android/app/src/main/res/drawable-nodpi/doodle_stars_2.webp	drawable	none (gap)	none	doodle not in assets/images/doodles yet
+apps/android/app/src/main/res/drawable-nodpi/doodle_stars_3.webp	drawable	none (gap)	none	doodle not in assets/images/doodles yet
+apps/android/app/src/main/res/drawable-nodpi/doodle_underline_1.webp	drawable	none (gap)	none	doodle not in assets/images/doodles yet
+apps/android/app/src/main/res/drawable-nodpi/doodle_underline_2.webp	drawable	none (gap)	none	doodle not in assets/images/doodles yet
+apps/android/app/src/main/res/drawable-nodpi/doodle_underline_3.webp	drawable	none (gap)	none	doodle not in assets/images/doodles yet
+apps/android/app/src/main/res/drawable-nodpi/doodle_underline_marker.webp	drawable	none (gap)	none	doodle not in assets/images/doodles yet
+apps/android/app/src/main/res/drawable-nodpi/doodle_underline_swoosh.webp	drawable	assets/images/doodles/underline_swoosh.webp	assets	
+apps/android/app/src/main/res/drawable-nodpi/doodle_unsure_1.webp	drawable	none (gap)	none	doodle not in assets/images/doodles yet
+apps/android/app/src/main/res/drawable-nodpi/doodle_unsure_2.webp	drawable	none (gap)	none	doodle not in assets/images/doodles yet
+apps/android/app/src/main/res/drawable-nodpi/doodle_verified_1.webp	drawable	none (gap)	none	doodle not in assets/images/doodles yet
+apps/android/app/src/main/res/drawable-nodpi/doodle_wavy_1.webp	drawable	none (gap)	none	doodle not in assets/images/doodles yet
+apps/android/app/src/main/res/drawable-nodpi/doodle_wavy_2.webp	drawable	none (gap)	none	doodle not in assets/images/doodles yet
+apps/android/app/src/main/res/drawable-nodpi/homepage_hero_poster.webp	drawable	n/a	n/a	Android drawable (shape, selector or player art)
+apps/android/app/src/main/res/drawable-nodpi/splash_story_01.webp	drawable	n/a	n/a	the app's launch story; the extension has no launch screen
+apps/android/app/src/main/res/drawable-nodpi/splash_story_02.webp	drawable	n/a	n/a	the app's launch story; the extension has no launch screen
+apps/android/app/src/main/res/drawable-nodpi/splash_story_03.webp	drawable	n/a	n/a	the app's launch story; the extension has no launch screen
+apps/android/app/src/main/res/drawable-nodpi/splash_story_04.webp	drawable	n/a	n/a	the app's launch story; the extension has no launch screen
+apps/android/app/src/main/res/drawable-nodpi/splash_story_05.webp	drawable	n/a	n/a	the app's launch story; the extension has no launch screen
+apps/android/app/src/main/res/drawable-nodpi/splash_story_06.webp	drawable	n/a	n/a	the app's launch story; the extension has no launch screen
+apps/android/app/src/main/res/drawable-nodpi/splash_story_07.webp	drawable	n/a	n/a	the app's launch story; the extension has no launch screen
+apps/android/app/src/main/res/drawable-nodpi/splash_story_08.webp	drawable	n/a	n/a	the app's launch story; the extension has no launch screen
+apps/android/app/src/main/res/drawable-nodpi/splash_story_09.webp	drawable	n/a	n/a	the app's launch story; the extension has no launch screen
+apps/android/app/src/main/res/drawable-nodpi/splash_story_10.webp	drawable	n/a	n/a	the app's launch story; the extension has no launch screen
+apps/android/app/src/main/res/drawable-nodpi/splash_story_11.webp	drawable	n/a	n/a	the app's launch story; the extension has no launch screen
+apps/android/app/src/main/res/drawable-nodpi/study_duo_shoo_01.webp	drawable	assets/images/mascots/duo_shoo_01.webp	assets	
+apps/android/app/src/main/res/drawable-nodpi/study_duo_shoo_02.webp	drawable	assets/images/mascots/duo_shoo_02.webp	assets	
+apps/android/app/src/main/res/drawable-nodpi/study_duo_shoo_03.webp	drawable	assets/images/mascots/duo_shoo_03.webp	assets	
+apps/android/app/src/main/res/drawable-nodpi/study_duo_shoo_04.webp	drawable	assets/images/mascots/duo_shoo_04.webp	assets	
+apps/android/app/src/main/res/drawable-nodpi/study_duo_shoo_05.webp	drawable	assets/images/mascots/duo_shoo_05.webp	assets	
+apps/android/app/src/main/res/drawable-nodpi/study_duo_shoo_06.webp	drawable	assets/images/mascots/duo_shoo_06.webp	assets	
+apps/android/app/src/main/res/drawable-nodpi/study_duo_sieve_01.webp	drawable	n/a	n/a	2026-11-18: the extension ships the owner's v3 sieve as duo_sieve_01..11.webp
+apps/android/app/src/main/res/drawable-nodpi/study_duo_sieve_02.webp	drawable	n/a	n/a	2026-11-18: the extension ships the owner's v3 sieve as duo_sieve_01..11.webp
+apps/android/app/src/main/res/drawable-nodpi/study_duo_sieve_03.webp	drawable	n/a	n/a	2026-11-18: the extension ships the owner's v3 sieve as duo_sieve_01..11.webp
+apps/android/app/src/main/res/drawable-nodpi/study_duo_sieve_04.webp	drawable	n/a	n/a	2026-11-18: the extension ships the owner's v3 sieve as duo_sieve_01..11.webp
+apps/android/app/src/main/res/drawable-nodpi/study_duo_sieve_05.webp	drawable	n/a	n/a	2026-11-18: the extension ships the owner's v3 sieve as duo_sieve_01..11.webp
+apps/android/app/src/main/res/drawable-nodpi/study_duo_sieve_06.webp	drawable	n/a	n/a	2026-11-18: the extension ships the owner's v3 sieve as duo_sieve_01..11.webp
+apps/android/app/src/main/res/drawable-nodpi/study_kriti_crayon.webp	drawable	n/a	n/a	Android drawable (shape, selector or player art)
+apps/android/app/src/main/res/drawable-nodpi/study_kriti_done.webp	drawable	n/a	n/a	Android drawable (shape, selector or player art)
+apps/android/app/src/main/res/drawable-nodpi/study_kriti_evening_01.webp	drawable	assets/images/mascots/kriti_evening_01.webp	assets	
+apps/android/app/src/main/res/drawable-nodpi/study_kriti_evening_02.webp	drawable	assets/images/mascots/kriti_evening_02.webp	assets	
+apps/android/app/src/main/res/drawable-nodpi/study_kriti_evening_03.webp	drawable	assets/images/mascots/kriti_evening_03.webp	assets	
+apps/android/app/src/main/res/drawable-nodpi/study_kriti_evening_04.webp	drawable	assets/images/mascots/kriti_evening_04.webp	assets	
+apps/android/app/src/main/res/drawable-nodpi/study_kriti_evening_05.webp	drawable	assets/images/mascots/kriti_evening_05.webp	assets	
+apps/android/app/src/main/res/drawable-nodpi/study_kriti_evening_06.webp	drawable	assets/images/mascots/kriti_evening_06.webp	assets	
+apps/android/app/src/main/res/drawable-nodpi/study_kriti_front.webp	drawable	n/a	n/a	Android drawable (shape, selector or player art)
+apps/android/app/src/main/res/drawable-nodpi/study_kriti_funnel.webp	drawable	n/a	n/a	removed 2026-11-18: the kitchen-sieve pose; uses point to kriti_sieve_05.webp
+apps/android/app/src/main/res/drawable-nodpi/study_kriti_happy.webp	drawable	n/a	n/a	Android drawable (shape, selector or player art)
+apps/android/app/src/main/res/drawable-nodpi/study_kriti_jump_01.webp	drawable	assets/images/mascots/kriti_jump_01.webp	assets	
+apps/android/app/src/main/res/drawable-nodpi/study_kriti_jump_02.webp	drawable	assets/images/mascots/kriti_jump_02.webp	assets	
+apps/android/app/src/main/res/drawable-nodpi/study_kriti_jump_03.webp	drawable	assets/images/mascots/kriti_jump_03.webp	assets	
+apps/android/app/src/main/res/drawable-nodpi/study_kriti_jump_04.webp	drawable	assets/images/mascots/kriti_jump_04.webp	assets	
+apps/android/app/src/main/res/drawable-nodpi/study_kriti_jump_05.webp	drawable	assets/images/mascots/kriti_jump_05.webp	assets	
+apps/android/app/src/main/res/drawable-nodpi/study_kriti_loading_01.webp	drawable	n/a	n/a	Android drawable (shape, selector or player art)
+apps/android/app/src/main/res/drawable-nodpi/study_kriti_loading_02.webp	drawable	n/a	n/a	Android drawable (shape, selector or player art)
+apps/android/app/src/main/res/drawable-nodpi/study_kriti_loading_03.webp	drawable	n/a	n/a	Android drawable (shape, selector or player art)
+apps/android/app/src/main/res/drawable-nodpi/study_kriti_loading_04.webp	drawable	n/a	n/a	Android drawable (shape, selector or player art)
+apps/android/app/src/main/res/drawable-nodpi/study_kriti_loading_05.webp	drawable	n/a	n/a	Android drawable (shape, selector or player art)
+apps/android/app/src/main/res/drawable-nodpi/study_kriti_logo_01.webp	drawable	assets/images/mascots/kriti_logo_01.webp	assets	
+apps/android/app/src/main/res/drawable-nodpi/study_kriti_logo_02.webp	drawable	assets/images/mascots/kriti_logo_02.webp	assets	
+apps/android/app/src/main/res/drawable-nodpi/study_kriti_logo_03.webp	drawable	assets/images/mascots/kriti_logo_03.webp	assets	
+apps/android/app/src/main/res/drawable-nodpi/study_kriti_logo_04.webp	drawable	assets/images/mascots/kriti_logo_04.webp	assets	
+apps/android/app/src/main/res/drawable-nodpi/study_kriti_logo_05.webp	drawable	assets/images/mascots/kriti_logo_05.webp	assets	
+apps/android/app/src/main/res/drawable-nodpi/study_kriti_magnifier.webp	drawable	n/a	n/a	Android drawable (shape, selector or player art)
+apps/android/app/src/main/res/drawable-nodpi/study_kriti_medal.webp	drawable	n/a	n/a	Android drawable (shape, selector or player art)
+apps/android/app/src/main/res/drawable-nodpi/study_kriti_mug_01.webp	drawable	assets/images/mascots/kriti_mug_01.webp	assets	
+apps/android/app/src/main/res/drawable-nodpi/study_kriti_mug_02.webp	drawable	assets/images/mascots/kriti_mug_02.webp	assets	
+apps/android/app/src/main/res/drawable-nodpi/study_kriti_mug_03.webp	drawable	assets/images/mascots/kriti_mug_03.webp	assets	
+apps/android/app/src/main/res/drawable-nodpi/study_kriti_mug_04.webp	drawable	assets/images/mascots/kriti_mug_04.webp	assets	
+apps/android/app/src/main/res/drawable-nodpi/study_kriti_mug_05.webp	drawable	assets/images/mascots/kriti_mug_05.webp	assets	
+apps/android/app/src/main/res/drawable-nodpi/study_kriti_mug_06.webp	drawable	assets/images/mascots/kriti_mug_06.webp	assets	
+apps/android/app/src/main/res/drawable-nodpi/study_kriti_music.webp	drawable	n/a	n/a	Android drawable (shape, selector or player art)
+apps/android/app/src/main/res/drawable-nodpi/study_kriti_notebook.webp	drawable	assets/images/mascots/kriti_notebook.webp	assets	
+apps/android/app/src/main/res/drawable-nodpi/study_kriti_peek.webp	drawable	assets/images/mascots/kriti_peek.webp	assets	
+apps/android/app/src/main/res/drawable-nodpi/study_kriti_peek_low.webp	drawable	n/a	n/a	Android drawable (shape, selector or player art)
+apps/android/app/src/main/res/drawable-nodpi/study_kriti_pencil_01.webp	drawable	n/a	n/a	Android drawable (shape, selector or player art)
+apps/android/app/src/main/res/drawable-nodpi/study_kriti_pencil_02.webp	drawable	n/a	n/a	Android drawable (shape, selector or player art)
+apps/android/app/src/main/res/drawable-nodpi/study_kriti_pencil_03.webp	drawable	n/a	n/a	Android drawable (shape, selector or player art)
+apps/android/app/src/main/res/drawable-nodpi/study_kriti_pencil_04.webp	drawable	n/a	n/a	Android drawable (shape, selector or player art)
+apps/android/app/src/main/res/drawable-nodpi/study_kriti_pencil_05.webp	drawable	n/a	n/a	Android drawable (shape, selector or player art)
+apps/android/app/src/main/res/drawable-nodpi/study_kriti_pencil_06.webp	drawable	n/a	n/a	Android drawable (shape, selector or player art)
+apps/android/app/src/main/res/drawable-nodpi/study_kriti_pointing.webp	drawable	n/a	n/a	2026-11-18: the extension uses the owner's kriti_pose_08 (point).webp
+apps/android/app/src/main/res/drawable-nodpi/study_kriti_reading.webp	drawable	n/a	n/a	2026-11-18: the extension uses the owner's kriti_pose_04 (read).webp
+apps/android/app/src/main/res/drawable-nodpi/study_kriti_salute.webp	drawable	n/a	n/a	Android drawable (shape, selector or player art)
+apps/android/app/src/main/res/drawable-nodpi/study_kriti_shrug.webp	drawable	n/a	n/a	Android drawable (shape, selector or player art)
+apps/android/app/src/main/res/drawable-nodpi/study_kriti_sign.webp	drawable	n/a	n/a	Android drawable (shape, selector or player art)
+apps/android/app/src/main/res/drawable-nodpi/study_kriti_sign_point.webp	drawable	n/a	n/a	Android drawable (shape, selector or player art)
+apps/android/app/src/main/res/drawable-nodpi/study_kriti_sign_raised.webp	drawable	n/a	n/a	Android drawable (shape, selector or player art)
+apps/android/app/src/main/res/drawable-nodpi/study_kriti_stretch_01.webp	drawable	n/a	n/a	Android drawable (shape, selector or player art)
+apps/android/app/src/main/res/drawable-nodpi/study_kriti_stretch_02.webp	drawable	n/a	n/a	Android drawable (shape, selector or player art)
+apps/android/app/src/main/res/drawable-nodpi/study_kriti_stretch_03.webp	drawable	n/a	n/a	Android drawable (shape, selector or player art)
+apps/android/app/src/main/res/drawable-nodpi/study_kriti_stretch_04.webp	drawable	n/a	n/a	Android drawable (shape, selector or player art)
+apps/android/app/src/main/res/drawable-nodpi/study_kriti_stretch_05.webp	drawable	n/a	n/a	Android drawable (shape, selector or player art)
+apps/android/app/src/main/res/drawable-nodpi/study_kriti_thinking.webp	drawable	n/a	n/a	2026-11-18: the extension uses the owner's kriti_pose_03 (think).webp
+apps/android/app/src/main/res/drawable-nodpi/study_kriti_thumbsup.webp	drawable	assets/images/mascots/kriti_thumbsup.webp	assets	
+apps/android/app/src/main/res/drawable-nodpi/study_kriti_wave.webp	drawable	n/a	n/a	2026-11-18: the extension uses the owner's kriti_pose_01 (wave).webp
+apps/android/app/src/main/res/drawable-nodpi/study_uljhan_fetch_01.webp	drawable	assets/images/mascots/uljhan_fetch_01.webp	assets	
+apps/android/app/src/main/res/drawable-nodpi/study_uljhan_fetch_02.webp	drawable	assets/images/mascots/uljhan_fetch_02.webp	assets	
+apps/android/app/src/main/res/drawable-nodpi/study_uljhan_fetch_03.webp	drawable	assets/images/mascots/uljhan_fetch_03.webp	assets	
+apps/android/app/src/main/res/drawable-nodpi/study_uljhan_fetch_04.webp	drawable	assets/images/mascots/uljhan_fetch_04.webp	assets	
+apps/android/app/src/main/res/drawable-nodpi/study_uljhan_fetch_05.webp	drawable	assets/images/mascots/uljhan_fetch_05.webp	assets	
+apps/android/app/src/main/res/drawable-nodpi/study_uljhan_fetch_06.webp	drawable	assets/images/mascots/uljhan_fetch_06.webp	assets	
+apps/android/app/src/main/res/drawable-nodpi/study_uljhan_front.webp	drawable	assets/images/mascots/uljhan_front.webp	assets	
+apps/android/app/src/main/res/drawable-nodpi/study_uljhan_happy.webp	drawable	n/a	n/a	2026-11-18: the extension uses the owner's uljhan_pose_04 (hop).webp
+apps/android/app/src/main/res/drawable-nodpi/study_uljhan_sad.webp	drawable	n/a	n/a	offline is Uljhan tangled (uljhan_tangle_0N.webp) since 2026-11-18
+apps/android/app/src/main/res/drawable-nodpi/study_uljhan_shrug.webp	drawable	n/a	n/a	2026-11-18: the extension uses the owner's uljhan_pose_02 (shrug).webp
+apps/android/app/src/main/res/drawable-nodpi/study_uljhan_wave_01.webp	drawable	assets/images/mascots/uljhan_wave_01.webp	assets	
+apps/android/app/src/main/res/drawable-nodpi/study_uljhan_wave_02.webp	drawable	assets/images/mascots/uljhan_wave_02.webp	assets	
+apps/android/app/src/main/res/drawable-nodpi/study_uljhan_wave_03.webp	drawable	assets/images/mascots/uljhan_wave_03.webp	assets	
+apps/android/app/src/main/res/drawable-nodpi/study_uljhan_wave_04.webp	drawable	assets/images/mascots/uljhan_wave_04.webp	assets	
+apps/android/app/src/main/res/drawable-nodpi/study_uljhan_wave_05.webp	drawable	assets/images/mascots/uljhan_wave_05.webp	assets	
+apps/android/app/src/main/res/drawable-xxxhdpi/ic_launcher_duo_foreground.webp	drawable	n/a	n/a	app icon
+apps/android/app/src/main/res/drawable-xxxhdpi/ic_launcher_duo_monochrome.webp	drawable	n/a	n/a	app icon
+apps/android/app/src/main/res/drawable-xxxhdpi/ic_launcher_kriti_calm_foreground.webp	drawable	n/a	n/a	app icon
+apps/android/app/src/main/res/drawable-xxxhdpi/ic_launcher_kriti_calm_monochrome.webp	drawable	n/a	n/a	app icon
+apps/android/app/src/main/res/drawable-xxxhdpi/ic_launcher_kriti_cheer_foreground.webp	drawable	n/a	n/a	app icon
+apps/android/app/src/main/res/drawable-xxxhdpi/ic_launcher_kriti_cheer_monochrome.webp	drawable	n/a	n/a	app icon
+apps/android/app/src/main/res/drawable-xxxhdpi/ic_launcher_kriti_foreground.webp	drawable	n/a	n/a	app icon
+apps/android/app/src/main/res/drawable-xxxhdpi/ic_launcher_kriti_funnel_foreground.webp	drawable	n/a	n/a	app icon
+apps/android/app/src/main/res/drawable-xxxhdpi/ic_launcher_kriti_funnel_monochrome.webp	drawable	n/a	n/a	app icon
+apps/android/app/src/main/res/drawable-xxxhdpi/ic_launcher_kriti_monochrome.webp	drawable	n/a	n/a	app icon
+apps/android/app/src/main/res/drawable-xxxhdpi/ic_launcher_paper_background.webp	drawable	n/a	n/a	app icon
+apps/android/app/src/main/res/drawable-xxxhdpi/ic_launcher_uljhan_happy_foreground.webp	drawable	n/a	n/a	app icon
+apps/android/app/src/main/res/drawable-xxxhdpi/ic_launcher_uljhan_happy_monochrome.webp	drawable	n/a	n/a	app icon
+apps/android/app/src/main/res/drawable-xxxhdpi/ic_launcher_uljhan_wave_foreground.webp	drawable	n/a	n/a	app icon
+apps/android/app/src/main/res/drawable-xxxhdpi/ic_launcher_uljhan_wave_monochrome.webp	drawable	n/a	n/a	app icon
+apps/android/app/src/main/res/drawable/ic_check.xml	drawable	n/a	n/a	Android drawable (shape, selector or player art)
+apps/android/app/src/main/res/drawable/ic_launcher_duo_direct_foreground.xml	drawable	n/a	n/a	app icon
+apps/android/app/src/main/res/drawable/ic_remove.xml	drawable	n/a	n/a	Android drawable (shape, selector or player art)
+apps/android/app/src/main/res/drawable/ic_stop_session.xml	drawable	n/a	n/a	Android drawable (shape, selector or player art)
+apps/android/app/src/main/res/drawable/ic_visibility_off.xml	drawable	n/a	n/a	Android drawable (shape, selector or player art)
+apps/android/app/src/main/res/drawable/icon_add.xml	drawable	assets/icons/crayon/add.svg	assets	
+apps/android/app/src/main/res/drawable/icon_add_selected.xml	drawable	assets/icons/crayon/add_selected.svg	assets	
+apps/android/app/src/main/res/drawable/icon_allow.xml	drawable	assets/icons/crayon/allow.svg	assets	
+apps/android/app/src/main/res/drawable/icon_allow_selected.xml	drawable	assets/icons/crayon/allow_selected.svg	assets	
+apps/android/app/src/main/res/drawable/icon_back.xml	drawable	assets/icons/crayon/back.svg	assets	
+apps/android/app/src/main/res/drawable/icon_back_10.xml	drawable	n/a	n/a	Android drawable (shape, selector or player art)
+apps/android/app/src/main/res/drawable/icon_back_10_selected.xml	drawable	n/a	n/a	Android drawable (shape, selector or player art)
+apps/android/app/src/main/res/drawable/icon_back_selected.xml	drawable	assets/icons/crayon/back_selected.svg	assets	
+apps/android/app/src/main/res/drawable/icon_block.xml	drawable	assets/icons/crayon/block.svg	assets	
+apps/android/app/src/main/res/drawable/icon_block_selected.xml	drawable	assets/icons/crayon/block_selected.svg	assets	
+apps/android/app/src/main/res/drawable/icon_captions.xml	drawable	n/a	n/a	Android drawable (shape, selector or player art)
+apps/android/app/src/main/res/drawable/icon_captions_selected.xml	drawable	n/a	n/a	Android drawable (shape, selector or player art)
+apps/android/app/src/main/res/drawable/icon_check.xml	drawable	assets/icons/crayon/check.svg	assets	
+apps/android/app/src/main/res/drawable/icon_check_selected.xml	drawable	assets/icons/crayon/check_selected.svg	assets	
+apps/android/app/src/main/res/drawable/icon_chevron.xml	drawable	assets/icons/crayon/chevron.svg	assets	
+apps/android/app/src/main/res/drawable/icon_chevron_selected.xml	drawable	assets/icons/crayon/chevron_selected.svg	assets	
+apps/android/app/src/main/res/drawable/icon_clips.xml	drawable	assets/icons/crayon/clips.svg	assets	
+apps/android/app/src/main/res/drawable/icon_clips_selected.xml	drawable	assets/icons/crayon/clips_selected.svg	assets	
+apps/android/app/src/main/res/drawable/icon_close.xml	drawable	assets/icons/crayon/close.svg	assets	
+apps/android/app/src/main/res/drawable/icon_close_selected.xml	drawable	assets/icons/crayon/close_selected.svg	assets	
+apps/android/app/src/main/res/drawable/icon_comment.xml	drawable	assets/icons/crayon/comment.svg	assets	
+apps/android/app/src/main/res/drawable/icon_comment_selected.xml	drawable	assets/icons/crayon/comment_selected.svg	assets	
+apps/android/app/src/main/res/drawable/icon_delete.xml	drawable	assets/icons/crayon/delete.svg	assets	
+apps/android/app/src/main/res/drawable/icon_delete_selected.xml	drawable	assets/icons/crayon/delete_selected.svg	assets	
+apps/android/app/src/main/res/drawable/icon_dislike.xml	drawable	n/a	n/a	Android drawable (shape, selector or player art)
+apps/android/app/src/main/res/drawable/icon_dislike_selected.xml	drawable	n/a	n/a	Android drawable (shape, selector or player art)
+apps/android/app/src/main/res/drawable/icon_downloads.xml	drawable	assets/icons/crayon/downloads.svg	assets	
+apps/android/app/src/main/res/drawable/icon_downloads_selected.xml	drawable	assets/icons/crayon/downloads_selected.svg	assets	
+apps/android/app/src/main/res/drawable/icon_expand.xml	drawable	assets/icons/crayon/expand.svg	assets	
+apps/android/app/src/main/res/drawable/icon_expand_selected.xml	drawable	assets/icons/crayon/expand_selected.svg	assets	
+apps/android/app/src/main/res/drawable/icon_favourite.xml	drawable	assets/icons/crayon/favourite.svg	assets	
+apps/android/app/src/main/res/drawable/icon_favourite_selected.xml	drawable	assets/icons/crayon/favourite_selected.svg	assets	
+apps/android/app/src/main/res/drawable/icon_filter.xml	drawable	n/a	n/a	Android drawable (shape, selector or player art)
+apps/android/app/src/main/res/drawable/icon_filter_selected.xml	drawable	n/a	n/a	Android drawable (shape, selector or player art)
+apps/android/app/src/main/res/drawable/icon_flag.xml	drawable	assets/icons/crayon/flag.svg	assets	
+apps/android/app/src/main/res/drawable/icon_flag_selected.xml	drawable	assets/icons/crayon/flag_selected.svg	assets	
+apps/android/app/src/main/res/drawable/icon_folder.xml	drawable	assets/icons/crayon/folder.svg	assets	
+apps/android/app/src/main/res/drawable/icon_folder_selected.xml	drawable	assets/icons/crayon/folder_selected.svg	assets	
+apps/android/app/src/main/res/drawable/icon_following.xml	drawable	assets/icons/crayon/following.svg	assets	
+apps/android/app/src/main/res/drawable/icon_following_selected.xml	drawable	assets/icons/crayon/following_selected.svg	assets	
+apps/android/app/src/main/res/drawable/icon_forward_10.xml	drawable	n/a	n/a	Android drawable (shape, selector or player art)
+apps/android/app/src/main/res/drawable/icon_forward_10_selected.xml	drawable	n/a	n/a	Android drawable (shape, selector or player art)
+apps/android/app/src/main/res/drawable/icon_fullscreen.xml	drawable	n/a	n/a	Android drawable (shape, selector or player art)
+apps/android/app/src/main/res/drawable/icon_fullscreen_exit.xml	drawable	n/a	n/a	Android drawable (shape, selector or player art)
+apps/android/app/src/main/res/drawable/icon_fullscreen_exit_selected.xml	drawable	n/a	n/a	Android drawable (shape, selector or player art)
+apps/android/app/src/main/res/drawable/icon_fullscreen_selected.xml	drawable	n/a	n/a	Android drawable (shape, selector or player art)
+apps/android/app/src/main/res/drawable/icon_help.xml	drawable	assets/icons/crayon/help.svg	assets	
+apps/android/app/src/main/res/drawable/icon_help_selected.xml	drawable	assets/icons/crayon/help_selected.svg	assets	
+apps/android/app/src/main/res/drawable/icon_hide.xml	drawable	assets/icons/crayon/hide.svg	assets	
+apps/android/app/src/main/res/drawable/icon_hide_selected.xml	drawable	assets/icons/crayon/hide_selected.svg	assets	
+apps/android/app/src/main/res/drawable/icon_history.xml	drawable	assets/icons/crayon/history.svg	assets	
+apps/android/app/src/main/res/drawable/icon_history_selected.xml	drawable	assets/icons/crayon/history_selected.svg	assets	
+apps/android/app/src/main/res/drawable/icon_home.xml	drawable	assets/icons/crayon/home.svg	assets	
+apps/android/app/src/main/res/drawable/icon_home_selected.xml	drawable	assets/icons/crayon/home_selected.svg	assets	
+apps/android/app/src/main/res/drawable/icon_info.xml	drawable	assets/icons/crayon/info.svg	assets	
+apps/android/app/src/main/res/drawable/icon_info_selected.xml	drawable	assets/icons/crayon/info_selected.svg	assets	
+apps/android/app/src/main/res/drawable/icon_kids.xml	drawable	assets/icons/crayon/kids.svg	assets	
+apps/android/app/src/main/res/drawable/icon_kids_selected.xml	drawable	assets/icons/crayon/kids_selected.svg	assets	
+apps/android/app/src/main/res/drawable/icon_library.xml	drawable	assets/icons/crayon/library.svg	assets	
+apps/android/app/src/main/res/drawable/icon_library_selected.xml	drawable	assets/icons/crayon/library_selected.svg	assets	
+apps/android/app/src/main/res/drawable/icon_like.xml	drawable	n/a	n/a	Android drawable (shape, selector or player art)
+apps/android/app/src/main/res/drawable/icon_like_selected.xml	drawable	n/a	n/a	Android drawable (shape, selector or player art)
+apps/android/app/src/main/res/drawable/icon_link.xml	drawable	assets/icons/crayon/link.svg	assets	
+apps/android/app/src/main/res/drawable/icon_link_selected.xml	drawable	assets/icons/crayon/link_selected.svg	assets	
+apps/android/app/src/main/res/drawable/icon_lock.xml	drawable	assets/icons/crayon/lock.svg	assets	
+apps/android/app/src/main/res/drawable/icon_lock_selected.xml	drawable	assets/icons/crayon/lock_selected.svg	assets	
+apps/android/app/src/main/res/drawable/icon_loop.xml	drawable	n/a	n/a	Android drawable (shape, selector or player art)
+apps/android/app/src/main/res/drawable/icon_loop_selected.xml	drawable	n/a	n/a	Android drawable (shape, selector or player art)
+apps/android/app/src/main/res/drawable/icon_moon.xml	drawable	assets/icons/crayon/moon.svg	assets	
+apps/android/app/src/main/res/drawable/icon_moon_selected.xml	drawable	assets/icons/crayon/moon_selected.svg	assets	
+apps/android/app/src/main/res/drawable/icon_more.xml	drawable	assets/icons/crayon/more.svg	assets	
+apps/android/app/src/main/res/drawable/icon_more_selected.xml	drawable	assets/icons/crayon/more_selected.svg	assets	
+apps/android/app/src/main/res/drawable/icon_music.xml	drawable	assets/icons/crayon/music.svg	assets	
+apps/android/app/src/main/res/drawable/icon_music_selected.xml	drawable	assets/icons/crayon/music_selected.svg	assets	
+apps/android/app/src/main/res/drawable/icon_mute.xml	drawable	n/a	n/a	Android drawable (shape, selector or player art)
+apps/android/app/src/main/res/drawable/icon_mute_selected.xml	drawable	n/a	n/a	Android drawable (shape, selector or player art)
+apps/android/app/src/main/res/drawable/icon_next.xml	drawable	n/a	n/a	Android drawable (shape, selector or player art)
+apps/android/app/src/main/res/drawable/icon_next_selected.xml	drawable	n/a	n/a	Android drawable (shape, selector or player art)
+apps/android/app/src/main/res/drawable/icon_notifications.xml	drawable	assets/icons/crayon/notifications.svg	assets	
+apps/android/app/src/main/res/drawable/icon_notifications_selected.xml	drawable	assets/icons/crayon/notifications_selected.svg	assets	
+apps/android/app/src/main/res/drawable/icon_pause.xml	drawable	n/a	n/a	Android drawable (shape, selector or player art)
+apps/android/app/src/main/res/drawable/icon_pause_selected.xml	drawable	n/a	n/a	Android drawable (shape, selector or player art)
+apps/android/app/src/main/res/drawable/icon_pip.xml	drawable	n/a	n/a	Android drawable (shape, selector or player art)
+apps/android/app/src/main/res/drawable/icon_pip_selected.xml	drawable	n/a	n/a	Android drawable (shape, selector or player art)
+apps/android/app/src/main/res/drawable/icon_play.xml	drawable	n/a	n/a	Android drawable (shape, selector or player art)
+apps/android/app/src/main/res/drawable/icon_play_selected.xml	drawable	n/a	n/a	Android drawable (shape, selector or player art)
+apps/android/app/src/main/res/drawable/icon_playlist.xml	drawable	assets/icons/crayon/playlist.svg	assets	
+apps/android/app/src/main/res/drawable/icon_playlist_selected.xml	drawable	assets/icons/crayon/playlist_selected.svg	assets	
+apps/android/app/src/main/res/drawable/icon_previous.xml	drawable	n/a	n/a	Android drawable (shape, selector or player art)
+apps/android/app/src/main/res/drawable/icon_previous_selected.xml	drawable	n/a	n/a	Android drawable (shape, selector or player art)
+apps/android/app/src/main/res/drawable/icon_queue.xml	drawable	n/a	n/a	Android drawable (shape, selector or player art)
+apps/android/app/src/main/res/drawable/icon_queue_selected.xml	drawable	n/a	n/a	Android drawable (shape, selector or player art)
+apps/android/app/src/main/res/drawable/icon_refresh.xml	drawable	assets/icons/crayon/refresh.svg	assets	
+apps/android/app/src/main/res/drawable/icon_refresh_selected.xml	drawable	assets/icons/crayon/refresh_selected.svg	assets	
+apps/android/app/src/main/res/drawable/icon_remove.xml	drawable	assets/icons/crayon/remove.svg	assets	
+apps/android/app/src/main/res/drawable/icon_remove_selected.xml	drawable	assets/icons/crayon/remove_selected.svg	assets	
+apps/android/app/src/main/res/drawable/icon_repeat_one.xml	drawable	n/a	n/a	Android drawable (shape, selector or player art)
+apps/android/app/src/main/res/drawable/icon_repeat_one_selected.xml	drawable	n/a	n/a	Android drawable (shape, selector or player art)
+apps/android/app/src/main/res/drawable/icon_replay.xml	drawable	n/a	n/a	Android drawable (shape, selector or player art)
+apps/android/app/src/main/res/drawable/icon_replay_selected.xml	drawable	n/a	n/a	Android drawable (shape, selector or player art)
+apps/android/app/src/main/res/drawable/icon_saved.xml	drawable	assets/icons/crayon/saved.svg	assets	
+apps/android/app/src/main/res/drawable/icon_saved_selected.xml	drawable	assets/icons/crayon/saved_selected.svg	assets	
+apps/android/app/src/main/res/drawable/icon_search.xml	drawable	assets/icons/crayon/search.svg	assets	
+apps/android/app/src/main/res/drawable/icon_search_selected.xml	drawable	assets/icons/crayon/search_selected.svg	assets	
+apps/android/app/src/main/res/drawable/icon_settings.xml	drawable	assets/icons/crayon/settings.svg	assets	
+apps/android/app/src/main/res/drawable/icon_settings_selected.xml	drawable	assets/icons/crayon/settings_selected.svg	assets	
+apps/android/app/src/main/res/drawable/icon_share.xml	drawable	assets/icons/crayon/share.svg	assets	
+apps/android/app/src/main/res/drawable/icon_share_selected.xml	drawable	assets/icons/crayon/share_selected.svg	assets	
+apps/android/app/src/main/res/drawable/icon_shuffle.xml	drawable	n/a	n/a	Android drawable (shape, selector or player art)
+apps/android/app/src/main/res/drawable/icon_shuffle_selected.xml	drawable	n/a	n/a	Android drawable (shape, selector or player art)
+apps/android/app/src/main/res/drawable/icon_speed.xml	drawable	n/a	n/a	Android drawable (shape, selector or player art)
+apps/android/app/src/main/res/drawable/icon_speed_selected.xml	drawable	n/a	n/a	Android drawable (shape, selector or player art)
+apps/android/app/src/main/res/drawable/icon_stop.xml	drawable	n/a	n/a	Android drawable (shape, selector or player art)
+apps/android/app/src/main/res/drawable/icon_stop_selected.xml	drawable	n/a	n/a	Android drawable (shape, selector or player art)
+apps/android/app/src/main/res/drawable/icon_sun.xml	drawable	assets/icons/crayon/sun.svg	assets	
+apps/android/app/src/main/res/drawable/icon_sun_selected.xml	drawable	assets/icons/crayon/sun_selected.svg	assets	
+apps/android/app/src/main/res/drawable/icon_timer.xml	drawable	assets/icons/crayon/timer.svg	assets	
+apps/android/app/src/main/res/drawable/icon_timer_selected.xml	drawable	assets/icons/crayon/timer_selected.svg	assets	
+apps/android/app/src/main/res/drawable/icon_unlock.xml	drawable	assets/icons/crayon/unlock.svg	assets	
+apps/android/app/src/main/res/drawable/icon_unlock_selected.xml	drawable	assets/icons/crayon/unlock_selected.svg	assets	
+apps/android/app/src/main/res/drawable/icon_voice.xml	drawable	n/a	n/a	Android drawable (shape, selector or player art)
+apps/android/app/src/main/res/drawable/icon_voice_selected.xml	drawable	n/a	n/a	Android drawable (shape, selector or player art)
+apps/android/app/src/main/res/drawable/icon_volume.xml	drawable	n/a	n/a	Android drawable (shape, selector or player art)
+apps/android/app/src/main/res/drawable/icon_volume_selected.xml	drawable	n/a	n/a	Android drawable (shape, selector or player art)
+apps/android/app/src/main/res/drawable/icon_you.xml	drawable	assets/icons/crayon/you.svg	assets	
+apps/android/app/src/main/res/drawable/icon_you_selected.xml	drawable	assets/icons/crayon/you_selected.svg	assets	
+apps/android/app/src/main/res/drawable/input_search_highlight.xml	drawable	n/a	n/a	Android drawable (shape, selector or player art)
+apps/android/app/src/main/res/drawable/splash_kriti_sieve.xml	drawable	n/a	n/a	the app's launch story; the extension has no launch screen
+apps/android/app/src/main/res/font/filtertube_delius.ttf	font	assets/fonts/delius.ttf	assets	
+apps/android/app/src/main/res/layout/activity_dashboard.xml	layout	n/a	n/a	Android layout; the extension builds its own markup
+apps/android/app/src/main/res/layout/activity_filters.xml	layout	n/a	n/a	Android layout; the extension builds its own markup
+apps/android/app/src/main/res/layout/activity_general_settings.xml	layout	n/a	n/a	Android layout; the extension builds its own markup
+apps/android/app/src/main/res/layout/activity_local_media_library.xml	layout	n/a	n/a	Android layout; the extension builds its own markup
+apps/android/app/src/main/res/layout/activity_local_media_player.xml	layout	n/a	n/a	Android layout; the extension builds its own markup
+apps/android/app/src/main/res/layout/activity_managed_webview.xml	layout	n/a	n/a	Android layout; the extension builds its own markup
+apps/android/app/src/main/res/layout/activity_pin_gate.xml	layout	n/a	n/a	Android layout; the extension builds its own markup
+apps/android/app/src/main/res/layout/activity_settings_section.xml	layout	n/a	n/a	Android layout; the extension builds its own markup
+apps/android/app/src/main/res/layout/bottom_sheet_dashboard_controls.xml	layout	n/a	n/a	Android layout; the extension builds its own markup
+apps/android/app/src/main/res/layout/bottom_sheet_first_install_welcome.xml	layout	n/a	n/a	Android layout; the extension builds its own markup
+apps/android/app/src/main/res/layout/fragment_channels.xml	layout	n/a	n/a	Android layout; the extension builds its own markup
+apps/android/app/src/main/res/layout/fragment_keywords.xml	layout	n/a	n/a	Android layout; the extension builds its own markup
+apps/android/app/src/main/res/layout/item_category_filter.xml	layout	n/a	n/a	Android layout; the extension builds its own markup
+apps/android/app/src/main/res/layout/item_channel.xml	layout	js/render_engine.js;css/paperkit-parity.css	audit	EXTENSION_ANDROID_PARITY_AUDIT_2026-11-16.md
+apps/android/app/src/main/res/layout/item_keyword.xml	layout	css/paperkit-parity.css;js/render_engine.js	audit	EXTENSION_ANDROID_PARITY_AUDIT_2026-11-16.md
+apps/android/app/src/main/res/layout/item_profile_option.xml	layout	n/a	n/a	Android layout; the extension builds its own markup
+apps/android/app/src/main/res/layout/sheet_support_offer.xml	layout	n/a	n/a	Android layout; the extension builds its own markup
+apps/android/app/src/main/res/mipmap-anydpi-v26/ic_launcher_duo.xml	app-icon	n/a	n/a	app icon
+apps/android/app/src/main/res/mipmap-anydpi-v26/ic_launcher_duo_direct.xml	app-icon	n/a	n/a	app icon
+apps/android/app/src/main/res/mipmap-anydpi-v26/ic_launcher_duo_direct_round.xml	app-icon	n/a	n/a	app icon
+apps/android/app/src/main/res/mipmap-anydpi-v26/ic_launcher_duo_round.xml	app-icon	n/a	n/a	app icon
+apps/android/app/src/main/res/mipmap-anydpi-v26/ic_launcher_kriti.xml	app-icon	n/a	n/a	app icon
+apps/android/app/src/main/res/mipmap-anydpi-v26/ic_launcher_kriti_calm.xml	app-icon	n/a	n/a	app icon
+apps/android/app/src/main/res/mipmap-anydpi-v26/ic_launcher_kriti_calm_round.xml	app-icon	n/a	n/a	app icon
+apps/android/app/src/main/res/mipmap-anydpi-v26/ic_launcher_kriti_cheer.xml	app-icon	n/a	n/a	app icon
+apps/android/app/src/main/res/mipmap-anydpi-v26/ic_launcher_kriti_cheer_round.xml	app-icon	n/a	n/a	app icon
+apps/android/app/src/main/res/mipmap-anydpi-v26/ic_launcher_kriti_funnel.xml	app-icon	n/a	n/a	app icon
+apps/android/app/src/main/res/mipmap-anydpi-v26/ic_launcher_kriti_funnel_round.xml	app-icon	n/a	n/a	app icon
+apps/android/app/src/main/res/mipmap-anydpi-v26/ic_launcher_kriti_round.xml	app-icon	n/a	n/a	app icon
+apps/android/app/src/main/res/mipmap-anydpi-v26/ic_launcher_uljhan_happy.xml	app-icon	n/a	n/a	app icon
+apps/android/app/src/main/res/mipmap-anydpi-v26/ic_launcher_uljhan_happy_round.xml	app-icon	n/a	n/a	app icon
+apps/android/app/src/main/res/mipmap-anydpi-v26/ic_launcher_uljhan_wave.xml	app-icon	n/a	n/a	app icon
+apps/android/app/src/main/res/mipmap-anydpi-v26/ic_launcher_uljhan_wave_round.xml	app-icon	n/a	n/a	app icon
+apps/android/app/src/main/res/raw/ui_break_bell.ogg	raw	assets/sounds/break_bell.ogg	assets	
+apps/android/app/src/main/res/raw/ui_celebrate.ogg	raw	assets/sounds/celebrate.ogg	assets	
+apps/android/app/src/main/res/raw/ui_crayon_scribble.ogg	raw	assets/sounds/crayon_scribble.ogg	assets	
+apps/android/app/src/main/res/raw/ui_gentle_error.ogg	raw	assets/sounds/gentle_error.ogg	assets	
+apps/android/app/src/main/res/raw/ui_kriti_giggle_chime.ogg	raw	assets/sounds/kriti_giggle_chime.ogg	assets	
+apps/android/app/src/main/res/raw/ui_paper_flip.ogg	raw	assets/sounds/paper_flip.ogg	assets	
+apps/android/app/src/main/res/raw/ui_pencil_tap.ogg	raw	assets/sounds/pencil_tap.ogg	assets	
+apps/android/app/src/main/res/raw/ui_select.ogg	raw	assets/sounds/select.ogg	assets	
+apps/android/app/src/main/res/raw/ui_soft_pop.ogg	raw	assets/sounds/soft_pop.ogg	assets	
+apps/android/app/src/main/res/raw/ui_stamp_thunk.ogg	raw	assets/sounds/stamp_thunk.ogg	assets	
+apps/android/app/src/main/res/raw/ui_success.ogg	raw	assets/sounds/success.ogg	assets	
+apps/android/app/src/main/res/raw/ui_uljhan_boing.ogg	raw	assets/sounds/uljhan_boing.ogg	assets	
+apps/android/app/src/main/res/raw/ui_undo_swish.ogg	raw	assets/sounds/undo_swish.ogg	assets	
+apps/android/app/src/main/res/values/colors_study.xml	values	n/a	n/a	Android resource ids, dimensions or themes
+apps/android/app/src/main/res/values/controls_buttons.xml	values	n/a	n/a	Android resource ids, dimensions or themes
+apps/android/app/src/main/res/values/ids_controls_v2.xml	values	n/a	n/a	Android resource ids, dimensions or themes
+apps/android/app/src/main/res/values/ids_motion_filters.xml	values	n/a	n/a	Android resource ids, dimensions or themes
+apps/android/app/src/main/res/values/ids_motion_kids.xml	values	n/a	n/a	Android resource ids, dimensions or themes
+apps/android/app/src/main/res/values/ids_music_theme.xml	values	n/a	n/a	Android resource ids, dimensions or themes
+apps/android/app/src/main/res/values/ids_paper_kit.xml	values	n/a	n/a	Android resource ids, dimensions or themes
+apps/android/app/src/main/res/values/ids_study.xml	values	n/a	n/a	Android resource ids, dimensions or themes
+apps/android/app/src/main/res/values/ids_viewer_v2.xml	values	n/a	n/a	Android resource ids, dimensions or themes
+apps/android/app/src/main/res/values/music_typography.xml	values	n/a	n/a	Android resource ids, dimensions or themes
+apps/android/app/src/main/res/values/strings.xml	values	data/ui_locales/en.json	strings	English words; the 37 other catalogs are data/ui_locales/<locale>.json
+apps/android/app/src/main/res/values/strings_allowed_search.xml	values	data/ui_locales/en.json	strings	English words; the 37 other catalogs are data/ui_locales/<locale>.json
+apps/android/app/src/main/res/values/strings_ask_parent.xml	values	data/ui_locales/en.json	strings	English words; the 37 other catalogs are data/ui_locales/<locale>.json
+apps/android/app/src/main/res/values/strings_controls.xml	values	data/ui_locales/en.json	strings	English words; the 37 other catalogs are data/ui_locales/<locale>.json
+apps/android/app/src/main/res/values/strings_controls_v2.xml	values	data/ui_locales/en.json	strings	English words; the 37 other catalogs are data/ui_locales/<locale>.json
+apps/android/app/src/main/res/values/strings_follower_count.xml	values	data/ui_locales/en.json	strings	English words; the 37 other catalogs are data/ui_locales/<locale>.json
+apps/android/app/src/main/res/values/strings_icons.xml	values	data/ui_locales/en.json	strings	English words; the 37 other catalogs are data/ui_locales/<locale>.json
+apps/android/app/src/main/res/values/strings_kids_setup_card.xml	values	data/ui_locales/en.json	strings	English words; the 37 other catalogs are data/ui_locales/<locale>.json
+apps/android/app/src/main/res/values/strings_kids_study.xml	values	data/ui_locales/en.json	strings	English words; the 37 other catalogs are data/ui_locales/<locale>.json
+apps/android/app/src/main/res/values/strings_loading.xml	values	data/ui_locales/en.json	strings	English words; the 37 other catalogs are data/ui_locales/<locale>.json
+apps/android/app/src/main/res/values/strings_main_integrations.xml	values	data/ui_locales/en.json	strings	English words; the 37 other catalogs are data/ui_locales/<locale>.json
+apps/android/app/src/main/res/values/strings_main_music.xml	values	data/ui_locales/en.json	strings	English words; the 37 other catalogs are data/ui_locales/<locale>.json
+apps/android/app/src/main/res/values/strings_main_player_gestures.xml	values	data/ui_locales/en.json	strings	English words; the 37 other catalogs are data/ui_locales/<locale>.json
+apps/android/app/src/main/res/values/strings_main_viewer_ui.xml	values	data/ui_locales/en.json	strings	English words; the 37 other catalogs are data/ui_locales/<locale>.json
+apps/android/app/src/main/res/values/strings_mascots.xml	values	data/ui_locales/en.json	strings	English words; the 37 other catalogs are data/ui_locales/<locale>.json
+apps/android/app/src/main/res/values/strings_motion_filters.xml	values	data/ui_locales/en.json	strings	English words; the 37 other catalogs are data/ui_locales/<locale>.json
+apps/android/app/src/main/res/values/strings_motion_kids.xml	values	data/ui_locales/en.json	strings	English words; the 37 other catalogs are data/ui_locales/<locale>.json
+apps/android/app/src/main/res/values/strings_motion_people.xml	values	data/ui_locales/en.json	strings	English words; the 37 other catalogs are data/ui_locales/<locale>.json
+apps/android/app/src/main/res/values/strings_motion_viewer.xml	values	data/ui_locales/en.json	strings	English words; the 37 other catalogs are data/ui_locales/<locale>.json
+apps/android/app/src/main/res/values/strings_nanah_links.xml	values	data/ui_locales/en.json	strings	English words; the 37 other catalogs are data/ui_locales/<locale>.json
+apps/android/app/src/main/res/values/strings_native_display.xml	values	data/ui_locales/en.json	strings	English words; the 37 other catalogs are data/ui_locales/<locale>.json
+apps/android/app/src/main/res/values/strings_native_main_topics.xml	values	data/ui_locales/en.json	strings	English words; the 37 other catalogs are data/ui_locales/<locale>.json
+apps/android/app/src/main/res/values/strings_native_overlay_text.xml	values	data/ui_locales/en.json	strings	English words; the 37 other catalogs are data/ui_locales/<locale>.json
+apps/android/app/src/main/res/values/strings_native_plurals.xml	values	data/ui_locales/en.json	strings	English words; the 37 other catalogs are data/ui_locales/<locale>.json
+apps/android/app/src/main/res/values/strings_native_recovery.xml	values	data/ui_locales/en.json	strings	English words; the 37 other catalogs are data/ui_locales/<locale>.json
+apps/android/app/src/main/res/values/strings_native_watch_actions.xml	values	data/ui_locales/en.json	strings	English words; the 37 other catalogs are data/ui_locales/<locale>.json
+apps/android/app/src/main/res/values/strings_offline_download.xml	values	data/ui_locales/en.json	strings	English words; the 37 other catalogs are data/ui_locales/<locale>.json
+apps/android/app/src/main/res/values/strings_offline_library_ui.xml	values	data/ui_locales/en.json	strings	English words; the 37 other catalogs are data/ui_locales/<locale>.json
+apps/android/app/src/main/res/values/strings_onboarding.xml	values	data/ui_locales/en.json	strings	English words; the 37 other catalogs are data/ui_locales/<locale>.json
+apps/android/app/src/main/res/values/strings_paper_kit.xml	values	data/ui_locales/en.json	strings	English words; the 37 other catalogs are data/ui_locales/<locale>.json
+apps/android/app/src/main/res/values/strings_parent_mode.xml	values	data/ui_locales/en.json	strings	English words; the 37 other catalogs are data/ui_locales/<locale>.json
+apps/android/app/src/main/res/values/strings_platform_labels.xml	values	data/ui_locales/en.json	strings	English words; the 37 other catalogs are data/ui_locales/<locale>.json
+apps/android/app/src/main/res/values/strings_privacy.xml	values	data/ui_locales/en.json	strings	English words; the 37 other catalogs are data/ui_locales/<locale>.json
+apps/android/app/src/main/res/values/strings_profiles.xml	values	data/ui_locales/en.json	strings	English words; the 37 other catalogs are data/ui_locales/<locale>.json
+apps/android/app/src/main/res/values/strings_sangeet.xml	values	data/ui_locales/en.json	strings	English words; the 37 other catalogs are data/ui_locales/<locale>.json
+apps/android/app/src/main/res/values/strings_settings_sync_ui.xml	values	data/ui_locales/en.json	strings	English words; the 37 other catalogs are data/ui_locales/<locale>.json
+apps/android/app/src/main/res/values/strings_sound.xml	values	data/ui_locales/en.json	strings	English words; the 37 other catalogs are data/ui_locales/<locale>.json
+apps/android/app/src/main/res/values/strings_study.xml	values	data/ui_locales/en.json	strings	English words; the 37 other catalogs are data/ui_locales/<locale>.json
+apps/android/app/src/main/res/values/strings_study_enforce.xml	values	data/ui_locales/en.json	strings	English words; the 37 other catalogs are data/ui_locales/<locale>.json
+apps/android/app/src/main/res/values/strings_study_search.xml	values	data/ui_locales/en.json	strings	English words; the 37 other catalogs are data/ui_locales/<locale>.json
+apps/android/app/src/main/res/values/strings_support_variants.xml	values	data/ui_locales/en.json	strings	English words; the 37 other catalogs are data/ui_locales/<locale>.json
+apps/android/app/src/main/res/values/strings_sync_status.xml	values	data/ui_locales/en.json	strings	English words; the 37 other catalogs are data/ui_locales/<locale>.json
+apps/android/app/src/main/res/values/strings_tv_capability.xml	values	data/ui_locales/en.json	strings	English words; the 37 other catalogs are data/ui_locales/<locale>.json
+apps/android/app/src/main/res/values/strings_tv_controls.xml	values	data/ui_locales/en.json	strings	English words; the 37 other catalogs are data/ui_locales/<locale>.json
+apps/android/app/src/main/res/values/strings_tv_music.xml	values	data/ui_locales/en.json	strings	English words; the 37 other catalogs are data/ui_locales/<locale>.json
+apps/android/app/src/main/res/values/strings_viewer_polish.xml	values	data/ui_locales/en.json	strings	English words; the 37 other catalogs are data/ui_locales/<locale>.json
+apps/android/app/src/main/res/values/strings_viewer_terms.xml	values	data/ui_locales/en.json	strings	English words; the 37 other catalogs are data/ui_locales/<locale>.json
+apps/android/app/src/main/res/values/strings_viewer_v2.xml	values	data/ui_locales/en.json	strings	English words; the 37 other catalogs are data/ui_locales/<locale>.json
+apps/android/app/src/main/res/values/strings_youtube_accounts.xml	values	data/ui_locales/en.json	strings	English words; the 37 other catalogs are data/ui_locales/<locale>.json
+apps/android/app/src/main/res/values/strings_youtube_links.xml	values	data/ui_locales/en.json	strings	English words; the 37 other catalogs are data/ui_locales/<locale>.json
+apps/android/app/src/main/res/values/styles_onboarding.xml	values	n/a	n/a	Android resource ids, dimensions or themes
+apps/android/app/src/main/res/values/themes.xml	values	n/a	n/a	Android resource ids, dimensions or themes
+apps/android/app/src/main/res/values/themes_study.xml	values	n/a	n/a	Android resource ids, dimensions or themes

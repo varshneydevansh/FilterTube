@@ -30,7 +30,7 @@
         'hidePlaylistCards', 'hideMembersOnly', 'hideMixPlaylists', 'hideVideoSidebar',
         'hideRecommended', 'hideLiveChat', 'hideVideoInfo', 'hideVideoButtonsBar', 'hideAskButton',
         'hideVideoChannelRow', 'hideVideoDescription', 'hideMerchTicketsOffers',
-        'hideEndscreenVideowall', 'hideEndscreenCards', 'disableAutoplay', 'skipBlockedAutoplay', 'alwaysUseOriginalAudio',
+        'hideEndscreenVideowall', 'hideEndscreenCards', 'disableAutoplay', 'skipBlockedAutoplay', 'quietBlocking', 'alwaysUseOriginalAudio',
         'disableAnnotations', 'hideTopHeader', 'hideNotificationBell', 'hideExploreTrending',
         'hideMoreFromYouTube', 'hideSubscriptions', 'showQuickBlockButton', 'showBlockMenuItem',
         'hideSearchShelves'

@@ -216,15 +216,13 @@ test('popup and tab-view CSS loader order is tied to generated shell before hand
     '../css/design_tokens.css',
     '../css/components.css',
     '../css/popup.css',
-    '../css/serene-shell.css',
-    'https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@1,400;1,500;1,600&family=JetBrains+Mono:wght@500;700&family=Outfit:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap'
+    '../css/serene-shell.css'
   ]);
   assert.deepEqual(tagAttrValues(tabHtml, 'link', 'href'), [
     '../css/design_tokens.css',
     '../css/components.css',
     '../css/tab-view.css',
-    '../css/serene-shell.css',
-    'https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@1,400;1,500;1,600&family=JetBrains+Mono:wght@500;700&family=Outfit:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap'
+    '../css/serene-shell.css'
   ]);
 
   const popupScripts = tagAttrValues(popupHtml, 'script', 'src');

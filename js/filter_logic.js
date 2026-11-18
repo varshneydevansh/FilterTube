@@ -1171,6 +1171,9 @@
             this.channelIndexesDirty = false;
             this.blockedVideoIdSet = new Set(Array.isArray(this.settings.blockedVideoIds) ? this.settings.blockedVideoIds : []);
             this.allowedVideoIdSet = new Set(Array.isArray(this.settings.allowedVideoIds) ? this.settings.allowedVideoIds : []);
+            this.kidsFallbackAllowedVideoIdSet = new Set(Array.isArray(this.settings.kidsFallbackAllowedVideoIds) ? this.settings.kidsFallbackAllowedVideoIds : []);
+            // Ask a parent: "Allow once" (Android AskParentPasses), read like a parent's allowed video.
+            this.askParentPassVideoIdSet = new Set(Array.isArray(this.settings.askParentPassVideoIds) ? this.settings.askParentPassVideoIds : []);
             this.pageChannelMeta = null;
             this.blockedCount = 0;
             this.debugEnabled = !!window.__filtertubeDebug;
@@ -2316,6 +2319,70 @@
             };
         }
 
+        /**
+         * Android NativeOwnedFilterDecider lines 884-999: a video whose channel isn't known yet.
+         * Returns 'block', 'allow', 'wait' (hidden: the data-level filter can't hold a card back, so
+         * waiting means removing it; the page scan re-decides when the channel arrives) or null
+         * (the channel is known, or the extension keeps its own fallback: an unmatched card in
+         * block mode with a weak solo identity still shows, since the site may never name it).
+         */
+        _pendingChannelIdentityDecision(item, candidate, collaborators, context) {
+            const Identity = window.FilterTubeIdentity;
+            if (!Identity || typeof Identity.decidePendingChannelIdentity !== 'function') return null;
+            const { listMode, videoId, skipKeywordFiltering, rules, rendererType } = context;
+            if (!videoId || candidate.isPlaylist || candidate.isStructural || candidate.isMix) return null;
+            const allowMode = listMode === 'whitelist';
+            const filterChannels = Array.isArray(this.settings.filterChannels) ? this.settings.filterChannels : [];
+            const whitelistChannels = Array.isArray(this.settings.whitelistChannels) ? this.settings.whitelistChannels : [];
+            const hasChannelRules = filterChannels.length > 0 || whitelistChannels.length > 0;
+            if (!hasChannelRules && !(allowMode && candidate.isShort)) return null;
+            const layered = this.settings.listLayered === true;
+            const blockedVideo = this.blockedVideoIdSet.has(videoId);
+            const allowedVideo = this.allowedVideoIdSet.has(videoId);
+            // Video ids decide before the channel (layered: a blocked id hides at once).
+            if (blockedVideo || (!layered && allowedVideo)) return null;
+            const bylineLabel = [item?.shortBylineText, item?.longBylineText, item?.ownerText]
+                .map(text => flattenText(text)).filter(Boolean).join(' ');
+            const strength = Identity.channelIdentityStrength(collaborators, {
+                indexes: [this.filterChannelIndex, this.whitelistChannelIndex],
+                channelMap: this.channelMap,
+                expectedCollaboratorCount: Identity.collapsedCollaboratorExpectedCount(bylineLabel)
+            });
+            if (strength === 'strong') return null;
+            // On a creator's own page the page names the channel for its shelves (the app's channel
+            // page carries it on every card); the extension's creator-page fallback below decides.
+            if (strength === 'weak' && this.pageChannelMeta) {
+                try {
+                    const path = document.location?.pathname || '';
+                    if (/^\/(@[^/]+|channel\/UC[\w-]{22}|c\/[^/]+|user\/[^/]+)(?:\/|$)/i.test(path)) return null;
+                } catch (e) {
+                }
+            }
+            const keywordMatch = (keywords) => {
+                if (skipKeywordFiltering || !Array.isArray(keywords) || keywords.length === 0) return false;
+                const textToSearch = this._candidateSearchText(candidate);
+                return keywords.some(keywordRegex =>
+                    this._regexMatches(keywordRegex, this._keywordText(keywordRegex, candidate, textToSearch)) &&
+                    this._keywordDateFilterAllows(keywordRegex, candidate, item, rules, rendererType));
+            };
+            const decision = Identity.decidePendingChannelIdentity({
+                layered,
+                allowMode,
+                isShort: candidate.isShort === true,
+                blockedKeyword: keywordMatch(this.settings.filterKeywords),
+                allowedKeyword: keywordMatch(this.settings.whitelistKeywords),
+                blockedChannelName: Identity.matchesChannelNameRows(collaborators, this.filterChannelIndex),
+                allowedChannelName: Identity.matchesChannelNameRows(collaborators, this.whitelistChannelIndex),
+                allowedVideo,
+                // Android mainBlockedChannelKeys: channel rows other than BlockTube name rows.
+                hasBlockedChannelRules: filterChannels.some(entry => entry && entry.source !== 'blocktube-channel-name')
+            });
+            if (decision !== 'wait') return decision;
+            // A collaboration still loading waits in every mode; a weak solo card waits under allow
+            // mode or layered rules, and otherwise keeps the extension's own fallback.
+            return (strength === 'resolving' || allowMode || layered) ? 'wait' : null;
+        }
+
         _candidateSearchText(candidate) {
             if (!candidate || typeof candidate !== 'object') return '';
             const channelText = (candidate.collaborators || [])
@@ -2382,6 +2449,7 @@
             const candidate = this._autoplayEndpointCandidate(endpoint, endpointKey);
             const videoId = candidate.videoId;
             if (!videoId) return false;
+            if (this.askParentPassVideoIdSet.has(videoId)) return false;
 
             const listMode = (this.settings.listMode === 'whitelist') ? 'whitelist' : 'blocklist';
             const collaborators = candidate.collaborators;
@@ -2735,7 +2803,8 @@
                 this.settings.filterKeywordsComments
             ].some(list => Array.isArray(list) && list.length > 0);
             const candidate = this._buildCandidate(item, rendererType, unwrappedRenderer.wrapperRendererType, {
-                extractChannelIdentity: needsChannelIdentity,
+                // Allow mode always reads the channel: a Short shows only once its channel is known.
+                extractChannelIdentity: needsChannelIdentity || listMode === 'whitelist',
                 extractSearchMetadata: needsSearchMetadata
             });
             const title = candidate.title;
@@ -2832,6 +2901,29 @@
             } catch (e) {
             }
 
+            // A parent's "Allow once" lets the asked video through before any list rule (Android
+            // NativeOwnedFilterDecider: "allowed once by a parent"); surface switches above still hide.
+            if (!isCommentRenderer && videoId && this.askParentPassVideoIdSet.has(videoId)) {
+                this._logWhitelistDecision('allow:ask_parent_pass', { rendererType, originalRendererType, title });
+                return false;
+            }
+
+            // A card whose channel isn't known yet decides like the app (Android
+            // NativeOwnedFilterDecider, "channel identity pending"); see decidePendingChannelIdentity.
+            if (!isCommentRenderer) {
+                const pendingDecision = this._pendingChannelIdentityDecision(item, candidate, collaborators, {
+                    listMode, videoId, skipKeywordFiltering, rules, rendererType
+                });
+                if (pendingDecision === 'block' || pendingDecision === 'wait') {
+                    this._logWhitelistDecision(`${pendingDecision}:channel_identity_pending`, { rendererType, originalRendererType, title });
+                    return true;
+                }
+                if (pendingDecision === 'allow') {
+                    this._logWhitelistDecision('allow:channel_identity_pending', { rendererType, originalRendererType, title });
+                    return this._blocksByContentRules(item, rules, rendererType);
+                }
+            }
+
             // Block and allow rules stay active together. The profile mode only
             // supplies the fallback decision when neither side matches.
             if (!isCommentRenderer) {
@@ -2923,6 +3015,15 @@
                     rendererType === 'shortsLockupViewModel' ||
                     rendererType === 'shortsLockupViewModelV2'
                 );
+
+                if (videoId && this.kidsFallbackAllowedVideoIdSet?.has(videoId)) {
+                    this._logWhitelistDecision('allow:kids_allowed_video', {
+                        rendererType,
+                        originalRendererType,
+                        title
+                    });
+                    return this._blocksByContentRules(item, rules, rendererType);
+                }
 
                 if (!hasChannelRules && !hasKeywordRules) {
                     this._logWhitelistDecision('block:no_whitelist_rules', {
@@ -3075,6 +3176,29 @@
                     if (this._matchesAnyChannel(commentChannelInfo, this.settings.filterChannels, this.filterChannelIndex)) {
                         this._log(`🚫 Blocking comment by author: ${commentChannelInfo.name || commentChannelInfo.id || commentChannelInfo.handle}`);
                         return true;
+                    }
+                }
+
+                // Allowed-only mode flips comments as it flips cards (Android commentHidden): only a
+                // comment from an allowed author or with an allowed word shows; with layered rules a
+                // blocked word in the comment still hides it.
+                if (listMode === 'whitelist' && rules.commentText) {
+                    const allowChannels = Array.isArray(this.settings.whitelistChannels) ? this.settings.whitelistChannels : [];
+                    const allowKeywords = Array.isArray(this.settings.whitelistKeywords) ? this.settings.whitelistKeywords : [];
+                    const hasAuthor = !!(commentChannelInfo && (commentChannelInfo.name || commentChannelInfo.id || commentChannelInfo.handle || commentChannelInfo.customUrl));
+                    const authorAllowed = hasAuthor && allowChannels.length > 0
+                        && this._matchesAnyChannel(commentChannelInfo, allowChannels, this.whitelistChannelIndex);
+                    const textAllowed = !!commentText && allowKeywords.some(keywordRegex => this._regexMatches(keywordRegex, commentText));
+                    if (!authorAllowed && !textAllowed) {
+                        this._log('🚫 Blocking comment (allowed only: author and words not on the allowed list)');
+                        return true;
+                    }
+                    if (this.settings.listLayered === true && commentText) {
+                        const blockKeywords = Array.isArray(this.settings.filterKeywords) ? this.settings.filterKeywords : [];
+                        if (blockKeywords.some(keywordRegex => this._regexMatches(keywordRegex, commentText))) {
+                            this._log('🚫 Blocking comment (layered: blocked word)');
+                            return true;
+                        }
                     }
                 }
             }

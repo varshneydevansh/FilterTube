@@ -29,14 +29,24 @@ test('extension package and browser manifest versions currently match', () => {
   }
 });
 
-test('release notes now align with the packaged extension version', () => {
+test('release notes carry the packaged extension version, newest first', () => {
+  // The shared notes also list the native app releases (3.6.x), which can run ahead of the
+  // extension package. The banner looks up the manifest version, so that entry must exist.
   const packageVersion = readJson('package.json').version;
-  const firstEntry = firstReleaseNoteEntry();
+  const entries = readJson('data/release_notes.json').filter(entry => entry && typeof entry.version === 'string');
+  const packageEntry = entries.find(entry => entry.version === packageVersion);
+  const parts = version => version.split('.').map(Number);
+  const compare = (a, b) => parts(a).reduce((result, value, index) => result || value - parts(b)[index], 0);
 
   assert.match(packageVersion, /^\d+\.\d+\.\d+$/);
-  assert.equal(firstEntry.version, packageVersion);
-  assert.doesNotMatch(firstEntry.headline, /Upcoming:/);
-  assert.equal(firstEntry.detailsUrl, `https://github.com/varshneydevansh/FilterTube/releases/tag/v${packageVersion}`);
+  assert.ok(packageEntry, `release notes should include ${packageVersion}`);
+  assert.doesNotMatch(packageEntry.headline, /Upcoming:/);
+  assert.equal(packageEntry.detailsUrl, `https://github.com/varshneydevansh/FilterTube/releases/tag/v${packageVersion}`);
+  assert.ok(compare(firstReleaseNoteEntry().version, packageVersion) >= 0);
+  for (let index = 1; index < entries.length; index += 1) {
+    assert.ok(compare(entries[index - 1].version, entries[index].version) > 0,
+      `${entries[index - 1].version} should come before ${entries[index].version}`);
+  }
 });
 
 test('website analytics are website-only in code and privacy copy', () => {
