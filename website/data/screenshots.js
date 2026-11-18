@@ -27,6 +27,7 @@ const PHONE = { width: 1080, height: 2424 };
 const TABLET = { width: 2560, height: 1600 };
 const TV = { width: 1920, height: 1080 };
 const IPHONE = { width: 1080, height: 2348 };
+const IPAD = { width: 2420, height: 1668 };
 const IPHONE_NEW = { width: 1206, height: 2622 };
 
 const android = (file) => `/apps/screenshots/android/${file}.webp`;
@@ -59,8 +60,15 @@ export const devices = {
     href: "/ios",
     status: "Install with SideStore",
     layout: "desktop",
-    featured: null,
-    captures: {},
+    featured: "home",
+    captures: {
+      home: { src: ios("ipad-home"), title: "Home", alt: "FilterTube on iPad: Home with a study session running and a grid of JEE lesson videos", caption: "Home with a study session running.", ...IPAD, current: true },
+      study: { src: ios("ipad-study"), title: "Study plan", alt: "FilterTube on iPad: a JEE Main study plan with the exam channels switched on", caption: "A study plan with only the channels you chose.", ...IPAD, current: true },
+      watch: { src: ios("ipad-watch"), title: "Watch", alt: "FilterTube on iPad: a lesson video playing with recommendations beside it", caption: "The video and recommendations side by side.", ...IPAD, current: true },
+      kids: { src: ios("ipad-kids"), title: "Kids", alt: "FilterTube Kids Viewing on iPad with a grid of shows and playlists", caption: "Kids Viewing, with the parent's Kids rules.", ...IPAD, current: true },
+      controls: { src: ios("ipad-controls"), title: "Controls", alt: "FilterTube Controls on iPad", caption: "A wide Controls grid.", ...IPAD, current: true },
+      sangeet: { src: ios("ipad-sangeet"), title: "Sangeet player", alt: "Sangeet now playing on iPad with album art and the queue beside it", caption: "Album art and the queue side by side.", ...IPAD, current: true },
+    },
     extras: [],
   },
   androidPhone: {
@@ -128,7 +136,7 @@ export const devices = {
     captures: {
       home: { src: android("tv-home"), title: "Home", alt: "Android TV Home with blocked cards counted", caption: "Home with your filters applied.", ...TV, current: false },
       watch: { src: android("tv-watch"), title: "Watch", alt: "Android TV Watch page playing a nature documentary", caption: "Watch with recommendations from the same channel.", ...TV, current: false },
-      kids: { src: android("tv-kids-home"), title: "Kids Home on TV", alt: "Kids Viewing on Android TV with Shows and More for you rows", caption: "Kids rows built for the remote.", ...TV, current: false },
+      kids: { src: android("tv-kids-home"), title: "Kids Home on TV", alt: "Kids Viewing on Android TV with Shows and More for you rows", caption: "Kids rows built for the remote.", ...TV, current: true },
       controls: { src: android("tv-controls"), title: "FilterTube Controls", alt: "FilterTube Controls on Android TV", caption: "Controls from the sofa.", ...TV, current: true },
     },
     extras: [
@@ -183,7 +191,7 @@ export const kidsScreens = {
     { src: android("tablet-kids-watch"), title: "Two-pane Kids Watch", alt: "Kids Watch on a tablet with Up next beside the video", caption: "The video and Up next side by side.", ...TABLET, current: false },
   ],
   tv: [
-    { src: android("tv-kids-home"), title: "Kids Home on TV", alt: "Kids Viewing on Android TV with Shows and More for you rows", caption: "Kids rows built for the remote.", ...TV, current: false },
+    { src: android("tv-kids-home"), title: "Kids Home on TV", alt: "Kids Viewing on Android TV with Shows and More for you rows", caption: "Kids rows built for the remote.", ...TV, current: true },
     { src: android("tv-kids-search"), title: "Kids Search on TV", alt: "Kids search for dinosaurs on Android TV", caption: "Kids search on the big screen.", ...TV, current: false },
     { src: android("tv-kids-watch"), title: "Kids video on TV", alt: "A Kids video playing full screen on Android TV", caption: "Full-screen Kids playback.", ...TV, current: false },
   ],

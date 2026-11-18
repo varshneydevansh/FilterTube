@@ -34,3 +34,13 @@ Six screens on each of five devices, from the latest builds. Every screen the si
 1. Convert each capture to WebP, keeping its width: `cwebp -q 78 capture.png -o android/phone-home.webp`.
 2. In `website/data/screenshots.js`, point the device's slot at the file, set the real `width` and `height`, and set `current: true`. Write a short `alt` that says what's on screen, without naming the video site.
 3. The home device strip, the platform galleries and the iPad placeholder update on their own. Run `npm run build` to check.
+
+## Status (updated 2026-11-18)
+
+| Device | Done | Still open |
+|---|---|---|
+| iPhone | Home, Study, Watch, Kids, Controls, Sangeet | None |
+| iPad | Home (Study session running), Study plan, Watch, Kids, Controls, Sangeet (2420 x 1668 landscape) | None |
+| Android phone | Study, Watch, Controls, Sangeet | Home and Kids: the owner is capturing these on a real phone |
+| Android tablet | Home, Study, Watch, Controls, Sangeet | Kids is from 3.5.0 |
+| Android TV | Controls, Kids Home | Home, Watch, Sangeet and Study home. TV has no Study feature (only Self-Control), the emulator's Home is a personal signed-in feed, the player renders black and Sangeet stays on "Preparing audio". Capture these on a real TV. |
