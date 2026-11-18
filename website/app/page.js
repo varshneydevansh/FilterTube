@@ -499,6 +499,8 @@ export default function HomePage() {
 
       <DeviceStrip />
 
+      <CommunityTools />
+
       <AppReleaseStatusSection />
 
       <QuickGuideSection />
@@ -640,8 +642,6 @@ export default function HomePage() {
           </div>
         </div>
       </section>
-
-      <CommunityTools />
 
       <section id="platforms" className="px-4 py-20 md:px-6 md:py-28 lg:py-32">
         <div className="mx-auto max-w-[1400px]">
