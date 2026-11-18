@@ -622,6 +622,8 @@ body.ft-extension-surface #sidebarNav .nav-item.nav-item--quiet[aria-current="pa
   box-shadow: 2px 3px 0 0 var(--pk-desk);
 }
 .ft-about-duo__picture { display: block; width: 180px; height: auto; }
+/* mountAboutLoop hides the still while the loop shows; display: block above would otherwise keep both. */
+.ft-about-duo__picture[hidden] { display: none; }
 .ft-about-duo__words { display: grid; gap: 10px; max-width: 62ch; }
 .ft-about-duo__title { margin: 0; font-family: var(--pk-font-hand); font-weight: 400; font-size: 26px; color: var(--pk-ink); }
 .ft-about-duo__words p { margin: 0; font-size: 16px; line-height: 1.6; color: var(--pk-ink); }
