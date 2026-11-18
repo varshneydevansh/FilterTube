@@ -219,3 +219,11 @@ test('no surface prints a keyword RegExp source: Watch card, embeds, page logs',
     assert.doesNotMatch(dom, /keyword: regex\.source/);
     assert.doesNotMatch(dom, /\\nSource: /);
 });
+
+test('the page-world block log names the rule that matched, as the user wrote it', () => {
+    const filterLogic = read('js/filter_logic.js');
+    assert.doesNotMatch(filterLogic, /Blocking by dual-rule precedence/);
+    assert.match(filterLogic, /matchedRule = `keyword \$\{keywordRuleLabel\(keywordRegex\)\}`;/);
+    assert.match(filterLogic, /this\._log\(`🚫 Blocking by \$\{blockedRule \|\| 'a block rule'\}: "\$\{title \|\| rendererType\}"`\);/);
+});
+

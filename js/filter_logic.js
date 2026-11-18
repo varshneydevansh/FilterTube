@@ -2941,13 +2941,17 @@
             // Block and allow rules stay active together. The profile mode only
             // supplies the fallback decision when neither side matches.
             if (!isCommentRenderer) {
+                // What matched, for the debug log only (the user's rule, never a compiled pattern).
+                let matchedRule = '';
                 const matchSpecificity = (channels, channelIndex, keywords) => {
+                    matchedRule = '';
                     for (const collaborator of collaborators) {
                         if (
                             collaborator &&
                             (collaborator.name || collaborator.id || collaborator.handle || collaborator.customUrl) &&
                             this._matchesAnyChannel(collaborator, channels, channelIndex)
                         ) {
+                            matchedRule = `channel ${collaborator.name || collaborator.handle || collaborator.id || collaborator.customUrl}`;
                             return 2;
                         }
                     }
@@ -2958,6 +2962,7 @@
                                 this._regexMatches(keywordRegex, this._keywordText(keywordRegex, candidate, textToSearch)) &&
                                 this._keywordDateFilterAllows(keywordRegex, candidate, item, rules, rendererType)
                             ) {
+                                matchedRule = `keyword ${keywordRuleLabel(keywordRegex)}`;
                                 return 1;
                             }
                         }
@@ -2972,6 +2977,7 @@
                         this.filterChannelIndex,
                         Array.isArray(this.settings.filterKeywords) ? this.settings.filterKeywords : []
                     );
+                const blockedRule = blockSpecificity === 3 ? `video ${videoId}` : matchedRule;
                 const allowSpecificity = videoId && this.allowedVideoIdSet.has(videoId)
                     ? 3
                     : matchSpecificity(
@@ -2998,7 +3004,7 @@
                         // still passes through content filters, as in the DOM and external layers.
                         return allowSpecificity < 3 && this._blocksByContentRules(item, rules, rendererType);
                     }
-                    this._log(`🚫 Blocking by dual-rule precedence: "${title || rendererType}"`);
+                    this._log(`🚫 Blocking by ${blockedRule || 'a block rule'}: "${title || rendererType}"`);
                     return true;
                 }
             }
