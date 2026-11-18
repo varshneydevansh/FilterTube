@@ -267,11 +267,6 @@ function InstallGuide() {
                       </li>
                     ))}
                   </ul>
-                  <p className="mt-6 max-w-[62ch] text-sm leading-7 text-[var(--color-muted)]">
-                    The app is built on the same filtering engine as the
-                    open-source FilterTube extension. The app&apos;s own code
-                    is not open source.
-                  </p>
                 </div>
                 <Mascot
                   alt={kritiWave.alt}

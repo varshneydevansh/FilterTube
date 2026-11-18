@@ -38,7 +38,7 @@ export const footerLinks = {
       external: true,
     },
     {
-      label: "MIT License",
+      label: "Extension license (MIT)",
       href: "https://github.com/varshneydevansh/FilterTube/blob/master/LICENSE",
       external: true,
     },
@@ -204,8 +204,8 @@ export const faqItems = [
       "No. The browser extension keeps working on desktop. The Android, iPhone, iPad and TV apps extend the same control system to more screens.",
   },
   {
-    question: "Is FilterTube open source?",
+    question: "Is the browser extension open source?",
     answer:
-      "The browser extension is open source: its code, documentation, release history and issue tracker are public. The Android and iOS apps are not open source.",
+      "Yes. The extension's code, documentation, release history and issue tracker are public.",
   },
 ];
