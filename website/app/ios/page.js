@@ -19,7 +19,7 @@ import { ScenicDetailPage } from "@/components/scenic-detail-page";
 
 // The direct release (source URL, release page, SHA-256) comes from public/ios/source.json, which
 // the app repository's release script fills. Until then the page says the install link is coming.
-import { iosRelease } from "@/data/ios-release";
+import { SOURCE_JSON_URL, iosRelease } from "@/data/ios-release";
 
 // Set VIDEO_URL (a direct video file or embeddable URL) to show the
 // "Watch the 2-minute walkthrough" slot. While it is a placeholder it hides.
@@ -73,7 +73,7 @@ const promises = [
 
 const checklist = [
   { icon: DeviceMobile, text: "An iPhone or iPad with a passcode, on iOS or iPadOS 17 or newer (FilterTube needs 17)" },
-  { icon: Desktop, text: "A computer (Mac, Windows, Linux or a recent Chromebook), only for the first install" },
+  { icon: Desktop, text: "A computer (Mac, Windows, Linux or a recent Chromebook) and a USB cable, only for the first install" },
   { icon: UserCircle, text: "An Apple Account (Apple ID). A spare free one works fine" },
   { icon: WifiHigh, text: "Wi-Fi. Mobile data won't work for the setup" },
   { icon: Clock, text: "About 15 minutes" },
@@ -104,8 +104,16 @@ const stuck = [
     a: "Open LocalDevVPN and make sure it's connected. SideStore needs it on every time you install, update or refresh.",
   },
   {
+    q: "SideStore says the pairing file is invalid or missing",
+    a: "The pairing file can expire after an iOS update, a reset, or sometimes for no clear reason. Connect the phone to the computer, open iloader, choose Manage Pairing File and tap Place next to SideStore.",
+  },
+  {
+    q: "\"Untrusted Developer\", or the app won't open at all",
+    a: "On the phone, open Settings > General > VPN & Device Management, tap your Apple ID under Developer App and tap Trust. Also check that Developer Mode is on in Settings > Privacy & Security.",
+  },
+  {
     q: "\"Maximum number of apps\"",
-    a: "A free Apple ID allows only 3 sideloaded apps at once, and SideStore counts as one. Remove an app you don't need in SideStore, then try again.",
+    a: "A free Apple ID allows only 3 sideloaded apps at once, and SideStore counts as one. It also allows 10 new App IDs per week; FilterTube uses one. Remove an app you don't need in SideStore, then try again.",
   },
   {
     q: "A provisioning error, like 0xe8008024",
@@ -113,7 +121,7 @@ const stuck = [
   },
   {
     q: "FilterTube won't open after a week",
-    a: "Its 7-day signing ran out. Turn LocalDevVPN on, open SideStore and tap Refresh on FilterTube. Your settings are kept.",
+    a: "Its 7-day signing ran out. Turn LocalDevVPN on, open SideStore, go to My Apps and tap the days counter next to FilterTube (or Refresh All). Your settings are kept.",
   },
   {
     q: "Setup stops partway",
@@ -132,7 +140,7 @@ const faqs = [
   },
   {
     q: "How do updates work?",
-    a: "SideStore shows new FilterTube versions in its updates list. Tap update and you're done.",
+    a: "FilterTube's source lists every new version, so SideStore shows it in My Apps. Turn LocalDevVPN on and tap Update.",
   },
   {
     q: "Can I move to the App Store version later?",
@@ -295,7 +303,7 @@ function InstallGuide() {
               <div className="mt-12">
                 <Eyebrow>Install steps</Eyebrow>
                 <h2 className="mt-5 max-w-[22ch] text-balance font-display text-4xl tracking-[-0.06em] text-[var(--color-ink)] md:text-5xl">
-                  Four steps. That&apos;s it.
+                  Five steps. That&apos;s it.
                 </h2>
               </div>
               <ol className="mt-8 grid gap-4">
@@ -314,8 +322,11 @@ function InstallGuide() {
                 </StepCard>
                 <StepCard number="2" where="On your computer" title="Use iloader to put SideStore on your phone" mascot={kritiThumbs}>
                   <p className="mt-2">
-                    Download iloader, open it, sign in with your Apple ID, pick
-                    your iPhone, then tap Install.
+                    Plug your iPhone into the computer and tap Trust on the
+                    phone. Download iloader, open it, sign in with your Apple
+                    ID, pick your iPhone, then choose Install SideStore.
+                    iloader also puts SideStore&apos;s pairing file on the
+                    phone.
                   </p>
                   <div className="mt-3 flex flex-wrap gap-x-5 gap-y-2 text-sm">
                     {iloaderLinks.map((item) => (
@@ -325,24 +336,44 @@ function InstallGuide() {
                     ))}
                   </div>
                 </StepCard>
-                <StepCard number="3" where="On your iPhone" title={"Open SideStore and tap \u201cAdd FilterTube\u201d"} mascot={kritiWave}>
+                <StepCard number="3" where="On your iPhone" title="Trust it, then sign in to SideStore" mascot={kritiThumbs}>
                   <p className="mt-2">
-                    Open this page on your phone and tap the button. Then tap
+                    In Settings &gt; General &gt; VPN &amp; Device Management,
+                    tap your Apple ID under Developer App and tap Trust. Then
+                    turn on Developer Mode in Settings &gt; Privacy &amp;
+                    Security; the phone restarts.
+                  </p>
+                  <p className="mt-2">
+                    With LocalDevVPN on, open SideStore and sign in with the
+                    same Apple ID you used in iloader.
+                  </p>
+                </StepCard>
+                <StepCard number="4" where="On your iPhone" title={"Tap \u201cAdd to SideStore\u201d, then install FilterTube"} mascot={kritiWave}>
+                  <p className="mt-2">
+                    Open this page on your phone and tap the button. SideStore
+                    adds the FilterTube source; open FilterTube there and tap
                     Install.
                   </p>
                   <div className="mt-4 flex flex-col items-start gap-3">
                     {iosRelease.live ? (
-                      <ActionLink href={iosRelease.sideStoreHref}>Add FilterTube</ActionLink>
+                      <ActionLink href={iosRelease.sideStoreHref}>Add to SideStore</ActionLink>
                     ) : (
                       <ComingNote />
                     )}
                   </div>
+                  <p className="mt-3 text-sm">
+                    Button not working? In SideStore, open Sources, tap + and
+                    paste{" "}
+                    <code className="break-all font-mono text-[var(--color-ink)]">{SOURCE_JSON_URL}</code>
+                  </p>
                 </StepCard>
-                <StepCard number="4" where="Done" title="Keep it fresh" mascot={uljhanHappy}>
+                <StepCard number="5" where="Every week" title="Keep it fresh" mascot={uljhanHappy}>
                   <p className="mt-2">
-                    SideStore refreshes FilterTube every 7 days, right on your
-                    phone, as long as LocalDevVPN is on. You won&apos;t need the
-                    computer again.
+                    On a free Apple ID, apps signed this way last 7 days.
+                    SideStore refreshes FilterTube right on your phone, in the
+                    background or when you tap the days counter in My Apps, as
+                    long as LocalDevVPN is on. Refresh at least once a week;
+                    you won&apos;t need the computer again.
                   </p>
                 </StepCard>
               </ol>
@@ -353,13 +384,20 @@ function InstallGuide() {
                 </summary>
                 <p className="mt-3 text-sm leading-7 text-[var(--color-muted)]">
                   <TextLink href={altStoreHref}>AltStore</TextLink> works too.
-                  It needs a computer running AltServer on the same Wi-Fi as
-                  your phone about once a week. Advanced setups are covered in{" "}
+                  Install AltServer on your computer and use it to put AltStore
+                  on your phone, then trust the developer and turn on Developer
+                  Mode as in step 3. Tap the button below (or add{" "}
+                  <code className="break-all font-mono text-[var(--color-ink)]">{SOURCE_JSON_URL}</code>{" "}
+                  under Sources) and install FilterTube. You can also download
+                  the IPA from the GitHub release and open it with AltStore.
+                  The same limits apply (3 apps, 7 days), and refreshing needs
+                  your computer running AltServer on the same Wi-Fi as your
+                  phone, at least once a week. Advanced setups are covered in{" "}
                   <TextLink href={sideStoreDocsHref}>SideStore&apos;s docs</TextLink>.
                 </p>
                 <div className="mt-3">
                   {iosRelease.live ? (
-                    <ActionLink href={iosRelease.altStoreHref} variant="secondary">Add FilterTube to AltStore</ActionLink>
+                    <ActionLink href={iosRelease.altStoreHref} variant="secondary">Add to AltStore</ActionLink>
                   ) : (
                     <ComingNote />
                   )}

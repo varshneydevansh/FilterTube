@@ -13,7 +13,7 @@ The app repository's release script fills these fields of `apps[0].versions[0]`;
 
 What the page derives from them:
 
-- While `downloadURL` is not an `https://` URL or `size` is 0, the "Add FilterTube" buttons (SideStore
+- While `downloadURL` is not an `https://` URL or `size` is 0, the "Add to SideStore" and "Add to AltStore" buttons (SideStore
   and AltStore) show "Coming with the first iPhone release" instead of a link that can't install.
 - Once both are real, the buttons open `sidestore://source?url=https://filtertube.in/ios/source.json`
   and `altstore://source?url=...`.

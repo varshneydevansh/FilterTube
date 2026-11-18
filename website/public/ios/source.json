@@ -15,17 +15,24 @@
       "versions": [
         {
           "version": "3.6.2",
-          "buildVersion": "1",
-          "date": "2026-01-01",
+          "buildVersion": "30605.2611181751",
+          "date": "2026-11-18",
           "localizedDescription": "First iPhone and iPad release. Filters, profiles and offline saving.",
-          "downloadURL": "GITHUB_RELEASE_IPA_URL",
-          "size": 0,
+          "downloadURL": "https://github.com/varshneydevansh/FilterTube/releases/download/v3.6.2/FilterTube-Direct-3.6.2.ipa",
+          "size": 116835999,
+          "sha256": "3be067652a9c8f6ef80d304cc005e72ee243da5123dbd5f3cd511f16361254e2",
           "minOSVersion": "17.0"
         }
       ],
       "appPermissions": {
         "entitlements": [],
-        "privacy": {}
+        "privacy": {
+          "NSCameraUsageDescription": "FilterTube uses the camera only to scan Nanah pairing QR codes for private device-to-device sync.",
+          "NSLocalNetworkUsageDescription": "FilterTube finds your other FilterTube devices on this Wi-Fi so you can pair and send playlists, notes and rules without the internet. Nothing is trusted until you match the safety phrase on both screens.",
+          "NSMicrophoneUsageDescription": "FilterTube uses the microphone only when you tap Voice input in Search, to turn your speech into search text you can review.",
+          "NSPhotoLibraryUsageDescription": "FilterTube reads videos you allow so they can appear in your separate local device library.",
+          "NSSpeechRecognitionUsageDescription": "FilterTube turns your spoken search into text in the search field. Nothing is searched until you submit it."
+        }
       }
     }
   ],

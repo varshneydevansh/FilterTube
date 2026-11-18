@@ -1,5 +1,5 @@
 // The iPhone/iPad direct release, read from public/ios/source.json at build time. That file is the
-// AltStore/SideStore source the "Add FilterTube" button points to, and the app repository's release
+// AltStore/SideStore source the "Add to SideStore" button points to, and the app repository's release
 // script fills it (downloadURL, size, date, sha256). Nothing here is hand-edited: while the file
 // still holds placeholders, the release counts as not published and the page says so instead of
 // showing a link that can't install.
