@@ -27,6 +27,7 @@ const PHONE = { width: 1080, height: 2424 };
 const TABLET = { width: 2560, height: 1600 };
 const TV = { width: 1920, height: 1080 };
 const IPHONE = { width: 1080, height: 2348 };
+const IPHONE_NEW = { width: 1206, height: 2622 };
 
 const android = (file) => `/apps/screenshots/android/${file}.webp`;
 const ios = (file) => `/apps/screenshots/ios/${file}.webp`;
@@ -40,7 +41,11 @@ export const devices = {
     layout: "phone",
     featured: "controls",
     captures: {
-      controls: { src: ios("iphone-controls"), title: "Controls", alt: "FilterTube on iPhone: Controls with filters, profiles, settings and device sync", caption: "Filters, profiles and sync in one place.", ...IPHONE, current: false },
+      home: { src: ios("iphone-home"), title: "Home", alt: "FilterTube on iPhone: Home with the Main viewing space and its filters", caption: "Home with your filters applied.", ...IPHONE_NEW, current: true },
+      watch: { src: ios("iphone-watch"), title: "Watch", alt: "FilterTube on iPhone: a nature documentary playing with recommendations", caption: "A clean Watch page with your rules applied.", ...IPHONE_NEW, current: true },
+      kids: { src: ios("iphone-kids"), title: "Kids", alt: "FilterTube Kids Viewing home on iPhone", caption: "Kids Viewing, with the parent's Kids rules.", ...IPHONE_NEW, current: true },
+      controls: { src: ios("iphone-controls"), title: "Controls", alt: "FilterTube Controls on iPhone with filters, profiles, settings and sync", caption: "Filters, profiles and sync in one place.", ...IPHONE_NEW, current: true },
+      sangeet: { src: ios("iphone-sangeet"), title: "Sangeet", alt: "Sangeet now playing on iPhone with album art and playback controls", caption: "Album art and playback controls.", ...IPHONE_NEW, current: true },
     },
     extras: [
       { src: ios("iphone-launcher"), title: "Viewing spaces", alt: "FilterTube on iPhone: choose between Main Viewing and Kids Viewing", caption: "Main and Kids each keep their own rules.", ...IPHONE, current: false },
@@ -65,10 +70,11 @@ export const devices = {
     layout: "phone",
     featured: "watch",
     captures: {
-      watch: { src: android("phone-watch"), title: "Watch", alt: "FilterTube on an Android phone: the Watch page playing a nature documentary", caption: "A clean Watch page with your rules applied.", ...PHONE, current: false },
+      study: { src: android("phone-study"), title: "Study home", alt: "FilterTube Study home on an Android phone with the round ring and a lesson feed", caption: "A study round with only the channels you chose.", ...PHONE, current: true },
+      watch: { src: android("phone-watch"), title: "Watch", alt: "FilterTube on an Android phone: the Watch page playing a nature documentary", caption: "A clean Watch page with your rules applied.", ...PHONE, current: true },
       kids: { src: android("phone-kids-home"), title: "Kids Home", alt: "FilterTube Kids Viewing home on an Android phone", caption: "Kids Viewing, with the parent's Kids rules.", ...PHONE, current: false },
-      controls: { src: android("phone-controls"), title: "FilterTube Controls", alt: "FilterTube Controls overview on an Android phone", caption: "Every control in one place.", ...PHONE, current: false },
-      sangeet: { src: android("phone-now-playing"), title: "Sangeet", alt: "Sangeet now playing on an Android phone with album art and playback controls", caption: "Album art, shuffle, repeat, lyrics and video.", ...PHONE, current: false },
+      controls: { src: android("phone-controls"), title: "FilterTube Controls", alt: "FilterTube Controls overview on an Android phone", caption: "Every control in one place.", ...PHONE, current: true },
+      sangeet: { src: android("phone-sangeet"), title: "Sangeet", alt: "Sangeet now playing on an Android phone with album art and playback controls", caption: "Album art, shuffle, repeat, lyrics and video.", ...PHONE, current: true },
     },
     extras: [
       { src: android("phone-entry"), title: "Viewing spaces", alt: "FilterTube on an Android phone: choose your viewing space, Main or Kids", caption: "Main and Kids each keep their own rules.", ...PHONE, current: false },
@@ -98,12 +104,15 @@ export const devices = {
     layout: "desktop",
     featured: "watch",
     captures: {
-      watch: { src: android("tablet-watch"), title: "Two-pane Watch", alt: "Tablet Watch page with recommendations beside the video", caption: "The video and recommendations side by side.", ...TABLET, current: false },
+      home: { src: android("tablet-home"), title: "Home on tablet", alt: "FilterTube Home on a tablet with topic chips, a recent video and clips", caption: "Home with your filters applied.", ...TABLET, current: true },
+      study: { src: android("tablet-study"), title: "Study home on tablet", alt: "FilterTube Study home on a tablet with the round progress bar and a grid of lessons", caption: "A study round with a wide lesson grid.", ...TABLET, current: true },
+      watch: { src: android("tablet-watch"), title: "Two-pane Watch", alt: "Tablet Watch page with recommendations beside the video", caption: "The video and recommendations side by side.", ...TABLET, current: true },
       kids: { src: android("tablet-kids-home"), title: "Kids Home on tablet", alt: "Kids Viewing grid on a tablet with shows and playlists", caption: "A three-column grid of shows and playlists.", ...TABLET, current: false },
-      controls: { src: android("tablet-controls"), title: "Controls on tablet", alt: "FilterTube Controls on a tablet", caption: "A wide Controls grid with the signed-in channel.", ...TABLET, current: false },
-      sangeet: { src: android("tablet-music-explore"), title: "Sangeet Explore", alt: "Sangeet Explore on a tablet with new releases and moods", caption: "New releases, charts, moods and podcasts.", ...TABLET, current: false },
+      controls: { src: android("tablet-controls"), title: "Controls on tablet", alt: "FilterTube Controls on a tablet", caption: "A wide Controls grid.", ...TABLET, current: true },
+      sangeet: { src: android("tablet-sangeet"), title: "Sangeet player", alt: "Sangeet now playing on a tablet with large album art and the queue beside it", caption: "Album art and the queue side by side.", ...TABLET, current: true },
     },
     extras: [
+      { src: android("tablet-music-explore"), title: "Sangeet Explore", alt: "Sangeet Explore on a tablet with new releases and moods", caption: "New releases, charts, moods and podcasts.", ...TABLET, current: false },
       { src: android("tablet-search"), title: "Search grid", alt: "Tablet search results in a three-column grid", caption: "Three-column search results.", ...TABLET, current: false },
       { src: android("tablet-block-menu"), title: "Block from any card", alt: "Tablet Subscriptions with the FilterTube block menu open", caption: "Block a channel or filter all its videos from any card.", ...TABLET, current: false },
     ],
@@ -119,7 +128,7 @@ export const devices = {
       home: { src: android("tv-home"), title: "Home", alt: "Android TV Home with blocked cards counted", caption: "Home with your filters applied.", ...TV, current: false },
       watch: { src: android("tv-watch"), title: "Watch", alt: "Android TV Watch page playing a nature documentary", caption: "Watch with recommendations from the same channel.", ...TV, current: false },
       kids: { src: android("tv-kids-home"), title: "Kids Home on TV", alt: "Kids Viewing on Android TV with Shows and More for you rows", caption: "Kids rows built for the remote.", ...TV, current: false },
-      controls: { src: android("tv-controls"), title: "FilterTube Controls", alt: "FilterTube Controls on Android TV", caption: "Controls from the sofa.", ...TV, current: false },
+      controls: { src: android("tv-controls"), title: "FilterTube Controls", alt: "FilterTube Controls on Android TV", caption: "Controls from the sofa.", ...TV, current: true },
     },
     extras: [
       { src: android("tv-entry"), title: "Viewing spaces", alt: "FilterTube Android TV viewing space choice", caption: "Main and Kids on the big screen.", ...TV, current: false },
