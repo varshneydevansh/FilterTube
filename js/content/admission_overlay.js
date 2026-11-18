@@ -71,10 +71,30 @@
             'Blocked by Category Filter': 'admission.blockedCategory',
             'Blocked by Language Filter': 'admission.blockedLanguage',
             "Not part of today's study": 'admission.studyOffList',
-            'Not during study': 'admission.studyNotNow'
+            'Not during study': 'admission.studyNotNow',
+            // A blocked keyword's reason (FilterTubeIdentity.keywordMatchReasonLines).
+            'Matched: a blocked word': 'admission.matchedBlockedWord',
+            'Found in: the video title': 'admission.foundInTitle',
+            'Found in: the video description': 'admission.foundInDescription',
+            "Found in: the video's tags": 'admission.foundInTags',
+            'Found in: the channel name': 'admission.foundInChannel',
+            'Found in: the video details': 'admission.foundInDetails'
+        };
+        // The keyword line carries the user's own word: 'Matched: "AI" (exact word)'.
+        const keywordLines = [
+            [/^Matched: "(.*)" \(exact word\)$/, 'admission.matchedExactWord', 'Matched: "{word}" (exact word)'],
+            [/^Matched: "(.*)" \(pattern\)$/, 'admission.matchedPattern', 'Matched: "{word}" (pattern)'],
+            [/^Matched: "(.*)"$/, 'admission.matchedWord', 'Matched: "{word}"']
+        ];
+        const keywordLine = line => {
+            for (const [pattern, key, fallback] of keywordLines) {
+                const match = pattern.exec(line);
+                if (match) return localizedAdmissionText(key, fallback).split('{word}').join(match[1]);
+            }
+            return null;
         };
         return String(message || '').split('\n').map(line =>
-            labels[line] ? localizedAdmissionText(labels[line], line) : line).join('\n');
+            labels[line] ? localizedAdmissionText(labels[line], line) : (keywordLine(line) ?? line)).join('\n');
     }
 
     function loadAdmissionLocale(overlay) {

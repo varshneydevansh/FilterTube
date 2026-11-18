@@ -16,6 +16,16 @@
     }
     window.filterTubeLogicHasRun = true;
 
+    // A keyword rule for logs as the user wrote it ("AI" (exact word)), never its compiled pattern.
+    function keywordRuleLabel(regex) {
+        try {
+            const label = window.FilterTubeIdentity?.keywordRuleLabel?.(regex);
+            if (label) return label;
+        } catch (e) {
+        }
+        return 'a blocked word';
+    }
+
     window.FilterTubePerfDebug = window.FilterTubePerfDebug || {
         enabled() {
             try {
@@ -1367,6 +1377,10 @@
                     if (item.titleOnly === true) {
                         regex.__filtertubeTitleOnly = true;
                     }
+                    // How the user wrote the rule, for reasons and logs (never the compiled pattern).
+                    if (item.matchMode === 'regex' || typeof item.exact === 'boolean') {
+                        regex.__filtertubeKeyword = { matchMode: item.matchMode === 'regex' ? 'regex' : 'literal', exact: item.exact === true };
+                    }
                     return regex;
                 } catch (e) {
                     console.error('FilterTube: Failed to reconstruct RegExp:', item, e);
@@ -2487,7 +2501,7 @@
                             this._logWhitelistDecision('allow:autoplay_endpoint_matched_keyword', {
                                 endpointKey,
                                 videoId,
-                                keyword: keywordRegex.source
+                                keyword: keywordRuleLabel(keywordRegex)
                             });
                             return false;
                         }
@@ -3059,7 +3073,7 @@
                                 rendererType,
                                 originalRendererType,
                                 title,
-                                keyword: keywordRegex.source
+                                keyword: keywordRuleLabel(keywordRegex)
                             });
                             return this._blocksByContentRules(item, rules, rendererType);
                         }
@@ -3140,7 +3154,7 @@
                             matchLocation = 'json';
                         }
 
-                        this._log(`🚫 Blocking by keyword in ${matchLocation}: "${title.substring(0, 30)}..." (matched: ${keywordRegex.source})`);
+                        this._log(`🚫 Blocking by keyword in ${matchLocation}: "${title.substring(0, 30)}..." (matched: ${keywordRuleLabel(keywordRegex)})`);
                         return true;
                     }
                 }
@@ -3163,7 +3177,7 @@
                 if (commentText && commentKeywords.length > 0) {
                     for (const keywordRegex of commentKeywords) {
                         if (this._regexMatches(keywordRegex, commentText) && this._keywordDateFilterAllows(keywordRegex, candidate, item, rules, rendererType)) {
-                            this._log(`🚫 Blocking comment by keyword: ${commentText.substring(0, 50)}...`);
+                            this._log(`🚫 Blocking comment by keyword ${keywordRuleLabel(keywordRegex)}: ${commentText.substring(0, 50)}...`);
                             return true;
                         }
                     }

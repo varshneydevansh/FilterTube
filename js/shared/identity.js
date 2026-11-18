@@ -1101,6 +1101,137 @@
         return filterChannels.some(filterChannel => channelMatchesFilter(channelInfo, filterChannel, channelMap));
     }
 
+    // ---- Keyword rules, as the user typed them ---------------------------------------------------
+    // Compiled keyword rules travel as { pattern, flags } (settings_shared compileKeywords, the apps'
+    // FilterPayloadCompiler) and become RegExps in every world. A reason shown to people must never be
+    // the compiled pattern ("(^|[^\p{L}\p{N}_])AI(?=$|[^\p{L}\p{N}_])"): these helpers turn a rule back
+    // into the word the user typed and how it matches. Literal keywords are escaped reversibly, and an
+    // Exact rule is either wrapped in the Unicode word boundary or (Han/Kana/Hangul) compiled with 'u'.
+    const KEYWORD_EXACT_PREFIX = '(^|[^\\p{L}\\p{N}_])';
+    const KEYWORD_EXACT_SUFFIX = '(?=$|[^\\p{L}\\p{N}_])';
+    const KEYWORD_REGEX_SYNTAX = /[.*+?^${}()|[\]\\]/;
+
+    function unescapeLiteralKeyword(source) {
+        // Every special character must be escaped; an unescaped one means a real pattern.
+        if (KEYWORD_REGEX_SYNTAX.test(source.replace(/\\[\s\S]/g, ''))) return null;
+        let word = '';
+        for (let index = 0; index < source.length; index += 1) {
+            const char = source[index];
+            if (char !== '\\') { word += char; continue; }
+            const next = source[index + 1];
+            if (next === undefined) return null;
+            // \d, \w, \s, \b ... are classes, not escaped literals.
+            if (/[A-Za-z0-9]/.test(next)) return null;
+            word += next;
+            index += 1;
+        }
+        return word;
+    }
+
+    /**
+     * The word behind a keyword rule: { word, mode, dateFilter }. mode is 'exact' (matches as its own
+     * word), 'partial' (also inside longer words) or 'pattern' (a regular expression the user wrote).
+     * Accepts a RegExp from any compiled list (filterKeywords, whitelistKeywords, filterKeywordsComments)
+     * or a compiled item { pattern, flags, word?, exact?, matchMode? }. Never throws; null for no rule.
+     */
+    function describeKeywordRule(rule) {
+        try {
+            if (!rule || (typeof rule !== 'object' && typeof rule !== 'string')) return null;
+            const isRegExp = typeof rule === 'object' && typeof rule.test === 'function' && typeof rule.source === 'string';
+            const meta = isRegExp ? (rule.__filtertubeKeyword || {}) : (typeof rule === 'object' ? rule : {});
+            const dateFilter = (isRegExp ? rule.__filtertubeDateFilter : rule.dateFilter) || null;
+            const result = (word, mode) => ({
+                word: String(word),
+                mode,
+                dateFilter: dateFilter && dateFilter.enabled === true ? dateFilter : null
+            });
+            if (typeof rule === 'string') return rule.trim() ? result(rule.trim(), 'partial') : null;
+            if (meta.matchMode !== 'regex' && typeof meta.word === 'string' && meta.word.trim()) {
+                return result(meta.word.trim(), meta.exact === true ? 'exact' : 'partial');
+            }
+            const source = isRegExp ? rule.source : (typeof rule.pattern === 'string' ? rule.pattern : '');
+            const flags = isRegExp ? rule.flags : (typeof rule.flags === 'string' ? rule.flags : '');
+            if (!source || source === '(?:)') return null;
+            if (meta.matchMode === 'regex') return result(source, 'pattern');
+            let inner = source;
+            let exact = meta.exact === true;
+            if (inner.length > KEYWORD_EXACT_PREFIX.length + KEYWORD_EXACT_SUFFIX.length
+                && inner.startsWith(KEYWORD_EXACT_PREFIX) && inner.endsWith(KEYWORD_EXACT_SUFFIX)) {
+                inner = inner.slice(KEYWORD_EXACT_PREFIX.length, inner.length - KEYWORD_EXACT_SUFFIX.length);
+                exact = true;
+            } else if (inner.length > 4 && inner.startsWith('\\b') && inner.endsWith('\\b')) {
+                inner = inner.slice(2, -2);
+                exact = true;
+            } else if (meta.exact === undefined && String(flags).includes('u')) {
+                // Exact Han/Kana/Hangul keywords compile without the boundary, but with the 'u' flag.
+                exact = true;
+            }
+            const word = unescapeLiteralKeyword(inner);
+            if (word === null || !word.trim()) return result(source, 'pattern');
+            return result(word, exact ? 'exact' : 'partial');
+        } catch (e) {
+            return null;
+        }
+    }
+
+    /** One line for logs and reasons: "AI" (exact word) / "AI" / "a.+b" (pattern). '' for no rule. */
+    function keywordRuleLabel(rule) {
+        const described = describeKeywordRule(rule);
+        if (!described) return '';
+        const word = `"${described.word.replace(/\s+/g, ' ').trim().slice(0, 120)}"`;
+        if (described.mode === 'exact') return `${word} (exact word)`;
+        if (described.mode === 'pattern') return `${word} (pattern)`;
+        return word;
+    }
+
+    // Where a Watch-page keyword was found: the admission text fields' labels as stable tokens.
+    const KEYWORD_SOURCE_TOKENS = Object.freeze({
+        'title': 'title',
+        'player description': 'description',
+        'description': 'description',
+        'YouTube metadata keywords': 'tags',
+        'tags': 'tags',
+        'channel identity': 'channel',
+        'channel': 'channel'
+    });
+    const KEYWORD_SOURCE_LINES = Object.freeze({
+        title: 'Found in: the video title',
+        description: 'Found in: the video description',
+        tags: "Found in: the video's tags",
+        channel: 'Found in: the channel name',
+        metadata: 'Found in: the video details'
+    });
+
+    function keywordMatchSourceToken(label) {
+        return KEYWORD_SOURCE_TOKENS[String(label || '').trim()] || 'metadata';
+    }
+
+    /**
+     * The reason lines under "Blocked keyword" on a blocked-video card, in plain English (the admission
+     * overlay translates each line): 'Matched: "AI" (exact word)\nFound in: the video description'.
+     * decision: { keyword, keywordMode, source } from a keyword match.
+     */
+    function keywordMatchReasonLines(decision) {
+        const word = String(decision?.keyword || '').replace(/\s+/g, ' ').trim().slice(0, 120);
+        const mode = decision?.keywordMode;
+        const matched = !word
+            ? 'Matched: a blocked word'
+            : (mode === 'exact' ? `Matched: "${word}" (exact word)`
+                : (mode === 'pattern' ? `Matched: "${word}" (pattern)` : `Matched: "${word}"`));
+        const source = KEYWORD_SOURCE_LINES[keywordMatchSourceToken(decision?.source)] || KEYWORD_SOURCE_LINES.metadata;
+        return `${matched}\n${source}`;
+    }
+
+    /** A keyword match for a decision: { keyword, keywordMode, source } (no compiled pattern). */
+    function keywordMatchDecision(rule, sourceLabel) {
+        const described = describeKeywordRule(rule);
+        return {
+            keyword: described ? described.word : '',
+            keywordMode: described ? described.mode : 'partial',
+            source: keywordMatchSourceToken(sourceLabel)
+        };
+    }
+
     const api = {
         extractRawHandle,
         normalizeHandleValue,
@@ -1122,7 +1253,11 @@
         channelFilterAllKey,
         extractCustomUrlFromPath,
         extractChannelIdFromPath,
-        fastExtractIdentityFromHtmlChunk
+        fastExtractIdentityFromHtmlChunk,
+        describeKeywordRule,
+        keywordRuleLabel,
+        keywordMatchDecision,
+        keywordMatchReasonLines
     };
 
     const existing = root.FilterTubeIdentity && typeof root.FilterTubeIdentity === 'object'

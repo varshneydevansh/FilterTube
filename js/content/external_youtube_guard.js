@@ -274,7 +274,12 @@
             if (!dateAllowed) continue;
             for (const field of fields) {
                 regex.lastIndex = 0;
-                if (field.text && regex.test(field.text)) return { matched: true, pattern: regex.source, source: field.label };
+                if (field.text && regex.test(field.text)) {
+                    // The user's word and how it matches, never the compiled pattern.
+                    const described = root.FilterTubeIdentity?.keywordMatchDecision?.(entry || regex, field.label)
+                        || { keyword: '', keywordMode: 'partial', source: 'metadata' };
+                    return { matched: true, ...described };
+                }
             }
         }
         return { matched: false };
@@ -419,7 +424,7 @@
             ? 'Unable to verify required metadata\nPlayback remains paused' : 'Checking FilterTube rules…';
         if (decision.kind === 'video') return `Blocked video\nVideo ID: ${decision.videoId}`;
         if (decision.kind === 'channel') return `Blocked channel\n${metadata.channelName || metadata.channelId || ''}`.trim();
-        if (decision.kind === 'keyword') return `Blocked keyword\nMatched: ${decision.pattern || 'matched rule'}\nSource: ${decision.source || 'video metadata'}`;
+        if (decision.kind === 'keyword') return `Blocked keyword\n${root.FilterTubeIdentity?.keywordMatchReasonLines?.(decision) || 'Matched: a blocked word'}`;
         if (decision.kind === 'allow-only') return `Not in Allow only selected\n${metadata.channelName || decision.videoId || ''}`.trim();
         if (decision.kind === 'duration') return `Blocked by Duration Filter\nDuration: ${Math.round(Number(decision.durationSeconds) || 0)} seconds`;
         if (decision.kind === 'views') return 'Blocked by Minimum Views Filter';

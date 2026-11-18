@@ -481,7 +481,9 @@
                 return {
                     pattern: rawRegex ? escaped : (entry.exact ? exactPattern : escaped),
                     flags: rawRegex ? (entry.regexFlags || 'i') : (entry.exact ? 'iu' : 'i'),
-                    dateFilter: entry.dateFilter?.enabled ? entry.dateFilter : undefined
+                    dateFilter: entry.dateFilter?.enabled ? entry.dateFilter : undefined,
+                    // Lets a reason name the user's rule ("FilterTubeIdentity.describeKeywordRule").
+                    ...(rawRegex ? { matchMode: 'regex' } : {})
                 };
             });
     }

@@ -15,6 +15,14 @@ function sliceBetween(source, startNeedle, endNeedle) {
   return source.slice(start, end);
 }
 
+function loadSharedIdentity() {
+  const context = {};
+  context.globalThis = context;
+  vm.createContext(context);
+  vm.runInContext(read('js/shared/identity.js'), context);
+  return context.FilterTubeIdentity;
+}
+
 function loadAdmissionDecision() {
   const source = read('js/content/dom_fallback.js');
   const block = sliceBetween(
@@ -23,6 +31,7 @@ function loadAdmissionDecision() {
     'function formatCurrentWatchAdmissionMessage(decision, ownerMeta = {}) {'
   );
   const context = {
+    FilterTubeIdentity: loadSharedIdentity(),
     getCompiledKeywordRegexes(list) {
       return list.map(entry => new RegExp(typeof entry === 'string' ? entry : entry.pattern, 'i'));
     },
@@ -108,7 +117,7 @@ test('Watch admission exposes the exact winning rule family without changing pre
   assert.equal(decide({ filterChannels: [{ id: 'UCED' }] }, baseContext).kind, 'channel');
   assert.deepEqual(
     { ...decide({ filterKeywords: ['official'] }, baseContext) },
-    { blocked: true, kind: 'keyword', pattern: 'official', source: 'YouTube metadata keywords' }
+    { blocked: true, kind: 'keyword', keyword: 'official', keywordMode: 'partial', source: 'tags' }
   );
   assert.equal(decide({ listMode: 'whitelist', whitelistChannels: [{ id: 'UCOTHER' }] }, baseContext).kind, 'allow-only');
   assert.equal(decide({
@@ -137,7 +146,7 @@ test('current-player overlays identify every video-admission rule family', () =>
 
   assert.match(formatter, /Blocked video\\nVideo ID:/);
   assert.match(formatter, /Blocked channel/);
-  assert.match(formatter, /Blocked keyword\\nMatched:/);
+  assert.match(formatter, /Blocked keyword\\n\$\{typeof lines === 'function' \? lines\(decision\) : 'Matched: a blocked word'\}/);
   assert.match(formatter, /Not in Allow only selected/);
   assert.match(formatter, /Blocked by Duration Filter/);
   assert.match(formatter, /Blocked by Upload Date Filter/);

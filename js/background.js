@@ -4035,7 +4035,7 @@ async function getCompiledSettings(sender = null, profileType = null, forceRefre
                             // Validation happens again here so malformed imported rows never
                             // enter either JSON-first or DOM matching.
                             new RegExp(word, regexFlags);
-                            compiledEntry = { pattern: word, flags: regexFlags };
+                            compiledEntry = { pattern: word, flags: regexFlags, matchMode: 'regex' };
                         } catch (e) {
                             continue;
                         }

@@ -733,6 +733,10 @@ function getCompiledKeywordRegexes(rawList) {
                 if (keywordData.titleOnly === true) {
                     regex.__filtertubeTitleOnly = true;
                 }
+                // How the user wrote the rule, for the blocked card's reason (never the compiled pattern).
+                if (keywordData.matchMode === 'regex' || typeof keywordData.exact === 'boolean') {
+                    regex.__filtertubeKeyword = { matchMode: keywordData.matchMode === 'regex' ? 'regex' : 'literal', exact: keywordData.exact === true };
+                }
                 compiled.push(regex);
                 continue;
             }
@@ -2166,16 +2170,10 @@ function getCurrentWatchAdmissionDecision(settings, context = {}) {
                 const source = textFields.find(field => (
                     field && typeof field.text === 'string' && field.text && matchesKeyword(regex, field.text)
                 ));
-                return {
-                    pattern: regex.source || '',
-                    source: source?.label || 'video metadata'
-                };
+                return describeCurrentWatchKeywordMatch(regex, source?.label || 'video metadata');
             }
             if (includeOwner && !titleOnly && ownerName && matchesKeyword(regex, ownerName)) {
-                return {
-                    pattern: regex.source || '',
-                    source: 'channel identity'
-                };
+                return describeCurrentWatchKeywordMatch(regex, 'channel identity');
             }
         }
         return null;
@@ -2222,6 +2220,16 @@ function getCurrentWatchAdmissionDecision(settings, context = {}) {
     const ownerKeyword = keywordMatch(settings?.filterKeywords, true);
     if (ownerKeyword) return { blocked: true, kind: 'keyword', ...ownerKeyword };
     return { blocked: false, kind: 'none' };
+}
+
+/**
+ * A Watch-page keyword match as the user wrote the rule: { keyword, keywordMode, source }, where
+ * source is title / description / tags / channel / metadata. The compiled pattern never leaves here.
+ */
+function describeCurrentWatchKeywordMatch(regex, sourceLabel) {
+    const shared = globalThis.FilterTubeIdentity?.keywordMatchDecision;
+    if (typeof shared === 'function') return shared(regex, sourceLabel);
+    return { keyword: '', keywordMode: 'partial', source: 'metadata' };
 }
 
 // The Watch gate during Study (STUDY_ENFORCEMENT_SPEC P0.1): an off-list video never plays. The
@@ -2283,9 +2291,8 @@ function formatCurrentWatchAdmissionMessage(decision, ownerMeta = {}) {
         return `Blocked by View Count Filter\nViews: ${trimForOverlay(decision.viewCount)}`;
     }
     if (decision?.kind === 'keyword') {
-        const raw = decision.pattern || 'matched rule';
-        const source = trimForOverlay(decision.source || 'video metadata');
-        return `Blocked keyword\nMatched: ${trimForOverlay(raw)}${source ? `\nSource: ${source}` : ''}`;
+        const lines = globalThis.FilterTubeIdentity?.keywordMatchReasonLines;
+        return `Blocked keyword\n${typeof lines === 'function' ? lines(decision) : 'Matched: a blocked word'}`;
     }
     if (decision?.kind === 'allow-only') {
         const identity = ownerName || decision.videoId || '';
@@ -8538,7 +8545,7 @@ function shouldHideContent(title, channel, settings, options = {}) {
             const compiled = getCompiledKeywordRegexes(whitelistKeywords);
             for (const regex of compiled) {
                 if (matchesKeyword(regex, title) && keywordDateFilterAllows(regex, publishTimestamp)) {
-                    logWhitelistDecision('allow:matched_keyword', { keyword: regex.source });
+                    logWhitelistDecision('allow:matched_keyword', { keyword: globalThis.FilterTubeIdentity?.keywordRuleLabel?.(regex) || '' });
                     return false;
                 }
             }
