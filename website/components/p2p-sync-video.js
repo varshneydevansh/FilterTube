@@ -13,7 +13,7 @@ const SPOKEN = [
   "Check both show the same safety words, so you know it’s really their device.",
   "Choose what to share, for example filter words and Kids rules.",
   "It goes straight to their device, locked. No FilterTube server keeps a copy.",
-  "Later changes stay in sync. Auto-sync is still in testing.",
+  "Later changes stay in sync. Turn on Auto-sync to keep them matched.",
   "Your devices talk to each other. Nothing in between can read it.",
 ];
 

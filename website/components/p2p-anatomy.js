@@ -9,7 +9,7 @@ import { p2pAnatomyGeometry as G, p2pAnatomySvg } from "@/components/p2p-anatomy
 
 // Each step is true to how FilterTube device sync works (docs/app/TECHNICAL_RUNTIME.md, Nanah):
 // a 4-character code or QR, a safety phrase compared on both screens, a chosen profile scope,
-// an encrypted direct connection, and auto-sync that is still in testing. The home page video
+// an encrypted direct connection, and opt-in auto-sync. The home page video
 // (components/p2p-sync-video.js) shows the same five steps; picking a step there lights it here.
 export const STEPS = [
   {
@@ -34,8 +34,8 @@ export const STEPS = [
   },
   {
     label: "Stay in sync",
-    readout: "auto-sync · in testing",
-    caption: "Auto-sync is still in testing: once both devices are verified, later changes can follow. To sync directly, FilterTube needs to be open on both devices.",
+    readout: "auto-sync · opt-in",
+    caption: "Turn on Auto-sync and, once both devices are verified, later changes follow. To sync directly, FilterTube needs to be open on both devices.",
   },
 ];
 

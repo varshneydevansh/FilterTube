@@ -199,13 +199,13 @@ export const faqItems = [
       "Yes. The product model already includes Kids-focused rule management, separate profiles, and PIN-protected flows so family safety is not bolted on later.",
   },
   {
-    question: "Will the upcoming apps replace FilterTube on desktop?",
+    question: "Do the apps replace FilterTube on desktop?",
     answer:
-      "No. FilterTube already works today on desktop browsers. Mobile, iPad, and TV surfaces extend the same control system and make the brand easier to trust across devices.",
+      "No. The browser extension keeps working on desktop. The Android, iPhone, iPad and TV apps extend the same control system to more screens.",
   },
   {
-    question: "Is the project open source?",
+    question: "Is FilterTube open source?",
     answer:
-      "Yes. The repository, documentation, release history, and issue tracker are public, which makes the product easier to audit and improve.",
+      "The browser extension is open source: its code, documentation, release history and issue tracker are public. The Android and iOS apps are not open source.",
   },
 ];

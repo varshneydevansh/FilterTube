@@ -217,9 +217,9 @@ export default function DownloadsPage() {
             <p className="mt-6 max-w-[68ch] text-pretty text-base leading-8 text-[var(--color-muted)] md:text-lg">
               Browser releases stay public on GitHub and store listings. Android
               phone/tablet builds can be attached to the same release stream for
-              Google Play, GrapheneOS, and other direct-install users. iPhone
-              and iPad can install the app directly with SideStore while Apple
-              sorts out the developer account.
+              Google Play, GrapheneOS, and other direct-install users. Trouble
+              on Apple&apos;s side delays the App Store version, so iPhone and
+              iPad install directly with SideStore, or AltStore.
             </p>
           </div>
 
@@ -247,9 +247,9 @@ export default function DownloadsPage() {
                 </h2>
                 <p className="mt-5 text-sm leading-7 text-[var(--color-muted)]">
                   Anyone can install the Android app from Google Play or search
-                  the store for FilterTube. iPhone and iPad can install the app
-                  directly with SideStore while Apple sorts out the developer
-                  account. TV remains separate platform work.
+                  the store for FilterTube; Android TV uses the same listing.
+                  iPhone and iPad install directly with SideStore, or AltStore,
+                  while trouble on Apple&apos;s side delays the App Store version.
                 </p>
               </div>
               <div id="ios-status" className="grid gap-3 sm:grid-cols-2">
@@ -269,8 +269,9 @@ export default function DownloadsPage() {
                     iOS and iPadOS
                   </h3>
                   <p className="mt-3 text-sm leading-7 text-[var(--color-muted)]">
-                    Install directly with SideStore and your own Apple ID while
-                    Apple sorts out the developer account.{" "}
+                    Trouble on Apple&apos;s side delays the App Store version.
+                    Until then, install directly with SideStore (or AltStore)
+                    and your own Apple ID.{" "}
                     <Link className="font-semibold text-[var(--color-accent)] underline underline-offset-4" href="/ios#install">
                       See the iPhone and iPad install guide
                     </Link>
@@ -297,7 +298,8 @@ export default function DownloadsPage() {
                 <p className="mt-5 text-sm leading-7 text-[var(--color-muted)]">
                   Google Play is the simplest way to get the complete phone and
                   tablet app. The direct APK is a separate, simpler build.
-                  Android TV and Fire TV have their own development track.
+                  Android TV uses the same Google Play listing, and a TV APK is
+                  on every GitHub release. Fire TV is planned.
                 </p>
                 <div className="mt-7 flex flex-col gap-3 sm:flex-row">
                   <ActionLink external href={releaseHref}>

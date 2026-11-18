@@ -382,7 +382,7 @@ function InstallGuide() {
                   Coming to AltStore PAL and the App Store
                 </p>
                 <p className="mt-2 text-sm leading-7 text-[var(--color-muted)]">
-                  Once Apple sorts out the developer account, people in the EU,
+                  Once the trouble on Apple&apos;s side is resolved, people in the EU,
                   Japan and Brazil will be able to install FilterTube with{" "}
                   <TextLink href="https://altstore.io">AltStore PAL</TextLink>,
                   with no computer and no weekly refresh, and everyone else

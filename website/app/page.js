@@ -176,7 +176,7 @@ function AppReleaseStatusSection() {
     {
       eyebrow: "Android phone + tablet",
       title: "Your videos, on Android.",
-      body: "A custom Main and Kids app, with filters and family profiles. Explore Music, Notes and local-media development too. Install from Google Play—no invitation or email needed.",
+      body: "A custom Main and Kids app, with filters and family profiles, plus Sangeet for music, video Notes and Offline Media. Install from Google Play—no invitation or email needed.",
       image: "/apps/android.png",
       imageAlt: "FilterTube Android app artwork",
       action: "Explore Android",
@@ -187,7 +187,7 @@ function AppReleaseStatusSection() {
     {
       eyebrow: "iPhone + iPad",
       title: "iPhone and iPad, together.",
-      body: "A native app for smaller screens and a wider iPad workspace. Install it directly with SideStore while Apple sorts out the developer account.",
+      body: "A native app for smaller screens and a wider iPad workspace. Trouble on Apple's side delays the App Store version; until then, install with SideStore, or AltStore.",
       image: "/apps/app-store-transparent.png",
       imageAlt: "FilterTube iPhone and iPad app artwork",
       action: "Install on iPhone or iPad",
@@ -370,7 +370,7 @@ function QuickGuideSection() {
                   ["Pair and verify", "Use a short code or the QR, then check that both screens show the same safety words."],
                   ["You choose", "Pick the profile and what to share. The other device reviews it first, and only approved parents can change a child’s protected settings."],
                   ["Locked, direct", "A relay can help your devices find each other across networks. It only passes locked data it can’t open."],
-                  ["Auto-sync, in testing", "Verified devices can keep each other up to date. Changes wait on the device while you’re offline."],
+                  ["Auto-sync, opt-in", "Verified devices can keep each other up to date. Changes wait on the device while you’re offline."],
                 ].map(([term, detail]) => (
                   <div className="border-t border-[color:var(--color-line)] pt-4" key={term}>
                     <dt className="font-semibold text-[var(--color-ink)]">{term}</dt>
@@ -588,14 +588,14 @@ export default function HomePage() {
                   </div>
                   <div className="rounded-[1.5rem] border border-white/8 bg-[linear-gradient(180deg,#18202a,#10161d)] p-5 text-[#f8f6f2] shadow-[0_24px_48px_-34px_rgba(4,8,14,0.7)]">
                     <p className="text-[0.72rem] uppercase tracking-[0.22em] text-white/72">
-                      In development
+                      More screens
                     </p>
                     <p className="mt-3 font-display text-3xl tracking-[-0.05em] text-[#fffaf4]">
                       iOS + Android TV
                     </p>
                     <p className="mt-3 text-sm leading-7 text-white/84">
-                      iPhone, iPad and TV work is underway, with each platform’s
-                      availability and tested features shown separately.
+                      Android TV is on Google Play. iPhone and iPad install with
+                      SideStore while trouble on Apple&apos;s side delays the App Store.
                     </p>
                   </div>
                 </div>
@@ -658,7 +658,7 @@ export default function HomePage() {
             <SectionHeading
               eyebrow="Apps"
               title="On your phone, your tablet, and more screens."
-              description="Android is available now. Explore iPhone and iPad development, the browser extension, and the Android TV work inside the Android overview."
+              description="Android phones, tablets and TVs are available now. iPhone and iPad install directly, and the browser extension works on desktop."
             />
           </Reveal>
 
@@ -714,7 +714,7 @@ export default function HomePage() {
             <SectionHeading
               eyebrow="Feature guide"
               title="The details, when you need them."
-              description="Explore the full controls below. Development and experimental features are labelled; support differs by platform and release."
+              description="Explore the full controls below. Experimental features are labelled; support differs by platform."
             />
           </Reveal>
           <details className="ft-disclosure ft-shell mt-8 rounded-[2rem] border border-[color:var(--color-line)] p-2">

@@ -2,7 +2,7 @@
 //! page's Anatomy figure: Pair, Verify, Choose, Send, Stay in sync. Two drawn devices (a parent's
 //! phone and a child's tablet) talk straight to each other. Facts follow docs/app/TECHNICAL_RUNTIME.md
 //! (Nanah): a 4-character code or QR, safety words compared on both screens, a chosen share,
-//! an encrypted direct connection, and auto-sync that is still in testing. Kriti closes it.
+//! an encrypted direct connection, and opt-in auto-sync. Kriti closes it.
 use fframes::{AudioMap, Color, Duration, FFramesContext, Frame, Svgr, Transform, Video, include_media_dir};
 
 include_media_dir!(pub struct SyncMedia, "media");
@@ -27,7 +27,7 @@ const CAPTIONS: [[&str; 2]; 6] = [
     ["Check both show the same safety words.", "Then you know it\u{2019}s really their device."],
     ["Choose what to share.", "Filter words and Kids rules, for example."],
     ["It goes straight to their device, locked.", "No FilterTube server keeps a copy."],
-    ["Later changes stay in sync.", "Auto-sync is still in testing."],
+    ["Later changes stay in sync.", "Turn on Auto-sync to keep them matched."],
     ["Your devices talk to each other.", "Nothing in between can read it."],
 ];
 

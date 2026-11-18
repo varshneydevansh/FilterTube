@@ -50,7 +50,7 @@ export const metadata = {
   openGraph: {
     title: "FilterTube",
     description:
-      "Your feed, your rules. FilterTube brings local filtering, family controls and verified encrypted device sharing to Android, iPhone, iPad and browsers, with TV in development.",
+      "Your feed, your rules. FilterTube brings local filtering, family controls and verified encrypted device sharing to Android phones, tablets and TVs, iPhone, iPad and browsers.",
     url: "https://filtertube.in",
     siteName: "FilterTube",
     images: [

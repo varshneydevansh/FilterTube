@@ -195,7 +195,7 @@ export const homeCapabilityCards = [
       "Pair and verify devices before sharing updates. Keep local backups and review imported rules without handing control to a central FilterTube account.",
     points: [
       "Use a code or QR, compare the safety phrase, then choose the profile and update.",
-      "Opt-in Auto-sync is in testing. Availability varies by app and release.",
+      "Opt-in Auto-sync keeps approved devices up to date. Direct sync needs both devices open and connected.",
       "Connection services may help devices meet or relay encrypted updates. PINs, ownership, and device permissions stay local.",
     ],
     icon: Stack,
@@ -341,10 +341,10 @@ export const homeTechnicalFeatures = [
     detail: "Files add rules only; they do not change PINs or profiles.",
   },
   {
-    title: "Subscribed-channel Whitelist",
+    title: "Followed-channel Whitelist",
     description:
-      "Import channels from the signed-in viewing account into the current profile’s Whitelist, then choose whether to only store them or turn Whitelist mode on.",
-    detail: "Useful when a child should only see channels already subscribed.",
+      "Import the channels the signed-in viewing account follows into the current profile’s Whitelist, then choose whether to only store them or turn Whitelist mode on.",
+    detail: "Useful when a child should only see channels you already follow.",
   },
   {
     title: "Date-limited keywords",
@@ -390,31 +390,27 @@ export const homeTechnicalFeatures = [
   },
   {
     title: "Minimum-view filters",
-    status: "Extension update",
     description:
       "Optionally hide videos below a view-count threshold in Main and Kids when a usable view count is available.",
     detail:
-      "A newer extension feature; do not assume identical support in every installed app build.",
+      "Works in the extension and the apps; videos without a usable view count are not hidden by this rule.",
   },
   {
     title: "Saved video notes",
-    status: "Development updates",
     description:
-      "Keep notes with a video inside the selected profile. Extension Notes work on supported Watch pages; Android development builds also include a video Notes editor.",
+      "Keep notes with a video inside the selected profile. Extension Notes work on supported Watch pages; the Android app has a video Notes editor and a searchable Notes index.",
     detail:
-      "In testing; availability and Notes access depend on the app, release and profile permissions.",
+      "Notes belong to one profile and follow its permissions.",
   },
   {
     title: "Opt-in Auto-sync",
-    status: "Development updates",
     description:
       "Choose supported settings, filter rules, and notes to sync on approved profile links between verified devices. Offline changes wait locally for a supported connection.",
     detail:
-      "In testing for extension and Android updates; supported devices must be open and connected for direct sync.",
+      "In the extension and the Android app; supported devices must be open and connected for direct sync.",
   },
   {
     title: "Reviewed preference reset",
-    status: "Extension update",
     description:
       "Review ordinary display and playback defaults for the chosen profile. Your filter rules, notes, PINs, time limits, device permissions and profile ownership are preserved.",
     detail:
@@ -422,7 +418,6 @@ export const homeTechnicalFeatures = [
   },
   {
     title: "Compatible rule exports",
-    status: "Extension update",
     description:
       "Review compatible channel and keyword rules before exporting one profile and rule space for BlockTube.",
     detail:
@@ -556,7 +551,7 @@ export const detailPages = {
     featureCards: [],
     deviceSyncHref: "#extension-p2p",
     exploreTitle: "Explore the extension",
-    exploreDescription: "Add controls to the existing pages through the popup, dashboard, and supported inline actions. Open a group for the details. Newer features may not be in your browser store release yet.",
+    exploreDescription: "Add controls to the existing pages through the popup, dashboard, and supported inline actions. Open a group for the details.",
     exploreGroups: [
       {
         id: "extension-filters",
@@ -565,7 +560,7 @@ export const detailPages = {
         points: [
           "Block unwanted channels, keywords or videos, or use Whitelist for approved content. Keep Blocked and Allowed rules with exceptions; editing a list does not switch your viewing mode.",
           "Paste a channel handle, ID or supported URL. Use Exact for precise keywords, filter supported comments, and choose creators on supported collaboration cards.",
-          "Import subscribed channels into the current profile's Whitelist, then choose whether to enable Whitelist mode. Main and Kids retain separate rule spaces and modes.",
+          "Import the channels you follow into the current profile's Whitelist, then choose whether to enable Whitelist mode. Main and Kids retain separate rule spaces and modes.",
           "Narrow videos by length, upload date, uppercase titles and—in newer releases—minimum views. Search and sort saved rules separately by when they were added.",
           "Choose from 15 video categories or 32 experimental Main video-language options using available metadata. Language filtering is not speech recognition and is not exposed for Kids; missing metadata can limit any content decision.",
         ],
@@ -596,7 +591,6 @@ export const detailPages = {
       },
       {
         id: "extension-notes",
-        status: "Newer releases / in testing",
         title: "Notes for useful moments",
         summary: "Keep a note with the video and profile it belongs to.",
         points: [
@@ -608,7 +602,6 @@ export const detailPages = {
       },
       {
         id: "extension-p2p",
-        status: "New Auto-sync features in testing",
         title: "Connect your devices",
         summary: "Share selected updates securely with verified devices.",
         points: [
@@ -635,10 +628,9 @@ export const detailPages = {
     ],
     milestoneTitle: "Browser availability",
     milestoneIntro:
-      "Choose a store or manual build appropriate for your browser; a development feature is not automatically in every store release.",
+      "Choose a store or manual build appropriate for your browser.",
     milestones: [
       "Chrome, Firefox, and Edge have store listings; compatible Chromium browsers use the relevant installation path.",
-      "Newer Notes, minimum-view rules, compatible exports, preference reset, and Auto-sync features may not be in your store release yet.",
       "Platform changes still require compatibility work; advert filtering is not a promise of permanent immunity to platform changes.",
     ],
     related: ["android", "kids", "ml-ai"],
@@ -655,7 +647,7 @@ export const detailPages = {
     titleLead: "A calm FilterTube companion for",
     titleDisplay: "phones and tablets",
     description:
-      "The Android phone and tablet app is publicly available on Google Play. The native iPhone and iPad app can be installed directly with SideStore while Apple sorts out the developer account.",
+      "The Android phone and tablet app is publicly available on Google Play. Trouble on Apple's side delays the App Store version of the native iPhone and iPad app; until then, install it with SideStore, or AltStore.",
     heroArtworks: [
       {
         src: "/apps/android.png",
@@ -740,12 +732,12 @@ export const detailPages = {
     eyebrow: "iPhone + iPad",
     navTitle: "iPhone and iPad",
     routeSummary:
-      "Native iPhone and iPad viewing, filters, profiles, and family controls. Install it directly with SideStore while Apple sorts out the developer account.",
+      "Native iPhone and iPad viewing, filters, profiles, and family controls. Trouble on Apple's side delays the App Store version; until then, install with SideStore, or AltStore.",
     titleLead: "A native FilterTube app for",
     titleDisplay: "iPhone and iPad",
     description:
       "FilterTube brings Main and Kids viewing, native controls, profiles, PINs, and protected time to iPhone and iPad. Apple is having trouble on their end with the developer account, so the App Store version will take a while; until then you can install the app directly with SideStore or AltStore.",
-    heroScreensLabel: "iOS simulator development build · hover or tap a screen",
+    heroScreensLabel: "FilterTube on iPhone · hover or tap a screen",
     heroScreens: [
       {
         src: "/apps/screenshots/ios/iphone-launcher.webp",
@@ -771,7 +763,7 @@ export const detailPages = {
     ],
     screenshotsTitle: "A closer look at iPhone and iPad",
     screenshotsEyebrow: "iPhone and iPad",
-    screenshotsDescription: "Screens from the current iPhone development build. Fresh iPhone and iPad captures from the latest build are on the way. Open any screen for a full-size view.",
+    screenshotsDescription: "Real screens from the latest iPhone and iPad build. Open any screen for a full-size view.",
     screenshotRails: [
       { id: "iphone-screens", label: "iPhone", status: "Install with SideStore", layout: "phone", device: "iPhone", screenshots: iphoneScreens },
       { id: "ipad-screens", label: "iPad", status: "Install with SideStore", layout: "desktop", device: "iPad", screenshots: ipadScreens },
@@ -850,14 +842,14 @@ export const detailPages = {
     titleLead: "A wider FilterTube workspace for",
     titleDisplay: "iPad and home setup",
     description:
-      "The native iPad app ships alongside iPhone. Install it directly with SideStore while Apple sorts out the developer account.",
+      "The native iPad app ships alongside iPhone. Trouble on Apple's side delays the App Store version; until then, install it with SideStore, or AltStore.",
     heroArtwork: {
       src: "/apps/app-store-transparent.png",
       alt: "FilterTube iPad app artwork",
     },
     screenshotsTitle: "A closer look at iPhone and iPad",
     screenshotsEyebrow: "iPhone and iPad",
-    screenshotsDescription: "Screens from the current iPhone development build. Fresh iPhone and iPad captures from the latest build are on the way. Open any screen for a full-size view.",
+    screenshotsDescription: "Real screens from the latest iPhone and iPad build. Open any screen for a full-size view.",
     screenshotRails: [
       { id: "ipados-iphone-screens", label: "iPhone", status: "Install with SideStore", layout: "phone", device: "iPhone", screenshots: iphoneScreens },
       { id: "ipados-ipad-screens", label: "iPad", status: "Install with SideStore", layout: "desktop", device: "iPad", screenshots: ipadScreens },
@@ -922,7 +914,7 @@ export const detailPages = {
     slug: "android",
     icon: DeviceMobile,
     tone: "forest",
-    status: "Phone, tablet + TV · 3.5.0",
+    status: "Phone, tablet + TV",
     eyebrow: "Android phone, tablet + TV",
     navTitle: "Android",
     routeSummary:
@@ -930,13 +922,13 @@ export const detailPages = {
     titleLead: "Your viewing, your rules on",
     titleDisplay: "Android",
     description:
-      "Watch Main and Kids in FilterTube's custom Android app, with filters, profiles, parent controls, protected time and private peer-to-peer device sync. Phones and tablets install from Google Play. Android TV arrives with 3.5.0 on the same listing, and a TV APK is on every GitHub release.",
+      "Watch Main and Kids in FilterTube's custom Android app, with filters, profiles, parent controls, protected time and private peer-to-peer device sync. Phones, tablets and Android TV install from the same Google Play listing, and a TV APK is on every GitHub release.",
     heroVideo: {
       src: "/videos/android/android-contours.mp4",
       poster: "/videos/android/android-contours-poster.png",
       label: "Quiet Android background motion",
     },
-    heroScreensLabel: "FilterTube 3.5.0 · hover or tap a screen",
+    heroScreensLabel: "FilterTube on Android · hover or tap a screen",
     heroScreens: [
       androidPhoneScreens.find((screen) => screen.src.endsWith("phone-watch.webp")),
       androidPhoneScreens.find((screen) => screen.src.endsWith("phone-sangeet.webp")),
@@ -944,7 +936,7 @@ export const detailPages = {
     ],
     chips: [
       "Phone + tablet: available",
-      "Android TV: new in 3.5.0",
+      "Android TV: available",
       "Private P2P sync",
     ],
     primaryCta: {
@@ -960,7 +952,7 @@ export const detailPages = {
     appPreview: {
       eyebrow: "Android app demo",
       title: "See the custom viewing experience.",
-      body: "A look at FilterTube on phone and tablet. Newer development features below are labelled separately from the public release.",
+      body: "A look at FilterTube on phone and tablet. Features coming in the next update are labelled below.",
       embedHref: "https://www.youtube-nocookie.com/embed/SHvSICSMHL4?rel=0",
       watchHref: appDemoVideoHref,
     },
@@ -975,9 +967,9 @@ export const detailPages = {
       },
       {
         label: "Android TV",
-        value: "New in 3.5.0",
+        value: "Available",
         detail:
-          "Remote-first Home, Search, Subscriptions, You and Watch, with profiles, PINs, Kids controls and filters. Install the TV APK from GitHub; the Google Play TV release follows Play review.",
+          "Remote-first Home, Search, Following, You and Watch, with profiles, PINs, Kids controls and filters. Phones, tablets and TVs share one Google Play listing, and a TV APK is on every GitHub release.",
       },
       {
         label: "Fire TV",
@@ -989,28 +981,28 @@ export const detailPages = {
     deviceSyncHref: "#android-p2p",
     screenshotsTitle: "A closer look at the Android app",
     screenshotsEyebrow: "Every screen · phone, tablet and TV",
-    screenshotsDescription: "Real screens from FilterTube 3.5.0 on a phone, a tablet and Android TV. Open any screen for a full-size view.",
+    screenshotsDescription: "Real screens from the latest FilterTube build on a phone, a tablet and Android TV. Open any screen for a full-size view.",
     screenshotRails: [
       { id: "android-phone-screens", label: "Phone", status: "Google Play", layout: "phone", screenshots: androidPhoneScreens },
       { id: "android-tablet-screens", label: "Tablet", status: "Google Play", layout: "desktop", screenshots: androidTabletScreens },
-      { id: "android-tv-screens", label: "Android TV", status: "New in 3.5.0", layout: "desktop", screenshots: androidTvScreens },
+      { id: "android-tv-screens", label: "Android TV", status: "Google Play + TV APK", layout: "desktop", screenshots: androidTvScreens },
     ],
     screenshots: [
       {
         src: "/apps/screenshots/android-player-settings.png",
-        alt: "Playback settings in the Android development build",
+        alt: "Playback settings in the Android app",
         title: "Player settings",
         caption: "Quality, captions, chapters, and viewing controls.",
       },
       {
         src: "/apps/screenshots/android-music-player.png",
-        alt: "Music player in the Android development build",
-        title: "Music player",
+        alt: "The Sangeet player in the Android app",
+        title: "Sangeet player",
         caption: "A dedicated listening view with queue, lyrics, and playback controls.",
       },
       {
         src: "/apps/screenshots/android-notes-editor.png",
-        alt: "Empty video Notes editor in the Android development build",
+        alt: "Empty video Notes editor in the Android app",
         title: "Notes editor",
         caption: "An empty per-video editor with timestamp tools.",
       },
@@ -1018,13 +1010,12 @@ export const detailPages = {
     featureCards: [
       {
         id: "android-tv",
-        status: "New in 3.5.0",
         title: "Android TV",
-        body: "Home, Search, Subscriptions, You and Watch built for the remote, with profiles, PINs, Kids controls, filters and FilterTube Controls on the big screen. Install the TV APK from GitHub; the Google Play TV release follows Play review. Personal Auto-sync on TV is still in testing, and Fire TV compatibility is planned separately.",
+        body: "Home, Search, Following, You and Watch built for the remote, with profiles, PINs, Kids controls, filters, Accounts & Sync and FilterTube Controls on the big screen. Install from the same Google Play listing or the TV APK on GitHub. Study on the big screen comes in the next update, and Fire TV compatibility is planned separately.",
       },
     ],
     exploreTitle: "Explore the full app",
-    exploreDescription: "The custom frontend goes beyond a filter list. Open a group to see the viewing spaces and controls. This overview includes the Android development build; availability varies by release.",
+    exploreDescription: "The custom frontend goes beyond a filter list. Open a group to see the viewing spaces and controls.",
     exploreGroups: [
       {
         id: "android-browse",
@@ -1032,7 +1023,7 @@ export const detailPages = {
         summary: "Home, Search, channels, and your own viewing spaces.",
         points: [
           "Home and Search help you discover videos, open search options, and visit channel pages. Watch keeps the video and its related controls together.",
-          "You, Subscriptions, Playlists, Shorts, and History give your browsing and saved activity their own destinations. Shorts can still be filtered when you prefer not to see them.",
+          "You, Following, Saved, Playlists, Clips, and History give your browsing and saved activity their own destinations. Clips can still be filtered when you prefer not to see them.",
           "Kids has its own viewing context and rules. Main and Kids do not need to share the same filtering boundaries.",
         ],
       },
@@ -1041,7 +1032,7 @@ export const detailPages = {
         title: "Make playback comfortable",
         summary: "Choose how the video plays, sounds, and appears.",
         points: [
-          "The native Watch player includes quality, buffering, loop, autoplay, sleep timer, silence handling, volume, and playback-speed controls in the development build.",
+          "The native Watch player includes quality, buffering, loop, autoplay, sleep timer, silence handling, volume, and playback-speed controls.",
           "Use fullscreen or floating playback, navigate chapters, and adjust captions and appearance. Transcript controls help you follow along with the video where text is available.",
           "Playback queues and local history/resume keep the viewing flow connected. Available controls depend on the video and installed release.",
           "Optional community tools, all off until you turn them on: sponsor-segment skipping (SponsorBlock), community titles and thumbnails (DeArrow), dislike estimates (RYD) and synced lyrics (LRCLIB). Each contacts its own service only when enabled.",
@@ -1049,13 +1040,12 @@ export const detailPages = {
       },
       {
         id: "android-music",
-        status: "In testing",
-        title: "Music, with its own space",
-        summary: "Browse Music and manage what is playing.",
+        title: "Sangeet, a space for music",
+        summary: "Listen with the same filters, in a player built for songs.",
         points: [
-          "Music Home and Explore lead into Artist, Library, and Albums pages in the development build.",
-          "Search or sort the songs already loaded on an album page. Now Playing brings the queue, lyrics where available, and video controls together.",
-          "These Music updates are in testing and may not be in your current Google Play version.",
+          "Sangeet Home has shelves such as Listen again, and Explore leads to moods, genres and charts. Artist, Album and Library pages open from there.",
+          "Now Playing spins the cover like a record on a turntable, takes its colours from the art, and brings the queue, synced lyrics and the video together. Lyrics can also come from LRCLIB, an optional extra you are asked about once.",
+          "Start a station from a song or an artist, reorder the queue, and search or sort the songs on an album page. Your filters apply to music too.",
         ],
       },
       {
@@ -1076,42 +1066,40 @@ export const detailPages = {
           "Separate profiles, PIN gates, and parent-managed protected time keep child access distinct from parent editing authority. A child switching PIN does not unlock parent settings.",
           "Review rule-list imports and keep backups when moving an existing setup. Profile scope stays separate from the Main/Kids rule space.",
           "Daily viewing limits, a player sleep timer and timed Self-Control or Hard Timer Whitelist sessions serve different needs. Reviewed focus sessions hold the selected rules and cannot be cancelled inside the app once started.",
-          "Phone and tablet family controls do not imply identical TV coverage. Full Kids and family controls are still in development on Android TV.",
+          "Profiles, PINs, Kids controls and filters work on Android TV too. Ask a parent and Study on TV come in the next update.",
         ],
       },
       {
         id: "notes-auto-sync",
-        status: "In testing",
         title: "Notes and your media",
         summary: "Keep useful video moments and local files close.",
         points: [
-          "The newer Android development build includes per-video Notes with timestamps, an editor and a searchable Notes index. Notes belong to the chosen profile and still follow its permissions.",
+          "Per-video Notes come with timestamps, an editor and a searchable Notes index. Notes belong to the chosen profile and still follow its permissions.",
           "Offline Media organizes local files into Recent, Folders, Videos, Audio and Favourites, with resume and queue controls. Saving online videos for offline viewing is available only in the direct GitHub build, with encrypted copies that expire after 30 days; the Google Play build does not download videos.",
-          "Notes and local-media updates are in testing; availability varies by app release.",
         ],
       },
       {
         id: "android-p2p",
-        status: "New Auto-sync features in testing",
         title: "Your devices, connected",
         summary: "Choose what to share between your verified devices.",
         points: [
           "Pair with a code or QR, compare the safety phrase, and choose the profile and update. Being on the same network does not automatically make a device trusted.",
-          "Parents can send approved updates to protected profiles. New personal Auto-sync uses approved profile links and lets you choose supported settings, filter rules, and Notes.",
-          "Offline changes wait locally for a supported connection. Direct sync needs the devices open and connected; optional pickup has separate delivery settings. Personal Auto-sync is in testing and may not be in your Play release.",
+          "Parents can send approved updates to protected profiles. Personal Auto-sync uses approved profile links and lets you choose supported settings, filter rules, and Notes.",
+          "Offline changes wait locally for a supported connection. Direct sync needs the devices open and connected; optional pickup has separate delivery settings.",
         ],
         link: { label: "How peer-to-peer syncing works", href: "/#device-sync" },
       },
     ],
     milestoneTitle: "What is available, and what comes next",
     milestoneIntro:
-      "Choose the version available for your device. New features and TV access have separate release schedules.",
+      "Phones, tablets and TVs share one app. Here is what is available now and what comes next.",
     milestones: [
       "Phone and tablet: public on Google Play. Install directly—no invitation or email needed.",
-      "Newer Notes, Auto-sync, Music, and local-media updates are in testing; availability varies by release.",
-      "Android TV: new in 3.5.0. The TV APK is on GitHub releases; the Google Play TV release follows Play review.",
+      "Sangeet, Notes, Auto-sync and Offline Media are in the current app.",
+      "Android TV: on the same Google Play listing, with a TV APK on every GitHub release.",
+      "Coming in the next update: Kriti and Uljhan, the rebuilt Study planner, Ask a parent, and the Sangeet, Clips, Following and Saved names in every language.",
       "Offline video saving: direct GitHub build only, encrypted and expiring after 30 days. Google Play builds do not download videos.",
-      "Fire TV compatibility is planned. TV Personal Auto-sync is still in testing.",
+      "Fire TV compatibility is planned.",
       "The separate direct APK has a simpler frontend than the Google Play app.",
     ],
     related: ["extension", "ios", "kids"],
@@ -1120,15 +1108,15 @@ export const detailPages = {
     slug: "tv",
     icon: Television,
     tone: "sunset",
-    status: "Android TV: new in 3.5.0",
+    status: "Android TV available",
     eyebrow: "TV overview",
     navTitle: "TV overview",
     routeSummary:
-      "Android TV is new in FilterTube 3.5.0; Fire TV compatibility is planned.",
+      "FilterTube runs on Android TV; Fire TV compatibility is planned.",
     titleLead: "Shared-screen calm for",
     titleDisplay: "TV environments",
     description:
-      "FilterTube 3.5.0 brings browsing, search, remote navigation, playback, profiles, PINs, Kids controls and filters to Android TV. Install the TV APK from GitHub; the Google Play TV release follows Play review. Fire TV support is planned separately.",
+      "FilterTube brings browsing, search, remote navigation, playback, profiles, PINs, Kids controls and filters to Android TV. Install it from Google Play or the TV APK on GitHub. Fire TV support is planned separately.",
     chips: ["Shared screens", "Playback trust", "Household safety"],
     primaryCta: {
       label: "Get FilterTube on desktop",
@@ -1164,15 +1152,15 @@ export const detailPages = {
     featureCards: [
       {
         title: "Built for shared attention",
-        body: "Main browsing and playback are in testing. Full Kids and family controls are still in development.",
+        body: "Main and Kids browsing and playback, with profiles, PINs and Kids controls. Ask a parent and Study on TV come in the next update.",
       },
       {
         title: "Less configuration in the foreground",
-        body: "Remote navigation keeps Main browsing and playback usable from the sofa. Cross-device control and Accounts & Sync remain development work.",
+        body: "Remote navigation keeps browsing and playback usable from the sofa. Accounts & Sync pairs the TV with your other devices.",
       },
       {
         title: "A different mood from mobile",
-        body: "TV layouts are designed for distance and directional input. Public installation is not available yet.",
+        body: "TV layouts are designed for distance and directional input. Install from Google Play or the TV APK on GitHub.",
       },
     ],
     milestoneTitle: "What TV needs to make clear",
@@ -1189,20 +1177,20 @@ export const detailPages = {
     slug: "android-tv",
     icon: Television,
     tone: "sky",
-    status: "New in 3.5.0",
+    status: "Google Play + TV APK",
     eyebrow: "Android TV app",
     navTitle: "Android TV",
     routeSummary:
-      "Remote-first Home, Search, Subscriptions, You and Watch with profiles, PINs, Kids controls and filters.",
+      "Remote-first Home, Search, Following, You and Watch with profiles, PINs, Kids controls and filters.",
     titleLead: "Your rules, from the sofa, on",
     titleDisplay: "Android TV",
     description:
-      "FilterTube 3.5.0 brings the custom app to Android TV and Google TV: browse, search and watch with the remote, with profiles, PINs, Kids controls and your filters on the big screen. Install the TV APK from GitHub; the Google Play TV release follows Play review.",
+      "FilterTube brings the custom app to Android TV and Google TV: browse, search and watch with the remote, with profiles, PINs, Kids controls and your filters on the big screen. Install it from Google Play or the TV APK on GitHub.",
     screenshotsTitle: "Every TV screen",
     screenshotsEyebrow: "Android TV · 1920×1080",
-    screenshotsDescription: "Real screens from FilterTube 3.5.0 on Android TV. Open any screen for a full-size view.",
+    screenshotsDescription: "Real screens from the latest FilterTube build on Android TV. Open any screen for a full-size view.",
     screenshotRails: [
-      { id: "tv-screens", label: "Android TV", status: "New in 3.5.0", layout: "desktop", screenshots: androidTvScreens },
+      { id: "tv-screens", label: "Android TV", status: "Google Play + TV APK", layout: "desktop", screenshots: androidTvScreens },
     ],
     chips: ["Distance readable", "Playback cues", "Household trust"],
     primaryCta: {
@@ -1241,7 +1229,7 @@ export const detailPages = {
       },
       {
         title: "Trust at glance",
-        body: "Profiles, PINs, Kids controls and filters work on TV. Personal Auto-sync on TV is still in testing.",
+        body: "Profiles, PINs, Kids controls and filters work on TV, and Accounts & Sync keeps it in step with your other devices.",
       },
       {
         title: "Still one brand",
@@ -1270,7 +1258,7 @@ export const detailPages = {
     titleLead: "A household-safe FilterTube layer for",
     titleDisplay: "Amazon Fire TV",
     description:
-      "Fire TV compatibility and public installation are planned. Android TV browsing and playback are in testing; full family controls are still in development.",
+      "Fire TV compatibility and public installation are planned. Android TV is available now, with profiles, PINs, Kids controls and filters.",
     chips: [
       "Family-safe playback",
       "Shared-screen confidence",
@@ -1392,15 +1380,15 @@ export const detailPages = {
     screenshotRails: [
       { id: "kids-phone-screens", label: "Phone", status: "iPhone + Android", layout: "phone", screenshots: kidsPhoneScreens },
       { id: "kids-tablet-screens", label: "Tablet", status: "iPad + Android", layout: "desktop", screenshots: kidsTabletScreens },
-      { id: "kids-tv-screens", label: "Android TV", status: "New in 3.5.0", layout: "desktop", screenshots: kidsTvScreens },
+      { id: "kids-tv-screens", label: "Android TV", status: "Google Play + TV APK", layout: "desktop", screenshots: kidsTvScreens },
     ],
     milestoneTitle: "Choose where your child watches",
     milestoneIntro: "The same family direction, with different availability on each platform.",
     milestones: [
       "Android phones and tablets: the custom Main and Kids app is on Google Play. No invitation or email is needed.",
       "Browser extension: adds filtering to supported Kids pages. Use the full settings page to manage profiles and Kids rules.",
-      "iPhone and iPad: Kids viewing and family controls are included. Install directly with SideStore while Apple sorts out the developer account.",
-      "Android TV: full Kids and family-control parity is still in development. Fire TV compatibility is planned. The phone listing is not a TV release.",
+      "iPhone and iPad: Kids viewing and family controls are included. Trouble on Apple's side delays the App Store version; until then, install with SideStore, or AltStore.",
+      "Android TV: Kids viewing, profiles, PINs and Kids controls, on the same Google Play listing. Ask a parent on TV comes in the next update. Fire TV compatibility is planned.",
       "Rules stay local. Optional verified device sharing is encrypted; helpers or relay services may be involved. Filters support parent decisions, rather than replacing review of what a child watches.",
     ],
     related: ["android", "ios", "extension"],

@@ -338,11 +338,11 @@ export function ScenicDetailPage({ page, relatedPages, children = null }) {
           ))}
         </section>
       ) : page.screenshots?.length ? (
-        <section className="py-10 md:py-16" aria-label={page.screenshotsLabel || "Android development screenshots"}>
+        <section className="py-10 md:py-16" aria-label={page.screenshotsLabel || "Android app screenshots"}>
           <div className="mx-auto max-w-[1400px] px-4 md:px-6">
             <Reveal>
               <SectionHeading
-                eyebrow={page.screenshotsEyebrow || "Installed Android development build"}
+                eyebrow={page.screenshotsEyebrow || "The Android app"}
                 title={page.screenshotsTitle}
                 description={page.screenshotsDescription}
               />
