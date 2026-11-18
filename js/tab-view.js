@@ -981,6 +981,7 @@ function appendMinimumViewsControls(rows, prefix, scheduleSave) {
     row.className = 'toggle-row';
     row.setAttribute('data-ft-control-row', 'true');
     row.setAttribute('data-ft-search', 'minimum views video popularity filter');
+    row.setAttribute('data-ft-control', 'views');
     const info = document.createElement('div');
     info.className = 'toggle-info';
     const title = document.createElement('label');
@@ -1325,6 +1326,7 @@ function initializeFiltersTabs() {
             row.className = 'toggle-row';
             row.setAttribute('data-ft-control-row', 'true');
             row.setAttribute('data-ft-search', `${control.title || ''} ${control.description || ''}`.toLowerCase());
+            if (control.control) row.setAttribute('data-ft-control', control.control);
             if (control.description) {
                 row.setAttribute('title', control.description);
             }
@@ -1398,6 +1400,7 @@ function initializeFiltersTabs() {
     durationRow.className = 'toggle-row';
     durationRow.setAttribute('data-ft-control-row', 'true');
     durationRow.setAttribute('data-ft-search', 'duration filter');
+    durationRow.setAttribute('data-ft-control', 'duration');
 
     const durationInfo = document.createElement('div');
     durationInfo.className = 'toggle-info';
@@ -1485,6 +1488,7 @@ function initializeFiltersTabs() {
     uploadDateRow.className = 'toggle-row';
     uploadDateRow.setAttribute('data-ft-control-row', 'true');
     uploadDateRow.setAttribute('data-ft-search', 'upload date filter');
+    uploadDateRow.setAttribute('data-ft-control', 'uploadDate');
 
     const uploadDateInfo = document.createElement('div');
     uploadDateInfo.className = 'toggle-info';
@@ -1665,6 +1669,7 @@ function initializeFiltersTabs() {
     categoryMainRow.className = 'toggle-row';
     categoryMainRow.setAttribute('data-ft-control-row', 'true');
     categoryMainRow.setAttribute('data-ft-search', 'category filter');
+    categoryMainRow.setAttribute('data-ft-control', 'category');
 
     const categoryMainInfo = document.createElement('div');
     categoryMainInfo.className = 'toggle-info';
@@ -1997,7 +2002,7 @@ function initializeFiltersTabs() {
     languageFiltersSection.innerHTML = `
         <div class="content-control-group__header"><div class="content-control-group__title"><span data-ft-tabview-i18n="popup.languageFilters">Language Filters</span> <span class="ft-experimental-badge" data-ft-tabview-i18n="popup.experimental">Experimental</span></div></div>
         <div class="content-control-group__rows">
-            <div class="toggle-row" data-ft-control-row="true" data-ft-search="language spoken audio filter">
+            <div class="toggle-row" data-ft-control-row="true" data-ft-control="language" data-ft-search="language spoken audio filter">
                 <div class="toggle-info">
                     <div class="toggle-title" data-ft-tabview-i18n="popup.spokenLanguage">Spoken Language Filter</div>
                     <div class="toggle-description" data-ft-tabview-i18n="popup.languageDescription">Uses YouTube's original/default audio evidence; auto-dubbed alternatives do not change the source language.</div>
@@ -2951,6 +2956,7 @@ function initializeKidsTabs() {
     kidsDurationRow.className = 'toggle-row';
     kidsDurationRow.setAttribute('data-ft-control-row', 'true');
     kidsDurationRow.setAttribute('data-ft-search', 'duration filter');
+    kidsDurationRow.setAttribute('data-ft-control', 'duration');
 
     const kidsDurationInfo = document.createElement('div');
     kidsDurationInfo.className = 'toggle-info';
@@ -3027,6 +3033,7 @@ function initializeKidsTabs() {
     kidsUploadDateRow.className = 'toggle-row';
     kidsUploadDateRow.setAttribute('data-ft-control-row', 'true');
     kidsUploadDateRow.setAttribute('data-ft-search', 'upload date filter');
+    kidsUploadDateRow.setAttribute('data-ft-control', 'uploadDate');
 
     const kidsUploadDateInfo = document.createElement('div');
     kidsUploadDateInfo.className = 'toggle-info';
@@ -3204,6 +3211,7 @@ function initializeKidsTabs() {
     kidsCategoryMainRow.className = 'toggle-row';
     kidsCategoryMainRow.setAttribute('data-ft-control-row', 'true');
     kidsCategoryMainRow.setAttribute('data-ft-search', 'category filter');
+    kidsCategoryMainRow.setAttribute('data-ft-control', 'category');
 
     const kidsCategoryInfo = document.createElement('div');
     kidsCategoryInfo.className = 'toggle-info';

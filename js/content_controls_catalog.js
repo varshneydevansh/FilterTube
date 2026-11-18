@@ -58,6 +58,8 @@
         { code: 'sw', label: 'Swahili', color: '#eab308' }
     ];
 
+    // control: the short key "What Uljhan tried today" (js/shared/hidden_log.js controlFromReason) uses
+    // to name a control and find its row (data-ft-control) on the Content Controls page.
     const groups = [
         {
             id: 'core',
@@ -66,16 +68,19 @@
             controls: [
                 {
                     key: 'hideShorts',
+                    control: 'clips',
                     title: 'Hide Clips',
                     description: 'Remove all short videos from feed'
                 },
                 {
                     key: 'hideHomeFeed',
+                    control: 'homeFeed',
                     title: 'Hide Homepage Feed',
                     description: 'Hide the Home feed grid'
                 },
                 {
                     key: 'hideComments',
+                    control: 'comments',
                     title: 'Hide All Comments',
                     description: 'Remove comment sections entirely'
                 }
@@ -93,21 +98,25 @@
                 },
                 {
                     key: 'hidePlayables',
+                    control: 'playables',
                     title: 'Hide Playables',
                     description: 'Hide Playables shelves, game cards, and navigation entries'
                 },
                 {
                     key: 'hidePlaylistCards',
+                    control: 'playlistCards',
                     title: 'Hide Playlist cards',
                     description: 'Remove playlist cards everywhere'
                 },
                 {
                     key: 'hideMembersOnly',
+                    control: 'membersOnly',
                     title: 'Hide Members-only videos',
                     description: 'Hide videos marked with the Members-only badge across feeds and watch'
                 },
                 {
                     key: 'hideMixPlaylists',
+                    control: 'mixes',
                     title: 'Hide Auto playlists and radio',
                     description: 'Hide auto playlist and radio playlist items'
                 },

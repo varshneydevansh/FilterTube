@@ -925,3 +925,28 @@ body.ft-extension-surface #sidebarNav .nav-item .nav-count { flex: none; min-wid
 @media (max-width: 1100px) {
   :root[data-theme] body.ft-extension-surface #dashboardView[data-ft-home] .ft-home .ft-home-actions .quick-actions-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 }
+
+/* "What Uljhan tried today" → Change: the switch that hid it, brought forward with one calm pulse
+   (js/dashboard_home.js revealControl). An overlay, since the rows' own background and shadow are
+   pinned by paperkit-parity.css; only its opacity moves. Reduced motion: it shows, holds, then goes. */
+body.ft-extension-surface .toggle-row.ft-control-spotlight { position: relative; }
+body.ft-extension-surface .toggle-row.ft-control-spotlight::after {
+  content: "";
+  position: absolute;
+  inset: 2px -6px;
+  border-radius: 12px;
+  pointer-events: none;
+  background: color-mix(in srgb, var(--ft-group-ink, var(--pk-sky-ink)) 10%, transparent);
+  box-shadow: inset 0 0 0 2px color-mix(in srgb, var(--ft-group-ink, var(--pk-sky-ink)) 55%, transparent);
+  opacity: 0;
+  animation: ft-control-spotlight 2200ms cubic-bezier(0.22, 1, 0.36, 1) 1 both;
+}
+@keyframes ft-control-spotlight {
+  0% { opacity: 0; }
+  18% { opacity: 1; }
+  60% { opacity: 1; }
+  100% { opacity: 0; }
+}
+@media (prefers-reduced-motion: reduce) {
+  body.ft-extension-surface .toggle-row.ft-control-spotlight::after { animation: none; opacity: 1; }
+}

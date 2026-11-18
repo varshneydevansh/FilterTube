@@ -10,8 +10,11 @@
  *   no plan.
  * - What Uljhan tried today: the last few hides on this device (js/shared/hidden_log.js,
  *   ftHiddenLogV1), each with what hid it and Allow: a precise exception for that one video (the
- *   profile's allowedVideoIds), or Content Controls for a control. A Kids profile or a running
- *   Self-Control Session can't allow.
+ *   profile's allowedVideoIds), or Change for a content control. A control row names its control
+ *   (Clips, Duration, ...; the entry's control key) and Change opens Content Controls (Kids for a Kids
+ *   hide) on that switch: scrolled into view, focused and pulsed once (still under reduced motion).
+ *   A row without a known control opens the page. A Kids profile or a running Self-Control Session
+ *   can't allow.
  * - Quick actions, the app cards (tab-view.js renderControlCenterApps) and the support strip.
  * Words come from data/ui_locales; nothing names the video site.
  */
@@ -153,6 +156,39 @@
         control: ['home.tried.control', 'Content control'],
         allowOnly: ['home.tried.allowOnly', 'Not on your allowed list']
     });
+
+    // A control row's pill: the control's own name, as the Content Controls page words it.
+    const CONTROL_COPY = Object.freeze({
+        clips: ['home.tried.controlName.clips', 'Clips'],
+        duration: ['home.tried.controlName.duration', 'Duration'],
+        uploadDate: ['home.tried.controlName.uploadDate', 'Upload date'],
+        category: ['home.tried.controlName.category', 'Category'],
+        language: ['home.tried.controlName.language', 'Language'],
+        views: ['home.tried.controlName.views', 'View count'],
+        mixes: ['home.tried.controlName.mixes', 'Auto playlists'],
+        homeFeed: ['home.tried.controlName.homeFeed', 'Home feed'],
+        comments: ['home.tried.controlName.comments', 'Comments'],
+        membersOnly: ['home.tried.controlName.membersOnly', 'Members-only'],
+        playlistCards: ['home.tried.controlName.playlistCards', 'Playlist cards'],
+        playables: ['home.tried.controlName.playables', 'Playables']
+    });
+
+    /** [key, fallback] for a row's reason pill: a control row names its control when the log knows it. */
+    function reasonCopy(item) {
+        if (item?.reason === 'control' && Object.prototype.hasOwnProperty.call(CONTROL_COPY, item.control)) return CONTROL_COPY[item.control];
+        return REASON_COPY[item?.reason] || REASON_COPY.keyword;
+    }
+
+    /**
+     * Where Change goes for a control: {nav, scope, control} — the sidebar row to open, the page that
+     * holds the switch and the switch's data-ft-control key ('' when unknown: just open the page).
+     * A Kids hide goes to the Kids page when that page has the control, else to Content Controls.
+     */
+    function controlDestination(control, surface, hasKidsRow = false) {
+        const key = Object.prototype.hasOwnProperty.call(CONTROL_COPY, control) ? control : '';
+        if (key && surface === 'kids' && hasKidsRow) return { nav: '.nav-item[data-tab="kids"]', scope: '#kidsView', control: key };
+        return { nav: '.nav-item[data-nav-id="content"]', scope: '#filtersView', control: key };
+    }
 
     // ---- Study state, shared (one request per change) ---------------------------------------------------
 
@@ -398,6 +434,47 @@
         return true;
     }
 
+    const frame = () => new Promise(resolve => root.requestAnimationFrame(() => resolve()));
+    const wait = ms => new Promise(resolve => root.setTimeout(resolve, ms));
+    let spotlightTimer = 0;
+
+    /** Open the page that holds [item]'s control and bring that switch forward: scroll, focus, one pulse. */
+    async function revealControl(item) {
+        const control = Object.prototype.hasOwnProperty.call(CONTROL_COPY, item?.control) ? item.control : '';
+        const hasKidsRow = !!control && !!doc.querySelector(`#kidsView [data-ft-control="${control}"]`);
+        const where = controlDestination(control, item?.surface, hasKidsRow);
+        openNav(where.nav);
+        if (!where.control) return;
+        // The router switches pages and the sidebar opens the Content Controls tab a frame later.
+        await frame();
+        await frame();
+        await wait(60);
+        const row = doc.querySelector(`${where.scope} [data-ft-control="${where.control}"]`);
+        if (!row) return;
+        const pane = row.closest('.tab-pane[data-tab-id]');
+        if (pane && !pane.classList.contains('active')) {
+            pane.closest('.tabs-container')?.querySelector(`.tab-button[data-tab-id="${pane.dataset.tabId}"]`)?.click();
+        }
+        // A search typed on that page earlier could be hiding the row.
+        if (row.style.display === 'none' || row.closest('[data-ft-control-group]')?.style.display === 'none') {
+            const search = pane?.querySelector('input.search-input');
+            if (search && search.value) {
+                search.value = '';
+                search.dispatchEvent(new root.Event('input', { bubbles: true }));
+            }
+        }
+        await frame();
+        const still = !!root.matchMedia?.('(prefers-reduced-motion: reduce)')?.matches;
+        try { row.scrollIntoView({ block: 'center', behavior: still ? 'auto' : 'smooth' }); } catch (e) { row.scrollIntoView(); }
+        const target = row.querySelector('input[type="checkbox"]') || row.querySelector('select, input, button');
+        try { target?.focus({ preventScroll: true }); } catch (e) { }
+        doc.querySelectorAll('.ft-control-spotlight').forEach(node => node.classList.remove('ft-control-spotlight'));
+        root.clearTimeout(spotlightTimer);
+        void row.offsetWidth; // restart the pulse when Change is pressed again
+        row.classList.add('ft-control-spotlight');
+        spotlightTimer = root.setTimeout(() => row.classList.remove('ft-control-spotlight'), 2400);
+    }
+
     function mountTried() {
         const list = doc.getElementById('ftHomeTriedList');
         if (!list) return;
@@ -419,7 +496,8 @@
                 const words = el('div', 'ft-home-tried__words');
                 words.append(el('span', 'ft-home-tried__title', item.title || item.videoId));
                 const meta = el('span', 'ft-home-tried__meta');
-                const reason = el('span', 'ft-home-tried__reason', t(...REASON_COPY[item.reason]));
+                const reasonText = t(...reasonCopy(item));
+                const reason = el('span', 'ft-home-tried__reason', reasonText);
                 meta.appendChild(reason);
                 if (item.channel) meta.appendChild(el('span', 'ft-home-tried__channel', item.channel));
                 words.appendChild(meta);
@@ -429,9 +507,13 @@
                     const label = action.kind === 'openControls' ? t('study.setup.change', 'Change') : t('home.tried.allow', 'Allow');
                     const allow = el('button', 'ft-home-tried__allow', label);
                     allow.type = 'button';
-                    allow.setAttribute('aria-label', `${label}: ${item.title || item.videoId}`);
+                    const named = action.kind === 'openControls' && CONTROL_COPY[action.control]
+                        ? t('home.tried.changeControl', 'Change {control} setting', { control: reasonText })
+                        : label;
+                    allow.setAttribute('aria-label', `${named}: ${item.title || item.videoId}`);
+                    if (action.kind === 'openControls' && action.control) allow.dataset.ftControl = action.control;
                     allow.addEventListener('click', async () => {
-                        if (action.kind === 'openControls') { openNav('.nav-item[data-nav-id="content"]'); return; }
+                        if (action.kind === 'openControls') { revealControl(action).catch(() => { }); return; }
                         allow.disabled = true;
                         const ok = await allowVideo(item, action).catch(() => false);
                         if (ok) draw(); else allow.disabled = false;
@@ -463,7 +545,7 @@
         mountQuick();
     }
 
-    root.FilterTubeDashboardHome = Object.freeze({ partOfDay, minutesOf, studyToday, navCount, REASON_COPY });
+    root.FilterTubeDashboardHome = Object.freeze({ partOfDay, minutesOf, studyToday, navCount, REASON_COPY, CONTROL_COPY, reasonCopy, controlDestination });
     if (doc.readyState === 'loading') doc.addEventListener('DOMContentLoaded', start, { once: true });
     else start();
 })(typeof window !== 'undefined' ? window : globalThis);

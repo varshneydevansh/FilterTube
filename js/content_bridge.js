@@ -1123,6 +1123,7 @@ function hiddenLogEntryFor(element, title, reason) {
             channelId,
             handle,
             reason: Log.classify(reason, { listMode: settings.listMode, channelBlocked: blocked }),
+            control: typeof Log.controlFromReason === 'function' ? Log.controlFromReason(reason) : '',
             surface: getStatsSurfaceKey() === 'kids' ? 'kids' : 'main'
         });
     } catch (e) {
