@@ -89,6 +89,7 @@ export const devices = {
     },
     extras: [
       { src: android("phone-study-session"), title: "A study session", alt: "FilterTube Study and focus on an Android phone: round 1 of 2 with 25 minutes left", caption: "Rounds and breaks, with Kriti keeping you company.", ...PIXEL, current: true },
+      { src: android("phone-study-break"), title: "Break", alt: "A study break on an Android phone: a 4 minute ring, Kriti standing by, and a note to stand up and drink water", caption: "Breaks are real breaks: stand up, drink some water.", ...PIXEL, current: true },
       { src: android("phone-study-done"), title: "Session done", alt: "FilterTube on an Android phone: Kriti holds a rosette after a finished study session", caption: "Every round counted at the end.", ...PIXEL, current: true },
       { src: android("phone-watch-study"), title: "Watching during study", alt: "A lecture playing on an Android phone during a study round, with Kriti noting comments are off while you study", caption: "Comments stay off while you study.", ...PIXEL, current: true },
       { src: android("phone-playlist"), title: "Playlist", alt: "A lecture playlist on an Android phone with Play all and the lesson list", caption: "Whole lecture series, in order.", ...PIXEL, current: true },
