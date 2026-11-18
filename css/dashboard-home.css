@@ -132,8 +132,7 @@ body.ft-extension-surface #sidebarNav .nav-item.nav-item--quiet[aria-current="pa
 }
 
 .ft-home-card,
-#dashboardView[data-ft-home] .ft-home-greeting,
-#dashboardView[data-ft-home] .ft-home-support {
+#dashboardView[data-ft-home] .ft-home-greeting {
   background: var(--pk-paper);
   border: 1.5px solid transparent;
   border-image: var(--pk-edge-line) 20 / 18px / 0 round;
@@ -593,19 +592,6 @@ body.ft-extension-surface #sidebarNav .nav-item.nav-item--quiet[aria-current="pa
   :root[data-theme] body.ft-extension-surface #dashboardView[data-ft-home] .ft-home .ft-home-apps .dashboard-app-card:is(:hover, :active) .ft-app-art { transform: none; }
 }
 
-/* 7. Support strip */
-:root[data-theme] body.ft-extension-surface #dashboardView[data-ft-home] .ft-home .ft-home-support {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 16px;
-  padding: 16px 22px;
-  border-image-source: var(--pk-edge-filters);
-  background: color-mix(in srgb, var(--pk-rose) 60%, var(--pk-paper));
-}
-.ft-home-support__line { margin: 0; font-family: var(--pk-font-hand); font-size: 18px; line-height: 1.4; color: var(--pk-ink); }
-.ft-home-support__kofi { flex: none; text-decoration: none; }
-
 /* The Support page's price line, and the support sheet's (js/mascots.js mountSupport). */
 .ft-support-price,
 .pk-support__price { margin: 10px 0 0; font-weight: 600; color: var(--pk-ink); line-height: 1.5; }
@@ -663,7 +649,6 @@ body.ft-extension-surface #sidebarNav .nav-item.nav-item--quiet[aria-current="pa
   :root[data-theme] body.ft-extension-surface #dashboardView[data-ft-home] .ft-home .ft-home-actions .quick-actions-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   :root[data-theme] body.ft-extension-surface #dashboardView[data-ft-home] .ft-home .ft-home-greeting { grid-template-columns: minmax(0, 1fr); }
   .ft-home-greeting__duo { display: none; }
-  :root[data-theme] body.ft-extension-surface #dashboardView[data-ft-home] .ft-home .ft-home-support { flex-direction: column; align-items: flex-start; }
   .ft-about-duo { grid-template-columns: minmax(0, 1fr); }
 }
 @media (prefers-reduced-motion: reduce) {
@@ -779,3 +764,164 @@ body.ft-extension-surface #sidebarNav.is-studying .nav-item[data-pk-tint="home"]
 }
 .ft-about-why__link:hover { color: var(--ft-color-brand-primary-hover); }
 .ft-about-why__link:focus-visible { outline: var(--ft-state-focus-width) solid var(--ft-state-focus-ring); outline-offset: var(--ft-state-focus-offset); border-radius: 4px; }
+
+/* ---------------------------------------------------------------------------
+ * Owner polish, 2026-11-18: support line in the top bar, a full-height sidebar
+ * whose rows don't cut words, and one column grid for every Home section.
+ * ------------------------------------------------------------------------- */
+
+body.ft-extension-surface[data-surface="tab-view"] {
+  /* The view's own inset (tab-view.css .view-container): the top bar uses it too, so its edges and
+     the cards' edges line up on every page. */
+  --ft-view-inset: clamp(0.95rem, 1.4vw, 1.1rem);
+  /* One gutter for every Home grid: the stats, the pair, quick actions and the app cards share columns. */
+  --ft-home-gutter: 20px;
+}
+
+/* 1. The top bar: the page title, the support line centred, then the controls. */
+:root[data-theme] body.ft-extension-surface[data-surface="tab-view"] .main-content { container: ft-main / inline-size; }
+:root[data-theme] body.ft-extension-surface[data-surface="tab-view"] .top-bar {
+  margin-inline: var(--ft-view-inset);
+  column-gap: 16px;
+}
+:root[data-theme] body.ft-extension-surface[data-surface="tab-view"] .top-bar #pageTitle { flex: 0 0 auto; max-width: 45%; }
+:root[data-theme] body.ft-extension-surface[data-surface="tab-view"] .top-bar .actions { margin-inline-start: 0; }
+
+:root[data-theme] body.ft-extension-surface[data-surface="tab-view"] .ft-topbar-support {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex: 0 1 auto;
+  min-width: 0;
+  margin: 0;
+  padding: 4px 4px 4px 16px;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--pk-rose) 55%, var(--pk-paper));
+  border: 1.5px solid color-mix(in srgb, var(--pk-brick) 18%, transparent);
+  box-shadow: none;
+}
+.ft-topbar-support .ft-home-support__line {
+  flex: 1 1 auto;
+  min-width: 0;
+  margin: 0;
+  font-family: var(--pk-font-hand);
+  font-size: 16px;
+  line-height: 1.25;
+  color: var(--pk-ink);
+  text-wrap: balance;
+}
+:root[data-theme] body.ft-extension-surface[data-surface="tab-view"] .ft-topbar-support .ft-home-support__kofi {
+  flex: none;
+  min-height: 32px !important;
+  height: auto !important;
+  padding: 0 14px !important;
+  border-radius: 999px !important;
+  font-size: 13px !important;
+  line-height: 32px !important;
+  white-space: nowrap;
+  text-decoration: none;
+}
+/* The Support page carries the same ask in full. */
+body.ft-extension-surface[data-active-view="donate"] .ft-topbar-support { display: none !important; }
+
+/* Not enough room for one line beside the title and controls: the line wraps to two inside the pill.
+   Narrower still: the pill takes its own row under the title, centred, never over the controls. */
+@container ft-main (max-width: 1240px) {
+  .ft-topbar-support .ft-home-support__line { font-size: 15px; }
+}
+@container ft-main (max-width: 900px) {
+  :root[data-theme] body.ft-extension-surface[data-surface="tab-view"] .top-bar { flex-wrap: wrap; row-gap: 10px; }
+  :root[data-theme] body.ft-extension-surface[data-surface="tab-view"] .ft-topbar-support {
+    order: 10;
+    flex: 1 1 100%;
+    justify-content: center;
+  }
+  :root[data-theme] body.ft-extension-surface[data-surface="tab-view"] .ft-topbar-support .ft-home-support__line { flex: 0 1 auto; text-align: center; }
+}
+/* Phones and narrow windows: the top bar is a grid (serene-shell.css); the pill is its last row. */
+@media (max-width: 768px) {
+  :root[data-theme] body.ft-extension-surface[data-surface="tab-view"] .top-bar {
+    grid-template-areas: "toggle title actions" "support support support";
+  }
+  :root[data-theme] body.ft-extension-surface[data-surface="tab-view"] .ft-topbar-support { grid-area: support; }
+}
+@media (max-width: 640px) {
+  body.ft-extension-surface[data-surface="tab-view"] { --ft-view-inset: 0.72rem; }
+  :root[data-theme] body.ft-extension-surface[data-surface="tab-view"] .top-bar {
+    grid-template-areas: "toggle title" "actions actions" "support support";
+  }
+  :root[data-theme] body.ft-extension-surface[data-surface="tab-view"] .ft-topbar-support {
+    padding: 8px 8px 8px 14px;
+    border-radius: 18px;
+    justify-content: space-between;
+  }
+  .ft-topbar-support .ft-home-support__line { text-align: start; }
+}
+
+/* 2. Sidebar: as tall as the window (the list scrolls inside it), a little wider, and rows that wrap
+   their note onto a second line instead of cutting it. */
+@media (min-width: 769px) {
+  :root[data-theme] body.ft-extension-surface[data-surface="tab-view"] .app-container {
+    grid-template-columns: minmax(16.5rem, 18.5rem) minmax(0, 1fr);
+  }
+  :root[data-theme] body.ft-extension-surface[data-surface="tab-view"] .sidebar {
+    align-self: stretch;
+    width: auto;
+    height: auto;
+    max-height: none;
+    padding-inline: 14px;
+  }
+}
+body.ft-extension-surface #sidebarNav .nav-item[data-pk-tint] { height: auto !important; min-height: 48px !important; }
+body.ft-extension-surface #sidebarNav .nav-item[data-pk-tint] .nav-summary {
+  display: -webkit-box !important;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  white-space: normal !important;
+  overflow-wrap: anywhere;
+}
+/* The counts sit on one right edge, whatever the row's words do. */
+body.ft-extension-surface #sidebarNav .nav-item .nav-count { flex: none; min-width: 1.4em; text-align: end; }
+
+/* 3. Home: wider on big windows, every section on one column grid with one gutter. */
+:root[data-theme] body.ft-extension-surface #dashboardView[data-ft-home] .ft-home {
+  max-width: 1480px;
+  gap: var(--ft-home-gutter);
+}
+:root[data-theme] body.ft-extension-surface #dashboardView[data-ft-home] .ft-home .ft-dash-stats .stats-grid,
+:root[data-theme] body.ft-extension-surface #dashboardView[data-ft-home] .ft-home .ft-home-actions .quick-actions-grid,
+#dashboardView[data-ft-home] .ft-home-pair,
+#dashboardView[data-ft-home] .ft-home-apps__grid { gap: var(--ft-home-gutter); }
+/* The app cards split in halves, so their gutter is the pair's and the stats' middle gutter. */
+@media (min-width: 1101px) {
+  #dashboardView[data-ft-home] .ft-home-apps__grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+
+/* Study today and What Uljhan tried today: the same height; each card's action sits on its floor. */
+#dashboardView[data-ft-home] .ft-home-pair { align-items: stretch; }
+#dashboardView[data-ft-home] .ft-home-pair > .ft-home-card { display: flex; flex-direction: column; }
+.ft-home-study__body { display: flex; flex-direction: column; flex: 1 1 auto; }
+.ft-home-study__line { max-width: 62ch; }
+.ft-home-study__actions,
+.ft-home-study__go { margin-top: auto; }
+.ft-home-study__body > .ft-home-study__go { align-self: flex-start; }
+.ft-home-tried__note { margin-top: auto; padding-top: 10px; }
+/* No plan yet: Kriti reads beside the words, so the card holds a picture, not an empty floor. */
+.ft-home-study__setup { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: center; gap: 4px 16px; margin-bottom: 16px; }
+.ft-home-study__setup .pk-moment { padding: 0; justify-self: end; }
+.ft-home-study__setup .ft-home-study__line { margin-bottom: 0; }
+@media (max-width: 560px) {
+  .ft-home-study__setup { grid-template-columns: minmax(0, 1fr); }
+  .ft-home-study__setup .pk-moment { display: none; }
+}
+/* The words start at the card's padding (the content grid was centring its capped column). */
+:root[data-theme] body.ft-extension-surface #dashboardView[data-ft-home] .ft-home .ft-home-apps .dashboard-app-card__content { justify-content: start !important; }
+
+/* A section title sits close to its own cards, further from the section above. */
+:root[data-theme] body.ft-extension-surface #dashboardView[data-ft-home] :is(.ft-home-actions, .ft-home-apps) { margin-top: 6px; row-gap: 0 !important; }
+#dashboardView[data-ft-home] :is(.ft-home-actions, .ft-home-apps) > .ft-home-section-title { margin: 0 0 10px !important; }
+/* Medium windows: quick actions in two columns (labels stay on one line); the middle gutter is still the stats' one. */
+@media (max-width: 1100px) {
+  :root[data-theme] body.ft-extension-surface #dashboardView[data-ft-home] .ft-home .ft-home-actions .quick-actions-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
