@@ -136,7 +136,7 @@ export const devices = {
     captures: {
       home: { src: android("tv-home"), title: "Home", alt: "Android TV Home with blocked cards counted", caption: "Home with your filters applied.", ...TV, current: false },
       watch: { src: android("tv-watch"), title: "Watch", alt: "Android TV Watch page playing a nature documentary", caption: "Watch with recommendations from the same channel.", ...TV, current: false },
-      kids: { src: android("tv-kids-home"), title: "Kids Home on TV", alt: "Kids Viewing on Android TV with Shows and More for you rows", caption: "Kids rows built for the remote.", ...TV, current: true },
+      kids: { src: android("tv-kids-home"), title: "Kids Home on TV", alt: "Kids Viewing on Android TV with Shows and More for you rows", caption: "Kids rows built for the remote.", ...TV, current: false },
       controls: { src: android("tv-controls"), title: "FilterTube Controls", alt: "FilterTube Controls on Android TV", caption: "Controls from the sofa.", ...TV, current: true },
     },
     extras: [
@@ -191,7 +191,7 @@ export const kidsScreens = {
     { src: android("tablet-kids-watch"), title: "Two-pane Kids Watch", alt: "Kids Watch on a tablet with Up next beside the video", caption: "The video and Up next side by side.", ...TABLET, current: false },
   ],
   tv: [
-    { src: android("tv-kids-home"), title: "Kids Home on TV", alt: "Kids Viewing on Android TV with Shows and More for you rows", caption: "Kids rows built for the remote.", ...TV, current: true },
+    { src: android("tv-kids-home"), title: "Kids Home on TV", alt: "Kids Viewing on Android TV with Shows and More for you rows", caption: "Kids rows built for the remote.", ...TV, current: false },
     { src: android("tv-kids-search"), title: "Kids Search on TV", alt: "Kids search for dinosaurs on Android TV", caption: "Kids search on the big screen.", ...TV, current: false },
     { src: android("tv-kids-watch"), title: "Kids video on TV", alt: "A Kids video playing full screen on Android TV", caption: "Full-screen Kids playback.", ...TV, current: false },
   ],
