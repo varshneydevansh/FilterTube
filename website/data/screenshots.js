@@ -24,6 +24,7 @@ export const captureSlotLabels = {
 };
 
 const PHONE = { width: 1080, height: 2424 };
+const PIXEL = { width: 1080, height: 2400 };
 const TABLET = { width: 2560, height: 1600 };
 const TV = { width: 1920, height: 1080 };
 const IPHONE = { width: 1080, height: 2348 };
@@ -79,6 +80,7 @@ export const devices = {
     layout: "phone",
     featured: "watch",
     captures: {
+      home: { src: android("phone-home"), title: "Home", alt: "FilterTube Home on an Android phone during a study round, with engineering subject chips and a lecture feed", caption: "Home during a study round: only what you chose.", ...PIXEL, current: true },
       study: { src: android("phone-study"), title: "Study home", alt: "FilterTube Study home on an Android phone with the round ring and a lesson feed", caption: "A study round with only the channels you chose.", ...PHONE, current: true },
       watch: { src: android("phone-watch"), title: "Watch", alt: "FilterTube on an Android phone: the Watch page playing a nature documentary", caption: "A clean Watch page with your rules applied.", ...PHONE, current: true },
       kids: { src: android("phone-kids-home"), title: "Kids Home", alt: "FilterTube Kids Viewing home on an Android phone", caption: "Kids Viewing, with the parent's Kids rules.", ...PHONE, current: false },
@@ -86,6 +88,10 @@ export const devices = {
       sangeet: { src: android("phone-sangeet"), title: "Sangeet", alt: "Sangeet now playing on an Android phone with album art and playback controls", caption: "Album art, shuffle, repeat, lyrics and video.", ...PHONE, current: true },
     },
     extras: [
+      { src: android("phone-study-session"), title: "A study session", alt: "FilterTube Study and focus on an Android phone: round 1 of 2 with 25 minutes left", caption: "Rounds and breaks, with Kriti keeping you company.", ...PIXEL, current: true },
+      { src: android("phone-study-done"), title: "Session done", alt: "FilterTube on an Android phone: Kriti holds a rosette after a finished study session", caption: "Every round counted at the end.", ...PIXEL, current: true },
+      { src: android("phone-playlist"), title: "Playlist", alt: "A lecture playlist on an Android phone with Play all and the lesson list", caption: "Whole lecture series, in order.", ...PIXEL, current: true },
+      { src: android("phone-watch-queue"), title: "Watching a series", alt: "A lecture playing on an Android phone with the playlist queue open below", caption: "The next lecture is always one tap away.", ...PIXEL, current: true },
       { src: android("phone-entry"), title: "Viewing spaces", alt: "FilterTube on an Android phone: choose your viewing space, Main or Kids", caption: "Main and Kids each keep their own rules.", ...PHONE, current: false },
       { src: android("phone-search"), title: "Search", alt: "Android search results with filters and block buttons", caption: "Search with filters; every card can be blocked.", ...PHONE, current: false },
       { src: android("phone-player-controls"), title: "Player", alt: "Android player controls with chapter markers", caption: "Captions, floating player, fullscreen and chapter marks.", ...PHONE, current: false },
