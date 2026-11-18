@@ -1,4 +1,4 @@
-import { galleryFor, kidsScreens } from "@/data/screenshots";
+import { devices, galleryFor, kidsScreens } from "@/data/screenshots";
 import {
   Compass,
   DeviceMobile,
@@ -939,7 +939,7 @@ export const detailPages = {
     heroScreensLabel: "FilterTube 3.5.0 · hover or tap a screen",
     heroScreens: [
       androidPhoneScreens.find((screen) => screen.src.endsWith("phone-watch.webp")),
-      androidPhoneScreens.find((screen) => screen.src.endsWith("phone-now-playing.webp")),
+      androidPhoneScreens.find((screen) => screen.src.endsWith("phone-sangeet.webp")),
       androidPhoneScreens.find((screen) => screen.src.endsWith("phone-sync-pairing.webp")),
     ],
     chips: [
@@ -1335,7 +1335,7 @@ export const detailPages = {
     slug: "kids",
     icon: ShieldCheck,
     tone: "rose",
-    status: "Android phone, tablet, TV + browser extension",
+    status: "Android, iOS, TV + extension",
     eyebrow: "Rules for Kids",
     navTitle: "Kids",
     routeSummary:
@@ -1344,6 +1344,12 @@ export const detailPages = {
     titleDisplay: "children watch",
     description:
       "Block channels and words you do not want in Kids—or choose Whitelist to allow only the channels you approve. Give each child their own rules and viewing limits, with changes managed by their parent.",
+    heroScreensLayout: "tv-phone",
+    heroScreensLabel: "Kids Viewing on Android TV and iPhone · hover or tap a screen",
+    heroScreens: [
+      { ...kidsScreens.tv.find((screen) => screen.src.endsWith("tv-kids-watch.webp")), title: "Kids on TV" },
+      { ...devices.iphone.captures.kids, title: "Kids on iPhone" },
+    ],
     chips: ["Channel + keyword filters", "Whitelist viewing", "Parent-managed profiles"],
     primaryCta: { label: "Get the Android app", href: androidPlayStoreHref, external: true },
     secondaryCta: { label: "Get the browser extension", href: downloadsHref, external: false },
@@ -1382,10 +1388,10 @@ export const detailPages = {
     ],
     screenshotsTitle: "Kids Viewing on every screen",
     screenshotsEyebrow: "Kids · phone, tablet and TV",
-    screenshotsDescription: "Real Kids Viewing screens from FilterTube 3.5.0 with a Kids profile. Changing rules from Kids always asks the parent PIN.",
+    screenshotsDescription: "Real Kids Viewing screens on iPhone, iPad, Android and Android TV. Changing rules from Kids always asks the parent PIN.",
     screenshotRails: [
-      { id: "kids-phone-screens", label: "Phone", status: "Google Play", layout: "phone", screenshots: kidsPhoneScreens },
-      { id: "kids-tablet-screens", label: "Tablet", status: "Google Play", layout: "desktop", screenshots: kidsTabletScreens },
+      { id: "kids-phone-screens", label: "Phone", status: "iPhone + Android", layout: "phone", screenshots: kidsPhoneScreens },
+      { id: "kids-tablet-screens", label: "Tablet", status: "iPad + Android", layout: "desktop", screenshots: kidsTabletScreens },
       { id: "kids-tv-screens", label: "Android TV", status: "New in 3.5.0", layout: "desktop", screenshots: kidsTvScreens },
     ],
     milestoneTitle: "Choose where your child watches",

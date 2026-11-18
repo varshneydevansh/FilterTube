@@ -124,6 +124,45 @@
   object-fit: contain;
 }
 
+/* TV + phone: the TV screen sits behind, the phone leans in front at the lower right. */
+.ft-screen-showcase[data-layout="tv-phone"] {
+  max-width: 40rem;
+}
+
+.ft-screen-showcase[data-layout="tv-phone"] .ft-screen-stack {
+  aspect-ratio: 1.32;
+}
+
+.ft-screen-showcase[data-layout="tv-phone"] .ft-stack-screen[data-position="tv"] {
+  top: 40%;
+  left: 41%;
+  width: 80%;
+  aspect-ratio: 16 / 9;
+  border-radius: 0.9rem;
+  transform: translate(-50%, -50%) rotate(-2deg);
+}
+
+.ft-screen-showcase[data-layout="tv-phone"] .ft-stack-screen[data-position="phone"] {
+  top: 58%;
+  left: 84%;
+  z-index: 2;
+  width: 30%;
+  aspect-ratio: 1206 / 2622;
+  border-radius: 1.2rem;
+  transform: translate(-50%, -50%) rotate(5deg);
+}
+
+/* The phone always stays in front so both screens remain visible; the chosen one straightens up. */
+.ft-screen-showcase[data-layout="tv-phone"] .ft-stack-screen[data-position="tv"][data-front="true"] {
+  z-index: 1;
+  transform: translate(-50%, -50%) rotate(0deg) scale(1.02);
+}
+
+.ft-screen-showcase[data-layout="tv-phone"] .ft-stack-screen[data-position="phone"][data-front="true"] {
+  z-index: 2;
+  transform: translate(-50%, -50%) rotate(0deg) scale(1.04);
+}
+
 .ft-stack-screen:focus-visible {
   outline: 3px solid var(--color-accent);
   outline-offset: 5px;

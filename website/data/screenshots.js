@@ -202,23 +202,28 @@ export function pendingSlots(deviceId) {
   return captureSlots.filter((slot) => !device.captures[slot]?.current);
 }
 
-// Kids Viewing screens, used by the Kids page.
+// Kids Viewing screens, used by the Kids page. Current captures lead each rail; Android phone and
+// tablet Kids screens still come from an older build (current: false) until they are re-captured.
+// Every Kids screen must show clearly child-appropriate content: tv-kids-home and tv-kids-search
+// stay off this page because their rows include music videos and a game channel.
 export const kidsScreens = {
   phone: [
+    { src: ios("iphone-kids"), title: "Kids Home on iPhone", alt: "FilterTube Kids Viewing home on iPhone with a cartoon episode and a nursery rhymes playlist", caption: "Kids Viewing, with the parent's Kids rules.", ...IPHONE_NEW, current: true },
     { src: android("phone-kids-home"), title: "Kids Home", alt: "FilterTube Kids Viewing home on an Android phone", caption: "Kids Viewing with the child's own Kids profile.", ...PHONE, current: false },
     { src: android("phone-parent-pin"), title: "Parent PIN to block", alt: "Parent Controls PIN prompt over Kids Viewing", caption: "Blocking or changing rules always asks the parent PIN.", ...PHONE, current: false },
     { src: android("phone-kids-search"), title: "Kids Search", alt: "Kids search results for dinosaurs", caption: "Search in Kids, with your Kids rules applied.", ...PHONE, current: false },
     { src: android("phone-kids-watch"), title: "Kids Watch", alt: "Kids Watch page with Up next", caption: "Up next is checked against parent rules before it plays.", ...PHONE, current: false },
+    { src: ios("iphone-kids-mode"), title: "Kids Mode on iPhone", alt: "FilterTube on iPhone: Kids Mode rules kept separate from Main", caption: "Separate Kids rules, set by a parent.", ...IPHONE_NEW, current: true },
     { src: android("phone-kids-mode"), title: "Kids Mode rules", alt: "FilterTube Kids Mode rules screen", caption: "Separate Kids rules, set by a parent.", ...PHONE, current: true },
   ],
   tablet: [
+    { src: ios("ipad-kids"), title: "Kids Home on iPad", alt: "FilterTube Kids Viewing on iPad with a grid of cartoons and nursery rhyme playlists", caption: "A wide grid of shows and playlists.", ...IPAD, current: true },
     { src: android("tablet-kids-home"), title: "Kids Home on tablet", alt: "Kids Viewing grid on a tablet with shows and playlists", caption: "A three-column grid of shows and playlists.", ...TABLET, current: false },
     { src: android("tablet-kids-search"), title: "Kids Search on tablet", alt: "Kids search results list on a tablet", caption: "Search results with room for long titles.", ...TABLET, current: false },
     { src: android("tablet-kids-watch"), title: "Two-pane Kids Watch", alt: "Kids Watch on a tablet with Up next beside the video", caption: "The video and Up next side by side.", ...TABLET, current: false },
   ],
   tv: [
-    { src: android("tv-kids-home"), title: "Kids Home on TV", alt: "Kids Viewing on Android TV with Shows and More for you rows", caption: "Kids rows built for the remote.", ...TV, current: true },
-    { src: android("tv-kids-search"), title: "Kids Search on TV", alt: "Kids search for dinosaurs on Android TV", caption: "Kids search on the big screen.", ...TV, current: true },
-    { src: android("tv-kids-watch"), title: "Kids video on TV", alt: "A Kids video playing full screen on Android TV", caption: "Full-screen Kids playback.", ...TV, current: true },
+    { src: android("tv-kids-watch"), title: "Kids video on TV", alt: "A Pinkfong dinosaur cartoon, The Dino Dentist, playing full screen in Kids Viewing on Android TV", caption: "Full-screen Kids playback.", ...TV, current: true },
+    { src: android("tv-kids"), title: "Kids rules on TV", alt: "Kids Mode on Android TV with the words scary and horror blocked", caption: "Block words like scary and horror for Kids, from the sofa.", ...TV, current: true },
   ],
 };

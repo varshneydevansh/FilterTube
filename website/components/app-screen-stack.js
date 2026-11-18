@@ -5,7 +5,15 @@ import { ArrowsOut } from "@phosphor-icons/react";
 import { ScreenshotViewer } from "@/components/screenshot-viewer";
 
 // Hallmark · pre-emit critique: P5 H4 E4 S5 R5 V4
-export function AppScreenStack({ screens, label, layout = "phone" }) {
+// Positions: three screens fan out (center, left, right). The "tv-phone" layout pairs a wide TV
+// screen behind a phone in front, so a big-screen and a handheld view read as one family.
+function positionFor(layout, index) {
+  if (layout === "tv-phone") return index === 0 ? "tv" : "phone";
+  return index === 0 ? "center" : index === 1 ? "left" : "right";
+}
+
+export function AppScreenStack({ screens: allScreens, label, layout = "phone" }) {
+  const screens = allScreens.filter(Boolean);
   const [viewerIndex, setViewerIndex] = useState(null);
   const [selected, setSelected] = useState(0);
   const [preview, setPreview] = useState(null);
@@ -20,7 +28,7 @@ export function AppScreenStack({ screens, label, layout = "phone" }) {
             aria-label={`Preview ${screen.title}`}
             aria-pressed={selected === index}
             className="ft-stack-screen"
-            data-position={index === 0 ? "center" : index === 1 ? "left" : "right"}
+            data-position={positionFor(layout, index)}
             data-front={current === index}
             key={screen.src}
             onBlur={() => setPreview(null)}
