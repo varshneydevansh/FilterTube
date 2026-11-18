@@ -1186,3 +1186,69 @@ body.ft-extension-surface[data-surface="popup"] .ft-popup-apps__pill:active .ft-
   body.ft-extension-surface[data-surface="popup"] .ft-popup-apps__pill:hover .ft-popup-apps__badge,
   body.ft-extension-surface[data-surface="popup"] .ft-popup-apps__pill:active .ft-popup-apps__badge { transform: none; }
 }
+
+/* Popup, owner 2026-11-18: more meadow, less white. A thinner scrim lets the video read; the panels are
+   frosted paper (translucent with a blur) so the meadow shows through as soft colour, never as detail
+   behind words. Text stays the same --pk-ink and --pk-muted, checked at WCAG AA against the frosted
+   panels over the brightest and darkest parts of the video. Reduced motion shows the poster still. */
+body.ft-extension-surface[data-surface="popup"] {
+  --ft-popup-glass: color-mix(in srgb, var(--pk-paper) 66%, transparent);
+  --ft-popup-glass-firm: color-mix(in srgb, var(--pk-paper) 80%, transparent);
+  --ft-popup-blur: blur(18px) saturate(1.12);
+}
+:root[data-theme="dark"] body.ft-extension-surface[data-surface="popup"] {
+  --ft-popup-glass: color-mix(in srgb, var(--pk-paper) 64%, transparent);
+  --ft-popup-glass-firm: color-mix(in srgb, var(--pk-paper) 78%, transparent);
+  --ft-popup-blur: blur(18px) saturate(1.05);
+}
+:root[data-page-tone][data-theme] body.ft-extension-surface[data-surface="popup"] .ft-popup-shell__video-scrim {
+  background: linear-gradient(180deg,
+    color-mix(in srgb, var(--pk-canvas) 34%, transparent) 0%,
+    color-mix(in srgb, var(--pk-canvas) 22%, transparent) 45%,
+    color-mix(in srgb, var(--pk-canvas) 40%, transparent) 100%) !important;
+}
+:root[data-theme="dark"] body.ft-extension-surface[data-surface="popup"] .ft-popup-shell__video { opacity: 1; filter: brightness(0.82) saturate(0.9); }
+:root[data-page-tone][data-theme="dark"] body.ft-extension-surface[data-surface="popup"] .ft-popup-shell__video-scrim {
+  background: linear-gradient(180deg,
+    color-mix(in srgb, var(--pk-canvas) 52%, transparent) 0%,
+    color-mix(in srgb, var(--pk-canvas) 40%, transparent) 45%,
+    color-mix(in srgb, var(--pk-canvas) 58%, transparent) 100%) !important;
+}
+/* Reduced motion: the poster still under the same scrim (the video is not shown). */
+:root[data-theme="dark"] body.ft-extension-surface[data-surface="popup"] .ft-popup-shell__media { background-color: var(--pk-canvas); }
+
+:root[data-page-tone][data-theme] body.ft-extension-surface[data-surface="popup"] :is(.ft-popup-brand, .ft-mascot-tally, .ft-popup-filter-card, .ft-popup-time-status, .ft-popup-apps__pill) {
+  background: var(--ft-popup-glass) !important;
+  -webkit-backdrop-filter: var(--ft-popup-blur) !important;
+  backdrop-filter: var(--ft-popup-blur) !important;
+}
+:root[data-page-tone][data-theme] body.ft-extension-surface[data-surface="popup"] .ft-popup-brand.ft-enabled {
+  background: color-mix(in srgb, var(--pk-sage) 34%, var(--ft-popup-glass)) !important;
+}
+/* The header's round controls and the inner panels are firmer frosted paper: small, busy-edged, or
+   holding typed words. */
+:root[data-page-tone][data-theme] body.ft-extension-surface[data-surface="popup"] :is(#ftProfileBadgeBtnPopup, #openInTabBtn, .ft-popup-filter-card .tab-buttons, .ft-popup-filter-card .text-input, .ft-popup-filter-card .keyword-list, .ft-popup-filter-card .channel-list) {
+  background-color: var(--ft-popup-glass-firm) !important;
+  -webkit-backdrop-filter: var(--ft-popup-blur) !important;
+  backdrop-filter: var(--ft-popup-blur) !important;
+}
+:root[data-page-tone][data-theme] body.ft-extension-surface[data-surface="popup"] .ft-popup-filter-card .tab-buttons {
+  background-color: color-mix(in srgb, var(--pk-lilac) 50%, var(--ft-popup-glass-firm)) !important;
+}
+/* The filter card's contents had no inset: the tabs and fields touched its crayon edge. */
+:root[data-page-tone][data-theme] body.ft-extension-surface[data-surface="popup"] .ft-popup-filter-card { padding: 8px !important; }
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  body.ft-extension-surface[data-surface="popup"] { --ft-popup-glass: color-mix(in srgb, var(--pk-paper) 92%, transparent); }
+}
+/* The list-mode pill sat straight on the video at 8.7 px: firm rose paper, and a size that reads. */
+:root[data-page-tone][data-theme] body.ft-extension-surface[data-surface="popup"] .ft-topbar-list-mode .exact-toggle.ft-list-mode-pill:not(.ft-list-mode-pill--study) {
+  min-height: 30px !important;
+  padding: 0 10px !important;
+  border-radius: 999px !important;
+  font-size: 11px !important;
+  background: color-mix(in srgb, var(--pk-rose) 60%, var(--pk-paper)) !important;
+  border: 1.5px solid color-mix(in srgb, var(--pk-brick) 45%, transparent) !important;
+  -webkit-backdrop-filter: var(--ft-popup-blur) !important;
+  backdrop-filter: var(--ft-popup-blur) !important;
+}
+:root[data-page-tone][data-theme="light"] body.ft-extension-surface[data-surface="popup"] .ft-topbar-list-mode .exact-toggle.ft-list-mode-pill:not(.ft-list-mode-pill--study) { color: var(--pk-brick) !important; }
