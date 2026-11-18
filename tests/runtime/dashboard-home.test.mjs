@@ -36,7 +36,7 @@ test('the hidden log keeps the last 30, one entry per video a day, newest last',
 test('the hidden log drops what it cannot show and never keeps more than it needs', () => {
   assert.equal(Log.entry({ at: at(9) }), null, 'no title and no video');
   const item = Log.entry({ at: at(9), title: '  A   title  ', videoId: 'not-an-id', channelId: 'nope', handle: 'bad handle', reason: 'weird', surface: 'x' });
-  assert.deepEqual({ ...item }, { at: at(9), day: '2026-11-17', videoId: '', title: 'A title', channel: '', channelId: '', handle: '', reason: 'keyword', surface: 'main' });
+  assert.deepEqual({ ...item }, { at: at(9), day: '2026-11-17', videoId: '', title: 'A title', channel: '', channelId: '', handle: '', reason: 'keyword', control: '', surface: 'main' });
   assert.equal(Log.entry({ title: 'x'.repeat(500) }).title.length, 140);
 });
 
@@ -54,6 +54,59 @@ test('which rule hid a card: channel lines, content controls, allow mode, else a
   assert.equal(Log.videoIdFromHref('/@someone'), '');
 });
 
+test('which content control hid a card, from its reason line', () => {
+  const lines = {
+    'Duration filter: A video': 'duration',
+    'Upload date filter: A video': 'uploadDate',
+    'Pending upload date metadata': 'uploadDate',
+    'Category filter: A video': 'category',
+    'Category unavailable in Allow only selected mode': 'category',
+    'Pending category metadata': 'category',
+    'Language filter: A video': 'language',
+    'View count filter: A video': 'views',
+    'Mix/radio hidden: Mix / Radio': 'mixes',
+    'Chip: Mixes': 'mixes',
+    'Shorts hidden globally': 'clips',
+    'Hide Shorts container': 'clips',
+    'Hide All Shorts': 'clips',
+    'Empty Shorts shelf': 'clips',
+    'Hide Home Feed': 'homeFeed',
+    'Hide All Comments': 'comments',
+    'Hide Members-only videos': 'membersOnly',
+    'Members only: A video': 'membersOnly',
+    'Hide Playlist cards': 'playlistCards',
+    'Hide Playables': 'playables',
+    'Blocked channel: @x': '',
+    'Content: A video': '',
+    'Short: A clip': '',
+    'Comment Filter': '',
+    'Duplicate item': '',
+    '': ''
+  };
+  for (const [line, control] of Object.entries(lines)) assert.equal(Log.controlFromReason(line), control, line);
+  assert.equal(Log.controlFromReason(undefined), '');
+  assert.equal(Log.controlFromReason(null), '');
+  // Every line that names a control is a content control for classify, so the row can name it.
+  for (const [line, control] of Object.entries(lines)) {
+    if (control && !/^(Chip|Pending|Empty|Members only)/.test(line)) assert.equal(Log.classify(line), 'control', line);
+  }
+  assert.deepEqual([...Log.CONTROLS], ['clips', 'duration', 'uploadDate', 'category', 'language', 'views', 'mixes', 'homeFeed', 'comments', 'membersOnly', 'playlistCards', 'playables']);
+});
+
+test('the control key is kept for content controls only, and old entries read back without one', () => {
+  const base = { at: at(9), videoId: 'aaaaaaaaaaa', title: 'A' };
+  assert.equal(Log.entry({ ...base, reason: 'control', control: 'clips' }).control, 'clips');
+  assert.equal(Log.entry({ ...base, reason: 'control', control: 'not-a-control' }).control, '');
+  assert.equal(Log.entry({ ...base, reason: 'keyword', control: 'clips' }).control, '', 'only a control row names a control');
+  // Stored before the field existed: no control, still shown, still opens Content Controls.
+  const old = { at: at(9), day: '2026-11-17', videoId: 'aaaaaaaaaaa', title: 'A', channel: '', channelId: '', handle: '', reason: 'control', surface: 'main' };
+  const [read] = Log.today(Log.push([old], []), at(12));
+  assert.equal(read.control, '');
+  assert.deepEqual({ ...Log.allowAction(old) }, { kind: 'openControls', control: '', surface: 'main' });
+  const mixed = Log.push([old], { ...base, at: at(10), videoId: 'bbbbbbbbbbb', reason: 'control', control: 'views' });
+  assert.deepEqual(mixed.map(item => item.control), ['', 'views']);
+});
+
 test('today\'s list is newest first and only today', () => {
   const log = Log.push([], [
     { at: at(8), videoId: 'aaaaaaaaaaa', title: 'Morning', reason: 'keyword' },
@@ -67,7 +120,8 @@ test('today\'s list is newest first and only today', () => {
 test('Allow is a precise exception for that one video; a content control opens Content Controls', () => {
   const keyword = Log.entry({ at: at(9), videoId: 'aaaaaaaaaaa', title: 'A', reason: 'keyword', surface: 'kids' });
   assert.deepEqual({ ...Log.allowAction(keyword) }, { kind: 'allowVideo', videoId: 'aaaaaaaaaaa', surface: 'kids' });
-  assert.deepEqual({ ...Log.allowAction({ ...keyword, reason: 'control' }) }, { kind: 'openControls' });
+  assert.deepEqual({ ...Log.allowAction({ ...keyword, reason: 'control' }) }, { kind: 'openControls', control: '', surface: 'kids' });
+  assert.deepEqual({ ...Log.allowAction({ ...keyword, reason: 'control', control: 'duration' }) }, { kind: 'openControls', control: 'duration', surface: 'kids' });
   assert.equal(Log.allowAction({ title: 'No video', reason: 'channel' }), null);
   const surface = { mode: 'blocklist', keywords: [{ word: 'prank' }] };
   const next = Log.withAllowedVideo(surface, 'aaaaaaaaaaa');

@@ -1,8 +1,10 @@
 /* "What Uljhan tried today" (the dashboard Home): a small, bounded list of the last things FilterTube
  * hid on this device, kept in chrome.storage.local under ftHiddenLogV1. Nothing leaves the device.
  * - The content script adds an entry where a hide is counted (content_bridge.incrementHiddenStats).
- * - Each entry: {at, day, videoId, title, channel, channelId, handle, reason, surface}; reason is
- *   "keyword", "channel", "control" or "allowOnly".
+ * - Each entry: {at, day, videoId, title, channel, channelId, handle, reason, control, surface}; reason
+ *   is "keyword", "channel", "control" or "allowOnly"; control names which content control hid it
+ *   (controlFromReason: "clips", "duration", ...), '' when unknown or not a control. Entries stored
+ *   before control existed read back with control ''.
  * - At most MAX entries, newest last; the same video on the same day is kept once (its newest hide).
  * - allowAction() says what "Allow" does for an entry, as the app's allow does: a precise exception
  *   for that one video (the profile's allowedVideoIds, which outranks a blocked word or channel),
@@ -21,6 +23,23 @@
     const REASONS = Object.freeze(['keyword', 'channel', 'control', 'allowOnly']);
     const VIDEO_ID = /^[A-Za-z0-9_-]{11}$/;
     const TEXT_MAX = 140;
+    // Which content control a hide's reason line names. The lines come from the content script
+    // (js/content/dom_fallback.js toggleVisibility / reconcileFilterTubeCardVisibility reasons).
+    const CONTROL_RULES = Object.freeze([
+        ['clips', /^(Shorts hidden|Hide Shorts|Hide All Shorts|Empty Shorts shelf|Hide Clips)/i],
+        ['duration', /^Duration filter/i],
+        ['uploadDate', /^(Upload date filter|Pending upload date)/i],
+        ['category', /^(Category filter|Category unavailable|Pending category)/i],
+        ['language', /^Language filter/i],
+        ['views', /^View count filter/i],
+        ['mixes', /^(Mix\/radio hidden|Chip: Mixes|Hide Mix|Hide Auto playlists)/i],
+        ['homeFeed', /^Hide Home(page)? Feed/i],
+        ['comments', /^Hide (All )?Comments/i],
+        ['membersOnly', /^(Hide )?Members[- ]only/i],
+        ['playlistCards', /^(Hide )?Playlist cards?/i],
+        ['playables', /^(Hide )?Playables/i]
+    ]);
+    const CONTROLS = Object.freeze(CONTROL_RULES.map(([key]) => key));
 
     function text(value, max = TEXT_MAX) {
         return typeof value === 'string' ? value.replace(/\s+/g, ' ').trim().slice(0, max) : '';
@@ -43,6 +62,14 @@
         if (/^(Duration filter|Upload date filter|Category filter|Language filter|View count filter|Mix\/radio hidden|Shorts hidden|Hide |Category unavailable)/i.test(line)) return 'control';
         if (listMode === 'whitelist') return 'allowOnly';
         return channelBlocked ? 'channel' : 'keyword';
+    }
+
+    /** The content control a reason line names ("clips", "duration", ...), or '' when none does. */
+    function controlFromReason(reasonLine) {
+        const line = String(reasonLine || '').trim();
+        if (!line) return '';
+        const hit = CONTROL_RULES.find(([, pattern]) => pattern.test(line));
+        return hit ? hit[0] : '';
     }
 
     /** The video id in a watch or Clips link; '' when there is none. */
@@ -70,6 +97,7 @@
             channelId: /^UC[\w-]{22}$/.test(String(input.channelId || '')) ? String(input.channelId) : '',
             handle: /^@[\w.-]{1,60}$/.test(String(input.handle || '')) ? String(input.handle) : '',
             reason,
+            control: reason === 'control' && CONTROLS.includes(input.control) ? input.control : '',
             surface: input.surface === 'kids' ? 'kids' : 'main'
         };
     }
@@ -96,13 +124,14 @@
 
     /**
      * What Allow does for an entry: {kind: "allowVideo", videoId, surface} adds the video to the
-     * profile's allowedVideoIds; {kind: "openControls"} for a content control; null when nothing can be
+     * profile's allowedVideoIds; {kind: "openControls", control, surface} for a content control (control ''
+ * when the log can't tell which); null when nothing can be
      * allowed (no video id).
      */
     function allowAction(item) {
         const value = entry(item || {});
         if (!value) return null;
-        if (value.reason === 'control') return { kind: 'openControls' };
+        if (value.reason === 'control') return { kind: 'openControls', control: value.control, surface: value.surface };
         if (!value.videoId) return null;
         return { kind: 'allowVideo', videoId: value.videoId, surface: value.surface };
     }
@@ -120,5 +149,5 @@
         return (Array.isArray(log) ? log : []).filter(item => item?.videoId !== videoId);
     }
 
-    return Object.freeze({ KEY, MAX, REASONS, classify, videoIdFromHref, entry, push, today, allowAction, withAllowedVideo, without, localDay });
+    return Object.freeze({ KEY, MAX, REASONS, CONTROLS, classify, controlFromReason, videoIdFromHref, entry, push, today, allowAction, withAllowedVideo, without, localDay });
 }));
