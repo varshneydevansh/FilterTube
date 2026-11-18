@@ -24,6 +24,8 @@ function Device({ shot, index }) {
           priority={key === "android" || key === "ipad"}
           sizes={kind === "tablet" ? "(min-width: 1024px) 38vw, 78vw" : "(min-width: 1024px) 15vw, 32vw"}
           src={screen.src}
+          // The captures are small webp already; resizing them at quality 75 blurred the UI text.
+          unoptimized
           width={screen.width}
         />
       </span>
