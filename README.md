@@ -5,7 +5,7 @@
 
 [![Latest release](https://img.shields.io/github/v/release/varshneydevansh/FilterTube)](https://github.com/varshneydevansh/FilterTube/releases/latest) [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE) [![Ask DeepWiki](https://deepwiki.com/badge.svg)](https://deepwiki.com/varshneydevansh/FilterTube) ![Lines of Code](https://img.shields.io/badge/total%20lines-1026.1k-brightgreen.svg) ![JavaScript LoC](https://img.shields.io/badge/javascript-155.5k%20lines-yellow.svg) ![Top Language](https://img.shields.io/github/languages/top/varshneydevansh/FilterTube?color=f1e05a) ![Repo Size](https://img.shields.io/github/repo-size/varshneydevansh/FilterTube?color=orange)
 
-[Get the Android app](https://play.google.com/store/apps/details?id=com.filtertube.app) · [Get it on iPhone and iPad](https://filtertube.in/ios) · [Get the browser extension](https://filtertube.in/downloads) · [Explore the website](https://filtertube.in)
+[Get it on iPhone and iPad](https://filtertube.in/ios) · [Get the Android app](https://play.google.com/store/apps/details?id=com.filtertube.app) · [Get the browser extension](https://filtertube.in/downloads) · [Explore the website](https://filtertube.in)
 </div>
 
 FilterTube puts **you** in charge of what you watch. Block channels or words, or allow only what you choose. Give every family member their own profile, plan focused study time, and keep your devices in sync **privately, device to device**, with no FilterTube account.
@@ -43,25 +43,26 @@ In the apps there is also a complete viewer: Home, Search, Watch, channels, Foll
 
 ## Get FilterTube
 
+### Get the iOS app
+
+FilterTube runs on iPhone and iPad. Apple is having trouble on their end with the developer account, so the App Store version will take a while. Until then:
+
+1. On your iPhone or iPad, open **[filtertube.in/ios](https://filtertube.in/ios)**. It has the full guide and the buttons.
+2. Set up **SideStore** once (recommended), following that guide. **AltStore** works too.
+3. Tap **Add to SideStore**, or add the source `https://filtertube.in/ios/source.json` yourself, then install FilterTube.
+4. On a free Apple ID, refresh FilterTube in SideStore within 7 days. Your settings are kept.
+
+Free, no ads, nothing locked, no FilterTube sign-up.
+
 | Platform | Availability | Install or learn more |
 | --- | --- | --- |
+| **iPhone and iPad** | New in 3.6.2. Install with SideStore (recommended) or AltStore while the App Store version waits on trouble on Apple's side. The IPA is attached to every GitHub release. | [iPhone and iPad guide](https://filtertube.in/ios) |
 | **Android phone and tablet** | The full Main and Kids app on Google Play. No invitation or email needed. | [Google Play](https://play.google.com/store/apps/details?id=com.filtertube.app) · [Android overview](https://filtertube.in/android) |
 | **Android TV / Google TV** | On the same Google Play listing as the phone app. A TV APK is attached to every GitHub release. | [Android TV](https://filtertube.in/android-tv) · [Latest release](https://github.com/varshneydevansh/FilterTube/releases/latest) |
-| **iPhone and iPad** | Install with SideStore (recommended) or AltStore. | [iPhone and iPad guide](https://filtertube.in/ios) |
 | **Direct Android build** | GitHub-only phone/tablet and TV APKs with offline video saving (encrypted copies that expire after 30 days) and in-app update checks. Installs beside the Play app. The Google Play builds do not download videos. | [Latest release](https://github.com/varshneydevansh/FilterTube/releases/latest) |
 | **Browser extension** | Chrome, Firefox and Edge listings; other desktop browsers use the matching store or the manual package. | [Chrome](https://chromewebstore.google.com/detail/filtertube/cjmdggnnpmpchholgnkfokibidbbnfgc) · [Firefox](https://addons.mozilla.org/en-US/firefox/addon/filtertube/) · [Edge](https://microsoftedge.microsoft.com/addons/detail/filtertube/lgeflbmplcmljnhffmoghkoccflhlbem) |
 
 [Latest GitHub release and assets](https://github.com/varshneydevansh/FilterTube/releases/latest) · [All releases](https://github.com/varshneydevansh/FilterTube/releases)
-
-### Get the iOS app
-
-FilterTube runs on iPhone and iPad today. Apple is having trouble on their end with the developer account, so the App Store version will take a while. Until then:
-
-1. Open the step-by-step guide at **[filtertube.in/ios](https://filtertube.in/ios)**.
-2. Install **SideStore** (recommended) or **AltStore**. SideStore signs the app with your own Apple ID, using Apple's free developer signing.
-3. Add FilterTube in SideStore, and refresh it there every 7 days. Your settings are kept.
-
-Free, no ads, nothing locked, no FilterTube sign-up.
 
 ## Screenshots
 
