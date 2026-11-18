@@ -20,12 +20,14 @@ test('shared category labels and selection marks follow the selected reading dir
 });
 
 test('collaboration accents and rule-editor indents mirror without a separate RTL copy', () => {
+  const edge = declarations('css/rule-source-tints.css', ':root .ft-rule-row.collaboration-member');
+  assert.match(edge, /border-inline-start:\s*4px solid/);
+  assert.doesNotMatch(edge, /border-left:/);
   for (const [file, selector] of [
     ['css/popup.css', '.keyword-item.collaboration-member'],
-    ['css/tab-view.css', '.channel-item.collaboration-entry']
+    ['css/tab-view.css', '.channel-item.collaboration-member']
   ]) {
     const block = declarations(file, selector);
-    assert.match(block, /border-inline-start:\s*4px solid/);
     assert.match(block, /padding-inline-start:/);
     assert.doesNotMatch(block, /border-left:|padding-left:/);
   }

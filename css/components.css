@@ -1688,7 +1688,8 @@ html[data-theme="dark"] .exact-toggle.toggle-variant-amber.active {
     text-transform: uppercase;
     letter-spacing: 0.06em;
     background: rgba(34, 197, 94, 0.15);
-    color: #15803d;
+    /* green-800: stays above 4.5:1 on the green channel-derived row tint. */
+    color: #166534;
 }
 
 /* Variant: Comments source */

@@ -325,7 +325,7 @@
 /* Rows, tiles and fields inside panels. */
 :root[data-page-tone][data-theme] body.ft-extension-surface[data-surface] .sidebar .nav-item,
 :root[data-page-tone][data-theme] body.ft-extension-surface[data-surface] .help-item,
-:root[data-page-tone][data-theme] body.ft-extension-surface[data-surface] .list-item,
+:root[data-page-tone][data-theme] body.ft-extension-surface[data-surface] .list-item:not(.ft-rule-tinted),
 :root[data-page-tone][data-theme] body.ft-extension-surface[data-surface] .toggle-row,
 :root[data-page-tone][data-theme] body.ft-extension-surface[data-surface] .content-control-group,
 :root[data-page-tone][data-theme] body.ft-extension-surface[data-surface] .ft-kids-sub-toggle-row,
@@ -362,7 +362,7 @@
 :root[data-page-tone][data-theme] body.ft-extension-surface[data-surface] .sidebar .nav-item:hover,
 :root[data-page-tone][data-theme] body.ft-extension-surface[data-surface] .sidebar .nav-item.active,
 :root[data-page-tone][data-theme] body.ft-extension-surface[data-surface] .help-item:hover,
-:root[data-page-tone][data-theme] body.ft-extension-surface[data-surface] .list-item:hover,
+:root[data-page-tone][data-theme] body.ft-extension-surface[data-surface] .list-item:not(.ft-rule-tinted):hover,
 :root[data-page-tone][data-theme] body.ft-extension-surface[data-surface] .toggle-row:hover,
 :root[data-page-tone][data-theme] body.ft-extension-surface[data-surface] .content-control-group .toggle-row:hover,
 :root[data-page-tone][data-theme] body.ft-extension-surface[data-surface] .ft-profile-dropdown-item:hover,

@@ -647,6 +647,8 @@ export const LANES = Object.freeze({
       'tests/runtime/get-watch-streaming-interception.test.mjs',
       'tests/runtime/ad-void-duration-seek-current-behavior.test.mjs',
       'tests/runtime/popup-intrinsic-sizing.test.mjs',
+      'tests/runtime/rule-source-tint-parity.test.mjs',
+      'tests/runtime/ui-localization-logical-layout.test.mjs',
       'tests/runtime/advert-content-interception.test.mjs',
       'tests/runtime/advert-runtime-startup.test.mjs',
       'tests/runtime/active-rule-authority-current-behavior.test.mjs',

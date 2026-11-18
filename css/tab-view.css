@@ -1675,30 +1675,28 @@ body:not(.ft-managed-child-editor-view) .ft-managed-child-global {
     box-shadow: 0 0 0 3px rgba(167, 139, 250, 0.2);
 }
 
-/* Kids list items */
+/* Kids list items. Source-tinted rows keep their tint (rule-source-tints.css). */
 #kidsView .list-item {
-    border-left: 3px solid transparent;
     transition: all 0.2s ease;
 }
 
-#kidsView .list-item:hover {
+#kidsView .list-item:not(.collaboration-member) {
+    border-left-width: 3px;
+    border-left-style: solid;
+}
+
+#kidsView .list-item:not(.ft-rule-tinted) {
+    border-left-color: transparent;
+}
+
+#kidsView .list-item:not(.ft-rule-tinted):hover {
     border-left-color: var(--ft-kids-pink);
     background: linear-gradient(90deg, rgba(252, 231, 243, 0.5) 0%, transparent 100%);
 }
 
-:root[data-theme="dark"] #kidsView .list-item:hover {
+:root[data-theme="dark"] #kidsView .list-item:not(.ft-rule-tinted):hover {
     border-left-color: #F472B8;
     background: linear-gradient(90deg, rgba(190, 24, 93, 0.15) 0%, transparent 100%);
-}
-
-#kidsView .list-item.channel-derived {
-    border-color: rgba(236, 72, 153, 0.25);
-    background: rgba(252, 231, 243, 0.6);
-}
-
-:root[data-theme="dark"] #kidsView .list-item.channel-derived {
-    border-color: rgba(244, 114, 182, 0.4);
-    background: rgba(190, 24, 93, 0.2);
 }
 
 /* Kids nav item in sidebar */
@@ -4535,74 +4533,13 @@ padding: var(--ft-space-xs) var(--ft-space-sm);
     font-size: var(--ft-font-size-base);
 }
 
-.list-item.channel-derived {
-    border-color: rgba(34, 197, 94, 0.25);
-    background: rgba(220, 252, 231, 0.6);
-}
+/* Source tints live in rule-source-tints.css. */
 
-:root[data-theme="dark"] .list-item.channel-derived {
-    border-color: rgba(34, 197, 94, 0.45);
-    background: rgba(21, 128, 61, 0.22);
-}
-
-.list-item.channel-derived.source-kids {
-    border-color: rgba(236, 72, 153, 0.36);
-    background: linear-gradient(90deg, rgba(220, 252, 231, 0.72) 0%, rgba(252, 231, 243, 0.82) 100%);
-}
-
-:root[data-theme="dark"] .list-item.channel-derived.source-kids {
-    border-color: rgba(236, 72, 153, 0.58);
-    background: linear-gradient(90deg, rgba(21, 128, 61, 0.24) 0%, rgba(190, 24, 93, 0.22) 100%);
-}
-
-.list-item.channel-derived.source-comments {
-    border-color: rgba(140, 92, 38, 0.34);
-    background: linear-gradient(90deg, rgba(220, 252, 231, 0.72) 0%, rgba(140, 92, 38, 0.14) 100%);
-}
-
-:root[data-theme="dark"] .list-item.channel-derived.source-comments {
-    border-color: rgba(140, 92, 38, 0.5);
-    background: linear-gradient(90deg, rgba(21, 128, 61, 0.24) 0%, rgba(140, 92, 38, 0.26) 100%);
-}
-
-.list-item.channel-derived.source-collab {
-    border-color: rgba(250, 204, 21, 0.48);
-    background: linear-gradient(90deg, rgba(220, 252, 231, 0.72) 0%, rgba(254, 243, 199, 0.88) 100%);
-}
-
-:root[data-theme="dark"] .list-item.channel-derived.source-collab {
-    border-color: rgba(250, 204, 21, 0.6);
-    background: linear-gradient(90deg, rgba(21, 128, 61, 0.24) 0%, rgba(133, 77, 14, 0.28) 100%);
-}
-
- .list-item.source-comments {
-     border-color: rgba(140, 92, 38, 0.25);
-     background: rgba(140, 92, 38, 0.1);
- }
-
- :root[data-theme="dark"] .list-item.source-comments {
-     border-color: rgba(140, 92, 38, 0.45);
-     background: rgba(140, 92, 38, 0.22);
- }
-
- .list-item.source-kids {
-     border-color: rgba(236, 72, 153, 0.28);
-     background: rgba(252, 231, 243, 0.7);
- }
-
- :root[data-theme="dark"] .list-item.source-kids {
-     border-color: rgba(236, 72, 153, 0.55);
-     background: rgba(190, 24, 93, 0.18);
- }
-
-.list-item.source-collab {
-    border-color: rgba(250, 204, 21, 0.48);
-    background: rgba(254, 243, 199, 0.78);
-}
-
-:root[data-theme="dark"] .list-item.source-collab {
-    border-color: rgba(250, 204, 21, 0.6);
-    background: rgba(133, 77, 14, 0.24);
+/* The lists are height-capped flex columns: rows keep their full height and
+ * scroll instead of shrinking under their own chips. */
+.advanced-list > .list-item,
+.ft-virtual-list-window > .list-item {
+    flex-shrink: 0;
 }
 
 .list-item.channel-derived .item-left {
@@ -4624,26 +4561,10 @@ padding: var(--ft-space-xs) var(--ft-space-sm);
     color: #cbd5f5;
 }
 
-/* Collaboration Entries */
-.channel-item.collaboration-entry {
-    border-inline-start: 4px solid var(--ft-color-collab-border, #facc15);
+/* Collaboration entries: the edge and tint live in rule-source-tints.css. */
+.channel-item.collaboration-member {
     padding-inline-start: calc(16px - 4px);
     position: relative;
-    background: rgba(250, 204, 21, 0.12);
-}
-
-.channel-item.collaboration-entry.collaboration-partial {
-    border-inline-start-style: dashed;
-    background: rgba(250, 204, 21, 0.18);
-}
-
-:root[data-theme="dark"] .channel-item.collaboration-entry {
-    border-inline-start-color: #facc15;
-    background: rgba(250, 204, 21, 0.16);
-}
-
-:root[data-theme="dark"] .channel-item.collaboration-entry.collaboration-partial {
-    background: rgba(234, 179, 8, 0.22);
 }
 
 .collaboration-badge {

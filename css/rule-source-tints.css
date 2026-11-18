@@ -1,0 +1,149 @@
+/*
+ * Keywords and Channels rows are tinted by where the rule came from.
+ * The popup (.keyword-item) and the dashboard (.list-item) both load this
+ * file, and RenderEngine.getRuleSourceClasses() decides the classes for both.
+ *
+ *   channel-derived  green   keyword added by a channel's Filter All
+ *   source-comments  brown   blocked from a comment
+ *   source-kids      pink    synced from the Kids list
+ *   source-collab    yellow  collaboration
+ *   collaboration-member     yellow edge on a collaborator's channel row
+ *
+ * A row with two sources blends them left to right.
+ * Each source sets --ft-rule-tint-bg / --ft-rule-tint-border; one paint rule
+ * below applies them. page-tones.css leaves .ft-rule-tinted rows alone.
+ */
+
+/* Single sources ---------------------------------------------------------- */
+
+.ft-rule-row.channel-derived {
+    --ft-rule-tint-border: rgba(34, 197, 94, 0.25);
+    --ft-rule-tint-bg: linear-gradient(rgba(220, 252, 231, 0.6), rgba(220, 252, 231, 0.6));
+}
+
+:root[data-theme="dark"] .ft-rule-row.channel-derived {
+    --ft-rule-tint-border: rgba(34, 197, 94, 0.45);
+    --ft-rule-tint-bg: linear-gradient(rgba(21, 128, 61, 0.22), rgba(21, 128, 61, 0.22));
+}
+
+.ft-rule-row.source-comments {
+    --ft-rule-tint-border: rgba(140, 92, 38, 0.25);
+    --ft-rule-tint-bg: linear-gradient(rgba(140, 92, 38, 0.1), rgba(140, 92, 38, 0.1));
+}
+
+:root[data-theme="dark"] .ft-rule-row.source-comments {
+    --ft-rule-tint-border: rgba(140, 92, 38, 0.45);
+    --ft-rule-tint-bg: linear-gradient(rgba(140, 92, 38, 0.22), rgba(140, 92, 38, 0.22));
+}
+
+.ft-rule-row.source-kids {
+    --ft-rule-tint-border: rgba(236, 72, 153, 0.28);
+    --ft-rule-tint-bg: linear-gradient(rgba(252, 231, 243, 0.7), rgba(252, 231, 243, 0.7));
+}
+
+:root[data-theme="dark"] .ft-rule-row.source-kids {
+    --ft-rule-tint-border: rgba(236, 72, 153, 0.55);
+    --ft-rule-tint-bg: linear-gradient(rgba(190, 24, 93, 0.18), rgba(190, 24, 93, 0.18));
+}
+
+.ft-rule-row.source-collab {
+    --ft-rule-tint-border: rgba(250, 204, 21, 0.48);
+    --ft-rule-tint-bg: linear-gradient(rgba(254, 243, 199, 0.78), rgba(254, 243, 199, 0.78));
+}
+
+:root[data-theme="dark"] .ft-rule-row.source-collab {
+    --ft-rule-tint-border: rgba(250, 204, 21, 0.6);
+    --ft-rule-tint-bg: linear-gradient(rgba(133, 77, 14, 0.24), rgba(133, 77, 14, 0.24));
+}
+
+.ft-rule-row.collaboration-member {
+    --ft-rule-tint-bg: linear-gradient(rgba(250, 204, 21, 0.12), rgba(250, 204, 21, 0.12));
+}
+
+:root[data-theme="dark"] .ft-rule-row.collaboration-member {
+    --ft-rule-tint-bg: linear-gradient(rgba(250, 204, 21, 0.16), rgba(250, 204, 21, 0.16));
+}
+
+.ft-rule-row.collaboration-member.collaboration-partial {
+    --ft-rule-tint-bg: linear-gradient(rgba(250, 204, 21, 0.18), rgba(250, 204, 21, 0.18));
+}
+
+:root[data-theme="dark"] .ft-rule-row.collaboration-member.collaboration-partial {
+    --ft-rule-tint-bg: linear-gradient(rgba(234, 179, 8, 0.22), rgba(234, 179, 8, 0.22));
+}
+
+/* Two sources blend ------------------------------------------------------- */
+
+.ft-rule-row.channel-derived.source-kids {
+    --ft-rule-tint-border: rgba(236, 72, 153, 0.36);
+    --ft-rule-tint-bg: linear-gradient(90deg, rgba(220, 252, 231, 0.72) 0%, rgba(252, 231, 243, 0.82) 100%);
+}
+
+:root[data-theme="dark"] .ft-rule-row.channel-derived.source-kids {
+    --ft-rule-tint-border: rgba(236, 72, 153, 0.58);
+    --ft-rule-tint-bg: linear-gradient(90deg, rgba(21, 128, 61, 0.24) 0%, rgba(190, 24, 93, 0.22) 100%);
+}
+
+.ft-rule-row.channel-derived.source-comments {
+    --ft-rule-tint-border: rgba(140, 92, 38, 0.34);
+    --ft-rule-tint-bg: linear-gradient(90deg, rgba(220, 252, 231, 0.72) 0%, rgba(140, 92, 38, 0.14) 100%);
+}
+
+:root[data-theme="dark"] .ft-rule-row.channel-derived.source-comments {
+    --ft-rule-tint-border: rgba(140, 92, 38, 0.5);
+    --ft-rule-tint-bg: linear-gradient(90deg, rgba(21, 128, 61, 0.24) 0%, rgba(140, 92, 38, 0.26) 100%);
+}
+
+.ft-rule-row.channel-derived.source-collab {
+    --ft-rule-tint-border: rgba(250, 204, 21, 0.48);
+    --ft-rule-tint-bg: linear-gradient(90deg, rgba(220, 252, 231, 0.72) 0%, rgba(254, 243, 199, 0.88) 100%);
+}
+
+:root[data-theme="dark"] .ft-rule-row.channel-derived.source-collab {
+    --ft-rule-tint-border: rgba(250, 204, 21, 0.6);
+    --ft-rule-tint-bg: linear-gradient(90deg, rgba(21, 128, 61, 0.24) 0%, rgba(133, 77, 14, 0.28) 100%);
+}
+
+.ft-rule-row.collaboration-member.source-kids {
+    --ft-rule-tint-bg: linear-gradient(90deg, rgba(254, 243, 199, 0.82) 0%, rgba(252, 231, 243, 0.82) 100%);
+}
+
+:root[data-theme="dark"] .ft-rule-row.collaboration-member.source-kids {
+    --ft-rule-tint-bg: linear-gradient(90deg, rgba(133, 77, 14, 0.28) 0%, rgba(190, 24, 93, 0.22) 100%);
+}
+
+.ft-rule-row.collaboration-member.source-comments {
+    --ft-rule-tint-bg: linear-gradient(90deg, rgba(254, 243, 199, 0.82) 0%, rgba(140, 92, 38, 0.14) 100%);
+}
+
+:root[data-theme="dark"] .ft-rule-row.collaboration-member.source-comments {
+    --ft-rule-tint-bg: linear-gradient(90deg, rgba(133, 77, 14, 0.28) 0%, rgba(140, 92, 38, 0.26) 100%);
+}
+
+/* Paint ------------------------------------------------------------------- */
+
+/* Dashboard rows sit on the page backdrop, so the tint lies over the row's own
+ * surface. Popup rows sit inside an opaque list and need no base. */
+.list-item.ft-rule-row {
+    --ft-rule-tint-base: var(--ft-tone-row, var(--ft-color-bg-surface));
+}
+
+/* :root lifts this over each page's dark .list-item / .keyword-item and hover rules. */
+:root .ft-rule-row.ft-rule-tinted {
+    border-color: var(--ft-rule-tint-border, var(--ft-color-sem-neutral-border));
+    background-color: var(--ft-rule-tint-base, transparent);
+    background-image: var(--ft-rule-tint-bg);
+    color: var(--ft-tone-ink, var(--ft-color-text-primary));
+}
+
+:root .ft-rule-row.collaboration-member {
+    border-inline-start: 4px solid var(--ft-color-collab-border, #facc15);
+}
+
+:root[data-theme="dark"] .ft-rule-row.collaboration-member {
+    border-inline-start-color: #facc15;
+}
+
+:root .ft-rule-row.collaboration-member.collaboration-partial {
+    border-inline-start-style: dashed;
+}

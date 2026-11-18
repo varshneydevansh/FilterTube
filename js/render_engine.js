@@ -285,12 +285,56 @@ const RenderEngine = (() => {
         return badge;
     }
 
-    function applySourceClasses(element, { channelDerived = false, sourceKey = null } = {}) {
+    // Where a Keywords/Channels rule came from decides its row tint. The popup
+    // and the dashboard both ask here, and css/rule-source-tints.css paints
+    // the classes, so the two surfaces cannot drift apart.
+    function getRuleSourceClasses({
+        channelDerived = false,
+        sourceKey = null,
+        collaboration = false,
+        collaborationPartial = false
+    } = {}) {
+        const classes = ['ft-rule-row'];
+        if (channelDerived) classes.push('channel-derived');
+        if (sourceKey === 'comments') classes.push('source-comments');
+        if (sourceKey === 'kids') classes.push('source-kids');
+        if (sourceKey === 'collab') classes.push('source-collab');
+        if (collaboration) classes.push('collaboration-member');
+        if (collaboration && collaborationPartial) classes.push('collaboration-partial');
+        if (classes.length > 1) classes.push('ft-rule-tinted');
+        return classes;
+    }
+
+    function applySourceClasses(element, options = {}) {
         if (!element) return;
-        if (channelDerived) element.classList.add('channel-derived');
-        if (sourceKey === 'comments') element.classList.add('source-comments');
-        if (sourceKey === 'kids') element.classList.add('source-kids');
-        if (sourceKey === 'collab') element.classList.add('source-collab');
+        getRuleSourceClasses(options).forEach((name) => element.classList.add(name));
+    }
+
+    function getKeywordRowSource(entry, linkedChannel) {
+        const isChannelDerived = entry?.source === 'channel';
+        if (!isChannelDerived) {
+            return { channelDerived: false, sourceKey: entry?.__ftFromKids ? 'kids' : null };
+        }
+        const linkedSource = typeof linkedChannel?.source === 'string' ? linkedChannel.source.toLowerCase() : '';
+        const sourceKey = entry?.__ftFromKids
+            ? 'kids'
+            : (linkedChannel?.collaborationGroupId || (Array.isArray(linkedChannel?.collaborationWith) && linkedChannel.collaborationWith.length > 0) || linkedSource.includes('collab'))
+                ? 'collab'
+                : linkedSource.includes('comment')
+                    ? 'comments'
+                    : linkedSource.includes('kids')
+                        ? 'kids'
+                        : 'channel';
+        return { channelDerived: true, sourceKey };
+    }
+
+    function getChannelRowSource(channel, collaborationMeta = null) {
+        return {
+            channelDerived: false,
+            sourceKey: channel?.__ftFromKids ? 'kids' : (channel?.source === 'comments' ? 'comments' : null),
+            collaboration: Boolean(collaborationMeta || channel?.collaborationGroupId),
+            collaborationPartial: collaborationMeta?.isPartial === true
+        };
     }
 
     function createSourceBadge({ sourceKey, title }) {
@@ -695,25 +739,14 @@ const RenderEngine = (() => {
 
         const isChannelDerived = entry.source === 'channel';
         const linkedChannel = isChannelDerived ? findChannelByRef(entry.channelRef) : null;
-        const linkedSource = typeof linkedChannel?.source === 'string' ? linkedChannel.source.toLowerCase() : '';
-        const channelDerivedSourceKey = entry?.__ftFromKids
-            ? 'kids'
-            : (linkedChannel?.collaborationGroupId || (Array.isArray(linkedChannel?.collaborationWith) && linkedChannel.collaborationWith.length > 0) || linkedSource.includes('collab'))
-                ? 'collab'
-                : linkedSource.includes('comment')
-                    ? 'comments'
-                    : linkedSource.includes('kids')
-                        ? 'kids'
-                        : 'channel';
+        const rowSource = getKeywordRowSource(entry, linkedChannel);
+        const channelDerivedSourceKey = rowSource.sourceKey;
 
         // Create item container
         const item = document.createElement('div');
         item.className = minimal ? 'keyword-item' : 'list-item';
         if (typeof entry?.word === 'string') item.dataset.ftRuleWord = entry.word.trim().toLowerCase();
-        applySourceClasses(item, {
-            channelDerived: isChannelDerived,
-            sourceKey: isChannelDerived ? channelDerivedSourceKey : (entry?.__ftFromKids ? 'kids' : null)
-        });
+        applySourceClasses(item, rowSource);
 
         // Left side: word and badges
         const left = document.createElement('div');
@@ -1461,15 +1494,9 @@ const RenderEngine = (() => {
         item.className = 'keyword-item';
         const ruleKey = String(channel?.id || channel?.handle || channel?.customUrl || channel?.name || '').trim().toLowerCase();
         if (ruleKey) item.dataset.ftRuleChannel = ruleKey;
-        applySourceClasses(item, {
-            sourceKey: channel?.__ftFromKids ? 'kids' : (channel?.source === 'comments' ? 'comments' : null)
-        });
+        applySourceClasses(item, getChannelRowSource(channel, collaborationMeta));
         if (channel.collaborationGroupId) {
-            item.classList.add('collaboration-member');
             item.setAttribute('data-collaboration-group-id', channel.collaborationGroupId);
-        }
-        if (collaborationMeta?.isPartial) {
-            item.classList.add('collaboration-partial');
         }
         const tooltipParts = [];
         if (collaborationMeta?.tooltip) {
@@ -1529,14 +1556,11 @@ const RenderEngine = (() => {
         item.className = 'list-item channel-item';
         const ruleKey = String(channel?.id || channel?.handle || channel?.customUrl || channel?.name || '').trim().toLowerCase();
         if (ruleKey) item.dataset.ftRuleChannel = ruleKey;
-        applySourceClasses(item, {
-            sourceKey: channel?.__ftFromKids ? 'kids' : (channel?.source === 'comments' ? 'comments' : null)
-        });
+        applySourceClasses(item, getChannelRowSource(channel, collaborationMeta));
+        if (channel?.collaborationGroupId) {
+            item.setAttribute('data-collaboration-group-id', channel.collaborationGroupId);
+        }
         if (collaborationMeta) {
-            item.classList.add('collaboration-entry');
-            if (collaborationMeta.isPartial) {
-                item.classList.add('collaboration-partial');
-            }
             const tooltipParts = [];
             if (collaborationMeta.tooltip) {
                 tooltipParts.push(collaborationMeta.tooltip);
@@ -2102,7 +2126,8 @@ const RenderEngine = (() => {
         renderChannelList,
         patchChannelListItem,
         createKeywordListItem,
-        createChannelListItem
+        createChannelListItem,
+        getRuleSourceClasses
     };
 })();
 

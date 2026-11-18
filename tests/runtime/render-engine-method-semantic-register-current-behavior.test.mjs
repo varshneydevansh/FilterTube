@@ -46,7 +46,7 @@ function doc() {
 
 function groupForMethod(name) {
   if (['getStateManager', 'getUIComponents', 'getSettings', 'scheduleIdle', 'cancelIdle', 'scheduleFrame', 'cancelFrameTask', 'getListGap', 'cancelVirtualList', 'cancelContainerRenderTasks', 'renderWindowedList', 'safeTimestamp'].includes(name)) return 'dependencyAndSchedulingHelpers';
-  if (['createPillBadge', 'applySourceClasses', 'createSourceBadge', 'createKidsSyncBadge', 'createCollaborationBadge'].includes(name)) return 'badgeAndSourceDecoration';
+  if (['createPillBadge', 'getRuleSourceClasses', 'applySourceClasses', 'getKeywordRowSource', 'getChannelRowSource', 'createSourceBadge', 'createKidsSyncBadge', 'createCollaborationBadge'].includes(name)) return 'badgeAndSourceDecoration';
   if ([
     'normalizeChannelHandle',
     'decodeChannelDisplayValue',
@@ -565,13 +565,13 @@ test('render engine register pins source fingerprint and broad callable reconcil
 test('render engine register accounts for every current IIFE-scoped declaration', () => {
   const rows = methodRows();
 
-  assert.equal(rows.length, 51);
+  assert.equal(rows.length, 54);
   assert.deepEqual(countBy(rows, 'kind'), {
     'const arrow': 5,
-    function: 46
+    function: 49
   });
   assert.deepEqual(countBy(rows, 'group'), {
-    badgeAndSourceDecoration: 5,
+    badgeAndSourceDecoration: 8,
     channelDisplayIdentityHelpers: 9,
     channelRenderingAndRowActions: 8,
     collaborationGrouping: 3,
