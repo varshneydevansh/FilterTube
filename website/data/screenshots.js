@@ -79,7 +79,7 @@ export const devices = {
     captures: {
       home: { src: ios("ipad-home"), title: "Home", alt: "FilterTube on iPad: Home with a study session running and a grid of JEE lesson videos", caption: "Home with a study session running.", ...IPAD, current: true },
       study: { src: ios("ipad-study"), title: "Study plan", alt: "FilterTube on iPad: a JEE Main study plan with the exam channels switched on", caption: "A study plan with only the channels you chose.", ...IPAD, current: true },
-      watch: { src: ios("ipad-watch"), title: "Watch", alt: "FilterTube on iPad: a lesson video playing with recommendations beside it", caption: "The video and recommendations side by side.", ...IPAD, current: true },
+      watch: { src: ios("ipad-watch"), title: "Watch", alt: "FilterTube on iPad in landscape: an education video playing with a soft colour glow behind it, Up next and Recommended beside it", caption: "The video and Up next side by side, with a soft glow.", ...IPAD, current: true },
       kids: { src: ios("ipad-kids"), title: "Kids", alt: "FilterTube Kids Viewing on iPad with a grid of shows and playlists", caption: "Kids Viewing, with the parent's Kids rules.", ...IPAD, current: true },
       controls: { src: ios("ipad-controls"), title: "Controls", alt: "FilterTube Controls on iPad", caption: "A wide Controls grid.", ...IPAD, current: true },
       sangeet: { src: ios("ipad-sangeet"), title: "Sangeet player", alt: "Sangeet now playing on iPad with album art and the queue beside it", caption: "Album art and the queue side by side.", ...IPAD, current: true },
@@ -161,7 +161,7 @@ export const devices = {
     featured: "watch",
     captures: {
       home: { src: android("tv-home"), title: "Home", alt: "Android TV Home with blocked cards counted", caption: "Home with your filters applied.", ...TV, current: true },
-      watch: { src: android("tv-watch"), title: "Watch", alt: "Android TV Watch page playing a nature documentary", caption: "Watch with recommendations from the same channel.", ...TV, current: false },
+      watch: { src: android("tv-watch"), title: "Watch", alt: "Android TV Watch page with an education video playing and a soft glow around it, recommendations on the right", caption: "Watch, with recommendations beside the video.", ...TV, current: true },
       kids: { src: android("tv-kids-home"), title: "Kids Home on TV", alt: "Kids Viewing on Android TV with Shows and More for you rows", caption: "Kids rows built for the remote.", ...TV, current: true },
       controls: { src: android("tv-controls"), title: "FilterTube Controls", alt: "FilterTube Controls on Android TV", caption: "Controls from the sofa.", ...TV, current: true },
     },
