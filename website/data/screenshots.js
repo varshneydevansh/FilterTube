@@ -149,7 +149,7 @@ export const devices = {
     extras: [
       { src: android("tablet-music-explore"), title: "Sangeet Explore", alt: "Sangeet Explore on a tablet with a grid of moods and genres", caption: "Moods and genres, from Chill and Focus to classical.", ...TABLET, current: true },
       { src: android("tablet-search"), title: "Search grid", alt: "Tablet search results in a three-column grid", caption: "Three-column search results.", ...TABLET, current: true },
-      { src: android("tablet-block-menu"), title: "Block from any card", alt: "Tablet Subscriptions with the FilterTube block menu open", caption: "Block a channel or filter all its videos from any card.", ...TABLET, current: true },
+      { src: android("tablet-block-menu"), title: "Block from any card", alt: "A tablet feed with the FilterTube block menu open", caption: "Block a channel or filter all its videos from any card.", ...TABLET, current: true },
     ],
   },
   androidTv: {

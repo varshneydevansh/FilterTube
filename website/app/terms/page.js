@@ -16,9 +16,9 @@ const sections = [
     ],
   },
   {
-    title: "Open-source code and releases",
+    title: "Extension code and releases",
     body: [
-      "FilterTube is distributed under the MIT License where stated in the repository. The source code remains the primary reference for permitted reuse and redistribution.",
+      "The FilterTube browser extension is distributed under the MIT License, as stated in its repository. That repository remains the primary reference for permitted reuse and redistribution of the extension.",
       "Release links, browser store listings, and public documentation may change as the project evolves.",
     ],
   },

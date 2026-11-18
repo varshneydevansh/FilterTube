@@ -1,12 +1,12 @@
 # Device sync explainer
 
 A silent 23.5-second video for the home page's device sync panel, made for parents: pair with a
-short code or QR, check the safety words match, choose what to share, it goes straight to the
+short code or QR, check the safety phrase matches, choose what to share, it goes straight to the
 other device locked, and later changes stay in sync. The five steps and their names match the
-Anatomy figure (components/p2p-anatomy.js), which sits below the video as "Look inside". Facts
+step diagrams (components/p2p-steps.js), which sit below the video as "Look inside". Facts
 follow docs/app/TECHNICAL_RUNTIME.md (Nanah) in the app repository: a 4-character code or QR,
-safety words compared on both screens, a chosen share, an encrypted direct connection, and
-auto-sync that is still in testing. The devices are drawn; Kriti is the cut-out from
+safety phrase compared on both screens, a chosen share, an encrypted direct connection, and
+opt-in auto-sync. The devices are drawn; Kriti is the cut-out from
 public/mascots. Rendered with fframes 1.3.0 (Metal), 1280 x 720, 24 fps, 564 frames.
 
 The scene start times in src/lib.rs (STARTS) are mirrored in components/p2p-sync-video.js so the

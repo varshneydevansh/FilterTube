@@ -3,17 +3,17 @@
 import { useEffect, useRef, useState } from "react";
 import { Pause, Play } from "@phosphor-icons/react";
 
-import { P2PAnatomy, STEPS } from "@/components/p2p-anatomy";
+import { P2PSteps, STEPS } from "@/components/p2p-steps";
 
 // When each step starts in the video (motion/p2p-sync/src/lib.rs, STARTS). The last scene is the
 // closing card, which keeps step 5 lit.
 const STARTS = [0, 4, 8, 12, 16.5];
 const SPOKEN = [
   "Pair with a short code or QR: your phone and your child’s device, nothing else.",
-  "Check both show the same safety words, so you know it’s really their device.",
+  "Check both show the same safety phrase, so you know it’s really their device.",
   "Choose what to share, for example filter words and Kids rules.",
   "It goes straight to their device, locked. No FilterTube server keeps a copy.",
-  "Later changes stay in sync. Auto-sync is still in testing.",
+  "Later changes stay in sync. Turn on Auto-sync to keep them matched.",
   "Your devices talk to each other. Nothing in between can read it.",
 ];
 
@@ -25,8 +25,8 @@ function stepAt(seconds) {
 
 /**
  * The parent-first explainer for device sync: a 23-second muted video (fframes, motion/p2p-sync)
- * on top, five step buttons that jump to each scene, and the Anatomy figure below as a closed
- * "Look inside" panel that lights the same step. Plays only on screen and never starts on its own
+ * on top, five step buttons that jump to each scene, and a closed "Look inside" panel below with
+ * one still diagram per step (components/p2p-steps.js) that follows the same step. Plays only on screen and never starts on its own
  * under reduced motion; the poster shows step 1 and the button plays it on request.
  */
 export function P2PSyncExplainer() {
@@ -125,10 +125,10 @@ export function P2PSyncExplainer() {
 
       <details className="ft-disclosure mt-8 rounded-[1.2rem] border border-[color:var(--color-line)] bg-[color:var(--color-soft-panel)]">
         <summary className="cursor-pointer px-5 py-4 font-semibold text-[var(--color-ink)]">
-          Look inside: the same five steps, in detail
+          Look inside: the five steps, one at a time
         </summary>
         <div className="px-3 pb-5 md:px-5">
-          <P2PAnatomy activeStep={picked} className="mx-auto max-w-[1040px]" />
+          <P2PSteps activeStep={picked} />
         </div>
       </details>
     </div>

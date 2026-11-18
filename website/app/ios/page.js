@@ -17,26 +17,15 @@ import { Reveal } from "@/components/reveal";
 import { detailPages } from "@/components/route-content";
 import { ScenicDetailPage } from "@/components/scenic-detail-page";
 
-// ---------------------------------------------------------------------------
-// PLACEHOLDERS: replace these three values when the first iOS direct release
-// is published. While a value still equals its placeholder name, the page
-// shows a visible "placeholder" marker instead of pretending it is real.
-// ---------------------------------------------------------------------------
-const SOURCE_JSON_URL = "SOURCE_JSON_URL";
-const GITHUB_RELEASE_URL = "GITHUB_RELEASE_URL";
-const IPA_SHA256 = "IPA_SHA256_CHECKSUM";
+// The direct release (source URL, release page, SHA-256) comes from public/ios/source.json, which
+// the app repository's release script fills. Until then the page says the install link is coming.
+import { iosRelease } from "@/data/ios-release";
 
 // Set VIDEO_URL (a direct video file or embeddable URL) to show the
 // "Watch the 2-minute walkthrough" slot. While it is a placeholder it hides.
 const VIDEO_URL = "VIDEO_URL";
+const isPlaceholder = (value) => value === "VIDEO_URL";
 
-const isPlaceholder = (value) =>
-  value === "VIDEO_URL" ||
-  value === "SOURCE_JSON_URL" ||
-  value === "GITHUB_RELEASE_URL" ||
-  value === "IPA_SHA256_CHECKSUM";
-
-const sideStoreAddSourceHref = `sidestore://source?url=${encodeURIComponent(SOURCE_JSON_URL)}`;
 const localDevVpnHref = "https://apps.apple.com/app/localdevvpn/id6755608044";
 const iloaderLinks = [
   { label: "macOS", href: "https://iloader.app/" },
@@ -159,13 +148,10 @@ function Eyebrow({ children }) {
   );
 }
 
-function PlaceholderMark({ name }) {
+function ComingNote({ children = "Coming with the first iPhone release" }) {
   return (
-    <span className="inline-flex items-center gap-2 rounded-full border border-dashed border-[color:var(--color-accent)] px-3 py-1 font-mono text-[0.72rem] text-[var(--color-accent)]">
-      {name}
-      <span className="font-sans uppercase tracking-[0.16em] text-[var(--color-muted)]">
-        placeholder
-      </span>
+    <span className="inline-flex min-h-11 items-center rounded-full border border-dashed border-[color:var(--color-line)] px-4 py-2 text-sm text-[var(--color-muted)]">
+      {children}
     </span>
   );
 }
@@ -267,11 +253,6 @@ function InstallGuide() {
                       </li>
                     ))}
                   </ul>
-                  <p className="mt-6 max-w-[62ch] text-sm leading-7 text-[var(--color-muted)]">
-                    The app is built on the same filtering engine as the
-                    open-source FilterTube extension. The app&apos;s own code
-                    is not open source.
-                  </p>
                 </div>
                 <Mascot
                   alt={kritiWave.alt}
@@ -350,10 +331,11 @@ function InstallGuide() {
                     Install.
                   </p>
                   <div className="mt-4 flex flex-col items-start gap-3">
-                    <ActionLink href={sideStoreAddSourceHref}>Add FilterTube</ActionLink>
-                    {isPlaceholder(SOURCE_JSON_URL) ? (
-                      <PlaceholderMark name="SOURCE_JSON_URL" />
-                    ) : null}
+                    {iosRelease.live ? (
+                      <ActionLink href={iosRelease.sideStoreHref}>Add FilterTube</ActionLink>
+                    ) : (
+                      <ComingNote />
+                    )}
                   </div>
                 </StepCard>
                 <StepCard number="4" where="Done" title="Keep it fresh" mascot={uljhanHappy}>
@@ -375,6 +357,13 @@ function InstallGuide() {
                   your phone about once a week. Advanced setups are covered in{" "}
                   <TextLink href={sideStoreDocsHref}>SideStore&apos;s docs</TextLink>.
                 </p>
+                <div className="mt-3">
+                  {iosRelease.live ? (
+                    <ActionLink href={iosRelease.altStoreHref} variant="secondary">Add FilterTube to AltStore</ActionLink>
+                  ) : (
+                    <ComingNote />
+                  )}
+                </div>
               </details>
 
               <div className="mt-6 rounded-[1.2rem] border border-[color:var(--color-line)] p-5">
@@ -382,7 +371,7 @@ function InstallGuide() {
                   Coming to AltStore PAL and the App Store
                 </p>
                 <p className="mt-2 text-sm leading-7 text-[var(--color-muted)]">
-                  Once Apple sorts out the developer account, people in the EU,
+                  Once the trouble on Apple&apos;s side is resolved, people in the EU,
                   Japan and Brazil will be able to install FilterTube with{" "}
                   <TextLink href="https://altstore.io">AltStore PAL</TextLink>,
                   with no computer and no weekly refresh, and everyone else
@@ -485,18 +474,18 @@ function InstallGuide() {
                       release, and check that its SHA-256 matches.
                     </p>
                     <div className="mt-3 flex flex-wrap items-center gap-3">
-                      {isPlaceholder(GITHUB_RELEASE_URL) ? (
-                        <PlaceholderMark name="GITHUB_RELEASE_URL" />
+                      {iosRelease.releaseURL ? (
+                        <TextLink href={iosRelease.releaseURL}>Official GitHub release</TextLink>
                       ) : (
-                        <TextLink href={GITHUB_RELEASE_URL}>Official GitHub release</TextLink>
+                        <ComingNote />
                       )}
                     </div>
                     <p className="mt-3 break-all">
                       SHA-256:{" "}
-                      {isPlaceholder(IPA_SHA256) ? (
-                        <PlaceholderMark name="IPA_SHA256_CHECKSUM" />
+                      {iosRelease.sha256 ? (
+                        <code className="font-mono text-[var(--color-ink)]">{iosRelease.sha256}</code>
                       ) : (
-                        <code className="font-mono text-[var(--color-ink)]">{IPA_SHA256}</code>
+                        <span>published with the first iPhone release</span>
                       )}
                     </p>
                   </div>
