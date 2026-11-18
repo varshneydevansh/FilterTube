@@ -1,0 +1,4 @@
+/target/
+/frames/
+*.mp4
+strip.png
