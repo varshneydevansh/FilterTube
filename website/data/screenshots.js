@@ -42,6 +42,7 @@ export const devices = {
     featured: "controls",
     captures: {
       home: { src: ios("iphone-home"), title: "Home", alt: "FilterTube on iPhone: Home with the Main viewing space and its filters", caption: "Home with your filters applied.", ...IPHONE_NEW, current: true },
+      study: { src: ios("iphone-study"), title: "Study plan", alt: "FilterTube on iPhone: a study plan with the exam channels you chose switched on", caption: "A study plan with only the channels you chose.", ...IPHONE_NEW, current: true },
       watch: { src: ios("iphone-watch"), title: "Watch", alt: "FilterTube on iPhone: a nature documentary playing with recommendations", caption: "A clean Watch page with your rules applied.", ...IPHONE_NEW, current: true },
       kids: { src: ios("iphone-kids"), title: "Kids", alt: "FilterTube Kids Viewing home on iPhone", caption: "Kids Viewing, with the parent's Kids rules.", ...IPHONE_NEW, current: true },
       controls: { src: ios("iphone-controls"), title: "Controls", alt: "FilterTube Controls on iPhone with filters, profiles, settings and sync", caption: "Filters, profiles and sync in one place.", ...IPHONE_NEW, current: true },
