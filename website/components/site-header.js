@@ -3,14 +3,14 @@
 import Image from "next/image";
 import Link from "next/link";
 import { startTransition, useEffect, useState } from "react";
-import { GithubLogo, InstagramLogo, List, RedditLogo, X } from "@phosphor-icons/react";
+import { DiscordLogo, GithubLogo, InstagramLogo, List, RedditLogo, X } from "@phosphor-icons/react";
 import { usePathname } from "next/navigation";
 
 import {
   navigationLinks,
   platformSlugs,
 } from "@/components/site-shell-data";
-import { githubHref, instagramHref, redditHref } from "@/components/route-content";
+import { discordHref, githubHref, instagramHref, redditHref } from "@/components/route-content";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { poses } from "@/data/mascots";
 
@@ -117,6 +117,16 @@ export function SiteHeader() {
               <InstagramLogo aria-hidden="true" size={18} weight="bold" />
             </a>
             <a
+              aria-label="FilterTube on Discord"
+              className="hidden h-11 w-11 items-center justify-center rounded-[0.95rem] border border-[color:var(--color-line)] bg-[color:var(--color-tile)] text-[var(--color-ink)] shadow-[0_18px_38px_-32px_rgba(8,10,16,0.26)] transition duration-700 ease-[cubic-bezier(0.32,0.72,0,1)] hover:-translate-y-0.5 hover:border-[color:var(--color-accent)] hover:text-[var(--color-accent)] active:translate-y-px active:scale-[0.98] lg:inline-flex"
+              href={discordHref}
+              rel="noreferrer"
+              target="_blank"
+              title="Discord"
+            >
+              <DiscordLogo aria-hidden="true" size={18} weight="bold" />
+            </a>
+            <a
               className="group hidden min-h-11 items-center gap-3 whitespace-nowrap rounded-[0.95rem] border border-[color:var(--color-line)] bg-[color:var(--color-tile)] px-4 py-2.5 text-sm font-medium text-[var(--color-ink)] shadow-[0_18px_38px_-32px_rgba(8,10,16,0.26)] transition duration-700 ease-[cubic-bezier(0.32,0.72,0,1)] hover:-translate-y-0.5 hover:border-[color:var(--color-accent)] hover:text-[var(--color-accent)] active:translate-y-px active:scale-[0.98] lg:inline-flex"
               href={redditHref}
               rel="noreferrer"
@@ -194,6 +204,15 @@ export function SiteHeader() {
                   />
                 </div>
               ))}
+              <a
+                className="inline-flex min-h-11 items-center justify-center gap-3 whitespace-nowrap rounded-[0.95rem] border border-[color:var(--color-line)] bg-[color:var(--color-tile)] px-5 py-3 text-sm font-medium text-[var(--color-ink)] transition duration-700 ease-[cubic-bezier(0.32,0.72,0,1)] hover:border-[color:var(--color-accent)] hover:text-[var(--color-accent)] active:translate-y-px active:scale-[0.98]"
+                href={discordHref}
+                rel="noreferrer"
+                target="_blank"
+              >
+                <DiscordLogo aria-hidden="true" size={15} weight="fill" />
+                Discord community
+              </a>
               <a
                 className="inline-flex min-h-11 items-center justify-center gap-3 whitespace-nowrap rounded-[0.95rem] border border-[color:var(--color-line)] bg-[color:var(--color-tile)] px-5 py-3 text-sm font-medium text-[var(--color-ink)] transition duration-700 ease-[cubic-bezier(0.32,0.72,0,1)] hover:border-[color:var(--color-accent)] hover:text-[var(--color-accent)] active:translate-y-px active:scale-[0.98]"
                 href={redditHref}

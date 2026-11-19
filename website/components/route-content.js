@@ -18,6 +18,7 @@ export const docsHref =
 
 export const githubHref = "https://github.com/varshneydevansh/FilterTube";
 export const redditHref = "https://www.reddit.com/r/FilterTubeApp/";
+export const discordHref = "https://discord.gg/kbdt6ed5h";
 export const instagramHref = "https://www.instagram.com/filtertube.in/";
 export const downloadsHref = "/downloads";
 export const androidPlayStoreHref =
@@ -103,6 +104,7 @@ export const footerLinks = {
     { label: "ML & AI", href: "/ml-ai" },
   ],
   resources: [
+    { label: "Discord community", href: discordHref, external: true },
     { label: "Reddit community", href: redditHref, external: true },
     { label: "Instagram", href: instagramHref, external: true },
     { label: "Documentation", href: docsHref, external: true },
