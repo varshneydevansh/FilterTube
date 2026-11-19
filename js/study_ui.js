@@ -763,7 +763,8 @@
             if (s.step === 'kind') return t('study.setup.title', 'Set up study');
             if (s.step === 'list') {
                 if (s.mode === 'exam') return s.country ? t('study.setup.examsIn', 'Exams in {country}', { country: countryName(s.country) }) : t('study.setup.examsTitle', 'Exams');
-                return s.mode === 'school' ? t('study.setup.kindSchool', 'School') : t('study.setup.kindSkill', 'Learn a skill');
+                if (s.mode === 'school') return t('study.setup.kindSchool', 'School');
+                return s.mode === 'interview' ? t('study.setup.kindInterview', 'A job interview') : t('study.setup.kindSkill', 'Learn a skill');
             }
             if (s.step === 'stream') {
                 const list = packs().filter(pack => array(pack.variants).length && pack.kind !== 'class');
@@ -807,7 +808,7 @@
             panel.dataset.step = s.step;
             const country = s.country;
             if (Packs.countryAccent) panel.dataset.country = country || '';
-            const parts = { kind: renderKind, list: s.mode === 'exam' ? renderExams : s.mode === 'school' ? renderSchool : renderSkills,
+            const parts = { kind: renderKind, list: s.mode === 'exam' ? renderExams : s.mode === 'school' ? renderSchool : s.mode === 'interview' ? renderInterviews : renderSkills,
                 stream: renderStream, review: renderReview, ready: renderReady }[s.step];
             const tail = parts(body);
             panel.replaceChildren(header(), body);
@@ -905,12 +906,16 @@
             const boards = Setup.StudySchool.boards(catalog, s.country, Setup.MIN_CHANNELS);
             const schoolLine = !boards.length ? t('study.setup.kindSchoolNone', 'Lessons that fit any curriculum')
                 : t('study.setup.kindExamples', '{names} and more', { names: boards.map(board => board.label).filter(label => label.length <= 16).slice(0, 3).join(', ') || boards[0].label });
+            // The Interview tile shows only when the catalog has interview packs (Android StudySetupActivity).
+            const hasInterviews = Setup.StudyInterviews.of(catalog, Setup.MIN_CHANNELS).length > 0;
             const tiles = el('div', 'ft-setup-tiles');
             for (const [mode, name, line, doodle] of [
                 ['exam', t('study.setup.kindExam', 'An exam'), examLine, 'seal'],
                 ['school', t('study.setup.kindSchool', 'School'), schoolLine, 'note'],
-                ['skill', t('study.setup.kindSkill', 'Learn a skill'), t('study.setup.kindSkillBody', 'Coding, maths and science. Add your own channels too.'), 'crayon']
-            ]) {
+                ['skill', t('study.setup.kindSkill', 'Learn a skill'), t('study.setup.kindSkillBody', 'Maths, science and open lectures. Add your own channels too.'), 'crayon'],
+                ['interview', t('study.setup.kindInterview', 'A job interview'),
+                    t('study.setup.kindInterviewBody', 'Coding, system design, finance, HR and more. Add your own channels too.'), 'clip']
+            ].filter(([mode]) => mode !== 'interview' || hasInterviews)) {
                 const tile = button('', `ft-setup-tile is-${mode}`, () => {
                     if (s.mode !== mode) { s.query = ''; s.alsoOpen = false; }
                     s.mode = mode;
@@ -1085,6 +1090,14 @@
         // ---- Step 2c: a skill
         function skillDoodle(pack) {
             const words = new Set(Setup.StudyExamFields.words(pack.id));
+            // Interview packs (Android skillDoodle: bridge, gear, atom, coins, bolt, peak, leaf), in the doodles we have.
+            if (words.has('system')) return 'scribble_circle';
+            if (words.has('devops') || words.has('cloud')) return 'cloud';
+            if (words.has('data')) return 'sparkle';
+            if (words.has('finance')) return 'stamp';
+            if (words.has('product')) return 'star';
+            if (words.has('consulting')) return 'magnifier';
+            if (words.has('hr')) return 'heart';
             if (words.has('coding')) return 'note';
             if (words.has('maths')) return 'crayon';
             if (words.has('science')) return 'sparkle';
@@ -1117,6 +1130,16 @@
                 list.appendChild(el('p', 'ft-setup-h2', t('study.setup.skillKidsHeading', 'Kids learning')));
                 kids.forEach(pack => list.appendChild(pickRow(pack)));
             }
+            body.appendChild(list);
+            return listBar();
+        }
+
+        // ---- Step 2d: a job interview
+        function renderInterviews(body) {
+            body.append(el('h3', 'ft-setup-h1', t('study.setup.interviewQuestion', 'Which interview are you preparing for?')),
+                el('p', 'ft-study-muted', t('study.setup.skillBody', 'Pick one or more. You can add your own channels next.')));
+            const list = el('div', 'ft-setup-picks');
+            Setup.StudyInterviews.of(catalog, Setup.MIN_CHANNELS).forEach(pack => list.appendChild(pickRow(pack)));
             body.appendChild(list);
             return listBar();
         }

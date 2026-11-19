@@ -91,8 +91,26 @@
         in_gate: ['previous year questions', 'engineering mathematics'],
         'in_jee:main': ['projectile motion', 'mole concept'],
         'in_jee:advanced': ['rotational motion', 'irodov'],
-        in_jee: ['projectile motion', 'mole concept']
+        in_jee: ['projectile motion', 'mole concept'],
+        global_coding_interview: ['two sum', 'dynamic programming'],
+        interview_system_design: ['url shortener', 'rate limiter'],
+        interview_devops_cloud: ['kubernetes', 'ci/cd pipeline'],
+        interview_data_science: ['sql interview questions', 'a/b testing'],
+        interview_product: ['product sense', 'prioritization'],
+        interview_consulting: ['market sizing', 'profitability case'],
+        interview_finance: ['dcf', 'walk me through'],
+        interview_hr: ['tell me about yourself', 'star method']
     });
+    /**
+     * Android StudyInterviewTopics: every interview pack is studied with these, so a search for "mock
+     * interview" goes to its channels, such titles pass, and they rank first on an interview plan's Home.
+     */
+    const INTERVIEW_TOPICS = Object.freeze(['interview', 'interview questions', 'mock interview', 'interview preparation', 'interview prep']);
+    /** The interview packs' ids: "interview_*" and the coding pack that kept its id from the Skill days. */
+    function isInterviewPackId(id) {
+        const value = typeof id === 'string' ? id.trim() : '';
+        return value.startsWith('interview_') || value === 'global_coding_interview';
+    }
     const TOPIC_SYNONYMS = Object.freeze({
         // GATE Civil
         'building materials': ['cement', 'concrete', 'aggregate', 'aggregates', 'bricks', 'brick', 'mortar', 'lime',
@@ -204,6 +222,31 @@
         // SMA (Indonesia)
         trigonometri: ['sin cos tan', 'identitas trigonometri', 'aturan sinus', 'aturan cosinus'],
         stoikiometri: ['konsep mol', 'persamaan reaksi', 'mol'],
+        // Interviews (coding, system design, cloud, data, product, consulting, finance, HR)
+        'dynamic programming': ['dp', 'memoization', 'knapsack', 'longest common subsequence', 'tabulation'],
+        graphs: ['bfs', 'dfs', 'dijkstra', 'topological sort', 'union find', 'graph algorithms'],
+        'system design': ['load balancer', 'caching', 'sharding', 'rate limiter', 'url shortener', 'message queue',
+            'consistent hashing', 'high level design', 'low level design', 'hld', 'lld', 'scalability'],
+        'low level design': ['lld', 'design patterns', 'solid principles', 'object oriented design', 'class diagram'],
+        kubernetes: ['k8s', 'pods', 'helm', 'kubectl', 'deployments'],
+        docker: ['containers', 'dockerfile', 'docker compose'],
+        'ci/cd': ['jenkins', 'github actions', 'pipelines', 'continuous integration', 'continuous delivery'],
+        aws: ['ec2', 's3', 'iam', 'vpc', 'lambda', 'solutions architect'],
+        sql: ['joins', 'window functions', 'group by', 'subqueries', 'sql interview questions'],
+        'machine learning': ['ml', 'regression', 'classification', 'overfitting', 'bias variance', 'gradient descent'],
+        statistics: ['probability', 'hypothesis testing', 'p value', 'a/b testing', 'confidence interval'],
+        'product sense': ['product design', 'favorite product', 'improve a product', 'product design question'],
+        'product metrics': ['north star metric', 'kpi', 'metrics question', 'root cause analysis', 'metric drop'],
+        'case interview': ['case study', 'case interview framework', 'market sizing', 'profitability', 'market entry',
+            'guesstimate', 'mece'],
+        guesstimate: ['market sizing', 'estimation question', 'guesstimates'],
+        valuation: ['dcf', 'discounted cash flow', 'comparable companies', 'precedent transactions', 'lbo', 'wacc'],
+        accounting: ['three statements', 'financial statements', 'balance sheet', 'cash flow statement', 'income statement',
+            'walk me through the three statements'],
+        'behavioral interview': ['behavioural interview', 'star method', 'tell me about yourself', 'strengths and weaknesses',
+            'why should we hire you', 'hr interview questions'],
+        'hr interview': ['hr round', 'tell me about yourself', 'salary negotiation', 'why should we hire you',
+            'hr interview questions'],
         // O/L (Sri Lanka)
         'o/l': ['ordinary level', 'gce o/l', 'සාමාන්‍ය පෙළ', 'சாதாரண தரம்']
     });
@@ -709,7 +752,10 @@
         const key = wordKey(seed);
         let found = null;
         if (kind === SUGGESTION_KINDS.TOPIC_SYNONYMS) found = own(TOPIC_SYNONYMS, key);
-        else if (kind === SUGGESTION_KINDS.PACK_TOPICS) found = own(PACK_TOPIC_SUGGESTIONS, key) || own(PACK_TOPIC_SUGGESTIONS, key.split(':')[0]);
+        else if (kind === SUGGESTION_KINDS.PACK_TOPICS) {
+            found = own(PACK_TOPIC_SUGGESTIONS, key) || own(PACK_TOPIC_SUGGESTIONS, key.split(':')[0])
+                || (isInterviewPackId(key.split(':')[0]) ? INTERVIEW_TOPICS : null);
+        }
         else if (kind === SUGGESTION_KINDS.SEARCH_EXAMPLES) found = own(SEARCH_EXAMPLE_SUGGESTIONS, key) || own(SEARCH_EXAMPLE_SUGGESTIONS, key.split(':')[0]);
         return array(found).slice();
     }
@@ -1357,7 +1403,7 @@
         NORMAL, STUDY, BREAK, LIMIT, BREAK_NOTICE_MS, BREAK_WAIT_MAX_MS, GENTLE_END_PAUSE_MS,
         SELF_LOCK_MAX_MINUTES, PARENT_LOCK_MAX_MINUTES, STUDY_SOURCE, TOPIC_SOURCE,
         parseTime, localDateKey, splitRounds, planOccurrences, studyClock, studyRulesApply, studyPhase,
-        SUGGESTION_KINDS, suggest, suggestionSeed, studyTopics, studyAllowPhrases, topicTerms, topicPatterns,
+        SUGGESTION_KINDS, INTERVIEW_TOPICS, isInterviewPackId, suggest, suggestionSeed, studyTopics, studyAllowPhrases, topicTerms, topicPatterns,
         topicsForQuery, planSearchTerms, channelSearchGroups, exampleSearches, searchExplainer, topicLabel, breakSkipPreview, SKIP_UNDO_MS,
         dayRing, ringBoundaries, currentBreak,
         PAGE_STATES, PAGE_BAND_PX, PAGE_LAST_FIVE_MS, PAGE_CROSSFADE_MS, pageState, pageEvening, pagePalette, mixColor,

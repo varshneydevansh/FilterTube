@@ -5,7 +5,8 @@
  * - StudyExamList: a country's exams grouped by field, with neighbours' and global exams folded under
  *   "Also taken from {country}", and search across all of it.
  * - StudySchool: a country's boards, the classes each board covers, and the global class packs.
- * - StudySkills: the "Learn a skill" packs (global lessons, coding).
+ * - StudySkills: the "Learn a skill" packs (global lessons).
+ * - StudyInterviews: the "A job interview" packs (coding, system design, finance, HR, ...).
  * - StudyReviewGroups: Review's channel and topic groups ("For {stream}", "Everyone taking {exam}",
  *   "Your own"), the edits a switch or an added channel makes, and the bar's counts.
  * - StudyChannelInput: what someone typed into "Add a channel" (a name, an @handle, a UC id or a link).
@@ -20,6 +21,8 @@
 
     const GLOBAL_PREFIX = 'global_';
     const KIND_CLASS = 'class';
+    /** Job-interview prep (Android StudyPackCatalog.KIND_INTERVIEW): global packs, their own setup tile. */
+    const KIND_INTERVIEW = 'interview';
     const EXAM_KINDS = Object.freeze(['study', 'exam']);
     /** Android StudySetupActivity.MIN_CHANNELS: a pack shows in setup with at least this many channels. */
     const MIN_CHANNELS = 3;
@@ -119,7 +122,16 @@
 
     // ---- Steps (Android StudySetupPath) ----------------------------------------------------------
 
-    const MODES = Object.freeze({ EXAM: 'exam', SCHOOL: 'school', SKILL: 'skill' });
+    const MODES = Object.freeze({ EXAM: 'exam', SCHOOL: 'school', SKILL: 'skill', INTERVIEW: 'interview' });
+
+    /** The tile a chosen pack lives under (Android StudySetupMode.of), so changing a plan reopens on its list. */
+    function modeOf(pack) {
+        if (pack?.kind === 'kids_age' || pack?.kind === 'kids_classic') return MODES.SKILL;
+        if (pack?.kind === KIND_INTERVIEW) return MODES.INTERVIEW;
+        if (isGlobal(pack) && (pack?.kind === KIND_CLASS || StudyExamFields.of(pack) === 'skills')) return MODES.SKILL;
+        if (pack?.kind === KIND_CLASS) return MODES.SCHOOL;
+        return MODES.EXAM;
+    }
     const STEPS = Object.freeze(['kind', 'list', 'stream', 'review', 'ready']);
 
     const StudySetupPath = Object.freeze({
@@ -355,6 +367,17 @@
                 return { board, grade: board.grades.find(grade => grade.packId === packId) || null };
             }
             return null;
+        }
+    });
+
+    const StudyInterviews = Object.freeze({
+        /** Interview packs in catalog order: coding first, then system design, cloud, data, product, consulting, finance, HR. */
+        of(catalog, minChannels = 0) {
+            return array(catalog?.packs).filter(pack => pack.kind === KIND_INTERVIEW && array(pack.channels).length >= minChannels);
+        },
+        /** "DSA, System design, Finance": the tile's examples, from the packs' short names. */
+        examples(catalog, minChannels = 0, count = 3) {
+            return [...new Set(StudyInterviews.of(catalog, minChannels).map(pack => text(pack.shortName)).filter(Boolean))].slice(0, count);
         }
     });
 
@@ -608,10 +631,7 @@
     function reopenAt(selected, catalog, deviceCountry) {
         const chosen = array(selected).map(id => array(catalog?.packs).find(pack => pack.id === id)).find(Boolean);
         if (!chosen) return { step: 'kind', mode: MODES.EXAM, country: countryCode(deviceCountry) };
-        let mode = MODES.EXAM;
-        if (chosen.kind === 'kids_age' || chosen.kind === 'kids_classic') mode = MODES.SKILL;
-        else if (isGlobal(chosen) && (chosen.kind === KIND_CLASS || StudyExamFields.of(chosen) === 'skills')) mode = MODES.SKILL;
-        else if (chosen.kind === KIND_CLASS) mode = MODES.SCHOOL;
+        const mode = modeOf(chosen);
         const device = countryCode(deviceCountry);
         const country = isGlobal(chosen) ? device : (array(chosen.countries).find(code => code === device) || array(chosen.countries)[0] || null);
         return { step: 'list', mode, country };
@@ -628,8 +648,8 @@
     }
 
     return Object.freeze({
-        MIN_CHANNELS, ROWS_FOLDED, TOPICS_FOLDED, MAX_TOPICS, MODES, STEPS,
-        StudySetupPath, StudyExamFields, StudyExamList, StudySchool, StudySkills, StudyReviewGroups, StudyChannelInput,
+        MIN_CHANNELS, ROWS_FOLDED, TOPICS_FOLDED, MAX_TOPICS, MODES, STEPS, KIND_INTERVIEW, modeOf,
+        StudySetupPath, StudyExamFields, StudyExamList, StudySchool, StudySkills, StudyInterviews, StudyReviewGroups, StudyChannelInput,
         channelsFor, topicsFor, normalizeKey, refKey, topicKey, isGlobal, packName, variant, variantName,
         savedEdits, planLabel, reopenAt, countries
     });

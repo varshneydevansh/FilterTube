@@ -63,7 +63,7 @@ test('India\'s exams are grouped by field in order, with neighbours and global e
     const also = new Set(ids(model.alsoPacks));
     assert.ok(also.has('us_sat') && also.has('global_ielts') && also.has('global_ib'));
     assert.ok([...own].every(id => !also.has(id)));
-    // Coding interviews are a skill, not an exam.
+    // Coding interviews are an interview, not an exam.
     assert.ok(!own.has('global_coding_interview') && !also.has('global_coding_interview'));
     assert.deepEqual(model.elsewhere, []);
 });
@@ -118,9 +118,9 @@ test('the school stem drops grades and brackets', () => {
     assert.equal(StudySchool.stem('Key Stage 3'), 'Key Stage 3');
 });
 
-test('skills are the global lessons and coding', () => {
+test('skills are the global lessons, and coding interviews moved to Interview', () => {
     const skillIds = ids(StudySkills.of(catalog, 3));
-    assert.ok(skillIds.includes('global_cls_khan_academy') && skillIds.includes('global_coding_interview'));
+    assert.ok(skillIds.includes('global_cls_khan_academy') && !skillIds.includes('global_coding_interview'));
     assert.ok(!skillIds.includes('global_ielts'));
 });
 

@@ -263,6 +263,7 @@
 .ft-setup-tile.is-exam { background: var(--pk-rose, #fae8e6); transform: rotate(-0.5deg); }
 .ft-setup-tile.is-school { background: var(--pk-sky, #e9f4fb); transform: rotate(0.4deg); }
 .ft-setup-tile.is-skill { background: var(--pk-sage, #edf4e7); transform: rotate(-0.3deg); }
+.ft-setup-tile.is-interview { background: var(--pk-lilac, #efe6f7); transform: rotate(0.3deg); }
 .ft-setup-tile:hover { transform: rotate(0deg) translateY(-1px); }
 .ft-setup-tile__copy { display: flex; flex-direction: column; gap: 4px; flex: 1; min-width: 0; order: 2; }
 .ft-setup-tile__name { font-family: var(--pk-font-display, inherit); font-size: 1.375rem; font-weight: 600; }
