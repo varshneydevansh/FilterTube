@@ -227,3 +227,27 @@ export const kidsScreens = {
     { src: android("tv-kids"), title: "Kids rules on TV", alt: "Kids Mode on Android TV with the words scary and horror blocked", caption: "Block words like scary and horror for Kids, from the sofa.", ...TV, current: true },
   ],
 };
+
+// Browser extension screens, used by the extension page. The 3.6.2 captures (current: true) come
+// from the owner's own browser, cropped so no browser toolbar, profile photo or site sidebar shows.
+// Kids rules and Accounts & Sync are still 3.4.1 captures (current: false) until they are re-captured.
+const ext = (file) => `/apps/screenshots/${file}`;
+
+export const extensionScreens = {
+  // Hero fan: the popup in front, two dashboard cards behind it.
+  hero: [
+    { src: ext("extension-popup.webp"), title: "Popup", alt: "FilterTube extension popup: switched on, 144 hidden so far, with keyword search, Add keyword and colour-coded rules", width: 390, height: 536, current: true },
+    { src: ext("extension-study-card.webp"), title: "Study plan", alt: "FilterTube extension study plan: SAT channels such as College Board and Khan Academy switched on, with SAT and GMAT topics", width: 570, height: 572, current: true },
+    { src: ext("extension-uljhan-card.webp"), title: "What was hidden", alt: "FilterTube extension Home card listing videos hidden today because they matched a blocked word, each with an Allow button", width: 590, height: 382, current: true },
+  ],
+  gallery: [
+    { src: ext("extension-home.webp"), title: "Home", alt: "FilterTube extension dashboard Home: Good afternoon, 144 things kept out today, time saved, Study today and the videos Uljhan tried today", caption: "What was kept out today, time saved, and your study plan at a glance.", width: 1838, height: 1321, current: true },
+    { src: ext("extension-channel-rules.webp"), title: "Channel rules", alt: "FilterTube extension Channel Management with blocked channel rows coloured by where each rule came from, and the popup open beside it", caption: "Blocked channels, coloured by where each rule came from. The popup stays one click away.", width: 1840, height: 1323, current: true },
+    { src: ext("extension-content-controls-page.webp"), title: "Content controls", alt: "FilterTube extension Content Controls: switches to hide Clips, the home feed, comments, adverts, Playables and more", caption: "Switch off Clips, adverts, Playables and more, everywhere at once.", width: 1838, height: 1321, current: true },
+    { src: ext("extension-study-plan.webp"), title: "Study plan", alt: "FilterTube extension Study and focus: a plan for SAT and GMAT with exam channels switched on and topic chips beside them", caption: "Pick your exam and keep the channels and topics you want.", width: 1836, height: 1313, current: true },
+    { src: ext("extension-study-feed.webp"), title: "Study feed", alt: "A study feed on the video site's home page: lessons from the plan's channels with SAT topic chips above them", caption: "The home page becomes a feed of lessons from your plan.", width: 1277, height: 918, current: true },
+    { src: ext("extension-import-export.webp"), title: "Import and export", alt: "FilterTube extension Settings, Import / Export: download a backup, restore one, or import a channel and keyword list with a preview", caption: "Back up, restore, or preview a rule list before importing it.", width: 1839, height: 1319, current: true },
+    { src: ext("extension-kids-rules.png"), title: "Kids rules", alt: "FilterTube extension preview: Kids rules", caption: "Keep channel rules for Kids separate from Main viewing.", width: 1722, height: 1263, current: false },
+    { src: ext("extension-accounts-sync.png"), title: "Accounts & Sync", alt: "FilterTube extension preview: Accounts & Sync", caption: "Choose a device, verify the connection and decide what to sync.", width: 1718, height: 1258, current: false },
+  ],
+};

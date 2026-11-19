@@ -1,4 +1,4 @@
-import { devices, galleryFor, kidsScreens } from "@/data/screenshots";
+import { devices, extensionScreens, galleryFor, kidsScreens } from "@/data/screenshots";
 
 import {
   extensionInstallHref,
@@ -426,65 +426,12 @@ export const detailPages = {
       "Filter channels, keywords, Shorts, comments, and supported content on the pages you already use. Use the popup for quick changes, the dashboard for deeper setup, and the video menu to block content as you browse.",
     heroScreensLayout: "popup",
     heroScreensLabel: "Extension preview",
-    heroScreens: [
-      { src: "/apps/screenshots/extension-keywords.png", title: "Keywords", alt: "FilterTube extension popup with keyword search, add and list controls", width: 391, height: 388 },
-      { src: "/apps/screenshots/extension-channels.png", title: "Channels", alt: "FilterTube extension popup with channel search and saved channel rules", width: 392, height: 442 },
-      { src: "/apps/screenshots/extension-content-controls.png", title: "Content controls", alt: "FilterTube extension popup with category and feed filter switches", width: 397, height: 542 },
-    ],
+    heroScreens: extensionScreens.hero,
     screenshotsLayout: "desktop",
     screenshotsLabel: "Extension preview screenshots",
     screenshotsTitle: "A closer look at the extension",
     screenshotsDescription: "Features and appearance may differ from your browser store version.",
-    screenshots: [
-      {
-        src: "/apps/screenshots/extension-dashboard.png",
-        title: "Dashboard",
-        alt: "FilterTube extension preview: Dashboard",
-        caption: "An overview of profiles, viewing spaces and frequently used controls.",
-        width: 1720,
-        height: 1261,
-      },
-      {
-        src: "/apps/screenshots/extension-channel-rules.png",
-        title: "Channel rules",
-        alt: "FilterTube extension preview: Channel rules",
-        caption: "Review blocked and allowed channels for your selected profile.",
-        width: 1723,
-        height: 1251,
-      },
-      {
-        src: "/apps/screenshots/extension-kids-rules.png",
-        title: "Kids rules",
-        alt: "FilterTube extension preview: Kids rules",
-        caption: "Keep channel rules for Kids separate from Main viewing.",
-        width: 1722,
-        height: 1263,
-      },
-      {
-        src: "/apps/screenshots/extension-focus-settings.png",
-        title: "Focus and settings",
-        alt: "FilterTube extension preview: Focus and settings",
-        caption: "Review focus sessions, backups and preference controls.",
-        width: 1716,
-        height: 1254,
-      },
-      {
-        src: "/apps/screenshots/extension-imports-language.png",
-        title: "Imports and language",
-        alt: "FilterTube extension preview: Imports and language",
-        caption: "Preview imported rules and choose your interface language.",
-        width: 1722,
-        height: 1245,
-      },
-      {
-        src: "/apps/screenshots/extension-accounts-sync.png",
-        title: "Accounts & Sync",
-        alt: "FilterTube extension preview: Accounts & Sync",
-        caption: "Choose a device, verify the connection and decide what to sync.",
-        width: 1718,
-        height: 1258,
-      },
-    ],
+    screenshots: extensionScreens.gallery,
 
     primaryCta: {
       label: "Choose your browser",
