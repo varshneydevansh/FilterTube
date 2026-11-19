@@ -31,7 +31,7 @@
   "content_scripts": [
     {
       "matches": ["*://*.youtube.com/*", "*://*.youtubekids.com/*"],
-      "exclude_matches": ["*://*.youtube.com/embed/*"],
+      "exclude_matches": ["*://*.youtube.com/embed/*", "*://studio.youtube.com/*"],
       "js": [
         "js/shared/identity.js", "js/shared/view_count_isolated.js", "js/content/admission_overlay.js",
         "js/content/dom_state.js",
