@@ -4,6 +4,7 @@ export const extensionInstallHref =
 export const navigationLinks = [
   { label: "Android", href: "/android" },
   { label: "iOS", href: "/ios" },
+  { label: "Extension", href: "/extension" },
   { label: "Kids", href: "/kids" },
   { label: "Features", href: "/#capabilities" },
   { label: "Downloads", href: "/downloads" },
