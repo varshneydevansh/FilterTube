@@ -109,6 +109,8 @@
   "admission.foundInTags": "Encontrada en: las etiquetas del vídeo",
   "admission.foundInChannel": "Encontrada en: el nombre del canal",
   "admission.foundInDetails": "Encontrada en: los detalles del vídeo",
+  "admission.queueSkipped": "Se omitió un video que tus filtros ocultan",
+  "admission.queueEndAllBlocked": "No queda nada en esta cola que tus filtros permitan",
   "admission.quietVideoTitle": "Este vídeo no está disponible",
   "admission.quietChannelTitle": "Este canal no está disponible",
   "admission.quietBack": "Volver",

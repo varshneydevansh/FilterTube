@@ -109,6 +109,8 @@
   "admission.foundInTags": "எங்கே கிடைத்தது: வீடியோ குறிச்சொற்களில்",
   "admission.foundInChannel": "எங்கே கிடைத்தது: சேனல் பெயரில்",
   "admission.foundInDetails": "எங்கே கிடைத்தது: வீடியோ விவரங்களில்",
+  "admission.queueSkipped": "உங்கள் வடிப்பான்கள் மறைக்கும் ஒரு வீடியோ தவிர்க்கப்பட்டது",
+  "admission.queueEndAllBlocked": "இந்த வரிசையில் உங்கள் வடிப்பான்கள் அனுமதிப்பது எதுவும் இல்லை",
   "admission.quietVideoTitle": "இந்த வீடியோ கிடைக்கவில்லை",
   "admission.quietChannelTitle": "இந்தச் சேனல் கிடைக்கவில்லை",
   "admission.quietBack": "பின்செல்",

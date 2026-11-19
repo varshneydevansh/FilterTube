@@ -1799,7 +1799,12 @@ function setDirectAccessOverlay(stateValue, message) {
     if (overlay.parentElement !== host) host.appendChild(overlay);
     host.setAttribute('data-filtertube-direct-access-overlay-host', 'true');
     const nextState = stateValue === 'blocked' ? 'blocked' : 'pending';
-    const nextMessage = String(message || (stateValue === 'blocked' ? 'Blocked by FilterTube' : 'Checking FilterTube rules…'));
+    let nextMessage = String(message || (stateValue === 'blocked' ? 'Blocked by FilterTube' : 'Checking FilterTube rules…'));
+    // A playlist or Mix with nothing allowed left that way says so on the card.
+    const queueEndLine = nextState === 'blocked' && typeof getQueueBlockedSkipEndLine === 'function'
+        ? getQueueBlockedSkipEndLine()
+        : '';
+    if (queueEndLine && !nextMessage.split('\n').includes(queueEndLine)) nextMessage = `${nextMessage}\n${queueEndLine}`;
     if (overlay.getAttribute('data-state') !== nextState) overlay.setAttribute('data-state', nextState);
     if (overlay.__filtertubeAdmissionSourceMessage !== nextMessage ||
         overlay.__filtertubeAdmissionSourceState !== nextState ||
@@ -2414,6 +2419,105 @@ function enforceCurrentChannelPageDirectAccess(settings) {
     }
 }
 
+// Playlists and Mixes: a video blocked only once its Watch page loads (a description keyword or
+// other late metadata) moves the queue on when the queue brought it here (Next, Previous,
+// autoplay, media keys); a video the user opened directly keeps its blocked card. The decision
+// model and the session-only verdict cache live in queue_blocked_skip.js.
+let filterTubeQueueBlockedSkipController = null;
+const FILTERTUBE_QUEUE_ROW_HIDE_MARKERS = [
+    'data-filtertube-blocked-channel-id', 'data-filtertube-blocked-channel-handle', 'data-filtertube-blocked-channel-custom',
+    'data-filtertube-hidden-by-channel', 'data-filtertube-hidden-by-keyword', 'data-filtertube-hidden-by-duration',
+    'data-filtertube-hidden-by-upload-date', 'data-filtertube-hidden-by-category', 'data-filtertube-hidden-by-language',
+    'data-filtertube-hidden-by-mix-radio', 'data-filtertube-hidden-by-hide-all-shorts', 'data-filtertube-current-watch-blocked'
+];
+
+function getQueueBlockedSkipController() {
+    if (filterTubeQueueBlockedSkipController) return filterTubeQueueBlockedSkipController;
+    const api = window.FilterTubeQueueBlockedSkip;
+    if (!api || typeof api.createController !== 'function') return null;
+    const onWatch = () => String(document.location?.pathname || '') === '/watch';
+    const params = () => new URLSearchParams(document.location?.search || '');
+    const panelRows = () => getPlaylistPanelRows(getPlaylistPanelContainer() || document);
+    const rowLink = row => row?.querySelector?.('a[href*="watch?v="], a[href^="/watch?v="]') || null;
+    filterTubeQueueBlockedSkipController = api.createController({
+        document,
+        window,
+        now: () => Date.now(),
+        setTimeout: (callback, delay) => setTimeout(callback, delay),
+        clearTimeout: id => clearTimeout(id),
+        currentVideoId: () => (onWatch() ? getCurrentWatchVideoId() : ''),
+        currentList: () => (onWatch() ? (params().get('list') || '') : ''),
+        currentIndex: () => {
+            if (!onWatch()) return 0;
+            const index = Number(params().get('index'));
+            if (index > 0) return index;
+            const selected = panelRows().find(row => isSelectedPlaylistPanelRow(row));
+            return api.parseWatchHref(rowLink(selected)?.getAttribute?.('href')).index;
+        },
+        isEnabled: settings => isFilterTubeFilteringEnabled(settings),
+        latestSettings: () => currentSettings,
+        signature: settings => getCurrentVideoAdmissionRuleSignature(settings),
+        rows: panelRows,
+        rowVideoId: row => getPlaylistRowVideoId(row),
+        rowLink,
+        rowIsSelected: row => isSelectedPlaylistPanelRow(row),
+        rowBlockedByPage: (row, settings) => {
+            if (row.classList?.contains('filtertube-hidden') || row.hasAttribute?.('data-filtertube-hidden')) {
+                return row.getAttribute?.('data-filtertube-whitelist-pending') !== 'true';
+            }
+            // The row's own title and channel (allow-only mode waits for the Watch page instead).
+            if (settings?.listMode === 'whitelist') return false;
+            const title = String(row.querySelector?.('#video-title, .ytmPlaylistPanelVideoRendererTitle, .ytmPlaylistPanelVideoRendererV2Title, h4')?.textContent || '').trim();
+            const channel = getPlaylistRowChannelName(row);
+            if (!title && !channel) return false;
+            return Boolean(shouldHideContent(title, channel, settings, {
+                videoId: getPlaylistRowVideoId(row),
+                channelMeta: channel ? { name: channel } : {},
+                contentTag: String(row.tagName || '').toLowerCase()
+            }));
+        },
+        hideRow: (row, reason) => toggleVisibility(row, true, `Filtered video: ${String(reason || '').split('\n')[0]}`, true),
+        restoreRow: row => {
+            if (FILTERTUBE_QUEUE_ROW_HIDE_MARKERS.some(marker => row.hasAttribute?.(marker))) return;
+            toggleVisibility(row, false, '', true);
+        },
+        isStillBlocked: videoId => {
+            const admission = getDirectAccessState();
+            return admission.decision === 'blocked' && admission.videoId === videoId;
+        },
+        media: () => document.querySelector('video.html5-main-video'),
+        isQuiet: settings => isQuietBlockingEnabled(settings),
+        text: (key, fallback) => window.FilterTubeAdmissionOverlay?.text?.(key, fallback) || fallback,
+        loadLocale: () => window.FilterTubeAdmissionOverlay?.loadLocale?.(),
+        refreshBlockedCard: () => {
+            const overlay = document.getElementById('filtertube-direct-access-overlay');
+            const message = overlay?.__filtertubeAdmissionSourceMessage;
+            if (typeof message === 'string' && message) setDirectAccessOverlay('blocked', message);
+        }
+    });
+    filterTubeQueueBlockedSkipController.install();
+    return filterTubeQueueBlockedSkipController;
+}
+
+function getQueueBlockedSkipEndLine() {
+    try {
+        return filterTubeQueueBlockedSkipController?.endLineFor(getCurrentWatchVideoId()) || '';
+    } catch (e) {
+        return '';
+    }
+}
+
+// Every blocked regular Watch video passes here after its pause and card. Inside a playlist or
+// Mix the queue model owns what happens next (always on there); elsewhere the opt-in
+// "Skip blocked autoplay videos" (#82) keeps its own rules.
+function handleCurrentWatchBlocked(videoId, settings, message) {
+    try {
+        if (getQueueBlockedSkipController()?.onBlocked(videoId, settings, message)) return;
+    } catch (e) {
+    }
+    if (typeof scheduleBlockedAutoplaySkip === 'function') scheduleBlockedAutoplaySkip(videoId, settings);
+}
+
 function enforceCurrentWatchOwnerBlock(settings) {
     try {
         // A coalesced DOM pass may finish after a settings update. Current-video
@@ -2431,6 +2535,8 @@ function enforceCurrentWatchOwnerBlock(settings) {
         if (settings?.skipBlockedAutoplay === true && typeof installBlockedAutoplaySkipSignals === 'function') {
             installBlockedAutoplaySkipSignals();
         }
+        // Playlist navigation signals (Next, Previous, end of video) are recorded from the first pass on.
+        if (typeof getQueueBlockedSkipController === 'function') getQueueBlockedSkipController();
         if (directAccessState.routeTransitionPending) {
             clearCurrentVideoAdmissionPresentation();
             try {
@@ -2462,6 +2568,22 @@ function enforceCurrentWatchOwnerBlock(settings) {
             if (isShortRoute) clearCurrentShortAdmissionOverlay();
             return;
         }
+        // Playlists and Mixes: rows this tab already saw blocked under the same rules stay hidden in
+        // the panel, and such a video is blocked (and passed over) before it starts.
+        const queueSkip = !isShortRoute && !isEmbedRoute && typeof getQueueBlockedSkipController === 'function'
+            ? getQueueBlockedSkipController()
+            : null;
+        if (queueSkip) {
+            queueSkip.applyPanelVerdicts(settings);
+            const cachedVerdict = queueSkip.cachedVerdict(routeVideoId, settings);
+            if (cachedVerdict) {
+                const cachedMessage = cachedVerdict.reason || 'Blocked video';
+                pauseCurrentWatchForDirectAccess(routeVideoId, 'blocked');
+                setDirectAccessOverlay('blocked', cachedMessage);
+                handleCurrentWatchBlocked(routeVideoId, settings, cachedMessage);
+                return;
+            }
+        }
         // Views are optional evidence: a known low total can block immediately,
         // but missing totals never request metadata or create a pending state.
         const viewCountDecision = getCurrentWatchViewCountDecision(settings, settings?.videoMetaMap?.[routeVideoId] || {});
@@ -2473,7 +2595,7 @@ function enforceCurrentWatchOwnerBlock(settings) {
                 setCurrentShortAdmissionOverlay('blocked', message);
             } else {
                 setDirectAccessOverlay('blocked', message);
-                if (!isEmbedRoute && typeof scheduleBlockedAutoplaySkip === 'function') scheduleBlockedAutoplaySkip(routeVideoId, settings);
+                if (!isEmbedRoute && typeof handleCurrentWatchBlocked === 'function') handleCurrentWatchBlocked(routeVideoId, settings, message);
             }
             return;
         }
@@ -2644,8 +2766,9 @@ function enforceCurrentWatchOwnerBlock(settings) {
                     pauseCurrentShortPlayer();
                     setCurrentShortAdmissionOverlay('blocked', formatCurrentWatchAdmissionMessage(contentDecision, ownerMeta || {}));
                 } else {
-                    setDirectAccessOverlay('blocked', formatCurrentWatchAdmissionMessage(contentDecision, ownerMeta || {}));
-                    if (!isEmbedRoute && typeof scheduleBlockedAutoplaySkip === 'function') scheduleBlockedAutoplaySkip(routeVideoId, settings);
+                    const contentMessage = formatCurrentWatchAdmissionMessage(contentDecision, ownerMeta || {});
+                    setDirectAccessOverlay('blocked', contentMessage);
+                    if (!isEmbedRoute && typeof handleCurrentWatchBlocked === 'function') handleCurrentWatchBlocked(routeVideoId, settings, contentMessage);
                 }
                 return;
             }
@@ -2654,6 +2777,7 @@ function enforceCurrentWatchOwnerBlock(settings) {
         const shouldBlock = admissionDecision.blocked;
         if (!shouldBlock) {
             rememberCurrentVideoAdmission(ownerMeta.videoId, settings);
+            if (queueSkip) queueSkip.onAllowed(ownerMeta.videoId);
             releaseDirectAccessGuard(ownerMeta.videoId, true);
             if (isShortRoute) clearCurrentShortAdmissionOverlay();
             try {
@@ -2676,10 +2800,8 @@ function enforceCurrentWatchOwnerBlock(settings) {
         }
 
         pauseCurrentWatchForDirectAccess(ownerMeta.videoId, 'blocked');
-        setDirectAccessOverlay(
-            'blocked',
-            formatCurrentWatchAdmissionMessage(admissionDecision, ownerMeta)
-        );
+        const admissionMessage = formatCurrentWatchAdmissionMessage(admissionDecision, ownerMeta);
+        setDirectAccessOverlay('blocked', admissionMessage);
 
         try {
             ownerMeta.ownerRoot?.setAttribute?.('data-filtertube-current-watch-blocked', 'true');
@@ -2742,19 +2864,23 @@ function enforceCurrentWatchOwnerBlock(settings) {
 
         if (isEmbedRoute) return;
 
-        // A rejection owns only this video's admission, not navigation. Stay
-        // on the blocked video even when an allowed playlist successor exists.
-        // The one exception is the opt-in skipBlockedAutoplay (#82): a regular
-        // (non-playlist) video reached by autoplay may continue to the next
-        // visible allowed related video, at most 3 times in a row. That skip is
-        // generation-guarded and re-checks the live enabled state and video
-        // identity when it fires, so no delayed Next action survives Disable
-        // (#77). With the setting off (default) nothing is scheduled.
+        // A rejection owns this video's admission; it never clicks anything here.
+        // handleCurrentWatchBlocked decides what happens next:
+        // - In a playlist or Mix (always on): a video the queue brought here
+        //   (Next, Previous, autoplay, media keys) moves once to the first
+        //   allowed row that way, never wrapping, at most 25 in a row; a video
+        //   the user opened directly keeps this card (queue_blocked_skip.js).
+        // - Elsewhere, only the opt-in skipBlockedAutoplay (#82): a regular
+        //   video reached by autoplay may continue to the next visible allowed
+        //   related video, at most 3 times in a row.
+        // Both skips are generation-guarded and re-check the live enabled state
+        // and video identity when they fire, so no delayed action survives
+        // Disable (#77).
         const shell = document.querySelector('ytm-watch, ytd-watch-flexy');
         if (shell) {
             shell.setAttribute('data-filtertube-current-watch-blocked', 'true');
         }
-        if (typeof scheduleBlockedAutoplaySkip === 'function') scheduleBlockedAutoplaySkip(ownerMeta.videoId, settings);
+        if (typeof handleCurrentWatchBlocked === 'function') handleCurrentWatchBlocked(ownerMeta.videoId, settings, admissionMessage);
         return;
     } catch (e) {
     }
@@ -3439,6 +3565,7 @@ function isExplicitlyHiddenByFilterTube(element) {
         || element.getAttribute('data-filtertube-hidden-by-category')
         || element.getAttribute('data-filtertube-hidden-by-language')
         || element.getAttribute('data-filtertube-hidden-by-hide-all-shorts')
+        || element.getAttribute('data-filtertube-hidden-by-watch-verdict')
     );
     if (hasExplicitMarker) return true;
 
@@ -7658,6 +7785,7 @@ async function applyDOMFallback(settings, options = {}) {
                                 || targetToHide.getAttribute('data-filtertube-hidden-by-category')
                                 || targetToHide.getAttribute('data-filtertube-hidden-by-mix-radio')
                                 || targetToHide.getAttribute('data-filtertube-hidden-by-hide-all-shorts')
+                                || targetToHide.getAttribute('data-filtertube-hidden-by-watch-verdict')
                             );
                         } catch (e) {
                             return false;

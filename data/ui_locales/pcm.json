@@ -62,6 +62,8 @@
   "admission.foundInTags": "Where e dey: di video tags",
   "admission.foundInChannel": "Where e dey: di channel name",
   "admission.foundInDetails": "Where e dey: di video details",
+  "admission.queueSkipped": "We skip one video wey your filters dey hide",
+  "admission.queueEndAllBlocked": "Nothing remain for dis queue wey your filters allow",
   "admission.quietVideoTitle": "This video no dey available",
   "admission.quietChannelTitle": "This channel no dey available",
   "admission.quietBack": "Go back",

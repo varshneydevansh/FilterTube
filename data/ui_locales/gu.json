@@ -109,6 +109,8 @@
   "admission.foundInTags": "ક્યાં મળ્યો: વિડિયોના ટૅગમાં",
   "admission.foundInChannel": "ક્યાં મળ્યો: ચૅનલના નામમાં",
   "admission.foundInDetails": "ક્યાં મળ્યો: વિડિયોની વિગતોમાં",
+  "admission.queueSkipped": "તમારા ફિલ્ટર છુપાવે છે તે એક વિડિયો છોડી દેવાયો",
+  "admission.queueEndAllBlocked": "આ કતારમાં તમારા ફિલ્ટર મંજૂરી આપે એવું હવે કંઈ બાકી નથી",
   "admission.quietVideoTitle": "આ વીડિયો ઉપલબ્ધ નથી",
   "admission.quietChannelTitle": "આ ચેનલ ઉપલબ્ધ નથી",
   "admission.quietBack": "પાછા જાઓ",

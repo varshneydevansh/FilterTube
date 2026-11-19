@@ -737,7 +737,7 @@ test('YouTube embeds run in matching frames while search-engine pages stay out o
   assert.match(read('js/content/first_run_prompt.js'), /window\.top !== window/);
 });
 
-test('blocked playback stays on the current video even with an allowed playlist successor', () => {
+test('admission never navigates by itself; playlist skips belong to the queue model', () => {
   const dom = read('js/content/dom_fallback.js');
   const help = read('html/tab-view.html');
   const spec = read('docs/USER_FEEDBACK_RULES_AND_GUIDANCE_SPEC_2026-08-08.md');
@@ -749,8 +749,10 @@ test('blocked playback stays on the current video even with an allowed playlist 
 
   assert.doesNotMatch(admission, /findNextAllowedWatchPlaylistLink\(|\.click\(|openWatchPlaylistPanelIfCollapsed\(/);
   assert.doesNotMatch(admission, /toggleVisibility\(shell, true/);
-  assert.match(admission, /rejection owns only this video's admission/);
-  assert.match(help, /does not automatically choose another video/);
+  assert.match(admission, /A rejection owns this video's admission; it never clicks anything here/);
+  // A video the user opened keeps its card; a playlist or Mix step moves on (queue_blocked_skip.js).
+  assert.match(help, /If you opened that video yourself, it stays on it/);
+  assert.match(help, /stops at the end of the list/);
   assert.match(help, /does not read or remove ordinary video links on Google Search or other websites/);
   assert.match(spec, /external search-result links remain visible/);
   assert.match(spec, /youtube-nocookie\.com\/embed\//);

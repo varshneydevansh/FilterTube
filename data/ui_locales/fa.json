@@ -109,6 +109,8 @@
   "admission.foundInTags": "پیدا شد در: برچسب‌های ویدیو",
   "admission.foundInChannel": "پیدا شد در: نام کانال",
   "admission.foundInDetails": "پیدا شد در: جزئیات ویدیو",
+  "admission.queueSkipped": "ویدیویی که فیلترهای شما پنهان می‌کنند رد شد",
+  "admission.queueEndAllBlocked": "در این صف چیزی باقی نمانده که فیلترهای شما اجازه دهند",
   "admission.quietVideoTitle": "این ویدیو در دسترس نیست",
   "admission.quietChannelTitle": "این کانال در دسترس نیست",
   "admission.quietBack": "بازگشت",

@@ -78,7 +78,9 @@
             'Found in: the video description': 'admission.foundInDescription',
             "Found in: the video's tags": 'admission.foundInTags',
             'Found in: the channel name': 'admission.foundInChannel',
-            'Found in: the video details': 'admission.foundInDetails'
+            'Found in: the video details': 'admission.foundInDetails',
+            // A playlist or Mix with nothing allowed left in the skip direction (queue_blocked_skip.js).
+            'Nothing left in this queue that your filters allow': 'admission.queueEndAllBlocked'
         };
         // The keyword line carries the user's own word: 'Matched: "AI" (exact word)'.
         const keywordLines = [

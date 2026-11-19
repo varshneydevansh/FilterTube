@@ -109,6 +109,8 @@
   "admission.foundInTags": "وُجدت في: وسوم الفيديو",
   "admission.foundInChannel": "وُجدت في: اسم القناة",
   "admission.foundInDetails": "وُجدت في: تفاصيل الفيديو",
+  "admission.queueSkipped": "تم تخطي فيديو تخفيه عوامل التصفية لديك",
+  "admission.queueEndAllBlocked": "لم يتبقَّ في قائمة الانتظار هذه شيء تسمح به عوامل التصفية لديك",
   "admission.quietVideoTitle": "هذا الفيديو غير متاح",
   "admission.quietChannelTitle": "هذه القناة غير متاحة",
   "admission.quietBack": "رجوع",

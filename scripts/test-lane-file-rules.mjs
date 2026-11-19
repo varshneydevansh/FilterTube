@@ -49,7 +49,7 @@ export const FILE_LANE_RULES = Object.freeze([
   },
   {
     id: 'dom-fallback-runtime',
-    patterns: [/^js\/content\/dom_fallback\.js$/],
+    patterns: [/^js\/content\/(?:dom_fallback|queue_blocked_skip)\.js$/],
     lanes: ['whitelist', 'dom', 'blocking', 'performance']
   },
   {

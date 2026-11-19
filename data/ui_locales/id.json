@@ -62,6 +62,8 @@
   "admission.foundInTags": "Ditemukan di: tag video",
   "admission.foundInChannel": "Ditemukan di: nama channel",
   "admission.foundInDetails": "Ditemukan di: detail video",
+  "admission.queueSkipped": "Melewati video yang disembunyikan filter Anda",
+  "admission.queueEndAllBlocked": "Tidak ada lagi di antrean ini yang diizinkan filter Anda",
   "admission.quietVideoTitle": "Video ini tidak tersedia",
   "admission.quietChannelTitle": "Channel ini tidak tersedia",
   "admission.quietBack": "Kembali",

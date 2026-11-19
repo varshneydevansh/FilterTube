@@ -242,6 +242,8 @@
   "admission.foundInTags": "Found in: the video's tags",
   "admission.foundInChannel": "Found in: the channel name",
   "admission.foundInDetails": "Found in: the video details",
+  "admission.queueSkipped": "Skipped a video your filters hide",
+  "admission.queueEndAllBlocked": "Nothing left in this queue that your filters allow",
   "admission.quietVideoTitle": "This video isn't available",
   "admission.quietChannelTitle": "This channel isn't available",
   "admission.quietBack": "Go back",

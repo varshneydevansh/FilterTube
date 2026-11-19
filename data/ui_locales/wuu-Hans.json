@@ -62,6 +62,8 @@
   "admission.foundInTags": "寻着个地方：视频标签",
   "admission.foundInChannel": "寻着个地方：频道名字",
   "admission.foundInDetails": "寻着个地方：视频详情",
+  "admission.queueSkipped": "跳过了一只侬个过滤规则隐藏个视频",
+  "admission.queueEndAllBlocked": "搿个队列里向呒没侬个过滤规则允许个视频了",
   "admission.quietVideoTitle": "迭只视频看勿了",
   "admission.quietChannelTitle": "迭只频道用勿了",
   "admission.quietBack": "回转去",

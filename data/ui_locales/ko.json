@@ -62,6 +62,8 @@
   "admission.foundInTags": "발견 위치: 동영상 태그",
   "admission.foundInChannel": "발견 위치: 채널 이름",
   "admission.foundInDetails": "발견 위치: 동영상 세부정보",
+  "admission.queueSkipped": "필터에서 숨기는 동영상을 건너뛰었습니다",
+  "admission.queueEndAllBlocked": "이 대기열에 필터에서 허용하는 항목이 더 이상 없습니다",
   "admission.quietVideoTitle": "이 동영상은 볼 수 없습니다",
   "admission.quietChannelTitle": "이 채널은 이용할 수 없습니다",
   "admission.quietBack": "뒤로 가기",

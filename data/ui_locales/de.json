@@ -109,6 +109,8 @@
   "admission.foundInTags": "Gefunden in: den Tags des Videos",
   "admission.foundInChannel": "Gefunden in: dem Kanalnamen",
   "admission.foundInDetails": "Gefunden in: den Videodetails",
+  "admission.queueSkipped": "Ein Video übersprungen, das deine Filter ausblenden",
+  "admission.queueEndAllBlocked": "In dieser Warteschlange ist nichts mehr, das deine Filter erlauben",
   "admission.quietVideoTitle": "Dieses Video ist nicht verfügbar",
   "admission.quietChannelTitle": "Dieser Kanal ist nicht verfügbar",
   "admission.quietBack": "Zurück",

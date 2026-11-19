@@ -109,6 +109,8 @@
   "admission.foundInTags": "کہاں ملا: ویڈیو کے ٹیگز میں",
   "admission.foundInChannel": "کہاں ملا: چینل کے نام میں",
   "admission.foundInDetails": "کہاں ملا: ویڈیو کی معلومات میں",
+  "admission.queueSkipped": "آپ کے فلٹرز سے چھپی ایک ویڈیو چھوڑ دی گئی",
+  "admission.queueEndAllBlocked": "اس قطار میں اب کچھ نہیں بچا جس کی آپ کے فلٹرز اجازت دیں",
   "admission.quietVideoTitle": "یہ ویڈیو دستیاب نہیں ہے",
   "admission.quietChannelTitle": "یہ چینل دستیاب نہیں ہے",
   "admission.quietBack": "واپس جائیں",

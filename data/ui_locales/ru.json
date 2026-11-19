@@ -109,6 +109,8 @@
   "admission.foundInTags": "Где найдено: в тегах видео",
   "admission.foundInChannel": "Где найдено: в названии канала",
   "admission.foundInDetails": "Где найдено: в сведениях о видео",
+  "admission.queueSkipped": "Пропущено видео, скрытое вашими фильтрами",
+  "admission.queueEndAllBlocked": "В этой очереди не осталось ничего, что разрешают ваши фильтры",
   "admission.quietVideoTitle": "Это видео недоступно",
   "admission.quietChannelTitle": "Этот канал недоступен",
   "admission.quietBack": "Назад",

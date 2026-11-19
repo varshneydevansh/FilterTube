@@ -51,6 +51,7 @@
                 "js/content/menu.js",
                 "js/content/dom_helpers.js",
                 "js/content/dom_extractors.js",
+                "js/content/queue_blocked_skip.js",
                 "js/content/dom_fallback.js",
                 "js/content/block_channel.js",
                 "js/content/bridge_injection.js",

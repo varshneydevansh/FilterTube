@@ -62,6 +62,8 @@
   "admission.foundInTags": "कुठे सापडला: व्हिडिओच्या टॅगमध्ये",
   "admission.foundInChannel": "कुठे सापडला: चॅनेलच्या नावात",
   "admission.foundInDetails": "कुठे सापडला: व्हिडिओच्या तपशिलात",
+  "admission.queueSkipped": "तुमचे फिल्टर लपवतात असा एक व्हिडिओ वगळला",
+  "admission.queueEndAllBlocked": "या रांगेत तुमच्या फिल्टरला मान्य असे आता काहीही उरले नाही",
   "admission.quietVideoTitle": "हा व्हिडिओ उपलब्ध नाही",
   "admission.quietChannelTitle": "हे चॅनेल उपलब्ध नाही",
   "admission.quietBack": "मागे जा",

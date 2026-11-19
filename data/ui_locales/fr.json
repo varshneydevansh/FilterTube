@@ -109,6 +109,8 @@
   "admission.foundInTags": "Trouvé dans : les tags de la vidéo",
   "admission.foundInChannel": "Trouvé dans : le nom de la chaîne",
   "admission.foundInDetails": "Trouvé dans : les détails de la vidéo",
+  "admission.queueSkipped": "Vidéo ignorée : vos filtres la masquent",
+  "admission.queueEndAllBlocked": "Il ne reste rien dans cette file que vos filtres autorisent",
   "admission.quietVideoTitle": "Cette vidéo n’est pas disponible",
   "admission.quietChannelTitle": "Cette chaîne n’est pas disponible",
   "admission.quietBack": "Retour",

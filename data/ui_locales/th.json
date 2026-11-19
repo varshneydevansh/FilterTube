@@ -62,6 +62,8 @@
   "admission.foundInTags": "พบใน: แท็กของวิดีโอ",
   "admission.foundInChannel": "พบใน: ชื่อช่อง",
   "admission.foundInDetails": "พบใน: รายละเอียดวิดีโอ",
+  "admission.queueSkipped": "ข้ามวิดีโอที่ตัวกรองของคุณซ่อนไว้",
+  "admission.queueEndAllBlocked": "ไม่มีรายการในคิวนี้ที่ตัวกรองของคุณอนุญาตแล้ว",
   "admission.quietVideoTitle": "วิดีโอนี้ไม่พร้อมใช้งาน",
   "admission.quietChannelTitle": "ช่องนี้ไม่พร้อมใช้งาน",
   "admission.quietBack": "ย้อนกลับ",

@@ -109,6 +109,8 @@
   "admission.foundInTags": "পাওয়া গেছে: ভিডিওর ট্যাগে",
   "admission.foundInChannel": "পাওয়া গেছে: চ্যানেলের নামে",
   "admission.foundInDetails": "পাওয়া গেছে: ভিডিওর তথ্যে",
+  "admission.queueSkipped": "আপনার ফিল্টার লুকায় এমন একটি ভিডিও এড়িয়ে যাওয়া হয়েছে",
+  "admission.queueEndAllBlocked": "এই কিউতে আপনার ফিল্টার অনুমতি দেয় এমন আর কিছু নেই",
   "admission.quietVideoTitle": "এই ভিডিওটি উপলভ্য নয়",
   "admission.quietChannelTitle": "এই চ্যানেলটি উপলভ্য নয়",
   "admission.quietBack": "ফিরে যান",

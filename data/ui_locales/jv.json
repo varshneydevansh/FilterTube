@@ -62,6 +62,8 @@
   "admission.foundInTags": "Ketemu ing: tag video",
   "admission.foundInChannel": "Ketemu ing: jeneng kanal",
   "admission.foundInDetails": "Ketemu ing: rincian video",
+  "admission.queueSkipped": "Nglewati video sing didhelikake filter sampeyan",
+  "admission.queueEndAllBlocked": "Ora ana maneh ing antrean iki sing diidini filter sampeyan",
   "admission.quietVideoTitle": "Video iki ora kasedhiya",
   "admission.quietChannelTitle": "Channel iki ora kasedhiya",
   "admission.quietBack": "Bali",
