@@ -1,0 +1,69 @@
+name: Route issues to Discord
+
+# Posts new or newly labelled issues into the matching FilterTube Discord channel:
+#   iOS label                          -> #ios-bugs
+#   Android, Mobile App or TV App label -> #android-bugs
+#   bug label with no platform label    -> #bugs
+# Release, issue and pull request activity in general already reaches #github-updates
+# through the repository webhook; this only adds the per-platform routing.
+
+on:
+  issues:
+    types: [opened, labeled]
+
+permissions: {}
+
+jobs:
+  route:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Post to the matching channels
+        env:
+          ACTION: ${{ github.event.action }}
+          ADDED: ${{ github.event.label.name }}
+          LABELS_JSON: ${{ toJSON(github.event.issue.labels.*.name) }}
+          TITLE: ${{ github.event.issue.title }}
+          URL: ${{ github.event.issue.html_url }}
+          NUMBER: ${{ github.event.issue.number }}
+          AUTHOR: ${{ github.event.issue.user.login }}
+          CREATED: ${{ github.event.issue.created_at }}
+          HOOK_IOS: ${{ secrets.DISCORD_WEBHOOK_IOS_BUGS }}
+          HOOK_ANDROID: ${{ secrets.DISCORD_WEBHOOK_ANDROID_BUGS }}
+          HOOK_BUGS: ${{ secrets.DISCORD_WEBHOOK_BUGS }}
+        run: |
+          set -eu
+          LABELS=$(printf '%s' "$LABELS_JSON" | jq -r '.[]')
+          has() { printf '%s\n' "$LABELS" | grep -qixF "$1"; }
+          is_ios=0; is_android=0; is_bug=0
+          has "iOS" && is_ios=1
+          { has "Android" || has "Mobile App" || has "TV App"; } && is_android=1
+          has "bug" && is_bug=1
+
+          # On "labeled", only the label just added can trigger a post, so an issue
+          # is announced once per channel rather than on every label change.
+          # Labels added while the issue is being created arrive as separate "labeled"
+          # events right after "opened"; "opened" already covers them.
+          if [ "$ACTION" = "labeled" ]; then
+            age=$(( $(date -u +%s) - $(date -u -d "$CREATED" +%s) ))
+            [ "$age" -lt 60 ] && exit 0
+            case "$(printf '%s' "$ADDED" | tr '[:upper:]' '[:lower:]')" in
+              ios) is_android=0; is_bug=0 ;;
+              android|"mobile app"|"tv app") is_ios=0; is_bug=0 ;;
+              bug) [ $is_ios = 1 ] || [ $is_android = 1 ] && exit 0; is_ios=0; is_android=0 ;;
+              *) exit 0 ;;
+            esac
+          fi
+
+          post() {
+            [ -n "$1" ] || return 0
+            labels=$(printf '%s' "$LABELS" | paste -sd, - | sed 's/,/, /g')
+            jq -n --arg t "#$NUMBER $TITLE" --arg u "$URL" --arg a "$AUTHOR" --arg l "${labels:-none}" \
+              '{username:"GitHub", embeds:[{title:($t|.[0:250]), url:$u, color:11224120,
+                fields:[{name:"Labels", value:$l, inline:true},{name:"Opened by", value:$a, inline:true}]}]}' \
+            | curl -fsS -H "Content-Type: application/json" -d @- "$1" >/dev/null
+          }
+
+          [ $is_ios = 1 ] && post "$HOOK_IOS"
+          [ $is_android = 1 ] && post "$HOOK_ANDROID"
+          [ $is_bug = 1 ] && [ $is_ios = 0 ] && [ $is_android = 0 ] && post "$HOOK_BUGS"
+          exit 0
