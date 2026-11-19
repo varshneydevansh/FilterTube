@@ -3443,5 +3443,10 @@
   "popup.apps.android": "Android",
   "popup.apps.androidStore": "Google Play",
   "popup.apps.ios": "iPhone に登場",
-  "popup.apps.iosGuide": "SideStore ガイド"
+  "popup.apps.iosGuide": "SideStore ガイド",
+  "community.title": "コミュニティに参加",
+  "community.body": "質問したり、フィルターのアイデアを共有したり、新しいリリースを知ったりできます。",
+  "community.discord": "Discord の FilterTube（新しいタブで開きます）",
+  "community.reddit": "Reddit の FilterTube（新しいタブで開きます）",
+  "community.instagram": "Instagram の FilterTube（新しいタブで開きます）"
 }

@@ -3445,5 +3445,10 @@
   "popup.apps.android": "Android",
   "popup.apps.androidStore": "Google Play",
   "popup.apps.ios": "አሁን በiPhone ላይ",
-  "popup.apps.iosGuide": "የSideStore መመሪያ"
+  "popup.apps.iosGuide": "የSideStore መመሪያ",
+  "community.title": "ማህበረሰቡን ይቀላቀሉ",
+  "community.body": "ጥያቄ ይጠይቁ፣ የማጣሪያ ሐሳቦችን ያጋሩ፣ ስለ አዳዲስ ልቀቶችም ይስሙ።",
+  "community.discord": "FilterTube በDiscord፣ በአዲስ ትር ይከፈታል",
+  "community.reddit": "FilterTube በReddit፣ በአዲስ ትር ይከፈታል",
+  "community.instagram": "FilterTube በInstagram፣ በአዲስ ትር ይከፈታል"
 }

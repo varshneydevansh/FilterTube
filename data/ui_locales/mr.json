@@ -3445,5 +3445,10 @@
   "popup.apps.android": "Android",
   "popup.apps.androidStore": "Google Play",
   "popup.apps.ios": "आता iPhone वर",
-  "popup.apps.iosGuide": "SideStore मार्गदर्शक"
+  "popup.apps.iosGuide": "SideStore मार्गदर्शक",
+  "community.title": "समुदायात सामील व्हा",
+  "community.body": "प्रश्न विचारा, फिल्टरच्या कल्पना शेअर करा आणि नव्या रिलीजची माहिती मिळवा.",
+  "community.discord": "Discord वर FilterTube, नवीन टॅबमध्ये उघडते",
+  "community.reddit": "Reddit वर FilterTube, नवीन टॅबमध्ये उघडते",
+  "community.instagram": "Instagram वर FilterTube, नवीन टॅबमध्ये उघडते"
 }

@@ -3445,5 +3445,10 @@
   "popup.apps.android": "Android",
   "popup.apps.androidStore": "Google Play",
   "popup.apps.ios": "Ora su iPhone",
-  "popup.apps.iosGuide": "Guida a SideStore"
+  "popup.apps.iosGuide": "Guida a SideStore",
+  "community.title": "Unisciti alla community",
+  "community.body": "Fai domande, condividi idee per i filtri e scopri le nuove versioni.",
+  "community.discord": "FilterTube su Discord, si apre in una nuova scheda",
+  "community.reddit": "FilterTube su Reddit, si apre in una nuova scheda",
+  "community.instagram": "FilterTube su Instagram, si apre in una nuova scheda"
 }

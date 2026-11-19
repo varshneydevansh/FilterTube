@@ -3445,5 +3445,10 @@
   "popup.apps.android": "Android",
   "popup.apps.androidStore": "Google Play",
   "popup.apps.ios": "Artık iPhone'da",
-  "popup.apps.iosGuide": "SideStore rehberi"
+  "popup.apps.iosGuide": "SideStore rehberi",
+  "community.title": "Topluluğa katıl",
+  "community.body": "Soru sor, filtre fikirlerini paylaş ve yeni sürümlerden haberdar ol.",
+  "community.discord": "Discord üzerinde FilterTube, yeni sekmede açılır",
+  "community.reddit": "Reddit üzerinde FilterTube, yeni sekmede açılır",
+  "community.instagram": "Instagram üzerinde FilterTube, yeni sekmede açılır"
 }

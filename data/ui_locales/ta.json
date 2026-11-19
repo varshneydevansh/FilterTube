@@ -3445,5 +3445,10 @@
   "popup.apps.android": "Android",
   "popup.apps.androidStore": "Google Play",
   "popup.apps.ios": "இப்போது iPhone-இல்",
-  "popup.apps.iosGuide": "SideStore வழிகாட்டி"
+  "popup.apps.iosGuide": "SideStore வழிகாட்டி",
+  "community.title": "சமூகத்தில் இணையுங்கள்",
+  "community.body": "கேள்விகள் கேளுங்கள், வடிகட்டி யோசனைகளைப் பகிருங்கள், புதிய வெளியீடுகளைப் பற்றி அறியுங்கள்.",
+  "community.discord": "Discord இல் FilterTube, புதிய தாவலில் திறக்கும்",
+  "community.reddit": "Reddit இல் FilterTube, புதிய தாவலில் திறக்கும்",
+  "community.instagram": "Instagram இல் FilterTube, புதிய தாவலில் திறக்கும்"
 }

@@ -3443,5 +3443,10 @@
   "popup.apps.android": "Android",
   "popup.apps.androidStore": "Google Play",
   "popup.apps.ios": "Saiki ana ing iPhone",
-  "popup.apps.iosGuide": "Pandhuan SideStore"
+  "popup.apps.iosGuide": "Pandhuan SideStore",
+  "community.title": "Melu komunitas",
+  "community.body": "Takon, bagi ide saringan, lan entuk kabar rilis anyar.",
+  "community.discord": "FilterTube ing Discord, kabukak ing tab anyar",
+  "community.reddit": "FilterTube ing Reddit, kabukak ing tab anyar",
+  "community.instagram": "FilterTube ing Instagram, kabukak ing tab anyar"
 }

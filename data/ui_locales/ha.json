@@ -3445,5 +3445,10 @@
   "popup.apps.android": "Android",
   "popup.apps.androidStore": "Google Play",
   "popup.apps.ios": "Yanzu a kan iPhone",
-  "popup.apps.iosGuide": "Jagorar SideStore"
+  "popup.apps.iosGuide": "Jagorar SideStore",
+  "community.title": "Shiga cikin al’umma",
+  "community.body": "Yi tambayoyi, raba ra’ayoyin tacewa, kuma ji labarin sababbin fitowa.",
+  "community.discord": "FilterTube a Discord, yana buɗewa a sabon shafi",
+  "community.reddit": "FilterTube a Reddit, yana buɗewa a sabon shafi",
+  "community.instagram": "FilterTube a Instagram, yana buɗewa a sabon shafi"
 }

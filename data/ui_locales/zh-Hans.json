@@ -3443,5 +3443,10 @@
   "popup.apps.android": "Android",
   "popup.apps.androidStore": "Google Play",
   "popup.apps.ios": "现已登陆 iPhone",
-  "popup.apps.iosGuide": "SideStore 指南"
+  "popup.apps.iosGuide": "SideStore 指南",
+  "community.title": "加入社区",
+  "community.body": "提问、分享过滤想法，并了解新版本。",
+  "community.discord": "Discord 上的 FilterTube，在新标签页中打开",
+  "community.reddit": "Reddit 上的 FilterTube，在新标签页中打开",
+  "community.instagram": "Instagram 上的 FilterTube，在新标签页中打开"
 }

@@ -3445,5 +3445,10 @@
   "popup.apps.android": "Android",
   "popup.apps.androidStore": "Google Play",
   "popup.apps.ios": "এখন iPhone-এ",
-  "popup.apps.iosGuide": "SideStore গাইড"
+  "popup.apps.iosGuide": "SideStore গাইড",
+  "community.title": "কমিউনিটিতে যোগ দিন",
+  "community.body": "প্রশ্ন করুন, ফিল্টারের আইডিয়া শেয়ার করুন আর নতুন রিলিজের খবর পান।",
+  "community.discord": "Discord-এ FilterTube, নতুন ট্যাবে খোলে",
+  "community.reddit": "Reddit-এ FilterTube, নতুন ট্যাবে খোলে",
+  "community.instagram": "Instagram-এ FilterTube, নতুন ট্যাবে খোলে"
 }

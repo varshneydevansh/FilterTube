@@ -3443,5 +3443,10 @@
   "popup.apps.android": "Android",
   "popup.apps.androidStore": "Google Play",
   "popup.apps.ios": "이제 iPhone에서",
-  "popup.apps.iosGuide": "SideStore 가이드"
+  "popup.apps.iosGuide": "SideStore 가이드",
+  "community.title": "커뮤니티에 참여하기",
+  "community.body": "질문하고, 필터 아이디어를 나누고, 새 릴리스 소식을 받아 보세요.",
+  "community.discord": "Discord의 FilterTube, 새 탭에서 열림",
+  "community.reddit": "Reddit의 FilterTube, 새 탭에서 열림",
+  "community.instagram": "Instagram의 FilterTube, 새 탭에서 열림"
 }

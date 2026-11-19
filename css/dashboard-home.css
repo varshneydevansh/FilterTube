@@ -952,3 +952,68 @@ body.ft-extension-surface .toggle-row.ft-control-spotlight::after {
 @media (prefers-reduced-motion: reduce) {
   body.ft-extension-surface .toggle-row.ft-control-spotlight::after { animation: none; opacity: 1; }
 }
+
+/* Community: one quiet row under "FilterTube everywhere". Words on the left, three small paper pills on the right;
+   on a narrow window the pills drop under the words. Each mark keeps a soft tint from the page palette. */
+:root[data-theme] body.ft-extension-surface #dashboardView[data-ft-home] .ft-home .ft-home-community {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px 20px;
+  margin-top: 14px;
+  padding: 14px 18px;
+  background: var(--pk-paper) !important;
+  border: 1.5px solid var(--pk-line) !important;
+  border-radius: 16px !important;
+  box-shadow: 0 2px 0 var(--pk-ledge) !important;
+}
+.ft-home-community__words { display: grid; gap: 2px; min-width: 0; flex: 1 1 260px; }
+.ft-home-community__title { margin: 0; font-family: var(--pk-font-hand); font-weight: 400; font-size: 19px; line-height: 1.25; color: var(--pk-ink); }
+.ft-home-community__body { margin: 0; font-size: 14px; line-height: 1.45; color: var(--pk-muted); }
+.ft-home-community__links { display: flex; flex-wrap: wrap; gap: 8px; }
+:root[data-theme] body.ft-extension-surface #dashboardView[data-ft-home] .ft-home .ft-home-community__link {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 40px;
+  padding: 6px 14px 6px 8px;
+  background: var(--pk-paper) !important;
+  border: 1.5px solid var(--pk-line) !important;
+  border-radius: 999px !important;
+  box-shadow: 0 2px 0 var(--pk-ledge) !important;
+  color: var(--pk-ink) !important;
+  font-family: var(--pk-font-label);
+  font-weight: 600;
+  font-size: 14px;
+  text-decoration: none;
+  transition: background-color var(--ft-state-duration) linear, border-color var(--ft-state-duration) linear !important;
+}
+.ft-home-community__link .ft-community-link__mark {
+  box-sizing: content-box;
+  flex: 0 0 auto;
+  width: 16px;
+  height: 16px;
+  padding: 5px;
+  border-radius: 50%;
+  background: var(--pk-lilac);
+  color: var(--pk-plum, var(--pk-ink));
+}
+.ft-home-community__link.ft-community-link--reddit .ft-community-link__mark { background: var(--pk-rose); color: var(--pk-brick); }
+.ft-home-community__link.ft-community-link--instagram .ft-community-link__mark { background: var(--pk-sun-wash); color: var(--pk-sun-ink); }
+:root[data-theme] body.ft-extension-surface #dashboardView[data-ft-home] .ft-home .ft-home-community__link:hover {
+  background: color-mix(in srgb, var(--pk-ink) 4%, var(--pk-paper)) !important;
+  border-color: var(--ft-state-hover-edge) !important;
+}
+:root[data-theme] body.ft-extension-surface #dashboardView[data-ft-home] .ft-home .ft-home-community__link:active { transform: var(--ft-state-press-shift); box-shadow: 0 1px 0 var(--pk-ledge) !important; }
+:root[data-theme] body.ft-extension-surface #dashboardView[data-ft-home] .ft-home .ft-home-community__link:focus-visible {
+  outline: var(--ft-state-focus-width) solid var(--ft-state-focus-ring);
+  outline-offset: var(--ft-state-focus-offset);
+}
+@media (prefers-reduced-motion: reduce) {
+  :root[data-theme] body.ft-extension-surface #dashboardView[data-ft-home] .ft-home .ft-home-community__link:active { transform: none; }
+}
+
+/* About: the community pills sit first in "Follow and connect", each with its small mark. */
+body.ft-extension-surface[data-surface="tab-view"] .ft-about-social-links a.ft-community-link { gap: 0.45rem; }
+.ft-about-social-links .ft-community-link__mark { flex: 0 0 auto; width: 16px; height: 16px; }

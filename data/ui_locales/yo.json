@@ -3443,5 +3443,10 @@
   "popup.apps.android": "Android",
   "popup.apps.androidStore": "Google Play",
   "popup.apps.ios": "Ó ti dé sórí iPhone",
-  "popup.apps.iosGuide": "Ìtọ́sọ́nà SideStore"
+  "popup.apps.iosGuide": "Ìtọ́sọ́nà SideStore",
+  "community.title": "Darapọ̀ mọ́ àwùjọ",
+  "community.body": "Béèrè ìbéèrè, pín èrò àlẹ̀mọ́, kí o sì gbọ́ nípa àwọn ìtújáde tuntun.",
+  "community.discord": "FilterTube lórí Discord, ó ń ṣí ní táàbù tuntun",
+  "community.reddit": "FilterTube lórí Reddit, ó ń ṣí ní táàbù tuntun",
+  "community.instagram": "FilterTube lórí Instagram, ó ń ṣí ní táàbù tuntun"
 }

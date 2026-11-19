@@ -3445,5 +3445,10 @@
   "popup.apps.android": "Android",
   "popup.apps.androidStore": "Google Play",
   "popup.apps.ios": "Sasa kwenye iPhone",
-  "popup.apps.iosGuide": "Mwongozo wa SideStore"
+  "popup.apps.iosGuide": "Mwongozo wa SideStore",
+  "community.title": "Jiunge na jumuiya",
+  "community.body": "Uliza maswali, shiriki mawazo ya vichujio na upate habari za matoleo mapya.",
+  "community.discord": "FilterTube kwenye Discord, hufunguka kwenye kichupo kipya",
+  "community.reddit": "FilterTube kwenye Reddit, hufunguka kwenye kichupo kipya",
+  "community.instagram": "FilterTube kwenye Instagram, hufunguka kwenye kichupo kipya"
 }

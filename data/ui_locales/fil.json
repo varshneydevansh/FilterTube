@@ -3445,5 +3445,10 @@
   "popup.apps.android": "Android",
   "popup.apps.androidStore": "Google Play",
   "popup.apps.ios": "Nasa iPhone na",
-  "popup.apps.iosGuide": "Gabay sa SideStore"
+  "popup.apps.iosGuide": "Gabay sa SideStore",
+  "community.title": "Sumali sa komunidad",
+  "community.body": "Magtanong, magbahagi ng mga ideya sa filter, at alamin ang mga bagong release.",
+  "community.discord": "FilterTube sa Discord, bubukas sa bagong tab",
+  "community.reddit": "FilterTube sa Reddit, bubukas sa bagong tab",
+  "community.instagram": "FilterTube sa Instagram, bubukas sa bagong tab"
 }

@@ -3443,5 +3443,10 @@
   "popup.apps.android": "Android",
   "popup.apps.androidStore": "Google Play",
   "popup.apps.ios": "Kini di iPhone",
-  "popup.apps.iosGuide": "Panduan SideStore"
+  "popup.apps.iosGuide": "Panduan SideStore",
+  "community.title": "Gabung komunitas",
+  "community.body": "Ajukan pertanyaan, bagikan ide filter, dan dapatkan kabar rilis baru.",
+  "community.discord": "FilterTube di Discord, terbuka di tab baru",
+  "community.reddit": "FilterTube di Reddit, terbuka di tab baru",
+  "community.instagram": "FilterTube di Instagram, terbuka di tab baru"
 }

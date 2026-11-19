@@ -3445,5 +3445,10 @@
   "popup.apps.android": "Android",
   "popup.apps.androidStore": "Google Play",
   "popup.apps.ios": "اکنون روی iPhone",
-  "popup.apps.iosGuide": "راهنمای SideStore"
+  "popup.apps.iosGuide": "راهنمای SideStore",
+  "community.title": "به جامعه بپیوندید",
+  "community.body": "سؤال بپرسید، ایده‌های فیلتر را به اشتراک بگذارید و از نسخه‌های جدید باخبر شوید.",
+  "community.discord": "FilterTube در Discord، در زبانهٔ جدید باز می‌شود",
+  "community.reddit": "FilterTube در Reddit، در زبانهٔ جدید باز می‌شود",
+  "community.instagram": "FilterTube در Instagram، در زبانهٔ جدید باز می‌شود"
 }

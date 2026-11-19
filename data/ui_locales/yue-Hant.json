@@ -3443,5 +3443,10 @@
   "popup.apps.android": "Android",
   "popup.apps.androidStore": "Google Play",
   "popup.apps.ios": "而家有 iPhone 版",
-  "popup.apps.iosGuide": "SideStore 教學"
+  "popup.apps.iosGuide": "SideStore 教學",
+  "community.title": "加入社群",
+  "community.body": "問問題、分享過濾諗法，同埋知道新版本消息。",
+  "community.discord": "Discord 上嘅 FilterTube，會喺新分頁開啟",
+  "community.reddit": "Reddit 上嘅 FilterTube，會喺新分頁開啟",
+  "community.instagram": "Instagram 上嘅 FilterTube，會喺新分頁開啟"
 }

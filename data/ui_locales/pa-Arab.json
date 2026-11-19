@@ -3445,5 +3445,10 @@
   "popup.apps.android": "Android",
   "popup.apps.androidStore": "Google Play",
   "popup.apps.ios": "ہُن iPhone تے",
-  "popup.apps.iosGuide": "SideStore گائیڈ"
+  "popup.apps.iosGuide": "SideStore گائیڈ",
+  "community.title": "کمیونٹی نال جُڑو",
+  "community.body": "سوال پُچھو، فلٹر دے خیال سانجھے کرو تے نویاں ریلیزاں دی خبر لوو۔",
+  "community.discord": "Discord اُتے FilterTube، نویں ٹیب وچ کھلدا اے",
+  "community.reddit": "Reddit اُتے FilterTube، نویں ٹیب وچ کھلدا اے",
+  "community.instagram": "Instagram اُتے FilterTube، نویں ٹیب وچ کھلدا اے"
 }

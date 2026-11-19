@@ -3445,5 +3445,10 @@
   "popup.apps.android": "Android",
   "popup.apps.androidStore": "Google Play",
   "popup.apps.ios": "E don land for iPhone",
-  "popup.apps.iosGuide": "SideStore guide"
+  "popup.apps.iosGuide": "SideStore guide",
+  "community.title": "Join di community",
+  "community.body": "Ask question, share filter idea, and hear about new release.",
+  "community.discord": "FilterTube for Discord, e go open for new tab",
+  "community.reddit": "FilterTube for Reddit, e go open for new tab",
+  "community.instagram": "FilterTube for Instagram, e go open for new tab"
 }

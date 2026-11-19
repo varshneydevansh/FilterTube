@@ -3445,5 +3445,10 @@
   "popup.apps.android": "Android",
   "popup.apps.androidStore": "Google Play",
   "popup.apps.ios": "اب iPhone پر",
-  "popup.apps.iosGuide": "SideStore گائیڈ"
+  "popup.apps.iosGuide": "SideStore گائیڈ",
+  "community.title": "کمیونٹی میں شامل ہوں",
+  "community.body": "سوال پوچھیں، فلٹر کے خیالات شیئر کریں اور نئی ریلیز کی خبر پائیں۔",
+  "community.discord": "Discord پر FilterTube، نئے ٹیب میں کھلتا ہے",
+  "community.reddit": "Reddit پر FilterTube، نئے ٹیب میں کھلتا ہے",
+  "community.instagram": "Instagram پر FilterTube، نئے ٹیب میں کھلتا ہے"
 }

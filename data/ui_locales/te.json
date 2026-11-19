@@ -3445,5 +3445,10 @@
   "popup.apps.android": "Android",
   "popup.apps.androidStore": "Google Play",
   "popup.apps.ios": "ఇప్పుడు iPhoneలో",
-  "popup.apps.iosGuide": "SideStore గైడ్"
+  "popup.apps.iosGuide": "SideStore గైడ్",
+  "community.title": "కమ్యూనిటీలో చేరండి",
+  "community.body": "ప్రశ్నలు అడగండి, ఫిల్టర్ ఆలోచనలు పంచుకోండి, కొత్త విడుదలల గురించి తెలుసుకోండి.",
+  "community.discord": "Discordలో FilterTube, కొత్త ట్యాబ్‌లో తెరుచుకుంటుంది",
+  "community.reddit": "Redditలో FilterTube, కొత్త ట్యాబ్‌లో తెరుచుకుంటుంది",
+  "community.instagram": "Instagramలో FilterTube, కొత్త ట్యాబ్‌లో తెరుచుకుంటుంది"
 }

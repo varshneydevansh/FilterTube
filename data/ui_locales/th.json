@@ -3443,5 +3443,10 @@
   "popup.apps.android": "Android",
   "popup.apps.androidStore": "Google Play",
   "popup.apps.ios": "มีบน iPhone แล้ว",
-  "popup.apps.iosGuide": "คู่มือ SideStore"
+  "popup.apps.iosGuide": "คู่มือ SideStore",
+  "community.title": "เข้าร่วมชุมชน",
+  "community.body": "ถามคำถาม แบ่งปันไอเดียตัวกรอง และรับข่าวรุ่นใหม่",
+  "community.discord": "FilterTube บน Discord เปิดในแท็บใหม่",
+  "community.reddit": "FilterTube บน Reddit เปิดในแท็บใหม่",
+  "community.instagram": "FilterTube บน Instagram เปิดในแท็บใหม่"
 }
