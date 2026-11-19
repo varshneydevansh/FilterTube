@@ -350,12 +350,6 @@
      "language": "hi"
     },
     {
-     "channelId": "UC1L2JoMpcY6MRLhFd3gg5Xg",
-     "handle": "@adda247",
-     "name": "Adda247",
-     "language": "hi"
-    },
-    {
      "channelId": "UCrthsrCaRSnnUC42FyyoNHw",
      "handle": "@suresh_ias_academy",
      "name": "Suresh IAS Academy",
@@ -438,12 +432,6 @@
    ],
    "channels": [
     {
-     "channelId": "UC1L2JoMpcY6MRLhFd3gg5Xg",
-     "handle": "@adda247",
-     "name": "Adda247",
-     "language": "hi"
-    },
-    {
      "channelId": "UCAyYBPzFioHUxvVZEn4rMJA",
      "handle": "@SSCAdda247",
      "name": "SSC Adda247",
@@ -474,10 +462,10 @@
      "language": "hi"
     },
     {
-     "channelId": "UCrQSX8p0tWpTrnSqVreEjZg",
-     "handle": "@Careerwillapp",
-     "name": "Careerwill App",
-     "language": "hi"
+     "channelId": "UCx-7YPrGnNC81ahyqvqu27g",
+     "handle": "@careerwillsscexam",
+     "name": "Careerwill SSC",
+     "language": "en"
     },
     {
      "channelId": "UCXPwWsvqwU18UKpsZD4bODw",
@@ -550,12 +538,6 @@
      "handle": "@khangsresearchcentre1685",
      "name": "Khan GS Research Centre",
      "language": "hi"
-    },
-    {
-     "channelId": "UCZWUw4fL9ShDZfxyGYrmPIg",
-     "handle": "@SSCStudyIQ",
-     "name": "StudyIQ Education",
-     "language": "hi"
     }
    ]
   },
@@ -623,7 +605,7 @@
     {
      "channelId": "UC1L2JoMpcY6MRLhFd3gg5Xg",
      "handle": "@adda247",
-     "name": "Adda247",
+     "name": "Adda247 Bank Exams",
      "language": "hi"
     },
     {
@@ -696,12 +678,6 @@
      "channelId": "UCgVg6dmZHCxze_ay0bolPew",
      "handle": "@Exampur__Official",
      "name": "Exampur",
-     "language": "hi"
-    },
-    {
-     "channelId": "UCrQSX8p0tWpTrnSqVreEjZg",
-     "handle": "@Careerwillapp",
-     "name": "Careerwill App",
      "language": "hi"
     }
    ]
@@ -1523,12 +1499,6 @@
      "language": "hi"
     },
     {
-     "channelId": "UCPu-I3uoI8Ti8bORaT9YN0A",
-     "handle": "@Arvindarorachemistry",
-     "name": "Arvind Arora",
-     "language": "hi"
-    },
-    {
      "channelId": "UCWEmndu9aCunQAVCjxsP7jg",
      "handle": "@class11th-neet",
      "name": "Arjuna NEET",
@@ -1688,12 +1658,6 @@
      "channelId": "UC4eEFUtZeW6iOqH8e9e0CyQ",
      "handle": "@SumitCatking",
      "name": "CATKing",
-     "language": "en"
-    },
-    {
-     "channelId": "UCsmRe6dscMAmSn30lknKcJw",
-     "handle": "@handakafunda995",
-     "name": "Handa Ka Funda",
      "language": "en"
     },
     {
@@ -2562,12 +2526,6 @@
      "language": "ur"
     },
     {
-     "channelId": "UCyb-e3NQpTe-R8pn10e_jDg",
-     "handle": "@cssprepakistan",
-     "name": "CSS Prep Pakistan",
-     "language": "en"
-    },
-    {
      "channelId": "UCptfMx6J5Qiq-WQUtcldITg",
      "handle": "@MCStudycss",
      "name": "MC Study CSS",
@@ -2901,8 +2859,8 @@
      "language": "bn"
     },
     {
-     "channelId": "UCp50UbfTBEZDVdc8tvX_Zxw",
-     "handle": "@10minuteschool",
+     "channelId": "UCL89KKkLs0tZKld-iIS3NGw",
+     "handle": "@10msmain",
      "name": "10 Minute School",
      "language": "bn"
     }
@@ -2954,8 +2912,8 @@
    ],
    "channels": [
     {
-     "channelId": "UCp50UbfTBEZDVdc8tvX_Zxw",
-     "handle": "@10minuteschool",
+     "channelId": "UCL89KKkLs0tZKld-iIS3NGw",
+     "handle": "@10msmain",
      "name": "10 Minute School",
      "language": "bn"
     },
@@ -3452,12 +3410,6 @@
    ],
    "channels": [
     {
-     "channelId": "UCwSrz4e55Y6fnHiPUmXXIzg",
-     "handle": "@collegeboard",
-     "name": "College Board",
-     "language": "en"
-    },
-    {
      "channelId": "UC4a-Gbdw7vOaccHmFo40b9g",
      "handle": "@khanacademy",
      "name": "Khan Academy",
@@ -3482,39 +3434,15 @@
      "language": "en"
     },
     {
-     "channelId": "UCpKbNuRROd1YBVwRz_vvhJw",
-     "handle": "@ThePrincetonReview",
-     "name": "The Princeton Review",
+     "channelId": "UCk36oMtkWyxeg7qwvUqAExw",
+     "handle": "@KaplanSATACT",
+     "name": "Kaplan SAT & ACT Prep",
      "language": "en"
     },
     {
-     "channelId": "UCDEGl-dvFcbc12LRQ19ZWkw",
-     "handle": "@KaplanTestPrep",
-     "name": "Kaplan",
-     "language": "en"
-    },
-    {
-     "channelId": "UCZ4sGYJ6l0cgnVNIHY8GY6w",
-     "handle": "@MagooshGRE",
-     "name": "Magoosh",
-     "language": "en"
-    },
-    {
-     "channelId": "UCC7F_3MMCQKSp7QvD-C9xbw",
-     "handle": "@PrepExpert",
-     "name": "Prep Expert",
-     "language": "en"
-    },
-    {
-     "channelId": "UCd-7TV_TXzgnes6I5PQPE7Q",
-     "handle": "@WyzantTutorTed",
-     "name": "Tutor Ted",
-     "language": "en"
-    },
-    {
-     "channelId": "UCWHftgvuG6M4sd35mpacqBQ",
-     "handle": "@johnpaullozada",
-     "name": "JohnPaul Lozada SAT",
+     "channelId": "UC8CW1R4mIuNUA3TVC92g_EA",
+     "handle": "@SetteleTutoring",
+     "name": "Settele Tutoring",
      "language": "en"
     }
    ]
@@ -3582,33 +3510,9 @@
      "language": "en"
     },
     {
-     "channelId": "UCpKbNuRROd1YBVwRz_vvhJw",
-     "handle": "@ThePrincetonReview",
-     "name": "The Princeton Review",
-     "language": "en"
-    },
-    {
-     "channelId": "UCDEGl-dvFcbc12LRQ19ZWkw",
-     "handle": "@KaplanTestPrep",
-     "name": "Kaplan",
-     "language": "en"
-    },
-    {
-     "channelId": "UCZ4sGYJ6l0cgnVNIHY8GY6w",
-     "handle": "@MagooshGRE",
-     "name": "Magoosh",
-     "language": "en"
-    },
-    {
-     "channelId": "UCC7F_3MMCQKSp7QvD-C9xbw",
-     "handle": "@PrepExpert",
-     "name": "Prep Expert",
-     "language": "en"
-    },
-    {
-     "channelId": "UCd-7TV_TXzgnes6I5PQPE7Q",
-     "handle": "@WyzantTutorTed",
-     "name": "Tutor Ted",
+     "channelId": "UCk36oMtkWyxeg7qwvUqAExw",
+     "handle": "@KaplanSATACT",
+     "name": "Kaplan SAT & ACT Prep",
      "language": "en"
     },
     {
@@ -3844,15 +3748,9 @@
      "language": "en"
     },
     {
-     "channelId": "UCDEGl-dvFcbc12LRQ19ZWkw",
-     "handle": "@KaplanTestPrep",
-     "name": "Kaplan",
-     "language": "en"
-    },
-    {
-     "channelId": "UCpKbNuRROd1YBVwRz_vvhJw",
-     "handle": "@ThePrincetonReview",
-     "name": "The Princeton Review",
+     "channelId": "UCwZ7x4y5NY7tz-yEyz9gr4g",
+     "handle": "@KaplanMCAT",
+     "name": "Kaplan MCAT Prep",
      "language": "en"
     },
     {
@@ -3948,15 +3846,9 @@
      "language": "en"
     },
     {
-     "channelId": "UCDEGl-dvFcbc12LRQ19ZWkw",
-     "handle": "@KaplanTestPrep",
-     "name": "Kaplan",
-     "language": "en"
-    },
-    {
-     "channelId": "UCpKbNuRROd1YBVwRz_vvhJw",
-     "handle": "@ThePrincetonReview",
-     "name": "The Princeton Review",
+     "channelId": "UCx5kVgj6IQIBqEMkj1CRVSA",
+     "handle": "@KaplanLSATPrep",
+     "name": "Kaplan LSAT Prep",
      "language": "en"
     },
     {
@@ -4249,12 +4141,6 @@
      "language": "en"
     },
     {
-     "channelId": "UCXITn68b4CsDw8pdFHVWm1g",
-     "handle": "@PrimroseKitten",
-     "name": "Primrose Kitten",
-     "language": "en"
-    },
-    {
      "channelId": "UCM2vdqz-7e4HAuzhpFuRY8w",
      "handle": "@mrbruff",
      "name": "Mr Bruff",
@@ -4276,12 +4162,6 @@
      "channelId": "UCLJnnnahpUYO2tOEcXe1mHA",
      "handle": "@HEGARTYMATHS",
      "name": "Hegarty Maths",
-     "language": "en"
-    },
-    {
-     "channelId": "UC0QUAInT0wuRKhnK-vm58KQ",
-     "handle": "@oaknational",
-     "name": "Oak National Academy",
      "language": "en"
     },
     {
@@ -4477,12 +4357,6 @@
      "language": "en"
     },
     {
-     "channelId": "UCXITn68b4CsDw8pdFHVWm1g",
-     "handle": "@PrimroseKitten",
-     "name": "Primrose Kitten",
-     "language": "en"
-    },
-    {
      "channelId": "UCps4gUjfZsu6-b-7mwK41lg",
      "handle": "@MrERintoul",
      "name": "Eliot Rintoul",
@@ -4541,12 +4415,6 @@
      "language": "en"
     },
     {
-     "channelId": "UCXov_HHAK5bOkGedPrJdtNA",
-     "handle": "@TheMedicPortal",
-     "name": "The Medic Portal",
-     "language": "en"
-    },
-    {
      "channelId": "UCYlwSdpmi_wOQPRcCT7iuvg",
      "handle": "@6med373",
      "name": "6med",
@@ -4562,12 +4430,6 @@
      "channelId": "UCrrExVLxy41Wm7JOZl11CSw",
      "handle": "@FutureDoc",
      "name": "Future Doc",
-     "language": "en"
-    },
-    {
-     "channelId": "UCDEGl-dvFcbc12LRQ19ZWkw",
-     "handle": "@KaplanTestPrep",
-     "name": "KaplanTestPrep",
      "language": "en"
     }
    ]
@@ -5472,21 +5334,9 @@
      "language": "en"
     },
     {
-     "channelId": "UCcGA7Y7V7eIZ9x4a1iIaRlQ",
-     "handle": "@exammajor",
-     "name": "Exam Major",
-     "language": "en"
-    },
-    {
      "channelId": "UCGpKjGyEq8MepUcnym1w2tQ",
      "handle": "@O3schools",
      "name": "O3SCHOOLS",
-     "language": "en"
-    },
-    {
-     "channelId": "UCrNvHNlxswrhvJk1EJhbVWg",
-     "handle": "@Examprep_africa",
-     "name": "ExamPrep Africa",
      "language": "en"
     },
     {
@@ -5511,12 +5361,6 @@
      "channelId": "UCjeXQ5VITD6h8_jnQC02VqA",
      "handle": "@DTWTUTORIALS",
      "name": "DTW Tutorials",
-     "language": "en"
-    },
-    {
-     "channelId": "UCFDGcTNgADMaBQF1QoJtnNg",
-     "handle": "@gesofficialTV",
-     "name": "Ghana Learning TV",
      "language": "en"
     },
     {
@@ -5630,21 +5474,9 @@
      "language": "en"
     },
     {
-     "channelId": "UCcGA7Y7V7eIZ9x4a1iIaRlQ",
-     "handle": "@exammajor",
-     "name": "Exam Major",
-     "language": "en"
-    },
-    {
      "channelId": "UCGpKjGyEq8MepUcnym1w2tQ",
      "handle": "@O3schools",
      "name": "O3SCHOOLS",
-     "language": "en"
-    },
-    {
-     "channelId": "UCrNvHNlxswrhvJk1EJhbVWg",
-     "handle": "@Examprep_africa",
-     "name": "ExamPrep Africa",
      "language": "en"
     },
     {
@@ -5741,12 +5573,6 @@
     "marking scheme"
    ],
    "channels": [
-    {
-     "channelId": "UC8oYyUHCXxBU_FnMwQXlqug",
-     "handle": "@ReviseKenya",
-     "name": "Revise Kenya",
-     "language": "en"
-    },
     {
      "channelId": "UCt_hC-sbZPGFlQUyd3b5ISQ",
      "handle": "@kcseforecast7580",
@@ -6695,9 +6521,9 @@
      "language": "en"
     },
     {
-     "channelId": "UClrQI1Oq5vpCbszyssXOVsA",
-     "handle": "@TargetTestPrep",
-     "name": "Target Test Prep",
+     "channelId": "UCk8cQ0UC8Y3Sb6CfrqWV4-w",
+     "handle": "@TargetTestPrepGRE",
+     "name": "Target Test Prep GRE",
      "language": "en"
     },
     {
@@ -6707,33 +6533,15 @@
      "language": "en"
     },
     {
-     "channelId": "UCpKbNuRROd1YBVwRz_vvhJw",
-     "handle": "@ThePrincetonReview",
-     "name": "The Princeton Review",
-     "language": "en"
-    },
-    {
-     "channelId": "UCDEGl-dvFcbc12LRQ19ZWkw",
-     "handle": "@KaplanTestPrep",
-     "name": "Kaplan",
-     "language": "en"
-    },
-    {
      "channelId": "UCIRZsN8eJEe4jHuITOEcShw",
      "handle": "@VinceKotchian",
      "name": "Vince Kotchian",
      "language": "en"
     },
     {
-     "channelId": "UC_6hTObvQksRv7fo-Nehb4w",
-     "handle": "@Wizako",
-     "name": "Wizako",
-     "language": "en"
-    },
-    {
-     "channelId": "UC1FW5GFlPOp-MI_HgRRA8Dw",
-     "handle": "@JamboreeEducation",
-     "name": "Jamboree Education",
+     "channelId": "UCdWG2a40vma3t1MRFxH8ERg",
+     "handle": "@WizakoPrepGRE",
+     "name": "Wizako GRE",
      "language": "en"
     },
     {
@@ -6810,9 +6618,9 @@
      "language": "en"
     },
     {
-     "channelId": "UCCvxJPdq-I7Tx2RIpx_v2ng",
-     "handle": "@manhattanprepgre7390",
-     "name": "Manhattan Prep",
+     "channelId": "UCzDPcZ6BJGzdc2m67HA3CTg",
+     "handle": "@Kaplan_GradPrep",
+     "name": "Kaplan Grad Prep (Manhattan Prep GMAT)",
      "language": "en"
     },
     {
@@ -6840,33 +6648,15 @@
      "language": "en"
     },
     {
-     "channelId": "UCZ4sGYJ6l0cgnVNIHY8GY6w",
-     "handle": "@MagooshGRE",
-     "name": "Magoosh",
-     "language": "en"
-    },
-    {
-     "channelId": "UCDEGl-dvFcbc12LRQ19ZWkw",
-     "handle": "@KaplanTestPrep",
-     "name": "Kaplan",
-     "language": "en"
-    },
-    {
-     "channelId": "UCpKbNuRROd1YBVwRz_vvhJw",
-     "handle": "@ThePrincetonReview",
-     "name": "The Princeton Review",
+     "channelId": "UCikMRvMvHsgaE8UvwwYBc5w",
+     "handle": "@MagooshGMAT",
+     "name": "Magoosh GMAT",
      "language": "en"
     },
     {
      "channelId": "UC_6hTObvQksRv7fo-Nehb4w",
      "handle": "@Wizako",
      "name": "Wizako",
-     "language": "en"
-    },
-    {
-     "channelId": "UC1FW5GFlPOp-MI_HgRRA8Dw",
-     "handle": "@JamboreeEducation",
-     "name": "Jamboree Education",
      "language": "en"
     }
    ]
@@ -17791,12 +17581,6 @@
      "language": "en"
     },
     {
-     "channelId": "UCXITn68b4CsDw8pdFHVWm1g",
-     "handle": "@PrimroseKitten",
-     "name": "Primrose Kitten",
-     "language": "en"
-    },
-    {
      "channelId": "UCM2vdqz-7e4HAuzhpFuRY8w",
      "handle": "@mrbruff",
      "name": "Mr Bruff",
@@ -17818,12 +17602,6 @@
      "channelId": "UCLJnnnahpUYO2tOEcXe1mHA",
      "handle": "@HEGARTYMATHS",
      "name": "Hegarty Maths",
-     "language": "en"
-    },
-    {
-     "channelId": "UC0QUAInT0wuRKhnK-vm58KQ",
-     "handle": "@oaknational",
-     "name": "Oak National Academy",
      "language": "en"
     },
     {
@@ -18031,12 +17809,6 @@
      "channelId": "UCeUFexWB7xDcw91NzqO--bQ",
      "handle": "@savemyexams",
      "name": "Save My Exams",
-     "language": "en"
-    },
-    {
-     "channelId": "UCXITn68b4CsDw8pdFHVWm1g",
-     "handle": "@PrimroseKitten",
-     "name": "Primrose Kitten",
      "language": "en"
     },
     {
@@ -19242,12 +19014,6 @@
     ]
    },
    "channels": [
-    {
-     "channelId": "UC8oYyUHCXxBU_FnMwQXlqug",
-     "handle": "@ReviseKenya",
-     "name": "Revise Kenya",
-     "language": "en"
-    },
     {
      "channelId": "UCt_hC-sbZPGFlQUyd3b5ISQ",
      "handle": "@kcseforecast7580",
@@ -23295,12 +23061,6 @@
      "channelId": "UCoWgc1mqe-bcfb_lem7EyOg",
      "handle": "@Ben10",
      "name": "Ben 10",
-     "language": "en"
-    },
-    {
-     "channelId": "UCRmz-wwsTeHEaGOK6WAiTNw",
-     "handle": "@DisneyXD-OfficialChannel",
-     "name": "Disney XD",
      "language": "en"
     },
     {
