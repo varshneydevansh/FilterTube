@@ -1,7 +1,5 @@
 import Link from "next/link";
 import {
-  AndroidLogo,
-  AppleLogo,
   ArrowRight,
   ArrowUpRight,
   DeviceMobile,
@@ -47,11 +45,9 @@ const shortcutPages = ["ml-ai"].map((slug) => detailPages[slug]);
 
 function FeaturedPlatformCard({ page, span }) {
   const tone = getTonePreset(page.tone);
-  const Icon = page.icon;
   const isDarkTone = page.tone === "ink";
   const headingClass = isDarkTone ? "text-[#fffaf4]" : "text-[#1d1b18]";
   const mutedClass = isDarkTone ? "text-white/82" : "text-[#4f4b45]";
-  const eyebrowClass = isDarkTone ? "text-white/70" : "text-[#615c55]";
 
   return (
     <Link
@@ -72,40 +68,20 @@ function FeaturedPlatformCard({ page, span }) {
         />
         <div className="relative z-10 flex h-full flex-col">
           <div className="flex items-start justify-between gap-4">
-            <div
-              className={`ft-platform-icon flex h-12 w-12 items-center justify-center rounded-[1rem] ${tone.iconShell}`}
-            >
-              {page.slug === "extension" ? <img alt="" src="/apps/firefox.png" width={28} height={28} /> : <Icon aria-hidden="true" size={22} weight="light" />}
-            </div>
             <span
               className={`ft-platform-badge inline-flex min-h-9 items-center rounded-full px-3 py-1 text-[0.68rem] font-medium uppercase tracking-[0.22em] ${tone.accentBadge}`}
             >
               {page.status}
             </span>
           </div>
-          <p
-            className={`mt-6 text-[0.72rem] uppercase tracking-[0.22em] ${eyebrowClass}`}
-          >
-            {page.eyebrow}
-          </p>
           <h3
-            className={`mt-3 max-w-[14ch] text-balance font-display text-4xl tracking-[-0.06em] ${headingClass}`}
+            className={`mt-6 max-w-[14ch] text-balance font-display text-4xl tracking-[-0.06em] ${headingClass}`}
           >
-            {page.titleDisplay}
+            {page.navTitle}
           </h3>
           <p className={`mt-4 max-w-[34ch] text-sm leading-7 ${mutedClass}`}>
             {page.routeSummary}
           </p>
-          <div className="mt-6 flex flex-wrap gap-2">
-            {page.chips.slice(0, 2).map((chip) => (
-              <span
-                className={`inline-flex min-h-10 items-center rounded-full border px-3 py-2 text-[0.68rem] uppercase tracking-[0.18em] ${tone.chip}`}
-                key={chip}
-              >
-                {chip}
-              </span>
-            ))}
-          </div>
           <span
             className={`mt-8 inline-flex items-center gap-2 text-sm font-medium ${headingClass}`}
           >
@@ -128,7 +104,6 @@ function ShortcutCard({ page }) {
   const isDarkTone = page.tone === "ink";
   const headingClass = isDarkTone ? "text-[#fffaf4]" : "text-[#1d1b18]";
   const mutedClass = isDarkTone ? "text-white/82" : "text-[#4f4b45]";
-  const eyebrowClass = isDarkTone ? "text-white/70" : "text-[#615c55]";
 
   return (
     <Link
@@ -141,13 +116,8 @@ function ShortcutCard({ page }) {
       >
         <div className={`absolute inset-0 ${tone.heroBackdrop} opacity-72`} />
         <div className="relative z-10">
-          <p
-            className={`text-[0.68rem] uppercase tracking-[0.22em] ${eyebrowClass}`}
-          >
-            {page.eyebrow}
-          </p>
           <h3
-            className={`mt-3 text-balance font-display text-2xl tracking-[-0.05em] ${headingClass}`}
+            className={`text-balance font-display text-2xl tracking-[-0.05em] ${headingClass}`}
           >
             {page.navTitle}
           </h3>
@@ -174,18 +144,15 @@ function ShortcutCard({ page }) {
 function AppReleaseStatusSection() {
   const appCards = [
     {
-      eyebrow: "Android phone + tablet",
       title: "Your videos, on Android.",
-      body: "A custom Main and Kids app, with filters and family profiles, plus Sangeet for music, video Notes and Offline Media. Install from Google Play—no invitation or email needed.",
+      body: "A custom Main and Kids app, with filters and family profiles, plus Sangeet for music, video Notes and Offline Media. Install from Google Play. No invitation or email needed.",
       image: "/apps/android.png",
       imageAlt: "FilterTube Android app artwork",
       action: "Explore Android",
       href: "/android",
       platform: "android",
-      icon: AndroidLogo,
     },
     {
-      eyebrow: "iPhone + iPad",
       title: "iPhone and iPad, together.",
       body: "A native app for smaller screens and a wider iPad workspace. Trouble on Apple's side delays the App Store version; until then, install with SideStore, or AltStore.",
       image: "/apps/app-store-transparent.png",
@@ -193,10 +160,8 @@ function AppReleaseStatusSection() {
       action: "Install on iPhone or iPad",
       href: "/ios",
       platform: "ios",
-      icon: AppleLogo,
     },
     {
-      eyebrow: "Browser extension · available now",
       title: "Keep watching in your browser.",
       body: "Use FilterTube on the pages you already visit, with a quick popup, full settings, and channel controls in the video menu. Choose Chrome, Firefox, Edge or another supported browser.",
       image: "/apps/firefox.png",
@@ -214,7 +179,6 @@ function AppReleaseStatusSection() {
         <Reveal>
           <div className="grid gap-5 lg:grid-cols-2 xl:grid-cols-3">
             {appCards.map((card) => {
-              const Icon = card.icon;
               return (
                 <article
                   className="ft-app-release-card ft-platform-theme ft-platform-surface relative isolate min-h-[22rem] overflow-hidden rounded-[2rem] border p-6 shadow-[var(--shadow-diffuse)] md:p-7"
@@ -222,15 +186,7 @@ function AppReleaseStatusSection() {
                   key={card.title}
                 >
                   <div className="relative z-10 flex h-full flex-col sm:max-w-[62%]">
-                    <div className="flex items-center gap-2.5">
-                      <span className="ft-platform-icon flex h-10 w-10 shrink-0 items-center justify-center rounded-xl">
-                        {Icon ? <Icon aria-hidden="true" size={22} weight="light" /> : <img alt="" src="/apps/firefox.png" width={28} height={28} />}
-                      </span>
-                      <p className="ft-platform-label text-[0.68rem] font-semibold uppercase tracking-[0.16em]">
-                        {card.eyebrow}
-                      </p>
-                    </div>
-                    <h2 className="mt-4 text-balance font-display text-3xl tracking-[-0.055em] text-[var(--color-ink)] md:text-4xl">
+                    <h2 className="text-balance font-display text-3xl tracking-[-0.055em] text-[var(--color-ink)] md:text-4xl">
                       {card.title}
                     </h2>
                     <p className="mb-6 mt-4 text-sm leading-7 text-[var(--color-muted)]">
@@ -268,9 +224,7 @@ function QuickGuideSection() {
       <div className="mx-auto max-w-[1400px]">
         <Reveal>
           <SectionHeading
-            eyebrow="Quick guide"
             title="Start small, then add family controls only when needed."
-            description="Choose the app or extension, add one rule, then build the setup that fits you."
           />
         </Reveal>
 
@@ -343,11 +297,8 @@ function QuickGuideSection() {
             <div id="device-sync">
               <div className="grid gap-5 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)] lg:items-end lg:gap-12">
                 <div>
-                  <p className="text-[0.72rem] uppercase tracking-[0.22em] text-[var(--color-muted)]">
-                    P2P · Peer-to-peer sync
-                  </p>
-                  <h3 className="mt-4 max-w-[14ch] font-display text-4xl tracking-[-0.06em] text-[var(--color-ink)] md:text-5xl">
-                    Your devices. In sync.
+                  <h3 className="max-w-[14ch] font-display text-4xl tracking-[-0.06em] text-[var(--color-ink)] md:text-5xl">
+                    Peer-to-peer device sync
                   </h3>
                 </div>
                 <div className="max-w-[52ch] text-base leading-8 text-[var(--color-muted)]">
@@ -410,9 +361,6 @@ export default function HomePage() {
             <div className="grid flex-1 items-center gap-12 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.04fr)] lg:gap-10 xl:gap-16">
               <div className="flex flex-col items-center text-center lg:items-start lg:text-left">
                 <div className="inline-flex min-h-11 items-center gap-3 rounded-full border border-white/30 bg-[rgba(13,18,27,0.2)] px-4 py-2 text-sm font-medium text-[#fffaf4] shadow-[inset_0_1px_0_rgba(255,255,255,0.18)] backdrop-blur-xl">
-                  <span className="shrink-0 rounded-full bg-white px-3 py-1 text-xs font-semibold uppercase tracking-[0.18em] text-[#1f2430]">
-                    Live now
-                  </span>
                   <span className="text-pretty">
                     Desktop extensions and the Android app are live. Find
                     FilterTube on Google Play.
@@ -430,7 +378,7 @@ export default function HomePage() {
 
                 <p className="ft-hero-support-copy relative mt-7 max-w-[760px] text-pretty rounded-[1.6rem] px-6 py-4 text-[16px] font-medium leading-7 md:px-8 md:text-[18px] md:leading-8 lg:max-w-[36rem] lg:px-6">
                   <span className="font-semibold text-white">
-                    Block what you don&apos;t want—or allow only what you trust.
+                    Block what you don&apos;t want, or allow only what you trust.
                   </span>{" "}
                   Control{" "}
                   <span className="ft-hero-support-emphasis">
@@ -470,9 +418,8 @@ export default function HomePage() {
               <div className="mx-auto w-full max-w-[42rem] lg:max-w-none">
                 <HeroShowcase />
                 <p className="ft-hero-status mx-auto mt-8 max-w-[34rem] rounded-2xl px-5 py-3 text-center text-sm font-medium leading-6 text-white md:px-6">
-                  A study plan on iPad and Sangeet on Android. Your devices and
-                  profiles stay in sync through verified, encrypted
-                  peer-to-peer sharing.
+                  Your devices and profiles stay in sync through verified,
+                  encrypted peer-to-peer sharing.
                 </p>
               </div>
             </div>
@@ -520,7 +467,6 @@ export default function HomePage() {
         <div className="mx-auto grid max-w-[1400px] gap-10 lg:grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)] lg:gap-16">
           <Reveal>
             <SectionHeading
-              eyebrow="Why FilterTube"
               title="A calmer place for what you choose to watch."
               description="FilterTube is for parents, students, and everyday users who need clear controls: add words, block channels, hide Shorts, set stricter profiles, and keep the setup local."
             />
@@ -542,9 +488,6 @@ export default function HomePage() {
               <div className="absolute inset-0 bg-[radial-gradient(circle_at_18%_20%,rgba(240,209,194,0.26),transparent_30%),radial-gradient(circle_at_82%_18%,rgba(181,205,193,0.2),transparent_26%)]" />
               <div className="relative z-10">
                 <div className="flex flex-wrap items-center justify-between gap-4">
-                  <p className="text-[0.72rem] uppercase tracking-[0.24em] text-[var(--color-muted)]">
-                    Why this exists
-                  </p>
                   <a
                     className="ft-shell-strong inline-flex min-h-11 items-center gap-2 rounded-full border border-[color:var(--color-line)] px-4 py-2 text-sm text-[var(--color-ink)] transition duration-500 ease-[cubic-bezier(0.32,0.72,0,1)] hover:-translate-y-0.5 hover:border-[color:var(--color-accent)] hover:text-[var(--color-accent)] active:translate-y-px active:scale-[0.99]"
                     href="https://support.google.com/youtubekids/thread/54509605/how-to-block-videos-by-keyword-or-tag?hl=en"
@@ -612,7 +555,6 @@ export default function HomePage() {
         <div className="mx-auto max-w-[1400px]">
           <Reveal>
             <SectionHeading
-              eyebrow="Controls"
               title="The main controls are simple: block, allow, hide, or protect."
               description="Most people can start with a Blocklist. Families can add profiles, PINs, Whitelist mode, and device updates as the setup grows."
             />
@@ -621,19 +563,9 @@ export default function HomePage() {
             {homeCapabilityCards.map((card, index) => (
               <Reveal className={card.span} delay={index * 80} key={card.title}>
                 <Panel innerClassName="h-full p-6 md:p-7">
-                  <div className="flex items-start justify-between gap-4">
-                    <div>
-                      <p className="text-[0.72rem] uppercase tracking-[0.22em] text-[var(--color-muted)]">
-                        {card.label}
-                      </p>
-                      <h3 className="mt-4 max-w-[18ch] font-display text-3xl tracking-[-0.05em] text-[var(--color-ink)]">
-                        {card.title}
-                      </h3>
-                    </div>
-                    <div className="rounded-full bg-[rgba(171,68,56,0.08)] p-3 text-[var(--color-accent)]">
-                      <card.icon aria-hidden="true" size={24} weight="light" />
-                    </div>
-                  </div>
+                  <h3 className="max-w-[18ch] font-display text-3xl tracking-[-0.05em] text-[var(--color-ink)]">
+                    {card.title}
+                  </h3>
                   <p className="mt-5 max-w-[58ch] text-base leading-8 text-[var(--color-muted)]">
                     {card.description}
                   </p>
@@ -656,7 +588,6 @@ export default function HomePage() {
         <div className="mx-auto max-w-[1400px]">
           <Reveal>
             <SectionHeading
-              eyebrow="Apps"
               title="On your phone, your tablet, and more screens."
               description="Android phones, tablets and TVs are available now. iPhone and iPad install directly, and the browser extension works on desktop."
             />
@@ -679,12 +610,9 @@ export default function HomePage() {
               <div className="ft-inset ft-shell-strong rounded-[calc(1.9rem-0.5rem)] p-5 md:p-6">
                 <div className="flex flex-wrap items-center justify-between gap-4">
                   <div>
-                    <p className="text-[0.72rem] uppercase tracking-[0.22em] text-[var(--color-muted)]">
-                      Keep exploring
-                    </p>
-                    <p className="mt-3 max-w-[30ch] text-sm leading-7 text-[var(--color-muted)]">
-                      Android TV and Fire TV share the Android story. Local
-                      intelligence has its own clearly labelled research track.
+                    <p className="max-w-[30ch] text-sm leading-7 text-[var(--color-muted)]">
+                      Android TV uses the same app as Android phones. Fire TV
+                      is planned.
                     </p>
                   </div>
                   <Link
@@ -712,9 +640,8 @@ export default function HomePage() {
         <div className="mx-auto max-w-[1400px]">
           <Reveal>
             <SectionHeading
-              eyebrow="Feature guide"
-              title="The details, when you need them."
-              description="Explore the full controls below. Experimental features are labelled; support differs by platform."
+              title="Feature guide"
+              description="Experimental features are labelled; support differs by platform."
             />
           </Reveal>
           <details className="ft-disclosure ft-shell mt-8 rounded-[2rem] border border-[color:var(--color-line)] p-2">
@@ -732,18 +659,22 @@ export default function HomePage() {
                     className="h-full"
                     innerClassName="flex h-full flex-col p-6 md:p-7"
                   >
-                    <p className="text-[0.72rem] uppercase tracking-[0.22em] text-[var(--color-muted)]">
-                      {feature.status || "Core controls"}
-                    </p>
-                    <h3 className="mt-4 max-w-[18ch] font-display text-3xl tracking-[-0.05em] text-[var(--color-ink)]">
+                    {feature.status ? (
+                      <p className="text-[0.72rem] uppercase tracking-[0.22em] text-[var(--color-muted)]">
+                        {feature.status}
+                      </p>
+                    ) : null}
+                    <h3 className={`${feature.status ? "mt-4 " : ""}max-w-[18ch] font-display text-3xl tracking-[-0.05em] text-[var(--color-ink)]`}>
                       {feature.title}
                     </h3>
                     <p className="mt-4 text-sm leading-7 text-[var(--color-muted)]">
                       {feature.description}
                     </p>
-                    <p className="mt-auto pt-6 text-[0.72rem] uppercase tracking-[0.2em] text-[var(--color-accent)]">
-                      {feature.detail}
-                    </p>
+                    {feature.detail ? (
+                      <p className="mt-auto pt-6 text-[0.72rem] uppercase tracking-[0.2em] text-[var(--color-accent)]">
+                        {feature.detail}
+                      </p>
+                    ) : null}
                   </Panel>
                 </Reveal>
               ))}
@@ -756,9 +687,7 @@ export default function HomePage() {
         <div className="mx-auto max-w-[1400px]">
           <Reveal>
             <SectionHeading
-              eyebrow="Common questions"
-              title="Simple answers before you open FilterTube."
-              description="Start with the basics. The advanced controls can wait until you need them."
+              title="Common questions"
             />
           </Reveal>
           <div className="mt-12 grid auto-rows-fr gap-5 md:grid-cols-2">
@@ -768,10 +697,7 @@ export default function HomePage() {
                   className="h-full"
                   innerClassName="flex h-full flex-col p-6 md:p-7"
                 >
-                  <p className="text-[0.72rem] uppercase tracking-[0.22em] text-[var(--color-muted)]">
-                    FAQ
-                  </p>
-                  <h3 className="mt-4 max-w-[18ch] font-display text-3xl tracking-[-0.05em] text-[var(--color-ink)]">
+                  <h3 className="max-w-[18ch] font-display text-3xl tracking-[-0.05em] text-[var(--color-ink)]">
                     {item.question}
                   </h3>
                   <p className="mt-4 text-sm leading-7 text-[var(--color-muted)]">
@@ -788,7 +714,6 @@ export default function HomePage() {
         <div className="mx-auto max-w-[1400px]">
           <Reveal>
             <SectionHeading
-              eyebrow="User feedback"
               title="The roadmap is being shaped by parents and caregivers."
               description="The strongest feedback has been simple: make the product easier to understand, stronger for family setups, and clearer about what works today."
             />
@@ -837,15 +762,12 @@ export default function HomePage() {
             <div className="relative z-10 grid gap-10 xl:grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)] xl:items-center">
               <Reveal>
                 <div>
-                  <p className="text-[0.72rem] uppercase tracking-[0.22em] text-[var(--color-muted)]">
-                    Get started
-                  </p>
-                  <h2 className="mt-5 max-w-[14ch] font-display text-4xl tracking-[-0.06em] text-[var(--color-ink)] md:text-6xl md:leading-[0.98]">
+                  <h2 className="max-w-[14ch] font-display text-4xl tracking-[-0.06em] text-[var(--color-ink)] md:text-6xl md:leading-[0.98]">
                     Start on Android, iPhone or in your browser.
                   </h2>
                   <p className="mt-5 max-w-[58ch] text-base leading-8 text-[var(--color-muted)]">
-                    Choose where you want to watch, add a channel or keyword,
-                    and make the experience your own. Android phone and tablet
+                    Choose where you want to watch, then add a channel or
+                    keyword. Android phone and tablet
                     installs are public, the iPhone app installs directly, and
                     there is no FilterTube sign-up.
                   </p>

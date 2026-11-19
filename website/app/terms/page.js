@@ -66,8 +66,7 @@ export default function TermsPage() {
       <div className="mx-auto max-w-[1100px]">
         <Reveal>
           <SectionHeading
-            eyebrow="Terms of use"
-            title="Clear terms, written in plain language."
+            title="Terms of use"
             description="Last updated on March 16, 2026. These terms cover the FilterTube website, current browser release, public code, and related downloads."
           />
         </Reveal>

@@ -1,16 +1,4 @@
-import {
-  ArrowUpRight,
-  CheckCircle,
-  Clock,
-  Coffee,
-  Desktop,
-  DeviceMobile,
-  Heart,
-  Question,
-  ShieldCheck,
-  WifiHigh,
-  UserCircle,
-} from "@phosphor-icons/react/ssr";
+import { ArrowUpRight, CheckCircle } from "@phosphor-icons/react/ssr";
 
 import { ActionLink, Panel } from "@/components/marketing-ui";
 import { Reveal } from "@/components/reveal";
@@ -72,11 +60,11 @@ const promises = [
 ];
 
 const checklist = [
-  { icon: DeviceMobile, text: "An iPhone or iPad with a passcode, on iOS or iPadOS 17 or newer (FilterTube needs 17)" },
-  { icon: Desktop, text: "A computer (Mac, Windows, Linux or a recent Chromebook) and a USB cable, only for the first install" },
-  { icon: UserCircle, text: "An Apple Account (Apple ID). A spare free one works fine" },
-  { icon: WifiHigh, text: "Wi-Fi. Mobile data won't work for the setup" },
-  { icon: Clock, text: "About 15 minutes" },
+  { text: "An iPhone or iPad with a passcode, on iOS or iPadOS 17 or newer (FilterTube needs 17)" },
+  { text: "A computer (Mac, Windows, Linux or a recent Chromebook) and a USB cable, only for the first install" },
+  { text: "An Apple Account (Apple ID). A spare free one works fine" },
+  { text: "Wi-Fi. Mobile data won't work for the setup" },
+  { text: "About 15 minutes" },
 ];
 
 const safetyPoints = [
@@ -147,14 +135,6 @@ const faqs = [
     a: "Yes. Export a backup from FilterTube's settings, install the App Store version when it's live, then import the backup there.",
   },
 ];
-
-function Eyebrow({ children }) {
-  return (
-    <p className="text-[0.72rem] uppercase tracking-[0.26em] text-[var(--color-muted)]">
-      {children}
-    </p>
-  );
-}
 
 function ComingNote({ children = "Coming with the first iPhone release" }) {
   return (
@@ -229,21 +209,20 @@ function InstallGuide() {
             <Panel innerClassName="p-6 md:p-10">
               <div className="grid gap-8 md:grid-cols-[minmax(0,1fr)_auto] md:items-center">
                 <div>
-                  <Eyebrow>Install on iPhone and iPad</Eyebrow>
-                  <h2 className="mt-5 text-balance font-display text-4xl font-semibold tracking-[-0.06em] text-[var(--color-ink)] md:text-6xl md:leading-[0.98]">
-                    FilterTube for iPhone and iPad.
+                  <h2 className="text-balance font-display text-4xl font-semibold tracking-[-0.06em] text-[var(--color-ink)] md:text-6xl md:leading-[0.98]">
+                    Install FilterTube on iPhone and iPad
                   </h2>
                   <p className="mt-6 max-w-[62ch] text-pretty text-base leading-8 text-[var(--color-muted)] md:text-lg">
                     I&apos;m sorry for the extra steps. I&apos;m working to
-                    bring FilterTube to the App Store &mdash; that&apos;s where
-                    I want it to be &mdash; but Apple is making things difficult
+                    bring FilterTube to the App Store, where I want it to be,
+                    but Apple is making things difficult
                     with the developer account, so that will take a while. Until
                     then, SideStore is the best way I&apos;ve found to install it,
                     and AltStore works too. This isn&apos;t a jailbreak or a
                     hack: FilterTube comes straight from my official GitHub
                     releases, and SideStore installs it with Apple&apos;s own
                     free developer signing, which Apple has offered worldwide
-                    since 2015 &mdash; the same way developers test apps on their
+                    since 2015, the same way developers test apps on their
                     own phones. Nothing on your phone is modified, FilterTube
                     runs in iOS&apos;s normal sandbox, and you can use a spare
                     Apple ID if you prefer.
@@ -280,17 +259,15 @@ function InstallGuide() {
         <div className="mx-auto max-w-[1180px]">
           <Reveal>
             <Panel innerClassName="p-6 md:p-10">
-              <Eyebrow>Before you start</Eyebrow>
-              <h2 className="mt-5 max-w-[22ch] text-balance font-display text-4xl tracking-[-0.06em] text-[var(--color-ink)] md:text-5xl">
-                Have these ready.
+              <h2 className="max-w-[22ch] text-balance font-display text-4xl tracking-[-0.06em] text-[var(--color-ink)] md:text-5xl">
+                Before you start
               </h2>
               <ul className="mt-8 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-                {checklist.map(({ icon: Icon, text }) => (
+                {checklist.map(({ text }) => (
                   <li
                     className="flex items-start gap-4 rounded-[1.2rem] border border-[color:var(--color-line)] bg-[color:var(--color-soft-panel)] p-5"
                     key={text}
                   >
-                    <Icon aria-hidden="true" className="shrink-0 text-[var(--color-accent)]" size={28} weight="light" />
                     <span className="text-sm leading-7 text-[var(--color-ink)]">{text}</span>
                   </li>
                 ))}
@@ -301,9 +278,8 @@ function InstallGuide() {
               </p>
 
               <div className="mt-12">
-                <Eyebrow>Install steps</Eyebrow>
-                <h2 className="mt-5 max-w-[22ch] text-balance font-display text-4xl tracking-[-0.06em] text-[var(--color-ink)] md:text-5xl">
-                  Five steps. That&apos;s it.
+                <h2 className="max-w-[22ch] text-balance font-display text-4xl tracking-[-0.06em] text-[var(--color-ink)] md:text-5xl">
+                  Install steps
                 </h2>
               </div>
               <ol className="mt-8 grid gap-4">
@@ -428,8 +404,7 @@ function InstallGuide() {
           <div className="mx-auto max-w-[1180px]">
             <Reveal>
               <Panel innerClassName="p-6 md:p-10">
-                <Eyebrow>Prefer to watch?</Eyebrow>
-                <h2 className="mt-5 font-display text-4xl tracking-[-0.06em] text-[var(--color-ink)] md:text-5xl">
+                <h2 className="font-display text-4xl tracking-[-0.06em] text-[var(--color-ink)] md:text-5xl">
                   Watch the 2-minute walkthrough
                 </h2>
                 <video
@@ -449,9 +424,8 @@ function InstallGuide() {
         <div className="mx-auto max-w-[1180px]">
           <Reveal>
             <Panel innerClassName="p-6 md:p-10">
-              <Eyebrow>Stuck?</Eyebrow>
-              <h2 className="mt-5 font-display text-4xl tracking-[-0.06em] text-[var(--color-ink)] md:text-5xl">
-                Quick fixes.
+              <h2 className="font-display text-4xl tracking-[-0.06em] text-[var(--color-ink)] md:text-5xl">
+                Quick fixes if you get stuck
               </h2>
               <div className="mt-8 grid gap-3">
                 {stuck.map((item) => (
@@ -480,9 +454,8 @@ function InstallGuide() {
         <div className="mx-auto max-w-[1180px]">
           <Reveal>
             <Panel innerClassName="p-6 md:p-10">
-              <Eyebrow>Is this legal and safe?</Eyebrow>
-              <h2 className="mt-5 max-w-[22ch] text-balance font-display text-4xl tracking-[-0.06em] text-[var(--color-ink)] md:text-5xl">
-                Yes. Here is what happens.
+              <h2 className="max-w-[22ch] text-balance font-display text-4xl tracking-[-0.06em] text-[var(--color-ink)] md:text-5xl">
+                Yes, it&apos;s legal and safe
               </h2>
               <div className="mt-8 grid gap-3 sm:grid-cols-2">
                 {safetyPoints.map((point) => (
@@ -498,14 +471,7 @@ function InstallGuide() {
                 ))}
               </div>
               <div className="mt-6 rounded-[1.2rem] border border-[color:var(--color-line)] p-5">
-                <div className="flex items-start gap-3">
-                  <ShieldCheck
-                    aria-hidden="true"
-                    className="mt-1 shrink-0 text-[var(--color-accent)]"
-                    size={22}
-                    weight="light"
-                  />
-                  <div className="min-w-0 text-sm leading-7 text-[var(--color-muted)]">
+                <div className="min-w-0 text-sm leading-7 text-[var(--color-muted)]">
                     <p className="font-semibold text-[var(--color-ink)]">Verify the download.</p>
                     <p className="mt-1">
                       Only install the app file from the official GitHub
@@ -526,7 +492,6 @@ function InstallGuide() {
                         <span>published with the first iPhone release</span>
                       )}
                     </p>
-                  </div>
                 </div>
               </div>
             </Panel>
@@ -548,9 +513,8 @@ function InstallGuide() {
                   width={kritiThumbs.width}
                 />
                 <div>
-                  <Eyebrow>What you get on iPhone</Eyebrow>
-                  <h2 className="mt-5 max-w-[24ch] text-balance font-display text-4xl tracking-[-0.06em] text-[var(--color-ink)] md:text-5xl">
-                    Same as the Android direct build.
+                  <h2 className="max-w-[24ch] text-balance font-display text-4xl tracking-[-0.06em] text-[var(--color-ink)] md:text-5xl">
+                    iPhone gets the same features as the Android direct build
                   </h2>
                   <p className="mt-5 max-w-[62ch] text-sm leading-7 text-[var(--color-muted)]">
                     The direct version lets you save videos for offline
@@ -563,10 +527,7 @@ function InstallGuide() {
                   </p>
                   <div className="mt-6 flex flex-wrap gap-3">
                     <ActionLink external href={koFiHref} variant="secondary">
-                      <span className="inline-flex items-center gap-2">
-                        <Coffee aria-hidden="true" size={16} weight="light" />
-                        Support on Ko-fi
-                      </span>
+                      Support on Ko-fi
                     </ActionLink>
                   </div>
                 </div>
@@ -581,9 +542,8 @@ function InstallGuide() {
         <div className="mx-auto max-w-[1180px]">
           <Reveal>
             <Panel innerClassName="p-6 md:p-10">
-              <Eyebrow>Questions</Eyebrow>
-              <h2 className="mt-5 font-display text-4xl tracking-[-0.06em] text-[var(--color-ink)] md:text-5xl">
-                Good to know.
+              <h2 className="font-display text-4xl tracking-[-0.06em] text-[var(--color-ink)] md:text-5xl">
+                Questions
               </h2>
               <div className="mt-8 grid gap-3">
                 {faqs.map((item) => (
@@ -592,17 +552,13 @@ function InstallGuide() {
                     key={item.q}
                   >
                     <summary className="cursor-pointer font-medium text-[var(--color-ink)]">
-                      <span className="inline-flex items-center gap-2">
-                        <Question aria-hidden="true" size={18} weight="light" />
-                        {item.q}
-                      </span>
+                      {item.q}
                     </summary>
                     <p className="mt-3 text-sm leading-7 text-[var(--color-muted)]">{item.a}</p>
                   </details>
                 ))}
               </div>
               <p className="mt-6 inline-flex items-center gap-2 text-sm leading-7 text-[var(--color-muted)]">
-                <Heart aria-hidden="true" className="text-[var(--color-accent)]" size={16} weight="fill" />
                 Thank you for trying FilterTube on iPhone and iPad.
               </p>
             </Panel>

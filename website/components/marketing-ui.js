@@ -15,13 +15,10 @@ export function Panel({ children, className = "", innerClassName = "" }) {
   );
 }
 
-export function SectionHeading({ eyebrow, title, description }) {
+export function SectionHeading({ title, description }) {
   return (
     <div className="max-w-[58rem]">
-      <p className="text-[0.72rem] uppercase tracking-[0.26em] text-[var(--color-muted)]">
-        {eyebrow}
-      </p>
-      <h2 className="mt-5 max-w-[13ch] text-balance font-display text-4xl font-semibold tracking-[-0.06em] text-[var(--color-ink)] md:text-6xl md:leading-[0.98]">
+      <h2 className="max-w-[13ch] text-balance font-display text-4xl font-semibold tracking-[-0.06em] text-[var(--color-ink)] md:text-6xl md:leading-[0.98]">
         {title}
       </h2>
       {description ? (

@@ -76,14 +76,9 @@ export function SiteHeader() {
               src="/brand/logo.png"
               width={36}
             />
-            <div className="leading-none">
-              <p className="pr-0.5 font-display text-lg leading-[1.04] tracking-[-0.035em] text-[var(--color-ink)]">
-                FilterTube
-              </p>
-              <p className="mt-1 text-[0.65rem] uppercase tracking-[0.22em] text-[var(--color-muted)]">
-                Calm your feed
-              </p>
-            </div>
+            <p className="pr-0.5 font-display text-lg leading-[1.04] tracking-[-0.035em] text-[var(--color-ink)]">
+              FilterTube
+            </p>
             {/* Kriti waves from the header: care for your feed, on every page. */}
             <img
               alt=""

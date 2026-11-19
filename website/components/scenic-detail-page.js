@@ -14,30 +14,11 @@ import { CapturePending } from "@/components/capture-pending";
 import { HeroVideo } from "@/components/hero-video";
 import { getTonePreset } from "@/components/scenic-tones";
 
-function formatRelatedTitles(relatedPages) {
-  if (relatedPages.length === 0) {
-    return "";
-  }
-  if (relatedPages.length === 1) {
-    return relatedPages[0].navTitle;
-  }
-  if (relatedPages.length === 2) {
-    return `${relatedPages[0].navTitle} and ${relatedPages[1].navTitle}`;
-  }
-
-  return `${relatedPages
-    .slice(0, -1)
-    .map((relatedPage) => relatedPage.navTitle)
-    .join(", ")}, and ${relatedPages.at(-1).navTitle}`;
-}
-
 function RelatedCard({ relatedPage }) {
   const tone = getTonePreset(relatedPage.tone);
-  const RelatedIcon = relatedPage.icon;
   const isDarkTone = relatedPage.tone === "ink";
   const headingClass = isDarkTone ? "text-[#fffaf4]" : "text-[#1d1b18]";
   const mutedClass = isDarkTone ? "text-white/82" : "text-[#4f4b45]";
-  const eyebrowClass = isDarkTone ? "text-white/70" : "text-[#615c55]";
 
   return (
     <Link
@@ -57,24 +38,16 @@ function RelatedCard({ relatedPage }) {
         />
         <div className="relative z-10">
           <div className="flex items-start justify-between gap-4">
-            <div
-              className={`ft-platform-icon flex h-12 w-12 items-center justify-center rounded-[1rem] ${tone.iconShell}`}
-            >
-              {relatedPage.slug === "extension" ? <img alt="" src="/apps/firefox.png" width={28} height={28} /> : <RelatedIcon aria-hidden="true" size={22} weight="light" />}
-            </div>
             <span
               className={`ft-platform-badge inline-flex min-h-9 items-center rounded-full px-3 py-1 text-[0.68rem] font-medium uppercase tracking-[0.22em] ${tone.accentBadge}`}
             >
               {relatedPage.status}
             </span>
           </div>
-          <p className={`mt-5 text-[0.72rem] uppercase tracking-[0.22em] ${eyebrowClass}`}>
-            {relatedPage.eyebrow}
-          </p>
           <h3
-            className={`mt-3 max-w-[14ch] text-balance font-display text-3xl tracking-[-0.05em] ${headingClass}`}
+            className={`mt-5 max-w-[14ch] text-balance font-display text-3xl tracking-[-0.05em] ${headingClass}`}
           >
-            {relatedPage.titleDisplay}
+            {relatedPage.navTitle}
           </h3>
           <p className={`mt-4 max-w-[34ch] text-sm leading-7 ${mutedClass}`}>
             {relatedPage.routeSummary}
@@ -96,12 +69,10 @@ function RelatedCard({ relatedPage }) {
 
 export function ScenicDetailPage({ page, relatedPages, children = null }) {
   const tone = getTonePreset(page.tone);
-  const Icon = page.icon;
   const isDark = page.tone === "ink";
   const headingText = isDark ? "text-[#fffaf4]" : "text-[#1d1b18]";
   const mutedText = isDark ? "text-white/82" : "text-[#4f4b45]";
   const eyebrowText = isDark ? "text-white/70" : "text-[#615c55]";
-  const milestoneEyebrow = isDark ? "Available now and next" : "What matters most";
   const milestoneCardTitle = "What is live and what comes next";
   const shellClass = isDark
     ? "ft-shell ring-1 ring-white/12 shadow-[0_26px_60px_-40px_rgba(0,0,0,0.45)]"
@@ -113,7 +84,6 @@ export function ScenicDetailPage({ page, relatedPages, children = null }) {
   const secondaryActionClass = isDark
     ? "border-white/16 bg-[rgba(16,22,30,0.82)] text-[#fffaf4] hover:border-white/28 hover:bg-[rgba(24,31,41,0.96)]"
     : "";
-  const relatedSummary = formatRelatedTitles(relatedPages);
   const hasHeroVideo = Boolean(page.heroVideo?.src);
   const heroArtworks = page.heroArtworks || (page.heroArtwork ? [page.heroArtwork] : []);
   const hasHeroScreens = Boolean(page.heroScreens?.length);
@@ -171,9 +141,6 @@ export function ScenicDetailPage({ page, relatedPages, children = null }) {
                   >
                     {page.status}
                   </span>
-                  <span className={`text-[0.72rem] uppercase tracking-[0.22em] ${eyebrowText}`}>
-                    {page.eyebrow}
-                  </span>
                 </div>
                 <p
                   className={`mt-8 text-pretty font-display text-[clamp(2.75rem,5.3vw,5.4rem)] font-medium tracking-[-0.07em] ${headingText}`}
@@ -188,16 +155,6 @@ export function ScenicDetailPage({ page, relatedPages, children = null }) {
                 <p className={`mt-6 max-w-[44rem] text-base leading-8 md:text-lg ${mutedText}`}>
                   {page.description}
                 </p>
-                <div className="mt-8 flex flex-wrap gap-3">
-                  {page.chips.map((chip) => (
-                    <span
-                      className={`inline-flex min-h-11 items-center rounded-full border px-4 py-2 text-[0.74rem] uppercase tracking-[0.2em] ${tone.chip}`}
-                      key={chip}
-                    >
-                      {chip}
-                    </span>
-                  ))}
-                </div>
                 <div className="mt-8 flex flex-col gap-3 sm:flex-row">
                   <ActionLink
                     external={page.primaryCta.external}
@@ -259,9 +216,8 @@ export function ScenicDetailPage({ page, relatedPages, children = null }) {
         </div>
         {page.slug === "extension" ? (
           <div className="relative z-10 -mx-4 mt-12 md:-mx-6">
-            <p className="mx-auto mb-4 max-w-[1400px] px-4 text-xs uppercase tracking-[0.2em] text-[var(--color-hero-muted)] md:px-6">Available for desktop browsers</p>
             <BrowserLogoRail carousel />
-            <p className="mx-auto mt-3 max-w-[1400px] px-4 text-xs leading-6 text-[var(--color-hero-muted)] md:px-6">Choose the matching store or manual package. Compatibility varies by browser and version. Arc is for existing desktop users.</p>
+            <p className="mx-auto mt-3 max-w-[1400px] px-4 text-xs leading-6 text-[var(--color-hero-muted)] md:px-6">Compatibility varies by browser and version. Arc is for existing desktop users.</p>
           </div>
         ) : null}
       </section>
@@ -274,10 +230,7 @@ export function ScenicDetailPage({ page, relatedPages, children = null }) {
             <Reveal>
               <div className="ft-shell grid items-center gap-6 rounded-[2rem] border border-[color:var(--color-line)] p-3 shadow-[var(--shadow-diffuse)] lg:grid-cols-[minmax(16rem,0.55fr)_minmax(0,1.45fr)] lg:p-5">
                 <div className="px-3 py-5 md:px-6 lg:py-6">
-                  <p className="text-[0.72rem] font-semibold uppercase tracking-[0.22em] text-[var(--color-accent)]">
-                    {page.appPreview.eyebrow}
-                  </p>
-                  <h2 className="mt-4 max-w-[16ch] text-balance font-display text-3xl tracking-[-0.055em] text-[var(--color-ink)] md:text-4xl">
+                  <h2 className="max-w-[16ch] text-balance font-display text-3xl tracking-[-0.055em] text-[var(--color-ink)] md:text-4xl">
                     {page.appPreview.title}
                   </h2>
                   <p className="mt-4 max-w-[42ch] text-base leading-8 text-[var(--color-muted)]">
@@ -315,7 +268,6 @@ export function ScenicDetailPage({ page, relatedPages, children = null }) {
           <div className="mx-auto max-w-[1400px] px-4 md:px-6">
             <Reveal>
               <SectionHeading
-                eyebrow={page.screenshotsEyebrow || "Every screen"}
                 title={page.screenshotsTitle}
                 description={page.screenshotsDescription}
               />
@@ -342,7 +294,6 @@ export function ScenicDetailPage({ page, relatedPages, children = null }) {
           <div className="mx-auto max-w-[1400px] px-4 md:px-6">
             <Reveal>
               <SectionHeading
-                eyebrow={page.screenshotsEyebrow || "The Android app"}
                 title={page.screenshotsTitle}
                 description={page.screenshotsDescription}
               />
@@ -363,7 +314,6 @@ export function ScenicDetailPage({ page, relatedPages, children = null }) {
           <Reveal>
             <SectionHeading
               description={page.milestoneIntro}
-              eyebrow={page.eyebrow}
               title={page.milestoneTitle}
             />
           </Reveal>
@@ -381,18 +331,13 @@ export function ScenicDetailPage({ page, relatedPages, children = null }) {
                         className={`absolute -left-8 top-6 h-24 w-24 rounded-full blur-3xl ${tone.primaryOrb}`}
                       />
                       <div className="relative z-10">
-                        <div
-                          className={`flex h-11 w-11 items-center justify-center rounded-[1rem] ${tone.iconShell}`}
-                        >
-                          <Icon aria-hidden="true" size={20} weight="light" />
-                        </div>
                         {card.status ? (
-                          <p className={`mt-5 text-xs font-semibold uppercase tracking-[0.14em] ${eyebrowText}`}>
+                          <p className={`text-xs font-semibold uppercase tracking-[0.14em] ${eyebrowText}`}>
                             {card.status}
                           </p>
                         ) : null}
                         <h3
-                          className={`mt-6 max-w-[15ch] text-balance font-display text-3xl tracking-[-0.05em] ${headingText}`}
+                          className={`${card.status ? "mt-6 " : ""}max-w-[15ch] text-balance font-display text-3xl tracking-[-0.05em] ${headingText}`}
                         >
                           {card.title}
                         </h3>
@@ -407,7 +352,7 @@ export function ScenicDetailPage({ page, relatedPages, children = null }) {
               {page.exploreGroups?.length ? (
                 <div className="ft-shell rounded-[1.9rem] border border-[color:var(--color-line)] p-5 md:p-7">
                   <h3 className={`font-display text-3xl tracking-[-0.05em] ${headingText}`}>{page.exploreTitle}</h3>
-                  <p className={`mt-3 text-sm leading-7 ${mutedText}`}>{page.exploreDescription}</p>
+                  {page.exploreDescription ? <p className={`mt-3 text-sm leading-7 ${mutedText}`}>{page.exploreDescription}</p> : null}
                   <div className="mt-6 space-y-3">
                     {page.exploreGroups.map((group) => (
                       <div id={group.id} key={group.id}>
@@ -446,11 +391,8 @@ export function ScenicDetailPage({ page, relatedPages, children = null }) {
                 <div
                   className={`ft-inset rounded-[calc(2rem-0.5rem)] p-6 md:p-8 ${tone.surface}`}
                 >
-                  <p className={`text-[0.72rem] uppercase tracking-[0.22em] ${eyebrowText}`}>
-                    {milestoneEyebrow}
-                  </p>
                   <h3
-                    className={`mt-5 max-w-[14ch] text-balance font-display text-4xl tracking-[-0.06em] ${headingText}`}
+                    className={`max-w-[14ch] text-balance font-display text-4xl tracking-[-0.06em] ${headingText}`}
                   >
                     {milestoneCardTitle}
                   </h3>
@@ -483,13 +425,7 @@ export function ScenicDetailPage({ page, relatedPages, children = null }) {
           <div className="mx-auto max-w-[1400px]">
             <Reveal>
               <SectionHeading
-                eyebrow="Keep exploring"
                 title="Keep exploring FilterTube."
-                description={
-                  relatedSummary
-                    ? `From here, continue with ${relatedSummary}.`
-                    : "Continue with the next FilterTube overview that fits your setup."
-                }
               />
             </Reveal>
             <div className="mt-12 grid gap-5 md:grid-cols-2 xl:grid-cols-3">

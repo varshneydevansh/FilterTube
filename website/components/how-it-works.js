@@ -54,8 +54,7 @@ export function HowItWorks() {
       <div className="mx-auto max-w-[1400px]" id="study-mode">
         <div className="grid items-center gap-10 lg:grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)] lg:gap-14">
           <Reveal>
-            <p className="text-[0.72rem] uppercase tracking-[0.26em] text-[var(--color-muted)]">Study mode</p>
-            <h2 className="mt-5 max-w-[15ch] text-balance font-display text-4xl font-semibold tracking-[-0.06em] text-[var(--color-ink)] md:text-6xl md:leading-[0.98]" id="how-it-works-title">
+            <h2 className="max-w-[15ch] text-balance font-display text-4xl font-semibold tracking-[-0.06em] text-[var(--color-ink)] md:text-6xl md:leading-[0.98]" id="how-it-works-title">
               Study with only the channels you chose.
             </h2>
             <p className="mt-5 max-w-[56ch] text-pretty text-base leading-8 text-[var(--color-muted)] md:text-lg">
@@ -111,8 +110,7 @@ export function HowItWorks() {
 
         <div className="mt-24 grid items-center gap-10 lg:grid-cols-[minmax(0,1.1fr)_minmax(0,0.9fr)]" id="whitelist">
           <Reveal>
-            <p className="text-[0.72rem] uppercase tracking-[0.26em] text-[var(--color-muted)]">Blocklist or Whitelist</p>
-            <h2 className="mt-5 max-w-[17ch] text-balance font-display text-4xl font-semibold tracking-[-0.06em] text-[var(--color-ink)] md:text-5xl md:leading-[1]">
+            <h2 className="max-w-[17ch] text-balance font-display text-4xl font-semibold tracking-[-0.06em] text-[var(--color-ink)] md:text-5xl md:leading-[1]">
               Name what to keep out, or choose what to let in.
             </h2>
             <p className="mt-5 max-w-[60ch] text-pretty text-base leading-8 text-[var(--color-muted)] md:text-lg">
@@ -150,9 +148,6 @@ export function HowItWorks() {
           <div className="ft-shell mt-10 rounded-[2rem] p-2 ring-1 ring-[color:var(--color-line)] shadow-[var(--shadow-diffuse)]">
             <div className="ft-inset rounded-[calc(2rem-0.5rem)] bg-[var(--color-surface)] p-5 md:p-8">
               <h3 className="font-display text-2xl tracking-[-0.04em] text-[var(--color-ink)] md:text-3xl">Try both on the same feed</h3>
-              <p className="mt-2 max-w-[60ch] text-sm leading-7 text-[var(--color-muted)]">
-                Switch modes to see what happens to the same six videos.
-              </p>
               <div className="mt-6">
                 <RuleDemo />
               </div>

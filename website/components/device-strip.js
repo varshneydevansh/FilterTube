@@ -45,8 +45,7 @@ export function DeviceStrip() {
     <section aria-labelledby="devices-title" className="px-4 py-16 md:px-6 md:py-24" id="devices">
       <div className="mx-auto max-w-[1400px]">
         <Reveal>
-          <p className="text-[0.72rem] uppercase tracking-[0.26em] text-[var(--color-muted)]">Devices</p>
-          <h2 className="mt-5 max-w-[18ch] text-balance font-display text-4xl font-semibold tracking-[-0.06em] text-[var(--color-ink)] md:text-6xl md:leading-[0.98]" id="devices-title">
+          <h2 className="max-w-[18ch] text-balance font-display text-4xl font-semibold tracking-[-0.06em] text-[var(--color-ink)] md:text-6xl md:leading-[0.98]" id="devices-title">
             The same rules on every screen you use.
           </h2>
           <p className="mt-5 max-w-[62ch] text-pretty text-base leading-8 text-[var(--color-muted)] md:text-lg">

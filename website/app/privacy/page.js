@@ -457,11 +457,8 @@ export default function PrivacyPage() {
       <div className="mx-auto max-w-[1180px]">
         <Panel innerClassName="space-y-8 p-7 md:p-10">
           <div>
-            <p className="text-[0.72rem] uppercase tracking-[0.26em] text-[var(--color-muted)]">
+            <h1 className="max-w-[18ch] font-display text-5xl font-semibold tracking-[-0.07em] text-[var(--color-ink)] md:text-7xl md:leading-[0.95]">
               Privacy policy
-            </p>
-            <h1 className="mt-5 max-w-[18ch] font-display text-5xl font-semibold tracking-[-0.07em] text-[var(--color-ink)] md:text-7xl md:leading-[0.95]">
-              Local-first means your rules stay with you.
             </h1>
             <p className="mt-6 max-w-[72ch] text-base leading-8 text-[var(--color-muted)] md:text-lg">
               Last updated on May 4, 2026. This page covers the FilterTube
@@ -486,10 +483,7 @@ export default function PrivacyPage() {
           </div>
 
           <div className="rounded-[1.45rem] border border-[color:var(--color-line)] bg-[color:var(--color-glass)] p-5 md:p-6">
-            <p className="text-[0.72rem] uppercase tracking-[0.22em] text-[var(--color-muted)]">
-              TL;DR
-            </p>
-            <p className="mt-3 max-w-[76ch] text-lg leading-8 text-[var(--color-ink)]">
+            <p className="max-w-[76ch] text-lg leading-8 text-[var(--color-ink)]">
               FilterTube is a local control tool, not an account service. Your
               rules, profiles, PINs, watch history, and search history are not
               uploaded into a FilterTube dashboard for us to view. The website
@@ -519,12 +513,8 @@ export default function PrivacyPage() {
           </div>
 
           <div className="rounded-[1.45rem] border border-[color:var(--color-line)] bg-[color:var(--color-glass)] p-5 md:p-6">
-            <p className="text-[0.72rem] uppercase tracking-[0.22em] text-[var(--color-muted)]">
-              Full policy index
-            </p>
-            <p className="mt-3 max-w-[72ch] text-sm leading-7 text-[var(--color-muted)]">
-              The summary above is not the whole policy. These links jump to the
-              detailed sections below.
+            <p className="max-w-[72ch] text-sm leading-7 text-[var(--color-muted)]">
+              The summary above is not the whole policy.
             </p>
             <div className="mt-4 grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
               {policyNav.map(([label, href]) => (

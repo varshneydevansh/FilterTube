@@ -44,18 +44,14 @@ export function SiteFooter() {
           <div className="relative z-10 px-6 pb-10 pt-8 md:px-8 md:pb-12 md:pt-10 lg:px-10 lg:pt-12">
             <div className="grid gap-8 lg:grid-cols-[minmax(0,0.95fr)_minmax(0,1.05fr)] lg:items-start">
               <div>
-                <p className="text-[0.72rem] uppercase tracking-[0.24em] text-[var(--color-muted)]">
-                  Built for calmer viewing
-                </p>
-                <h2 className="mt-5 max-w-[11ch] font-display text-4xl tracking-[-0.06em] text-[var(--color-ink)] md:text-6xl md:leading-[0.96]">
-                  Built to leave the screen calmer than it was.
+                <h2 className="max-w-[11ch] font-display text-4xl tracking-[-0.06em] text-[var(--color-ink)] md:text-6xl md:leading-[0.96]">
+                  Block what you don&apos;t want, on every screen.
                 </h2>
                 <p className="mt-5 max-w-[56ch] text-base leading-8 text-[var(--color-muted)]">
                   Calmer viewing on Android phones, tablets and TVs, and in
                   your browser. iPhone and iPad install it with SideStore
                   while trouble on Apple&apos;s side delays the App Store
                   version.
-                  Explore each platform’s features and availability.
                 </p>
                 <div className="mt-8 flex flex-col gap-3 sm:flex-row">
                   <ActionLink external href={androidPlayStoreHref}>
@@ -94,14 +90,7 @@ export function SiteFooter() {
             <div className="mt-14 border-t border-[color:var(--color-line)] pt-8">
               <div className="flex flex-col gap-5 lg:flex-row lg:items-end lg:justify-between">
                 <div>
-                  <p className="text-[0.72rem] uppercase tracking-[0.24em] text-[var(--color-muted)]">
-                    Independent project
-                  </p>
-                  <p className="mt-3 max-w-[44ch] text-sm leading-7 text-[var(--color-muted)]">
-                    Local-first filtering, family-safe direction, and calmer
-                    viewing across the devices that matter.
-                  </p>
-                  <details className="ft-disclosure mt-4 max-w-[48ch] text-sm leading-7 text-[var(--color-muted)]">
+                  <details className="ft-disclosure max-w-[48ch] text-sm leading-7 text-[var(--color-muted)]">
                     <summary className="w-fit cursor-pointer py-2 font-medium text-[var(--color-ink)]">
                       Support independent development
                     </summary>
@@ -132,9 +121,6 @@ export function SiteFooter() {
           <div className="relative border-t border-[color:var(--color-line)]">
             <FooterSignalArt />
             <div className="absolute inset-x-0 bottom-0 flex flex-col gap-3 px-6 pb-5 pt-10 md:px-8 lg:flex-row lg:items-end lg:justify-between lg:px-10">
-              <div className="rounded-full border border-white/14 bg-[rgba(9,14,22,0.36)] px-4 py-2 text-[0.72rem] uppercase tracking-[0.22em] text-white/78 backdrop-blur-md">
-                Serene by design. An independent project.
-              </div>
               <div className="flex flex-wrap items-center gap-4 text-sm text-white/78">
                 <a
                   className="transition duration-500 ease-[cubic-bezier(0.32,0.72,0,1)] hover:text-white"

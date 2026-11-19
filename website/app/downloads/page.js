@@ -1,11 +1,4 @@
-import {
-  AndroidLogo,
-  AppleLogo,
-  CheckCircle,
-  DownloadSimple,
-  GithubLogo,
-  ShieldCheck,
-} from "@phosphor-icons/react/ssr";
+import { CheckCircle, DownloadSimple } from "@phosphor-icons/react/ssr";
 
 import Link from "next/link";
 
@@ -34,7 +27,6 @@ const primaryDownloads = [
     title: "Browser extension",
     label: "Available now",
     platform: "extension",
-    logo: "/apps/firefox.png",
     description:
       "Install FilterTube on desktop browsers today. Store listings are the easiest path; GitHub releases keep the manual ZIP builds available.",
     actions: [
@@ -57,9 +49,8 @@ const primaryDownloads = [
     title: "Android phone/tablet",
     label: "Available on Google Play",
     platform: "android",
-    logo: "/apps/android.png",
     description:
-      "The feature-rich Android custom viewing app is publicly available on Google Play. Install it from the listing or search Google Play for FilterTube. The direct APK is a separate, simpler build and does not include the complete custom frontend.",
+      "The Android custom viewing app is publicly available on Google Play. Install it from the listing or search Google Play for FilterTube. The direct APK is a separate, simpler build and does not include the complete custom frontend.",
     actions: [
       {
         label: "Open on Google Play",
@@ -76,7 +67,6 @@ const primaryDownloads = [
     title: "iPhone and iPad",
     label: "Install directly",
     platform: "ios",
-    logo: "/apps/app-store-transparent.png",
     description:
       "I'm working to bring FilterTube to the App Store. Until then, you can install it directly on iPhone and iPad with SideStore, using your own Apple ID. Free, no ads, nothing locked.",
     actions: [
@@ -92,47 +82,32 @@ const primaryDownloads = [
 const androidMarkets = [
   {
     title: "Google Play",
-    status: "Complete custom viewing app",
     detail:
-      "The Google Play build is FilterTube's feature-rich, complete custom viewing experience for Main and Kids. Anyone can install it directly from the public listing or find it by searching Google Play.",
+      "The Google Play build is FilterTube's complete custom viewing app for Main and Kids. Anyone can install it from the public listing.",
   },
   {
     title: "Direct APK",
-    status: "Separate simpler build",
     detail:
-      "The direct-install APK is not the complete custom frontend available through Google Play. Keep this distinction clear before downloading or sideloading it.",
+      "The direct-install APK is not the complete custom frontend available through Google Play.",
   },
   {
     title: "IzzyOnDroid",
-    status: "Good next public repository",
-    detail:
-      "Needs public source and release APKs. Fastlane metadata will make this easier when the native app source is ready to expose.",
+    detail: "Needs public source and release APKs.",
   },
   {
     title: "F-Droid",
-    status: "Stricter future target",
     detail:
-      "Requires a buildable FLOSS source path and compatible dependencies. Treat this as release hardening, not a last-minute upload.",
+      "Requires a buildable FLOSS source path and compatible dependencies.",
   },
   {
     title: "Accrescent",
-    status: "Invite-only watchlist",
-    detail:
-      "Accrescent is privacy-aligned but currently invite-only. Keep it as a watchlist target instead of promising immediate publication.",
-  },
-  {
-    title: "Android TV / Fire TV",
-    status: "Separate future app",
-    detail:
-      "TV should ship as its own package and store listing later. It is not part of the current phone/tablet APK.",
+    detail: "Currently invite-only.",
   },
 ];
 
 const safetyChecks = [
   "Only install APKs linked from filtertube.in or the official GitHub releases page.",
   "Check the SHA-256 file before sideloading direct APK builds.",
-  "Keep the Android phone/tablet package as com.filtertube.app.",
-  "Android TV / Fire TV should use a separate future package, not this mobile APK.",
   "On iPhone and iPad, install only through SideStore or AltStore with the FilterTube source and IPA linked from filtertube.in/ios. Avoid paid signing services.",
 ];
 
@@ -156,9 +131,6 @@ function DownloadCard({ item }) {
       <div className="ft-platform-theme ft-platform-surface h-full rounded-[calc(2rem-0.5rem)] border p-6 md:p-7" data-tone={detailPages[item.platform].tone}>
         <div className="flex h-full flex-col">
           <div className="flex items-start justify-between gap-4">
-            <div className="ft-platform-icon flex h-12 w-12 shrink-0 items-center justify-center rounded-[1rem]">
-              <img alt="" className="h-10 w-10 object-contain" src={item.logo} width={40} height={40} />
-            </div>
             <span className="ft-platform-badge rounded-full border px-3 py-2 text-[0.68rem] uppercase tracking-[0.2em]">
               {item.label}
             </span>
@@ -208,16 +180,13 @@ export default function DownloadsPage() {
       <section className="px-4 pb-10 pt-32 md:px-6 md:pb-16 md:pt-40">
         <div className="mx-auto max-w-[1180px]">
           <div className="max-w-[820px]">
-            <p className="text-[0.72rem] uppercase tracking-[0.26em] text-[var(--color-muted)]">
-              Downloads
-            </p>
-            <h1 className="mt-5 text-balance font-display text-5xl font-semibold tracking-[-0.07em] text-[var(--color-ink)] md:text-7xl md:leading-[0.95]">
+            <h1 className="text-balance font-display text-5xl font-semibold tracking-[-0.07em] text-[var(--color-ink)] md:text-7xl md:leading-[0.95]">
               One stable place for every FilterTube build.
             </h1>
             <p className="mt-6 max-w-[68ch] text-pretty text-base leading-8 text-[var(--color-muted)] md:text-lg">
-              Browser releases stay public on GitHub and store listings. Android
-              phone/tablet builds can be attached to the same release stream for
-              Google Play, GrapheneOS, and other direct-install users. Trouble
+              Browser releases are on GitHub and the browser stores. Android
+              phone and tablet builds are on Google Play, and a simpler direct
+              APK is on GitHub. Trouble
               on Apple&apos;s side delays the App Store version, so iPhone and
               iPad install directly with SideStore, or AltStore.
             </p>
@@ -238,34 +207,23 @@ export default function DownloadsPage() {
           <Panel innerClassName="p-6 md:p-8 lg:p-10">
             <div className="grid gap-7 lg:grid-cols-[minmax(0,0.95fr)_minmax(0,1.05fr)] lg:items-center">
               <div>
-                <p className="text-[0.72rem] uppercase tracking-[0.26em] text-[var(--color-muted)]">
-                  App release state
-                </p>
-                <h2 className="mt-5 font-display text-4xl tracking-[-0.06em] text-[var(--color-ink)] md:text-5xl">
+                <h2 className="font-display text-4xl tracking-[-0.06em] text-[var(--color-ink)] md:text-5xl">
                   Android is public on Google Play; iPhone and iPad install
                   directly.
                 </h2>
-                <p className="mt-5 text-sm leading-7 text-[var(--color-muted)]">
-                  Anyone can install the Android app from Google Play or search
-                  the store for FilterTube; Android TV uses the same listing.
-                  iPhone and iPad install directly with SideStore, or AltStore,
-                  while trouble on Apple&apos;s side delays the App Store version.
-                </p>
               </div>
               <div id="ios-status" className="grid gap-3 sm:grid-cols-2">
                 <div className="rounded-[1.2rem] border border-[color:var(--color-line)] bg-[color:var(--color-soft-panel)] p-5">
-                  <AndroidLogo aria-hidden="true" size={26} weight="light" />
-                  <h3 className="mt-4 font-display text-2xl tracking-[-0.05em] text-[var(--color-ink)]">
+                  <h3 className="font-display text-2xl tracking-[-0.05em] text-[var(--color-ink)]">
                     Android
                   </h3>
                   <p className="mt-3 text-sm leading-7 text-[var(--color-muted)]">
-                    The public Google Play listing is live. Open the link above
-                    or search Google Play for FilterTube to install the app.
+                    The public Google Play listing is live, and Android TV uses
+                    the same listing.
                   </p>
                 </div>
                 <div className="rounded-[1.2rem] border border-[color:var(--color-line)] bg-[color:var(--color-soft-panel)] p-5">
-                  <AppleLogo aria-hidden="true" size={26} weight="light" />
-                  <h3 className="mt-4 font-display text-2xl tracking-[-0.05em] text-[var(--color-ink)]">
+                  <h3 className="font-display text-2xl tracking-[-0.05em] text-[var(--color-ink)]">
                     iOS and iPadOS
                   </h3>
                   <p className="mt-3 text-sm leading-7 text-[var(--color-muted)]">
@@ -289,10 +247,7 @@ export default function DownloadsPage() {
           <Panel innerClassName="p-6 md:p-8 lg:p-10">
             <div className="grid gap-8 lg:grid-cols-[minmax(0,0.78fr)_minmax(0,1.22fr)] lg:items-start">
               <div>
-                <p className="text-[0.72rem] uppercase tracking-[0.26em] text-[var(--color-muted)]">
-                  Android distribution
-                </p>
-                <h2 className="mt-5 font-display text-4xl tracking-[-0.06em] text-[var(--color-ink)] md:text-5xl">
+                <h2 className="font-display text-4xl tracking-[-0.06em] text-[var(--color-ink)] md:text-5xl">
                   Choose the Android build that fits.
                 </h2>
                 <p className="mt-5 text-sm leading-7 text-[var(--color-muted)]">
@@ -314,21 +269,14 @@ export default function DownloadsPage() {
               <div className="grid gap-3 sm:grid-cols-2">
                 {androidMarkets
                   .filter((market) =>
-                    [
-                      "Google Play",
-                      "Direct APK",
-                      "Android TV / Fire TV",
-                    ].includes(market.title),
+                    ["Google Play", "Direct APK"].includes(market.title),
                   )
                   .map((market) => (
                     <div
                       className="rounded-[1.2rem] border border-[color:var(--color-line)] bg-[color:var(--color-soft-panel)] p-4"
                       key={market.title}
                     >
-                      <p className="text-[0.68rem] uppercase tracking-[0.2em] text-[var(--color-muted)]">
-                        {market.status}
-                      </p>
-                      <h3 className="mt-3 font-display text-xl tracking-[-0.04em] text-[var(--color-ink)]">
+                      <h3 className="font-display text-xl tracking-[-0.04em] text-[var(--color-ink)]">
                         {market.title}
                       </h3>
                       <p className="mt-3 text-sm leading-7 text-[var(--color-muted)]">
@@ -367,19 +315,10 @@ export default function DownloadsPage() {
       <section className="px-4 pb-20 pt-4 md:px-6 md:pb-28">
         <div className="mx-auto grid max-w-[1180px] gap-5 lg:grid-cols-[minmax(0,1fr)_minmax(0,0.82fr)]">
           <Panel innerClassName="p-6 md:p-8">
-            <div className="flex items-start gap-4">
-              <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-[1rem] bg-[color:var(--color-elevation-spot)] text-[var(--color-ink)]">
-                <ShieldCheck aria-hidden="true" size={24} weight="light" />
-              </div>
               <div>
                 <h2 className="font-display text-3xl tracking-[-0.05em] text-[var(--color-ink)]">
                   Verify before installing.
                 </h2>
-                <p className="mt-4 text-sm leading-7 text-[var(--color-muted)]">
-                  Direct APK distribution is powerful, but it must stay boring
-                  and predictable: official link, signed file, checksum, and
-                  release notes in one place.
-                </p>
                 <ul className="mt-6 grid gap-3">
                   {safetyChecks.map((item) => (
                     <li
@@ -397,22 +336,17 @@ export default function DownloadsPage() {
                   ))}
                 </ul>
               </div>
-            </div>
           </Panel>
 
           <Panel innerClassName="p-6 md:p-8">
             <div className="flex h-full flex-col justify-between gap-8">
               <div>
-                <div className="flex h-12 w-12 items-center justify-center rounded-[1rem] bg-[color:var(--color-elevation-spot)] text-[var(--color-ink)]">
-                  <GithubLogo aria-hidden="true" size={24} weight="light" />
-                </div>
-                <h2 className="mt-6 font-display text-3xl tracking-[-0.05em] text-[var(--color-ink)]">
+                <h2 className="font-display text-3xl tracking-[-0.05em] text-[var(--color-ink)]">
                   Release assets live on GitHub.
                 </h2>
                 <p className="mt-4 text-sm leading-7 text-[var(--color-muted)]">
-                  filtertube.in is the clean front door. GitHub Releases remain
-                  the durable place for ZIPs, APKs, AABs, checksums, and
-                  changelog history.
+                  GitHub Releases has the ZIPs, APKs, AABs, checksums and
+                  changelog for each version.
                 </p>
               </div>
               <div className="grid gap-3">

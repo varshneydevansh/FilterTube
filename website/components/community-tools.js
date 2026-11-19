@@ -1,4 +1,4 @@
-import { ArrowUpRight, GithubLogo, Sparkle } from "@phosphor-icons/react/ssr";
+import { ArrowUpRight, GithubLogo } from "@phosphor-icons/react/ssr";
 
 import { Panel, SectionHeading } from "@/components/marketing-ui";
 import { Reveal } from "@/components/reveal";
@@ -62,15 +62,7 @@ function LocalAiNote() {
       <Panel className="mt-5" innerClassName="p-6 md:p-8">
         <div className="grid gap-6 lg:grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)] lg:gap-12">
           <div>
-            <div className="flex flex-wrap items-center gap-3">
-              <span className="rounded-full bg-[rgba(171,68,56,0.08)] p-3 text-[var(--color-accent)]">
-                <Sparkle aria-hidden="true" size={24} weight="light" />
-              </span>
-              <span className="rounded-full border border-[color:var(--color-line)] px-3 py-1 text-[0.72rem] uppercase tracking-[0.2em] text-[var(--color-muted)]">
-                In development
-              </span>
-            </div>
-            <h3 className="mt-5 font-display text-3xl tracking-[-0.045em] text-[var(--color-ink)]">
+            <h3 className="font-display text-3xl tracking-[-0.045em] text-[var(--color-ink)]">
               Coming: local AI, called aKriti
             </h3>
             <p className="mt-3 max-w-[48ch] text-base leading-7 text-[var(--color-muted)]">
@@ -120,7 +112,6 @@ export function CommunityTools() {
       <div className="mx-auto max-w-[1400px]">
         <Reveal>
           <SectionHeading
-            eyebrow="Community tools"
             title="Works with the open tools you already use."
             description="The apps can connect to four open community services. All four are off until you turn them on in Settings, Integrations."
           />

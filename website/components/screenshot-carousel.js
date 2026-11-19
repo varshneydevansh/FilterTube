@@ -144,7 +144,7 @@ export function ScreenshotCarousel({ screenshots, label, layout = "phone" }) {
       }}
     >
       <div className="ft-gallery-toolbar mx-auto mb-5 flex max-w-[1400px] flex-wrap items-center justify-between gap-3 px-4 md:px-6">
-        <p className="text-sm text-[var(--color-muted)]">{screenshots.length} {browserRail ? "desktop browsers · Choose your install path." : `${screenshots.length === 1 ? "screen" : "screens"} · Open a screen for a closer look.`}</p>
+        <p className="text-sm text-[var(--color-muted)]">{screenshots.length} {browserRail ? "desktop browsers" : screenshots.length === 1 ? "screen" : "screens"}</p>
         {screenshots.length > 1 ? (
           <div className="flex flex-wrap items-center gap-2">
             <span className="mr-2 text-xs text-[var(--color-muted)]" role="status">{status}</span>

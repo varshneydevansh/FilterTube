@@ -1,14 +1,4 @@
 import { devices, galleryFor, kidsScreens } from "@/data/screenshots";
-import {
-  Compass,
-  DeviceMobile,
-  EyeSlash,
-  MonitorPlay,
-  ShieldCheck,
-  Sparkle,
-  Stack,
-  Television,
-} from "@phosphor-icons/react/ssr";
 
 import {
   extensionInstallHref,
@@ -141,7 +131,6 @@ export const homeStoryNotes = [
 
 export const homeCapabilityCards = [
   {
-    label: "Playback",
     title: "Keep the video you chose at the center.",
     description:
       "FilterTube filters adverts and unwanted content. The Android app has its own viewing experience; the extension keeps the familiar player controls.",
@@ -149,11 +138,9 @@ export const homeCapabilityCards = [
       "Advert filtering is enabled by default in Blocklist and Whitelist modes.",
       "Playback paths differ by platform, and compatibility still needs maintenance when the platform changes.",
     ],
-    icon: EyeSlash,
     span: "xl:col-span-12",
   },
   {
-    label: "Rules",
     title: "Block what you name, or allow only what you trust.",
     description:
       "Add channels, keywords, or supported content filters. Keep separate rules for Main and Kids when they need different boundaries.",
@@ -161,11 +148,9 @@ export const homeCapabilityCards = [
       "Blocklist hides matching content; Whitelist limits viewing to approved rules.",
       "Exact matching, date ranges, categories, and content controls help make rules more precise.",
     ],
-    icon: Compass,
     span: "xl:col-span-7",
   },
   {
-    label: "Family",
     title: "Separate profiles, clear parent controls.",
     description:
       "Each person can have their own rules and viewing access. Parents manage protected child profiles and set viewing time where supported.",
@@ -173,11 +158,9 @@ export const homeCapabilityCards = [
       "A child switching PIN does not unlock parent settings.",
       "Parent or master approval controls protected edits, device permissions, and backups.",
     ],
-    icon: ShieldCheck,
     span: "xl:col-span-5",
   },
   {
-    label: "Focus",
     title: "Keep the useful parts. Quiet the distractions.",
     description:
       "Choose the surfaces that interrupt your attention instead of removing every feature.",
@@ -185,11 +168,9 @@ export const homeCapabilityCards = [
       "Hide Shorts, comments, or other supported feed and watch-page distractions.",
       "Choose Home feed, recommendations, Mixes, playlist panels, live chat, or end-screen controls where supported.",
     ],
-    icon: EyeSlash,
     span: "xl:col-span-5",
   },
   {
-    label: "Devices and data",
     title: "Your profiles, shared between devices you choose.",
     description:
       "Pair and verify devices before sharing updates. Keep local backups and review imported rules without handing control to a central FilterTube account.",
@@ -198,7 +179,6 @@ export const homeCapabilityCards = [
       "Opt-in Auto-sync keeps approved devices up to date. Direct sync needs both devices open and connected.",
       "Connection services may help devices meet or relay encrypted updates. PINs, ownership, and device permissions stay local.",
     ],
-    icon: Stack,
     span: "xl:col-span-7",
   },
 ];
@@ -229,25 +209,21 @@ export const systemSteps = [
     title: "Add rules",
     description:
       "Choose words, channels, videos, comments, Shorts, or Whitelist rules from the dashboard.",
-    icon: Compass,
   },
   {
     title: "Pick the profile",
     description:
       "Keep the adult profile, child profiles, and Kids rules separate when they need different limits.",
-    icon: Stack,
   },
   {
     title: "Start watching",
     description:
       "FilterTube removes matching videos and surfaces as the page loads, then cleans up anything added later.",
-    icon: EyeSlash,
   },
   {
     title: "Adjust when needed",
     description:
       "If the platform changes its layout, tell the developer. That is usually the reason filtering suddenly misses a surface.",
-    icon: ShieldCheck,
   },
 ];
 
@@ -275,7 +251,7 @@ export const homeFaqItems = [
   {
     question: "Do I need an invitation for Android?",
     answer:
-      "No. Install FilterTube from the public Google Play listing—no invitation or email needed. The separate direct APK is a simpler build, not the same custom app.",
+      "No. Install FilterTube from the public Google Play listing. No invitation or email needed. The separate direct APK is a simpler build, not the same custom app.",
   },
   {
     question: "What if a filter misses something?",
@@ -308,7 +284,6 @@ export const homeTechnicalFeatures = [
     title: "Comment controls",
     description:
       "Hide comment sections entirely, or use keyword/commenter rules when comments are the part causing the problem.",
-    detail: "Useful for calmer watch pages.",
   },
   {
     title: "Shorts controls",
@@ -332,7 +307,6 @@ export const homeTechnicalFeatures = [
     title: "Backups",
     description:
       "Export your FilterTube setup before a big change, or keep local backup files for recovery. Encrypted and optional automatic backup options are available where supported.",
-    detail: "Designed to keep control in your hands.",
   },
   {
     title: "Rule-list imports",
@@ -441,10 +415,8 @@ export const platformOrder = platformSlugs;
 export const detailPages = {
   extension: {
     slug: "extension",
-    icon: MonitorPlay,
     tone: "lilac",
     status: "Available for browsers",
-    eyebrow: "Browser extension",
     navTitle: "Browser extension",
     routeSummary:
       "Keep the familiar player and add filters, profiles, and local control in your browser.",
@@ -452,9 +424,8 @@ export const detailPages = {
     titleDisplay: "your rules",
     description:
       "Filter channels, keywords, Shorts, comments, and supported content on the pages you already use. Use the popup for quick changes, the dashboard for deeper setup, and the video menu to block content as you browse.",
-    chips: ["Main + Kids", "Local rules", "Family profiles"],
     heroScreensLayout: "popup",
-    heroScreensLabel: "Extension preview · hover or tap a screen",
+    heroScreensLabel: "Extension preview",
     heroScreens: [
       { src: "/apps/screenshots/extension-keywords.png", title: "Keywords", alt: "FilterTube extension popup with keyword search, add and list controls", width: 391, height: 388 },
       { src: "/apps/screenshots/extension-channels.png", title: "Channels", alt: "FilterTube extension popup with channel search and saved channel rules", width: 392, height: 442 },
@@ -462,9 +433,8 @@ export const detailPages = {
     ],
     screenshotsLayout: "desktop",
     screenshotsLabel: "Extension preview screenshots",
-    screenshotsEyebrow: "Current extension preview",
     screenshotsTitle: "A closer look at the extension",
-    screenshotsDescription: "Explore the full dashboard, profile rules, focus settings and device sync. Features and appearance may differ from your browser store version.",
+    screenshotsDescription: "Features and appearance may differ from your browser store version.",
     screenshots: [
       {
         src: "/apps/screenshots/extension-dashboard.png",
@@ -529,17 +499,17 @@ export const detailPages = {
     featureCards: [],
     deviceSyncHref: "#extension-p2p",
     exploreTitle: "Explore the extension",
-    exploreDescription: "Add controls to the existing pages through the popup, dashboard, and supported inline actions. Open a group for the details.",
+    exploreDescription: "Add controls to the existing pages through the popup, dashboard, and supported inline actions.",
     exploreGroups: [
       {
         id: "extension-filters",
         title: "Filter what appears",
-        summary: "Channel, keyword, video, and metadata rules—with separate Main and Kids spaces.",
+        summary: "Channel, keyword, video, and metadata rules, with separate Main and Kids spaces.",
         points: [
           "Block unwanted channels, keywords or videos, or use Whitelist for approved content. Keep Blocked and Allowed rules with exceptions; editing a list does not switch your viewing mode.",
           "Paste a channel handle, ID or supported URL. Use Exact for precise keywords, filter supported comments, and choose creators on supported collaboration cards.",
           "Use Import Subscribed Channels to add your subscriptions to the current profile's Whitelist, then choose whether to enable Whitelist mode. Main and Kids retain separate rule spaces and modes.",
-          "Narrow videos by length, upload date, uppercase titles and—in newer releases—minimum views. Search and sort saved rules separately by when they were added.",
+          "Narrow videos by length, upload date, uppercase titles and, in newer releases, minimum views. Search and sort saved rules separately by when they were added.",
           "Choose from 15 video categories or 32 experimental Main video-language options using available metadata. Language filtering is not speech recognition and is not exposed for Kids; missing metadata can limit any content decision.",
           "The dashboard home has a What Uljhan tried today card: the last 30 things your filters kept out, each with its reason (a blocked word, a blocked channel or a content control) and a way to change that setting. It is kept on this device only, and it is in the extension only; the apps do not have it.",
         ],
@@ -616,10 +586,8 @@ export const detailPages = {
   },
   mobile: {
     slug: "mobile",
-    icon: DeviceMobile,
     tone: "sage",
     status: "Available on Google Play",
-    eyebrow: "Dedicated apps",
     navTitle: "Mobile overview",
     routeSummary:
       "The Android app on Google Play, the direct iPhone and iPad install, and what the phone app looks like day to day.",
@@ -637,7 +605,6 @@ export const detailPages = {
         alt: "FilterTube iPhone and iPad App Store artwork",
       },
     ],
-    chips: ["Main + Kids", "Profiles and PINs", "Rules stay on your device"],
     primaryCta: {
       label: "Open downloads",
       href: downloadsHref,
@@ -649,7 +616,6 @@ export const detailPages = {
       external: true,
     },
     appPreview: {
-      eyebrow: "App preview video",
       title: "See FilterTube’s custom mobile experience.",
       body: "Watch the working phone and tablet experience, including the calmer custom interface built for Main and Kids.",
       embedHref: "https://www.youtube-nocookie.com/embed/SHvSICSMHL4?rel=0",
@@ -685,10 +651,8 @@ export const detailPages = {
   },
   ios: {
     slug: "ios",
-    icon: DeviceMobile,
     tone: "sky",
     status: "Install directly · App Store later",
-    eyebrow: "iPhone + iPad",
     navTitle: "iPhone and iPad",
     routeSummary:
       "Native iPhone and iPad viewing, filters, profiles, and family controls. Trouble on Apple's side delays the App Store version; until then, install with SideStore, or AltStore.",
@@ -696,7 +660,7 @@ export const detailPages = {
     titleDisplay: "iPhone and iPad",
     description:
       "FilterTube brings Main and Kids viewing, native controls, profiles, PINs, and protected time to iPhone and iPad. Apple is having trouble on their end with the developer account, so the App Store version will take a while; until then you can install the app directly with SideStore or AltStore.",
-    heroScreensLabel: "FilterTube on iPhone · hover or tap a screen",
+    heroScreensLabel: "FilterTube on iPhone",
     heroScreens: [
       {
         src: "/apps/screenshots/ios/iphone-launcher.webp",
@@ -721,13 +685,11 @@ export const detailPages = {
       },
     ],
     screenshotsTitle: "A closer look at iPhone and iPad",
-    screenshotsEyebrow: "iPhone and iPad",
-    screenshotsDescription: "Real screens from the latest iPhone and iPad build. Open any screen for a full-size view.",
+    screenshotsDescription: "Real screens from the latest iPhone and iPad build.",
     screenshotRails: [
       { id: "iphone-screens", label: "iPhone", status: "Install with SideStore", layout: "phone", device: "iPhone", screenshots: iphoneScreens },
       { id: "ipad-screens", label: "iPad", status: "Install with SideStore", layout: "desktop", device: "iPad", screenshots: ipadScreens },
     ],
-    chips: ["Main + Kids", "Profiles and PINs", "Install directly"],
     primaryCta: {
       label: "Install on iPhone or iPad",
       href: "#install",
@@ -771,10 +733,8 @@ export const detailPages = {
   },
   ipados: {
     slug: "ipados",
-    icon: MonitorPlay,
     tone: "sky",
     status: "Install directly · App Store later",
-    eyebrow: "iPad app",
     navTitle: "iPadOS",
     routeSummary:
       "The FilterTube app on iPad: Main and Kids viewing, filters and family setup with more room.",
@@ -787,13 +747,11 @@ export const detailPages = {
       alt: "FilterTube iPad app artwork",
     },
     screenshotsTitle: "A closer look at iPhone and iPad",
-    screenshotsEyebrow: "iPhone and iPad",
-    screenshotsDescription: "Real screens from the latest iPhone and iPad build. Open any screen for a full-size view.",
+    screenshotsDescription: "Real screens from the latest iPhone and iPad build.",
     screenshotRails: [
       { id: "ipados-iphone-screens", label: "iPhone", status: "Install with SideStore", layout: "phone", device: "iPhone", screenshots: iphoneScreens },
       { id: "ipados-ipad-screens", label: "iPad", status: "Install with SideStore", layout: "desktop", device: "iPad", screenshots: ipadScreens },
     ],
-    chips: ["Main + Kids", "Profiles and PINs", "Same install as iPhone"],
     primaryCta: {
       label: "Install on iPad",
       href: "/ios#install",
@@ -830,10 +788,8 @@ export const detailPages = {
   },
   android: {
     slug: "android",
-    icon: DeviceMobile,
     tone: "forest",
     status: "Phone, tablet + TV",
-    eyebrow: "Android phone, tablet + TV",
     navTitle: "Android",
     routeSummary:
       "Phone, tablet and Android TV share one app and one Google Play listing. Fire TV support is planned.",
@@ -846,16 +802,11 @@ export const detailPages = {
       poster: "/videos/android/android-contours-poster.png",
       label: "Quiet Android background motion",
     },
-    heroScreensLabel: "FilterTube on Android · hover or tap a screen",
+    heroScreensLabel: "FilterTube on Android",
     heroScreens: [
       androidPhoneScreens.find((screen) => screen.src.endsWith("phone-watch.webp")),
       androidPhoneScreens.find((screen) => screen.src.endsWith("phone-sangeet.webp")),
       androidPhoneScreens.find((screen) => screen.src.endsWith("phone-sync-pairing.webp")),
-    ],
-    chips: [
-      "Phone + tablet: available",
-      "Android TV: available",
-      "Private P2P sync",
     ],
     primaryCta: {
       label: "Install from Google Play",
@@ -868,7 +819,6 @@ export const detailPages = {
       external: true,
     },
     appPreview: {
-      eyebrow: "Android app demo",
       title: "See the custom viewing experience.",
       body: "A look at FilterTube on phone and tablet. Features coming in the next update are labelled below.",
       embedHref: "https://www.youtube-nocookie.com/embed/SHvSICSMHL4?rel=0",
@@ -876,8 +826,7 @@ export const detailPages = {
     },
     deviceSyncHref: "#android-p2p",
     screenshotsTitle: "A closer look at the Android app",
-    screenshotsEyebrow: "Every screen · phone, tablet and TV",
-    screenshotsDescription: "Real screens from the latest FilterTube build on a phone, a tablet and Android TV. Open any screen for a full-size view.",
+    screenshotsDescription: "Real screens from the latest FilterTube build on a phone, a tablet and Android TV.",
     screenshotRails: [
       { id: "android-phone-screens", label: "Phone", status: "Google Play", layout: "phone", screenshots: androidPhoneScreens },
       { id: "android-tablet-screens", label: "Tablet", status: "Google Play", layout: "desktop", screenshots: androidTabletScreens },
@@ -911,7 +860,6 @@ export const detailPages = {
       },
     ],
     exploreTitle: "Explore the full app",
-    exploreDescription: "The custom frontend goes beyond a filter list. Open a group to see the viewing spaces and controls.",
     exploreGroups: [
       {
         id: "android-browse",
@@ -1021,7 +969,7 @@ export const detailPages = {
     milestoneIntro:
       "Phones, tablets and TVs share one app. Here is what is available now and what comes next.",
     milestones: [
-      "Phone and tablet: public on Google Play. Install directly—no invitation or email needed.",
+      "Phone and tablet: public on Google Play. No invitation or email needed.",
       "Sangeet, Notes, Auto-sync and Offline Media are in the current app.",
       "Android TV: on the same Google Play listing, with a TV APK on every GitHub release.",
       "Coming in the next update: Kriti and Uljhan, the rebuilt Study planner, Ask a parent, and the Sangeet, Clips, Following and Saved names in every language.",
@@ -1033,10 +981,8 @@ export const detailPages = {
   },
   tv: {
     slug: "tv",
-    icon: Television,
     tone: "sunset",
     status: "Android TV available",
-    eyebrow: "TV overview",
     navTitle: "TV overview",
     routeSummary:
       "FilterTube runs on Android TV; Fire TV compatibility is planned.",
@@ -1044,7 +990,6 @@ export const detailPages = {
     titleDisplay: "living-room TV",
     description:
       "FilterTube brings browsing, search, remote navigation, playback, profiles, PINs, Kids controls and filters to Android TV. Install it from Google Play or the TV APK on GitHub. Fire TV support is planned separately.",
-    chips: ["Android TV: available", "Main + Kids", "Fire TV: planned"],
     primaryCta: {
       label: "Install from Google Play",
       href: androidPlayStoreHref,
@@ -1080,10 +1025,8 @@ export const detailPages = {
   },
   "android-tv": {
     slug: "android-tv",
-    icon: Television,
     tone: "sky",
     status: "Google Play + TV APK",
-    eyebrow: "Android TV app",
     navTitle: "Android TV",
     routeSummary:
       "Remote-first Home, Search, Following, You and Watch with profiles, PINs, Kids controls and filters.",
@@ -1092,12 +1035,10 @@ export const detailPages = {
     description:
       "FilterTube brings the custom app to Android TV and Google TV: browse, search and watch with the remote, with profiles, PINs, Kids controls and your filters on the big screen. Install it from Google Play or the TV APK on GitHub.",
     screenshotsTitle: "Every TV screen",
-    screenshotsEyebrow: "Android TV · 1920×1080",
-    screenshotsDescription: "Real screens from the latest FilterTube build on Android TV. Open any screen for a full-size view.",
+    screenshotsDescription: "Real screens from the latest FilterTube build on Android TV.",
     screenshotRails: [
       { id: "tv-screens", label: "Android TV", status: "Google Play + TV APK", layout: "desktop", screenshots: androidTvScreens },
     ],
-    chips: ["Google Play", "TV APK on GitHub", "Main + Kids"],
     primaryCta: {
       label: "Get the TV APK",
       href: `${githubHref}/releases/latest`,
@@ -1134,10 +1075,8 @@ export const detailPages = {
   },
   "fire-tv": {
     slug: "fire-tv",
-    icon: Television,
     tone: "amber",
     status: "Planned",
-    eyebrow: "Amazon Fire TV app",
     navTitle: "Amazon Fire TV",
     routeSummary:
       "Fire TV support is planned. Android TV and Google TV are supported now.",
@@ -1145,7 +1084,6 @@ export const detailPages = {
     titleDisplay: "Amazon Fire TV",
     description:
       "Fire TV compatibility and public installation are planned. Android TV is available now, with profiles, PINs, Kids controls and filters.",
-    chips: ["Planned", "Android TV available now"],
     primaryCta: {
       label: "See Android TV",
       href: "/android-tv",
@@ -1177,24 +1115,21 @@ export const detailPages = {
   },
   kids: {
     slug: "kids",
-    icon: ShieldCheck,
     tone: "rose",
     status: "Android, iOS, TV + extension",
-    eyebrow: "Rules for Kids",
     navTitle: "Kids",
     routeSummary:
       "Block unwanted channels and words, or allow only channels you choose. Keep Kids rules separate and parent-managed.",
     titleLead: "More say in what your",
     titleDisplay: "children watch",
     description:
-      "Block channels and words you do not want in Kids—or choose Whitelist to allow only the channels you approve. Give each child their own rules and viewing limits, with changes managed by their parent.",
+      "Block channels and words you do not want in Kids, or choose Whitelist to allow only the channels you approve. Give each child their own rules and viewing limits, with changes managed by their parent.",
     heroScreensLayout: "tv-phone",
-    heroScreensLabel: "Kids Viewing on Android TV and iPhone · hover or tap a screen",
+    heroScreensLabel: "Kids Viewing on Android TV and iPhone",
     heroScreens: [
       { ...kidsScreens.tv.find((screen) => screen.src.endsWith("tv-kids-watch.webp")), title: "Kids on TV" },
       { ...devices.iphone.captures.kids, title: "Kids on iPhone" },
     ],
-    chips: ["Channel + keyword filters", "Whitelist viewing", "Parent-managed profiles"],
     primaryCta: { label: "Get the Android app", href: androidPlayStoreHref, external: true },
     secondaryCta: { label: "Get the browser extension", href: downloadsHref, external: false },
     featureCards: [
@@ -1233,7 +1168,6 @@ export const detailPages = {
       },
     ],
     screenshotsTitle: "Kids Viewing on every screen",
-    screenshotsEyebrow: "Kids · phone, tablet and TV",
     screenshotsDescription: "Real Kids Viewing screens on iPhone, iPad, Android and Android TV. Changing rules from Kids always asks the parent PIN.",
     screenshotRails: [
       { id: "kids-phone-screens", label: "Phone", status: "iPhone + Android", layout: "phone", screenshots: kidsPhoneScreens },
@@ -1253,10 +1187,8 @@ export const detailPages = {
   },
   "ml-ai": {
     slug: "ml-ai",
-    icon: Sparkle,
     tone: "ink",
     status: "Research direction",
-    eyebrow: "ML and local intelligence",
     navTitle: "ML & AI",
     routeSummary:
       "How a future local intelligence layer could extend FilterTube without pushing user behavior into the cloud.",
@@ -1264,7 +1196,6 @@ export const detailPages = {
     titleDisplay: "smarter filtering",
     description:
       "FilterTube already works through explicit rules. A future local semantic layer could add broader matching, clearer suggestions, and possible thumbnail checks without giving up the product’s local-first trust model.",
-    chips: ["Local semantics", "Thumbnail direction", "No profiling"],
     primaryCta: {
       label: "Get FilterTube on desktop",
       href: extensionInstallHref,
