@@ -1,11 +1,13 @@
 name: Route issues to Discord
 
-# Posts new or newly labelled issues into the matching FilterTube Discord channel:
-#   iOS label                          -> #ios-bugs
-#   Android, Mobile App or TV App label -> #android-bugs
-#   bug label with no platform label    -> #bugs
-# Release, issue and pull request activity in general already reaches #github-updates
-# through the repository webhook; this only adds the per-platform routing.
+# Posts each issue once into the one FilterTube Discord channel that fits it:
+#   Feature Request or enhancement           -> #feature-requests (whatever the platform)
+#   iOS                                      -> #ios-bugs
+#   Android, Mobile App or TV App            -> #android-bugs
+#   bug with no platform label (extension)   -> #bugs
+# An issue for both iOS and Android goes to both platform channels.
+# The platform still shows in the post's Labels line. All issue, pull request and
+# release activity also reaches #github-updates through the repository webhook.
 
 on:
   issues:
@@ -17,7 +19,7 @@ jobs:
   route:
     runs-on: ubuntu-latest
     steps:
-      - name: Post to the matching channels
+      - name: Post to the matching channel
         env:
           ACTION: ${{ github.event.action }}
           ADDED: ${{ github.event.label.name }}
@@ -27,6 +29,7 @@ jobs:
           NUMBER: ${{ github.event.issue.number }}
           AUTHOR: ${{ github.event.issue.user.login }}
           CREATED: ${{ github.event.issue.created_at }}
+          HOOK_FEATURE: ${{ secrets.DISCORD_WEBHOOK_FEATURE_REQUESTS }}
           HOOK_IOS: ${{ secrets.DISCORD_WEBHOOK_IOS_BUGS }}
           HOOK_ANDROID: ${{ secrets.DISCORD_WEBHOOK_ANDROID_BUGS }}
           HOOK_BUGS: ${{ secrets.DISCORD_WEBHOOK_BUGS }}
@@ -34,24 +37,38 @@ jobs:
           set -eu
           LABELS=$(printf '%s' "$LABELS_JSON" | jq -r '.[]')
           has() { printf '%s\n' "$LABELS" | grep -qixF "$1"; }
-          is_ios=0; is_android=0; is_bug=0
-          has "iOS" && is_ios=1
-          { has "Android" || has "Mobile App" || has "TV App"; } && is_android=1
-          has "bug" && is_bug=1
+          kind() {  # which group a single label belongs to
+            case "$(printf '%s' "$1" | tr '[:upper:]' '[:lower:]')" in
+              "feature request"|enhancement) echo feature ;;
+              ios) echo ios ;;
+              android|"mobile app"|"tv app") echo android ;;
+              bug) echo bug ;;
+              *) echo other ;;
+            esac
+          }
+          feature=0; ios=0; android=0; bug=0
+          { has "Feature Request" || has "enhancement"; } && feature=1
+          has "iOS" && ios=1
+          { has "Android" || has "Mobile App" || has "TV App"; } && android=1
+          has "bug" && bug=1
 
-          # On "labeled", only the label just added can trigger a post, so an issue
-          # is announced once per channel rather than on every label change.
-          # Labels added while the issue is being created arrive as separate "labeled"
-          # events right after "opened"; "opened" already covers them.
+          # Where the issue belongs right now. Feature requests win over platform labels.
+          targets=""
+          if [ $feature = 1 ]; then targets="feature"
+          else
+            [ $ios = 1 ] && targets="$targets ios"
+            [ $android = 1 ] && targets="$targets android"
+            [ -z "$targets" ] && [ $bug = 1 ] && targets="bug"
+          fi
+
           if [ "$ACTION" = "labeled" ]; then
+            # Labels set while the issue is being created arrive as "labeled" events
+            # right after "opened", which already handled them.
             age=$(( $(date -u +%s) - $(date -u -d "$CREATED" +%s) ))
             [ "$age" -lt 60 ] && exit 0
-            case "$(printf '%s' "$ADDED" | tr '[:upper:]' '[:lower:]')" in
-              ios) is_android=0; is_bug=0 ;;
-              android|"mobile app"|"tv app") is_ios=0; is_bug=0 ;;
-              bug) [ $is_ios = 1 ] || [ $is_android = 1 ] && exit 0; is_ios=0; is_android=0 ;;
-              *) exit 0 ;;
-            esac
+            # Later, only the label just added can move the issue into a new channel.
+            added=$(kind "$ADDED")
+            case " $targets " in *" $added "*) targets="$added" ;; *) targets="" ;; esac
           fi
 
           post() {
@@ -62,8 +79,12 @@ jobs:
                 fields:[{name:"Labels", value:$l, inline:true},{name:"Opened by", value:$a, inline:true}]}]}' \
             | curl -fsS -H "Content-Type: application/json" -d @- "$1" >/dev/null
           }
-
-          [ $is_ios = 1 ] && post "$HOOK_IOS"
-          [ $is_android = 1 ] && post "$HOOK_ANDROID"
-          [ $is_bug = 1 ] && [ $is_ios = 0 ] && [ $is_android = 0 ] && post "$HOOK_BUGS"
+          for t in $targets; do
+            case $t in
+              feature) post "$HOOK_FEATURE" ;;
+              ios) post "$HOOK_IOS" ;;
+              android) post "$HOOK_ANDROID" ;;
+              bug) post "$HOOK_BUGS" ;;
+            esac
+          done
           exit 0
