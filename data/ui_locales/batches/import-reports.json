@@ -9,7 +9,7 @@
   "dashboard.importReport.status.fetching": "Fetching",
   "dashboard.importReport.status.complete": "Complete",
   "dashboard.importReport.description.allRows": "Every row in this import.",
-  "dashboard.importReport.description.needsAttention": "Automatic completion has stopped for this row—usually “channel does not exist,” terminated/deleted, a name-only entry, or a queue inconsistency. The rule remains active unless you remove it.",
+  "dashboard.importReport.description.needsAttention": "Automatic completion has stopped for this row: usually “channel does not exist,” terminated/deleted, a name-only entry, or a queue inconsistency. The rule remains active unless you remove it.",
   "dashboard.importReport.description.retrying": "The video service returned a temporary error or incomplete metadata; the rule remains active and will be tried again.",
   "dashboard.importReport.description.pending": "The row is waiting for its first paced lookup.",
   "dashboard.importReport.description.fetching": "This is the one channel lookup currently running.",

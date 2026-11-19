@@ -373,7 +373,7 @@ function initializePopupFiltersTabs() {
         const mode = categoryMode.value === 'allow'
             ? popupUiText('popup.allowed', 'Allowed') : popupUiText('popup.blocked', 'Blocked');
         categorySelectionCount.textContent = count === 0
-            ? popupUiText('popup.noCategories', 'No categories selected — filter is inactive')
+            ? popupUiText('popup.noCategories', 'No categories selected. The filter is inactive.')
             : `${mode}: ${popupCategorySelected.map(popupCategoryDisplayLabel).join(', ')}`;
         categoryClear.disabled = count === 0;
         categoryMode.disabled = !categoryEnabled.checked;
@@ -501,7 +501,7 @@ function initializePopupFiltersTabs() {
             ? popupUiText('popup.allowed', 'Allowed') : popupUiText('popup.blocked', 'Blocked');
         languageCount.textContent = popupLanguageSelected.length
             ? `${modeLabel}: ${popupLanguageSelected.map(popupLanguageDisplayLabel).join(', ')}`
-            : popupUiText('popup.noLanguages', 'No languages selected — filter is inactive');
+            : popupUiText('popup.noLanguages', 'No languages selected. The filter is inactive.');
         languageClear.disabled = popupLanguageSelected.length === 0;
         languageMode.disabled = !languageEnabled.checked;
         languagePanel.style.display = languageEnabled.checked ? 'block' : 'none';
@@ -1576,16 +1576,16 @@ document.addEventListener('DOMContentLoaded', async () => {
                     if (!copyBlocklist) {
                         UIComponents.showToast(profileType === 'kids'
                             ? popupUiText('popup.listMode.emptyKidsAllowedRules',
-                                'Kids Allowed rules are empty — videos will stay hidden until you add allow rules.')
+                                'Kids Allowed rules are empty: videos will stay hidden until you add allow rules.')
                             : popupUiText('popup.listMode.emptyAllowedRules',
-                                'Allowed rules are empty — videos will stay hidden until you add allow rules.'), 'info');
+                                'Allowed rules are empty: videos will stay hidden until you add allow rules.'), 'info');
                     }
                 } else if (nextState && whitelistEmpty) {
                     UIComponents.showToast(profileType === 'kids'
                         ? popupUiText('popup.listMode.emptyKidsAllowedRules',
-                            'Kids Allowed rules are empty — videos will stay hidden until you add allow rules.')
+                            'Kids Allowed rules are empty: videos will stay hidden until you add allow rules.')
                         : popupUiText('popup.listMode.emptyAllowedRules',
-                            'Allowed rules are empty — videos will stay hidden until you add allow rules.'), 'info');
+                            'Allowed rules are empty: videos will stay hidden until you add allow rules.'), 'info');
                 }
 
                 const resp = await sendRuntimeMessage({

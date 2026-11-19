@@ -382,7 +382,7 @@
       },
       /* @__PURE__ */ _("span", { className: "ft-popup-time-status__label", "data-ft-i18n": "popup.youtubeTime" }, "Viewing time"),
       /* @__PURE__ */ _("strong", { id: "ftManagedTimeStatusValuePopup", className: "ft-popup-time-status__value" })
-    ), /* @__PURE__ */ _("main", { className: "app-content ft-popup-content" }, /* @__PURE__ */ _("section", { className: "ft-popup-filter-card" }, /* @__PURE__ */ _("div", { className: "ft-popup-filter-card__header" }, /* @__PURE__ */ _("div", null, /* @__PURE__ */ _("p", { className: "ft-popup-filter-card__eyebrow", "data-ft-i18n": "popup.quickControl" }, "Quick control"), /* @__PURE__ */ _("h3", { className: "ft-popup-filter-card__title", "data-ft-i18n": "popup.updateProfile" }, "Update this profile fast")), /* @__PURE__ */ _("span", { className: "ft-popup-filter-card__badge", "data-ft-i18n": "popup.localFirst" }, "Local-first")), /* @__PURE__ */ _("div", { id: "popupFiltersTabsContainer" }))), /* @__PURE__ */ _(
+    ), /* @__PURE__ */ _("main", { className: "app-content ft-popup-content" }, /* @__PURE__ */ _("section", { className: "ft-popup-filter-card" }, /* @__PURE__ */ _("div", { id: "popupFiltersTabsContainer" }))), /* @__PURE__ */ _(
       "nav",
       {
         id: "ftPopupApps",

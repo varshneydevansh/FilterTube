@@ -114,14 +114,6 @@ function PopupShell() {
 
         <main className="app-content ft-popup-content">
           <section className="ft-popup-filter-card">
-            <div className="ft-popup-filter-card__header">
-              <div>
-                <p className="ft-popup-filter-card__eyebrow" data-ft-i18n="popup.quickControl">Quick control</p>
-                <h3 className="ft-popup-filter-card__title" data-ft-i18n="popup.updateProfile">Update this profile fast</h3>
-              </div>
-              <span className="ft-popup-filter-card__badge" data-ft-i18n="popup.localFirst">Local-first</span>
-            </div>
-
             <div id="popupFiltersTabsContainer" />
           </section>
         </main>

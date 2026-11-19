@@ -359,7 +359,6 @@
                     <div class="view-shell view-shell--filters">
                         <section class="view-hero filters-hero">
                             <div class="view-hero__copy">
-                                <p class="view-hero__eyebrow">Rules that already work today</p>
                                 <h2 class="view-hero__title">Build the exact feed boundaries you want FilterTube to keep.</h2>
                                 <p class="view-hero__body">Channels, keywords, clips, comments, and profile-specific rules all stay local and stay explicit.</p>
                             </div>
@@ -373,7 +372,6 @@
                     <div class="view-shell view-shell--semantic semantic-shell">
                         <section class="view-hero semantic-hero">
                             <div class="view-hero__copy">
-                                <p class="view-hero__eyebrow">Future layer</p>
                                 <h2 class="view-hero__title">Semantic ML is disabled until runtime matching is implemented.</h2>
                                 <p class="view-hero__body">Today FilterTube enforces explicit keywords, channels, whitelist rules, and content controls. Semantic state stays compatible with profiles, but it is not presented as an active filter.</p>
                             </div>
@@ -439,7 +437,6 @@
                     <div class="view-shell view-shell--settings settings-shell">
                         <section class="view-hero settings-hero">
                             <div class="view-hero__copy">
-                                <p class="view-hero__eyebrow">Focus, backups, and imports</p>
                                 <h2 class="view-hero__title">Protect a focus session or move your setup safely.</h2>
                                 <p class="view-hero__body">Start a non-cancellable FilterTube focus session, manage full backups, or preview rule-list imports. Profiles, PINs, and device updates live in Accounts &amp; Sync.</p>
                             </div>
@@ -630,7 +627,6 @@
                                                                         <strong>Format examples parents can compare against</strong>
                                                                         <span>Pick the file shape that looks closest to what you have. FilterTube still opens a row-by-row preview before it adds anything.</span>
                                                                     </div>
-                                                                    <code>preview first</code>
                                                                 </div>
                                                                 <div class="rule-list-format-trust-strip" aria-label="Rule list import safety flow">
                                                                     <span><b>1</b> Preview parsed rows</span>
@@ -886,7 +882,6 @@
                                                         <details class="rule-list-supported-formats">
                                                             <summary>
                                                                 <span>Exact parser rules</span>
-                                                                <code>safe preview first</code>
                                                             </summary>
                                                             <div class="rule-list-parser-notes" aria-label="Rule list parser boundaries">
                                                                 <span><b>Channels:</b> <code>UC...</code>, <code>@handle</code>, <code>/channel/UC...</code>, <code>/c/Name</code>, <code>/user/Name</code>, or channel URLs.</span>
@@ -1595,9 +1590,7 @@
                     <div class="view-shell view-shell--whatsnew whatsnew-shell">
                         <section class="view-hero whatsnew-hero">
                             <div class="view-hero__copy">
-                                <p class="view-hero__eyebrow">Release track</p>
                                 <h2 class="view-hero__title">Follow what FilterTube shipped without digging through the whole project history.</h2>
-                                <p class="view-hero__body">New controls, UI improvements, and behavior changes land here first so you can see what is already live today.</p>
                             </div>
                             <div class="view-hero__meta">
                                 <span class="view-meta-pill">Current version: v3.6.2</span>
@@ -1618,9 +1611,7 @@
                     <div class="view-shell view-shell--help help-shell">
                         <section class="view-hero help-hero">
                             <div class="view-hero__copy">
-                                <p class="view-hero__eyebrow">Help for parents and everyday users</p>
                                 <h2 class="view-hero__title">Start simple, then open the advanced parts only when you need them.</h2>
-                                <p class="view-hero__body">Use this page to decide what to click first, how keyword matching works, and where profiles, backups, imports, and device updates belong.</p>
                             </div>
                         </section>
 
@@ -1746,9 +1737,9 @@
                             <div class="card-body">
                                 <p><strong>Language Filters prefer the language linked to the video's default audio track.</strong> For captionless videos, strong script evidence in creator-supplied Player metadata can provide a fallback. Find this experimental card at the bottom of <strong>Content Controls</strong>, then turn it on to choose <strong>Block selected</strong> or <strong>Allow only selected</strong> and select languages from the visible pills. Turning the filter off collapses the picker but keeps your saved selection. Unknown-language videos remain visible, and Kids is not filtered by language yet. Main controls are also available in the popup.</p>
                                 <div class="help-list">
-                                    <div class="help-item"><div class="help-item-title">What counts as the language?</div><div class="help-item-body">FilterTube first uses the explicit original/default audio-format metadata, excluding auto-dubbed alternatives, then its audio/caption-track mapping. If those are absent, it can accept strong writing-system evidence from the title, description, and tags inside the same Player response—for example, dominant Russian Cyrillic text. It does not use the interface language, country, channel locale, or translated-subtitle menu.</div></div>
+                                    <div class="help-item"><div class="help-item-title">What counts as the language?</div><div class="help-item-body">FilterTube first uses the explicit original/default audio-format metadata, excluding auto-dubbed alternatives, then its audio/caption-track mapping. If those are absent, it can accept strong writing-system evidence from the title, description, and tags inside the same Player response, for example dominant Russian Cyrillic text. It does not use the interface language, country, channel locale, or translated-subtitle menu.</div></div>
                                     <div class="help-item"><div class="help-item-title">Block selected</div><div class="help-item-body">A resolved matching language is hidden. A video whose language is unavailable stays visible.</div></div>
-                                    <div class="help-item"><div class="help-item-title">Allow only selected</div><div class="help-item-body">A resolved nonmatching language is blocked. While language evidence is loading—or if it remains unavailable—the page stays usable instead of being blanked or pausing playback.</div></div>
+                                    <div class="help-item"><div class="help-item-title">Allow only selected</div><div class="help-item-body">A resolved nonmatching language is blocked. While language evidence is loading, or if it remains unavailable, the page stays usable instead of being blanked or pausing playback.</div></div>
                                     <div class="help-item"><div class="help-item-title">Why this does not double requests</div><div class="help-item-body">FilterTube first reuses a Player response already loaded by the page. If a visible uncached card needs more information, category, language, description, dates, and identity needs are merged into one paced request for that video and then cached.</div></div>
                                     <div class="help-item"><div class="help-item-title">Current boundary</div><div class="help-item-body">This control applies to Main. Kids does not show it until Kids responses provide equally reliable default-audio evidence. A dubbed video follows the selected default track.</div></div>
                                 </div>
@@ -2567,7 +2558,7 @@
                                         <div class="help-item">
                                             <div class="help-item-title">When time is finished</div>
                                             <div class="help-item-body">
-                                                Daily time is counted separately for every profile that has a limit—not as one shared browser allowance. The popup shows the active profile's remaining time. The video page and its controls stay behind a full-page FilterTube pause screen with the serene landscape only while the active profile is exhausted. A protected profile can wait for its daily reset, request more time for parent review, or switch through the normal PIN flow to another independently governed profile. Account profiles use their own policy and remaining balance, and active playback continues counting even when another extension or developer window temporarily has focus.
+                                                Daily time is counted separately for every profile that has a limit, not as one shared browser allowance. The popup shows the active profile's remaining time. The video page and its controls stay behind a full-page FilterTube pause screen with the serene landscape only while the active profile is exhausted. A protected profile can wait for its daily reset, request more time for parent review, or switch through the normal PIN flow to another independently governed profile. Account profiles use their own policy and remaining balance, and active playback continues counting even when another extension or developer window temporarily has focus.
                                             </div>
                                         </div>
                                         <div class="help-item">
@@ -2663,7 +2654,6 @@
                     <div class="view-shell view-shell--about ft-about-site">
                         <section class="ft-about-hero-site">
                             <div class="ft-about-hero-site__copy">
-                                <p class="ft-about-eyebrow">About the builder</p>
                                 <h2 class="ft-about-title">
                                     Devansh builds tools from
                                     <span>curiosity, focus, and open source.</span>
@@ -2709,13 +2699,11 @@
 
                         <div class="ft-about-feature-grid">
                             <a class="ft-about-video-card" href="https://www.youtube.com/watch?v=CA87pRNugT0" target="_blank" rel="noreferrer">
-                                <span class="ft-about-eyebrow">Personal video</span>
                                 <strong>Sisters are an invaluable gift</strong>
                                 <p>A personal video about how my sisters have shaped my life.</p>
                             </a>
 
                             <a class="ft-about-doc-card" href="https://docs.google.com/document/d/1kwZEY4KT-eDlELRsduAuB7IX94qenEHMyE6LA5l45eU/edit?tab=t.0" target="_blank" rel="noreferrer">
-                                <span class="ft-about-eyebrow">Work in progress</span>
                                 <strong>ADHD experiment notes, book thinking, and children's illustration work</strong>
                                 <p>One tiny WIP document collecting the ADHD experiments, writing direction, and children's Ramayan illustration-book notes.</p>
                             </a>
@@ -2738,7 +2726,6 @@
                     <div class="view-shell view-shell--donate donate-shell">
                         <section class="view-hero donate-hero">
                             <div class="view-hero__copy">
-                                <p class="view-hero__eyebrow">Support the product</p>
                                 <h2 class="view-hero__title">Help FilterTube keep growing across desktop, mobile, tablet, and TV without compromising trust.</h2>
                                 <p class="view-hero__body">Support is optional, the product stays fully usable, and contributions go toward maintenance, faster fixes, new surfaces, and the developer costs behind shipping them well.</p>
                             </div>
@@ -2763,7 +2750,7 @@
                                     <div class="support-disclaimer">
                                         Payments are processed securely by Ko-fi and PayPal. FilterTube does not receive or store any login or payment information.
                                     </div>
-                                    <p>Support is optional and there are no features locked behind a paywall. The goal is to keep the product sustainable while continuing to ship calm, privacy-first control surfaces.</p>
+                                    <p>Support is optional and there are no features locked behind a paywall.</p>
                                 </div>
                             </div>
 
