@@ -21,6 +21,23 @@
     const SAVED_NOTES_KEY = 'ftSavedVideoNotesV1';
     const LOCAL_PLAYLISTS_KEY = 'ftLocalPlaylistsV1';
     const KIDS_PERSONA_LINKS_KEY = 'kidsPersonaLinks';
+    const THEME_PREFERENCE_KEY = 'ftThemePreference';
+    const INTEGRITY_KEY = 'integrity';
+    const APP_PREFERENCES_KEY = 'appPreferences';
+    // Error codes the dashboard answers with a PIN prompt (then retries with auth.authorizationPin).
+    const BACKUP_CHANGED_PIN_REQUIRED = 'FT_BACKUP_CHANGED_PIN_REQUIRED';
+    const WEAKENING_PIN_REQUIRED = 'FT_IMPORT_WEAKENING_PIN_REQUIRED';
+    // A converted app backup -> the file it came from (its integrity block covers that file).
+    const convertedBackupOriginals = new WeakMap();
+
+    function isThemeValue(value) {
+        return value === 'dark' || value === 'light' || value === 'system';
+    }
+
+    function backupIntegrity() {
+        const api = global.FilterTubeBackupIntegrity || (typeof globalThis !== 'undefined' ? globalThis.FilterTubeBackupIntegrity : null);
+        return api && typeof api.verify === 'function' ? api : null;
+    }
 
     /** Returns a timestamp in ms (kept inline so tests can stub). */
     function nowTs() {
@@ -1109,6 +1126,13 @@
                 }))
                 .filter(Boolean);
             const sanitizedSettings = { ...settings };
+            // The apps keep Main's content and category filters in profile.main; this extension reads
+            // them from settings. Take main's when settings has none (main's copy stays as it was).
+            for (const key of ['contentFilters', 'categoryFilters']) {
+                if (!Object.prototype.hasOwnProperty.call(settings, key) && main[key] && typeof main[key] === 'object' && !Array.isArray(main[key])) {
+                    sanitizedSettings[key] = main[key];
+                }
+            }
             const timeLimitPolicy = normalizeManagedTimeLimitPolicy(settings.timeLimitPolicy);
             delete sanitizedSettings.filterComments;
             delete sanitizedSettings.timeLimitPolicy;
@@ -1823,7 +1847,10 @@
             },
             ...(profilesV4 ? { profilesV4 } : {}),
             settings: {
-                theme: mainSettings?.theme === 'dark' ? 'dark' : 'light',
+                // The stored choice, "system" (Follow system) included.
+                theme: isThemeValue(mainSettings?.themePreference)
+                    ? mainSettings.themePreference
+                    : (mainSettings?.theme === 'dark' ? 'dark' : 'light'),
                 sync: {
                     enabled: false,
                     deviceName: null
@@ -1852,7 +1879,7 @@
                     hideEndscreenVideowall: !!mainSettings?.hideEndscreenVideowall,
                     hideEndscreenCards: !!mainSettings?.hideEndscreenCards,
                     disableAutoplay: !!mainSettings?.disableAutoplay,
-                    skipBlockedAutoplay: !!mainSettings?.skipBlockedAutoplay,
+                    skipBlockedAutoplay: mainSettings?.skipBlockedAutoplay !== false,
                     quietBlocking: !!mainSettings?.quietBlocking,
                     alwaysUseOriginalAudio: !!mainSettings?.alwaysUseOriginalAudio,
                     disableAnnotations: !!mainSettings?.disableAnnotations,
@@ -2043,7 +2070,8 @@
         const applyKidsRulesOnMain = normalizeBool(settings?.main?.applyKidsRulesOnMain, false);
         const kidsStrictMode = normalizeBool(settings?.kids?.strictMode, true);
 
-        const theme = settings.theme === 'dark' ? 'dark' : 'light';
+        // No theme (or an unknown one) leaves this device's theme alone.
+        const theme = isThemeValue(settings.theme) ? settings.theme : null;
 
         return {
             ok: true,
@@ -2520,7 +2548,7 @@
             },
             profilesV4: snapshot,
             settings: {
-                theme: normalizeString(root.appThemeMode) || 'system',
+                ...(isThemeValue(normalizeString(root.appThemeMode)) ? { theme: normalizeString(root.appThemeMode) } : {}),
                 main: {
                     ...profileSettings,
                     mode: normalizeString(main.mode) || 'blocklist',

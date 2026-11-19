@@ -40,7 +40,7 @@
         // layered: true (written only when on) keeps the block list applying under the allow list.
         main: ['mode', 'layered', 'channels', 'keywords', 'whitelistChannels', 'whitelistKeywords', 'videoIds', 'allowedVideoIds'],
         // quietBlocking (Kids' own Quiet blocking) is also written only when on, like layered.
-        kids: ['mode', 'layered', 'strictMode', 'quietBlocking', 'blockedChannels', 'blockedKeywords', 'whitelistChannels', 'whitelistKeywords', 'videoIds', 'contentFilters', 'categoryFilters']
+        kids: ['mode', 'layered', 'strictMode', 'quietBlocking', 'blockedChannels', 'blockedKeywords', 'whitelistChannels', 'whitelistKeywords', 'videoIds', 'contentFilters', 'categoryFilters', 'languageFilters']
     };
     const contentGroups = {
         views: ['enabled', 'minViews'],

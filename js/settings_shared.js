@@ -14,6 +14,8 @@
     const FT_PROFILES_V3_KEY = 'ftProfilesV3';
     const FT_PROFILES_V4_KEY = 'ftProfilesV4';
     const DEFAULT_PROFILE_ID = 'default';
+    // Profile settings loadSettings never back-fills: a missing key keeps meaning "default".
+    const UNSET_STAYS_UNSET_KEYS = new Set(['skipBlockedAutoplay']);
     const CJK_KEYWORD_SCRIPT_RE = /[\p{Script=Han}\p{Script=Hangul}\p{Script=Hiragana}\p{Script=Katakana}]/u;
     const SETTINGS_KEYS = [
         'enabled',
@@ -95,12 +97,17 @@
         }
     }
 
+    // "system" is a real stored choice (Follow system): it resolves to the OS theme wherever it is shown.
     function isStoredThemePreference(value) {
+        return value === 'dark' || value === 'light' || value === 'system';
+    }
+
+    function isExplicitThemePreference(value) {
         return value === 'dark' || value === 'light';
     }
 
     function resolveThemePreference(value) {
-        return isStoredThemePreference(value) ? value : getSystemThemePreference();
+        return isExplicitThemePreference(value) ? value : getSystemThemePreference();
     }
 
     function isValidProfilesV4(value) {
@@ -178,7 +185,8 @@
                         hideEndscreenVideowall: !!storage?.hideEndscreenVideowall,
                         hideEndscreenCards: !!storage?.hideEndscreenCards,
                         disableAutoplay: !!storage?.disableAutoplay,
-                        skipBlockedAutoplay: !!storage?.skipBlockedAutoplay,
+                        // Unset reads as on (the default), never as off.
+                        skipBlockedAutoplay: storage?.skipBlockedAutoplay !== false,
                         quietBlocking: !!storage?.quietBlocking,
                         alwaysUseOriginalAudio: !!storage?.alwaysUseOriginalAudio,
                         disableAnnotations: !!storage?.disableAnnotations,
@@ -725,8 +733,10 @@
                 const hideComments = hasProfilesV4
                     ? profileSettings.hideComments === true
                     : result.hideAllComments === true;
-                const hasExplicitTheme = isStoredThemePreference(result?.[THEME_KEY]);
+                const hasExplicitTheme = isExplicitThemePreference(result?.[THEME_KEY]);
                 const theme = resolveThemePreference(result?.[THEME_KEY]);
+                // The stored choice, "system" included; no stored choice follows the system too.
+                const themePreference = isStoredThemePreference(result?.[THEME_KEY]) ? result[THEME_KEY] : 'system';
                 const autoBackupEnabled = Object.prototype.hasOwnProperty.call(profileSettings, 'autoBackupEnabled')
                     ? (profileSettings.autoBackupEnabled === true)
                     : (result?.[AUTO_BACKUP_KEY] === true);
@@ -756,7 +766,8 @@
                     hideEndscreenVideowall: readBool('hideEndscreenVideowall', !!result.hideEndscreenVideowall),
                     hideEndscreenCards: readBool('hideEndscreenCards', !!result.hideEndscreenCards),
                     disableAutoplay: readBool('disableAutoplay', !!result.disableAutoplay),
-                    skipBlockedAutoplay: readBool('skipBlockedAutoplay', !!result.skipBlockedAutoplay),
+                    // A profile or device that never set it keeps the default (on); an app backup has no key.
+                    skipBlockedAutoplay: readBool('skipBlockedAutoplay', result.skipBlockedAutoplay !== false),
                     quietBlocking: readBool('quietBlocking', !!result.quietBlocking),
                     alwaysUseOriginalAudio: readBool('alwaysUseOriginalAudio', !!result.alwaysUseOriginalAudio),
                     disableAnnotations: readBool('disableAnnotations', !!result.disableAnnotations),
@@ -784,6 +795,8 @@
                             const missing = {};
                             let needsWrite = false;
                             for (const [key, value] of Object.entries(effectiveSettings)) {
+                                // Unset stays unset, so a backup or sync never turns a default into a choice.
+                                if (UNSET_STAYS_UNSET_KEYS.has(key)) continue;
                                 if (!Object.prototype.hasOwnProperty.call(profileSettings, key)) {
                                     missing[key] = value;
                                     needsWrite = true;
@@ -814,8 +827,13 @@
                     }
                 }
 
-                const contentFilters = normalizeContentFilters(profileSettings.contentFilters);
-                const categoryFilters = safeObject(profileSettings.categoryFilters);
+                // The apps keep Main's content and category filters in profile.main; read them there when
+                // this profile's settings have none (as personal_sync.js does).
+                const activeMainSurface = safeObject(activeProfile.main);
+                const contentFilters = normalizeContentFilters(Object.prototype.hasOwnProperty.call(profileSettings, 'contentFilters')
+                    ? profileSettings.contentFilters : activeMainSurface.contentFilters);
+                const categoryFilters = safeObject(Object.prototype.hasOwnProperty.call(profileSettings, 'categoryFilters')
+                    ? profileSettings.categoryFilters : activeMainSurface.categoryFilters);
                 const languageFilters = safeObject(profileSettings.languageFilters);
 
                 resolve({
@@ -862,6 +880,7 @@
                     statsBySurface: safeObject(result.statsBySurface),
                     channelMap: result.channelMap || {},
                     theme,
+                    themePreference,
                     themeSource: hasExplicitTheme ? 'user' : 'system',
                     autoBackupEnabled,
                     contentFilters,
@@ -1322,11 +1341,29 @@
     }
 
     function setThemePreference(theme) {
-        const normalized = resolveThemePreference(theme);
+        // "system" is stored as itself; anything else unknown is stored as the theme it resolves to.
+        const stored = isStoredThemePreference(theme) ? theme : resolveThemePreference(theme);
+        const normalized = resolveThemePreference(stored);
         return new Promise(resolve => {
-            STORAGE_NAMESPACE?.set({ [THEME_KEY]: normalized }, () => resolve(normalized));
+            STORAGE_NAMESPACE?.set({ [THEME_KEY]: stored }, () => resolve(normalized));
         });
     }
+
+    // With "Follow system" stored, an open page follows the OS theme as it changes.
+    function watchSystemTheme() {
+        try {
+            const query = global?.matchMedia?.('(prefers-color-scheme: dark)');
+            if (!query || typeof query.addEventListener !== 'function' || typeof document === 'undefined') return;
+            query.addEventListener('change', () => {
+                STORAGE_NAMESPACE?.get([THEME_KEY], result => {
+                    if (isExplicitThemePreference(result?.[THEME_KEY])) return;
+                    applyThemePreference(result?.[THEME_KEY]);
+                });
+            });
+        } catch (e) {
+        }
+    }
+    watchSystemTheme();
 
     function isSettingsChange(changes) {
         return Object.keys(changes).some(key => SETTINGS_CHANGE_KEYS.has(key));
@@ -1358,6 +1395,7 @@
         saveSettings,
         applyThemePreference,
         getSystemThemePreference,
+        isStoredThemePreference,
         resolveThemePreference,
         getThemePreference,
         setThemePreference,

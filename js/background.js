@@ -236,7 +236,8 @@ function buildAutoBackupPayload({ settings, profilesV3, theme }) {
         },
         ...(effectiveProfilesV4 ? { profilesV4: effectiveProfilesV4 } : {}),
         settings: {
-            theme: theme === 'dark' ? 'dark' : 'light',
+            // The stored choice, "system" (Follow system) included.
+            theme: (theme === 'dark' || theme === 'light' || theme === 'system') ? theme : 'system',
             sync: {
                 enabled: false,
                 deviceName: null
@@ -265,7 +266,7 @@ function buildAutoBackupPayload({ settings, profilesV3, theme }) {
                 hideEndscreenVideowall: !!s.hideEndscreenVideowall,
                 hideEndscreenCards: !!s.hideEndscreenCards,
                 disableAutoplay: !!s.disableAutoplay,
-                skipBlockedAutoplay: !!s.skipBlockedAutoplay,
+                skipBlockedAutoplay: s.skipBlockedAutoplay !== false,
                 quietBlocking: !!s.quietBlocking,
                 alwaysUseOriginalAudio: !!s.alwaysUseOriginalAudio,
                 disableAnnotations: !!s.disableAnnotations,
@@ -366,7 +367,8 @@ function readAutoBackupState() {
             'ftProfilesV3',
             'ftThemePreference'
         ], items => {
-            const theme = items?.ftThemePreference === 'dark' ? 'dark' : 'light';
+            const storedTheme = items?.ftThemePreference;
+            const theme = (storedTheme === 'dark' || storedTheme === 'light' || storedTheme === 'system') ? storedTheme : 'system';
 
             const storedProfilesV4 = items?.ftProfilesV4;
             const hasProfilesV4 = isValidProfilesV4(storedProfilesV4);
@@ -460,7 +462,8 @@ function readAutoBackupState() {
                 hideEndscreenVideowall: boolFromV4('hideEndscreenVideowall', !!items?.hideEndscreenVideowall),
                 hideEndscreenCards: boolFromV4('hideEndscreenCards', !!items?.hideEndscreenCards),
                 disableAutoplay: boolFromV4('disableAutoplay', !!items?.disableAutoplay),
-                skipBlockedAutoplay: boolFromV4('skipBlockedAutoplay', !!items?.skipBlockedAutoplay),
+                // Unset reads as on (the default), never as off.
+                skipBlockedAutoplay: boolFromV4('skipBlockedAutoplay', items?.skipBlockedAutoplay !== false),
                 quietBlocking: boolFromV4('quietBlocking', !!items?.quietBlocking),
                 alwaysUseOriginalAudio: boolFromV4('alwaysUseOriginalAudio', !!items?.alwaysUseOriginalAudio),
                 disableAnnotations: boolFromV4('disableAnnotations', !!items?.disableAnnotations),
@@ -3476,7 +3479,7 @@ function buildProfilesV4FromLegacyState(items, storageUpdates = {}) {
                     hideEndscreenVideowall: !!items?.hideEndscreenVideowall,
                     hideEndscreenCards: !!items?.hideEndscreenCards,
                     disableAutoplay: !!items?.disableAutoplay,
-                    skipBlockedAutoplay: !!items?.skipBlockedAutoplay,
+                    skipBlockedAutoplay: items?.skipBlockedAutoplay !== false,
                     quietBlocking: !!items?.quietBlocking,
                     alwaysUseOriginalAudio: !!items?.alwaysUseOriginalAudio,
                     disableAnnotations: !!items?.disableAnnotations,
@@ -4794,7 +4797,7 @@ async function getCompiledSettings(sender = null, profileType = null, forceRefre
             compiledSettings.hideEndscreenVideowall = boolFromV4('hideEndscreenVideowall', items.hideEndscreenVideowall || false);
             compiledSettings.hideEndscreenCards = boolFromV4('hideEndscreenCards', items.hideEndscreenCards || false);
             compiledSettings.disableAutoplay = boolFromV4('disableAutoplay', items.disableAutoplay || false);
-            compiledSettings.skipBlockedAutoplay = boolFromV4('skipBlockedAutoplay', items.skipBlockedAutoplay || false);
+            compiledSettings.skipBlockedAutoplay = boolFromV4('skipBlockedAutoplay', items.skipBlockedAutoplay !== false);
             compiledSettings.quietBlocking = boolFromV4('quietBlocking', items.quietBlocking || false);
             // The Kids space has its own Quiet blocking (profile.kids.quietBlocking, off by default);
             // Main's setting never quiets the Kids site, and the Kids one never quiets Main.

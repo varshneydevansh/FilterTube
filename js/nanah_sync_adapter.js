@@ -1359,6 +1359,19 @@
         return JSON.parse(JSON.stringify(value));
     }
 
+    // Main's content and category filters live in profile.settings here and in profile.main on the
+    // apps; a Main-scope transfer carries them in its data either way.
+    const MAIN_FILTER_KEYS = ['contentFilters', 'categoryFilters'];
+
+    function withMainFilters(mainData, profile) {
+        const settings = safeObject(safeObject(profile).settings);
+        for (const key of MAIN_FILTER_KEYS) {
+            const value = Object.prototype.hasOwnProperty.call(settings, key) ? settings[key] : mainData[key];
+            if (value && typeof value === 'object' && !Array.isArray(value)) mainData[key] = cloneJson(value);
+        }
+        return mainData;
+    }
+
     async function buildScopedPortablePayload(io, scope) {
         if (typeof io.loadProfilesV4 !== 'function') {
             throw new Error('Profile-scoped Nanah sync requires loadProfilesV4');
@@ -1385,7 +1398,7 @@
                 section: 'main',
                 profileId: activeId,
                 profileName,
-                data: cloneJson(safeObject(activeProfile.main))
+                data: withMainFilters(cloneJson(safeObject(activeProfile.main)), activeProfile)
             };
         }
 
@@ -1419,7 +1432,26 @@
         }
     }
 
-    async function applyScopedPortablePayload(io, portable, { strategy = 'merge', targetProfileId = null, beforeProfileWrite = null } = {}) {
+    /** Main's filters from a Main-scope transfer go to settings, which own them here (not main). */
+    function withMainFiltersInSettings(profile, data, replace) {
+        const main = { ...safeObject(profile.main) };
+        const settings = { ...safeObject(profile.settings) };
+        for (const key of MAIN_FILTER_KEYS) {
+            if (!Object.prototype.hasOwnProperty.call(safeObject(data), key)) continue;
+            const value = cloneJson(safeObject(data[key]));
+            settings[key] = replace ? value : { ...safeObject(settings[key]), ...value };
+            delete main[key];
+        }
+        return { ...profile, settings, main };
+    }
+
+    /** Weakening a protected profile needs the master PIN or the parent's PIN, as in a backup restore. */
+    async function requireScopedWriteAuthorization(io, profilesV4, profiles, auth) {
+        if (typeof io.requireWeakeningAuthorization !== 'function') return;
+        await io.requireWeakeningAuthorization(profilesV4, { ...profilesV4, profiles }, auth);
+    }
+
+    async function applyScopedPortablePayload(io, portable, { strategy = 'merge', targetProfileId = null, beforeProfileWrite = null, auth = null } = {}) {
         if (typeof io.loadProfilesV4 !== 'function' || typeof io.saveProfilesV4 !== 'function') {
             throw new Error('Profile-scoped Nanah sync requires load/saveProfilesV4');
         }
@@ -1445,10 +1477,10 @@
         const replace = strategy === 'replace';
 
         if (scope === 'main') {
-            profiles[resolvedTargetProfileId] = {
+            profiles[resolvedTargetProfileId] = withMainFiltersInSettings({
                 ...activeProfile,
                 main: applyMainSurfaceData(activeProfile.main, data, replace)
-            };
+            }, data, replace);
         } else {
             profiles[resolvedTargetProfileId] = {
                 ...activeProfile,
