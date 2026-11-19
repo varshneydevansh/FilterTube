@@ -200,6 +200,21 @@ test('message routing keeps UI-only actions away from web pages', async () => {
     assert.deepEqual(h.profile().study.progress, {}, 'or progress');
 });
 
+test('the page\'s mode bar may End and Cancel a Gentle session; the lock rules still decide', async () => {
+    const h = harness({ study: { plan: null }, now: at(17, 10, 0) });
+    assert.equal((await h.controller.startSession({ minutes: 60 })).ok, true);
+    const ended = await h.controller.handleMessage({ action: 'FilterTube_StudyEndSession' }, { youtubeContent: true });
+    assert.equal(ended.ok, true);
+    assert.ok((await h.controller.getState()).endRequestedAt, 'the 30-second pause runs');
+    assert.equal((await h.controller.handleMessage({ action: 'FilterTube_StudyCancelEnd' }, { youtubeContent: true })).ok, true);
+    assert.equal((await h.controller.getState()).endRequestedAt, null);
+    assert.equal((await h.controller.handleMessage({ action: 'FilterTube_StudyEndSession' }, {})).error, 'untrusted_sender', 'web pages cannot');
+
+    const locked = harness({ study: { plan: null }, now: at(17, 10, 0) });
+    await locked.controller.startSession({ minutes: 60, lock: 'locked' });
+    assert.equal((await locked.controller.handleMessage({ action: 'FilterTube_StudyEndSession' }, { youtubeContent: true })).ok, false, 'Locked never ends early');
+});
+
 test('the study state names each pack with its chips and keywords (the study Home\'s subject chips)', async () => {
     const h = harness({ study: { activePackIds: ['us_sat', 'global_gmat'] }, now: at(16, 16, 10) });
     const packs = (await h.controller.getState()).packs;

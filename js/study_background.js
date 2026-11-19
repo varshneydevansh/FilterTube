@@ -1058,6 +1058,12 @@
                 if (!extensionPage && !youtubeContent) return Promise.resolve({ ok: false, error: 'untrusted_sender' });
                 return undoSkipBreak(request);
             }
+            // The page's mode bar (narrowed_view.js) offers End like the popup: only a self-started Gentle
+            // session ends, after its 30-second pause (requestEnd checks the lock rules), and Cancel undoes it.
+            if (action === 'FilterTube_StudyEndSession' || action === 'FilterTube_StudyCancelEnd') {
+                if (!extensionPage && !youtubeContent) return Promise.resolve({ ok: false, error: 'untrusted_sender' });
+                return action === 'FilterTube_StudyEndSession' ? requestEnd() : cancelEnd();
+            }
             if (!extensionPage) return Promise.resolve({ ok: false, error: 'untrusted_sender' });
             if (action === 'FilterTube_StudyAckSessionEnd') return acknowledgeSessionEnd();
             if (action === 'FilterTube_StudyStartSession') return startSession(request);

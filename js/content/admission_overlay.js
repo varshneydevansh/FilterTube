@@ -72,6 +72,7 @@
             'Blocked by Language Filter': 'admission.blockedLanguage',
             "Not part of today's study": 'admission.studyOffList',
             'Not during study': 'admission.studyNotNow',
+            "This channel isn't in your study plan": 'admission.studyChannelOff',
             // A blocked keyword's reason (FilterTubeIdentity.keywordMatchReasonLines).
             'Matched: a blocked word': 'admission.matchedBlockedWord',
             'Found in: the video title': 'admission.foundInTitle',
@@ -95,8 +96,10 @@
             }
             return null;
         };
+        // English words for a reason whose internal line reads differently (the line stays the key).
+        const english = { 'admission.allowOnly': 'Not on your allowed list' };
         return String(message || '').split('\n').map(line =>
-            labels[line] ? localizedAdmissionText(labels[line], line) : (keywordLine(line) ?? line)).join('\n');
+            labels[line] ? localizedAdmissionText(labels[line], english[labels[line]] || line) : (keywordLine(line) ?? line)).join('\n');
     }
 
     function loadAdmissionLocale(overlay) {
@@ -365,7 +368,7 @@
 
     // The Watch gate during Study: dom_fallback's study first lines become a calm teal study card
     // with "Back to study" (top frames only; an embedded player can't leave its page).
-    const STUDY_LINES = { "Not part of today's study": 'offList', 'Not during study': 'notNow' };
+    const STUDY_LINES = { "Not part of today's study": 'offList', 'Not during study': 'notNow', "This channel isn't in your study plan": 'channelOff' };
 
     function studyKind(message) {
         return STUDY_LINES[String(message || '').split('\n')[0]] || '';
@@ -418,17 +421,22 @@
             overlay.__filtertubeStudyParts = { status, title, reason, owner, actions };
         }
         const parts = overlay.__filtertubeStudyParts;
-        const offList = kind === 'offList';
+        const channelOff = kind === 'channelOff';
+        const offList = kind === 'offList' || channelOff;
         // Kriti points back to the plan (off the list) or holds her mug (a break, the limit, a clock check).
         const kriti = syncAdmissionMascot(overlay, '__filtertubeStudyMascot', card, offList ? 'kriti_pose_08.webp' : 'kriti_mug_06.webp', 132);
         if (kriti) admissionOverlayStyle(kriti, { order: '-1', alignSelf: localeDirection === 'rtl' ? 'flex-start' : 'flex-end', marginBottom: '-6px' });
         parts.status.textContent = localizedAdmissionText('admission.studyStatus', 'Study');
-        parts.title.textContent = offList
-            ? localizedAdmissionText('admission.studyOffList', "Not part of today's study")
-            : localizedAdmissionText('admission.studyNotNow', 'Not during study');
-        parts.reason.textContent = offList
-            ? localizedAdmissionText('admission.studyOffListBody', 'Videos from your study plan play now. This one can wait until study ends.')
-            : localizedAdmissionText('admission.studyNotNowBody', 'Nothing plays during a break, after today\'s limit or while the clock is being checked.');
+        parts.title.textContent = channelOff
+            ? localizedAdmissionText('admission.studyChannelOff', "This channel isn't in your study plan")
+            : offList
+                ? localizedAdmissionText('admission.studyOffList', "Not part of today's study")
+                : localizedAdmissionText('admission.studyNotNow', 'Not during study');
+        parts.reason.textContent = channelOff
+            ? localizedAdmissionText('admission.studyChannelOffBody', 'It’ll be here after study ends.')
+            : offList
+                ? localizedAdmissionText('admission.studyOffListBody', 'Videos from your study plan play now. This one can wait until study ends.')
+                : localizedAdmissionText('admission.studyNotNowBody', 'Nothing plays during a break, after today\'s limit or while the clock is being checked.');
         parts.owner.textContent = String(message || '').split('\n').slice(1).join(' ').trim();
         while (parts.actions.firstChild) parts.actions.removeChild(parts.actions.firstChild);
         let topFrame = true;

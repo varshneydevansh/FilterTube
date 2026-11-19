@@ -2352,7 +2352,7 @@ function showBlockedChannelPage(path, pageMeta, channelName, blockedBy) {
         const name = String(channelName || pageMeta?.name || channelId).replace(/\s+/g, ' ').trim().slice(0, 120);
         window.__filtertubeAskParentTarget = {
             kind: 'channel', videoId: null, channelId, title: name, channelName: name,
-            blockedBy: blockedBy === 'allow_list' ? 'allow_list' : 'channel'
+            blockedBy: blockedBy === 'allow_list' || blockedBy === 'study' ? 'allow_list' : 'channel'
         };
         let overlay = document.getElementById(FILTERTUBE_BLOCKED_CHANNEL_PAGE_ID);
         if (!overlay) {
@@ -2363,7 +2363,8 @@ function showBlockedChannelPage(path, pageMeta, channelName, blockedBy) {
             overlay.setAttribute('data-state', 'blocked');
             host.appendChild(overlay);
         }
-        const message = `${blockedBy === 'allow_list' ? 'Not in Allow only selected' : 'Blocked channel'}\n${name}`;
+        // During study the card is the study card (admission_overlay.js STUDY_LINES): not in the plan, back later.
+        const message = `${blockedBy === 'study' ? "This channel isn't in your study plan" : (blockedBy === 'allow_list' ? 'Not in Allow only selected' : 'Blocked channel')}\n${name}`;
         const quiet = isQuietBlockingEnabled();
         if (overlay.__filtertubeChannelPath !== path || overlay.__filtertubeAdmissionMessage !== message ||
             overlay.__filtertubeAdmissionQuiet !== quiet) {
@@ -2410,6 +2411,11 @@ function enforceCurrentChannelPageDirectAccess(settings) {
         // A child may ask a parent for this channel (Android: the ask from a blocked channel): the page
         // stays behind a blocked card with "Ask for this channel" and Back instead of leaving at once.
         if (settings?.askParentChild === true && showBlockedChannelPage(path, pageMeta, channelName, blockMatch ? 'channel' : 'allow_list')) return true;
+        // Allowed only and Study (the narrowed mode, narrowed_mode.js): a channel outside the list is held
+        // with a card that says why, instead of a silent jump to Home (Android study_channel_off).
+        const Narrowed = window.FilterTubeNarrowedMode;
+        if (!blockMatch && Narrowed?.pagePlan?.(Narrowed.modeOf(settings), 'channel')?.holdChannel
+            && showBlockedChannelPage(path, pageMeta, channelName, settings?.study?.phase === 'study' ? 'study' : 'allow_list')) return true;
         if (document.documentElement?.getAttribute('data-filtertube-direct-channel-redirect') === path) return true;
         document.documentElement?.setAttribute('data-filtertube-direct-channel-redirect', path);
         document.location.replace('/');

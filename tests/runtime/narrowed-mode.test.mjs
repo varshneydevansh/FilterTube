@@ -157,6 +157,9 @@ test('the page scripts read the one decision and redraw on events only', () => {
     assert.doesNotMatch(narrowed, /setInterval/);
     assert.match(view, /layer\.plan\.builtFeed\) return 'feed'/);
     assert.match(fs.readFileSync('js/content/bridge_settings.js', 'utf8'), /dispatchEvent\(new Event\('filtertube-settings-applied'\)\)/);
+    const fallback = fs.readFileSync('js/content/dom_fallback.js', 'utf8');
+    assert.match(fallback, /Narrowed\?\.pagePlan\?\.\(Narrowed\.modeOf\(settings\), 'channel'\)\?\.holdChannel/, 'a channel outside the list is held, not skipped');
+    assert.match(fs.readFileSync('js/content/admission_overlay.js', 'utf8'), /"This channel isn't in your study plan": 'channelOff'/);
     // Every new phrase has its English catalog entry.
     const en = JSON.parse(fs.readFileSync('data/ui_locales/en.json', 'utf8'));
     const keys = new Set([...view.matchAll(/(?<![\w.])t\('([\w.]+)'/g), ...narrowed.matchAll(/(?<![\w.])t\('([\w.]+)'/g),
