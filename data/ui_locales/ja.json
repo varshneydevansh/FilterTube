@@ -2749,7 +2749,7 @@
   "dashboard.preferences.error.changed": "プロフィール、保護者の承認、または設定の自動同期リンクが変更されたか、確認できませんでした。確認してからもう一度お試しください。",
   "dashboard.sync.peerHero": "確認済みのデバイス間でピアツーピア同期します。共有する内容を選び、家族のプロフィールを管理できます。",
   "controls.title.skipBlockedAutoplay": "ブロックされた自動再生動画をスキップ",
-  "controls.description.skipBlockedAutoplay": "自動再生がルールでブロックされた動画に当たったら、次の許可された動画に進みます（最大 3 回まで）",
+  "controls.description.skipBlockedAutoplay": "自動再生がルールでブロックされた動画に当たったら、次の許可された動画に進みます",
   "controls.title.quietBlocking": "目立たないブロック",
   "controls.description.quietBlocking": "ブロックした動画には FilterTube のお知らせではなく、シンプルな「視聴できません」画面を表示します",
   "controls.title.contentOnlyPlayback": "コンテンツのみ再生（試験的）",

@@ -2749,7 +2749,7 @@
   "dashboard.preferences.error.changed": "Di profile, parent approval or Settings Auto-sync links don change, or we no fit check dem. Review am and try again.",
   "dashboard.sync.peerHero": "Direct sync between your devices wey you don verify. Choose wetin you wan share and manage family profiles.",
   "controls.title.skipBlockedAutoplay": "Skip autoplay videos wey dem block",
-  "controls.description.skipBlockedAutoplay": "When autoplay reach video wey your rules block, e go continue to the next video wey dem allow (reach 3 tries)",
+  "controls.description.skipBlockedAutoplay": "When autoplay reach video wey your rules block, e go continue to the next video wey dem allow",
   "controls.title.quietBlocking": "Block am quietly",
   "controls.description.quietBlocking": "Videos wey dem block go show plain “e no dey available” screen instead of FilterTube notice",
   "controls.title.contentOnlyPlayback": "Play only content (test)",

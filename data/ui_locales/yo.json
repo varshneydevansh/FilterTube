@@ -2749,7 +2749,7 @@
   "dashboard.preferences.error.changed": "Profaili, ìfọwọ́sí òbí tàbí àwọn ọ̀nà asopọ̀ Ìmúṣọ̀kan Àdáṣiṣẹ́ Àwọn Ètò ti yí padà, tàbí a kò lè ṣàyẹ̀wò wọn. Ṣàyẹ̀wò kí o sì tún gbìyànjú.",
   "dashboard.sync.peerHero": "Ìmúṣiṣẹpọ̀ tààrà láàárín àwọn ẹ̀rọ rẹ tí a ti jẹ́rìí sí. Yan ohun tí o fẹ́ pín kí o sì ṣàkóso àwọn profaili ẹbí.",
   "controls.title.skipBlockedAutoplay": "Fo àwọn fídíò ìṣiṣẹ́ aládàáṣe tí a dí",
-  "controls.description.skipBlockedAutoplay": "Nígbà tí ìṣiṣẹ́ aládàáṣe bá dé fídíò tí àwọn òfin rẹ dí, tẹ̀síwájú sí fídíò tó kàn tí a fàyè gbà (títí dé ìgbìyànjú 3)",
+  "controls.description.skipBlockedAutoplay": "Nígbà tí ìṣiṣẹ́ aládàáṣe bá dé fídíò tí àwọn òfin rẹ dí, tẹ̀síwájú sí fídíò tó kàn tí a fàyè gbà",
   "controls.title.quietBlocking": "Ìdínà ní ìdákẹ́jẹ́ẹ́",
   "controls.description.quietBlocking": "Àwọn fídíò tí a dí yóò fi ojú-ìwé “kò sí” tó rọrùn hàn dípò ìkéde FilterTube",
   "controls.title.contentOnlyPlayback": "Ìṣiṣẹ́ àkóónú nìkan (Àdánwò)",

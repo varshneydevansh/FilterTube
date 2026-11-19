@@ -2749,7 +2749,7 @@
   "dashboard.preferences.error.changed": "Wasifu, idhini ya mzazi au viungo vya Ulandanishi wa kiotomatiki wa mipangilio vimebadilika, au havikuweza kukaguliwa. Kagua kisha ujaribu tena.",
   "dashboard.sync.peerHero": "Usawazishaji wa moja kwa moja kati ya vifaa vyako vilivyothibitishwa. Chagua cha kushiriki na udhibiti wasifu wa familia.",
   "controls.title.skipBlockedAutoplay": "Ruka video zilizozuiwa za uchezaji wa kiotomatiki",
-  "controls.description.skipBlockedAutoplay": "Uchezaji wa kiotomatiki unapofikia video ambayo sheria zako zinaizuia, endelea kwenye video inayofuata inayoruhusiwa (hadi majaribio 3)",
+  "controls.description.skipBlockedAutoplay": "Uchezaji wa kiotomatiki unapofikia video ambayo sheria zako zinaizuia, endelea kwenye video inayofuata inayoruhusiwa",
   "controls.title.quietBlocking": "Kuzuia kimyakimya",
   "controls.description.quietBlocking": "Video zilizozuiwa zinaonyesha skrini rahisi ya “haipatikani” badala ya ilani ya FilterTube",
   "controls.title.contentOnlyPlayback": "Uchezaji wa maudhui pekee (ya majaribio)",

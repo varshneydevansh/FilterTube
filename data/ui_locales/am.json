@@ -2749,7 +2749,7 @@
   "dashboard.preferences.error.changed": "መገለጫው፣ የወላጅ ፈቃድ ወይም የቅንብሮች ራስ-ሰር ማመሳሰል አገናኞች ተቀይረዋል ወይም ሊፈተሹ አልቻሉም። ይገምግሙና እንደገና ይሞክሩ።",
   "dashboard.sync.peerHero": "በተረጋገጡ መሣሪያዎችዎ መካከል ቀጥተኛ ማመሳሰል። የሚያጋሩትን ይምረጡ እና የቤተሰብ መገለጫዎችን ያስተዳድሩ።",
   "controls.title.skipBlockedAutoplay": "የታገዱ የራስ-ሰር ማጫወት ቪዲዮዎችን ዝለል",
-  "controls.description.skipBlockedAutoplay": "ራስ-ሰር ማጫወት ደንቦችዎ ወደሚያግዱት ቪዲዮ ሲደርስ ወደ ቀጣዩ የተፈቀደ ቪዲዮ ይቀጥሉ (እስከ 3 ሙከራዎች)",
+  "controls.description.skipBlockedAutoplay": "ራስ-ሰር ማጫወት ደንቦችዎ ወደሚያግዱት ቪዲዮ ሲደርስ ወደ ቀጣዩ የተፈቀደ ቪዲዮ ይቀጥሉ",
   "controls.title.quietBlocking": "ጸጥ ያለ ማገድ",
   "controls.description.quietBlocking": "የታገዱ ቪዲዮዎች ከFilterTube ማሳወቂያ ይልቅ ቀላል “አይገኝም” ማያ ያሳያሉ",
   "controls.title.contentOnlyPlayback": "ይዘት ብቻ ማጫወት (ሙከራዊ)",

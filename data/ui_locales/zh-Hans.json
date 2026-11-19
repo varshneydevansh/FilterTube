@@ -2749,7 +2749,7 @@
   "dashboard.preferences.error.changed": "个人资料、家长批准或设置自动同步链接已更改，或无法检查。请查看后重试。",
   "dashboard.sync.peerHero": "在你已验证的设备之间进行点对点同步。选择要共享的内容，并管理家庭配置文件。",
   "controls.title.skipBlockedAutoplay": "跳过被屏蔽的自动播放视频",
-  "controls.description.skipBlockedAutoplay": "当自动播放遇到被你的规则屏蔽的视频时，继续播放下一个允许的视频（最多尝试 3 次）",
+  "controls.description.skipBlockedAutoplay": "当自动播放遇到被你的规则屏蔽的视频时，继续播放下一个允许的视频",
   "controls.title.quietBlocking": "静默屏蔽",
   "controls.description.quietBlocking": "被屏蔽的视频只显示简单的“无法观看”画面，不显示 FilterTube 提示",
   "controls.title.contentOnlyPlayback": "仅内容播放（实验性）",

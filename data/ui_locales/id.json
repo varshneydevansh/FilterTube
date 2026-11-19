@@ -2749,7 +2749,7 @@
   "dashboard.preferences.error.changed": "Profil, persetujuan orang tua, atau tautan Sinkronisasi Otomatis Pengaturan berubah, atau tidak dapat diperiksa. Tinjau lalu coba lagi.",
   "dashboard.sync.peerHero": "Sinkronisasi langsung antarperangkat Anda yang terverifikasi. Pilih apa yang dibagikan dan kelola profil keluarga.",
   "controls.title.skipBlockedAutoplay": "Lewati video putar otomatis yang diblokir",
-  "controls.description.skipBlockedAutoplay": "Saat putar otomatis sampai ke video yang diblokir aturan Anda, lanjutkan ke video berikutnya yang diizinkan (hingga 3 kali percobaan)",
+  "controls.description.skipBlockedAutoplay": "Saat putar otomatis sampai ke video yang diblokir aturan Anda, lanjutkan ke video berikutnya yang diizinkan",
   "controls.title.quietBlocking": "Pemblokiran senyap",
   "controls.description.quietBlocking": "Video yang diblokir menampilkan layar “tidak tersedia” biasa, bukan pemberitahuan FilterTube",
   "controls.title.contentOnlyPlayback": "Pemutaran konten saja (Eksperimental)",

@@ -2749,7 +2749,7 @@
   "dashboard.preferences.error.changed": "प्रोफाइल, पालकांची मंजुरी किंवा सेटिंग्ज ऑटो-सिंक दुवे बदलले किंवा तपासता आले नाहीत. तपासा आणि पुन्हा प्रयत्न करा.",
   "dashboard.sync.peerHero": "तुमच्या पडताळलेल्या डिव्हाइसमध्ये थेट सिंक. काय शेअर करायचे ते निवडा आणि कुटुंबाच्या प्रोफाइल व्यवस्थापित करा.",
   "controls.title.skipBlockedAutoplay": "अवरोधित स्वयं-प्ले व्हिडिओ वगळा",
-  "controls.description.skipBlockedAutoplay": "स्वयं-प्ले तुमच्या नियमांनी अवरोधित केलेल्या व्हिडिओवर पोहोचल्यास, पुढील अनुमत व्हिडिओवर जा (3 प्रयत्नांपर्यंत)",
+  "controls.description.skipBlockedAutoplay": "स्वयं-प्ले तुमच्या नियमांनी अवरोधित केलेल्या व्हिडिओवर पोहोचल्यास, पुढील अनुमत व्हिडिओवर जा",
   "controls.title.quietBlocking": "शांत अवरोध",
   "controls.description.quietBlocking": "अवरोधित व्हिडिओंवर FilterTube सूचनेऐवजी साधी “उपलब्ध नाही” स्क्रीन दिसेल",
   "controls.title.contentOnlyPlayback": "फक्त-सामग्री प्लेबॅक (प्रायोगिक)",

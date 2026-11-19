@@ -2749,7 +2749,7 @@
   "dashboard.preferences.error.changed": "پروفائل، والدین کی منظوری یا ترتیبات کی خودکار ہم آہنگی کے روابط بدل گئے، یا ان کی جانچ نہیں ہو سکی۔ جائزہ لے کر دوبارہ کوشش کریں۔",
   "dashboard.sync.peerHero": "آپ کے تصدیق شدہ آلات کے درمیان براہِ راست سنک۔ منتخب کریں کہ کیا شیئر کرنا ہے اور خاندان کے پروفائلز سنبھالیں۔",
   "controls.title.skipBlockedAutoplay": "آٹو پلے میں روکی گئی ویڈیوز چھوڑ دیں",
-  "controls.description.skipBlockedAutoplay": "جب آٹو پلے ایسی ویڈیو پر پہنچے جسے آپ کے اصول روکتے ہیں تو اگلی اجازت یافتہ ویڈیو پر چلا جائے (زیادہ سے زیادہ 3 کوششیں)",
+  "controls.description.skipBlockedAutoplay": "جب آٹو پلے ایسی ویڈیو پر پہنچے جسے آپ کے اصول روکتے ہیں تو اگلی اجازت یافتہ ویڈیو پر چلا جائے",
   "controls.title.quietBlocking": "خاموشی سے روکنا",
   "controls.description.quietBlocking": "روکی گئی ویڈیوز پر FilterTube کے نوٹس کی جگہ سادہ ”دستیاب نہیں“ اسکرین دکھائی دے گی",
   "controls.title.contentOnlyPlayback": "صرف مواد کا پلے بیک (تجرباتی)",

@@ -2749,7 +2749,7 @@
   "dashboard.preferences.error.changed": "প্রোফাইল, অভিভাবকের অনুমোদন বা সেটিংস স্বয়ংক্রিয় সিঙ্ক লিংক বদলেছে বা যাচাই করা যায়নি। পর্যালোচনা করে আবার চেষ্টা করুন।",
   "dashboard.sync.peerHero": "আপনার যাচাই করা ডিভাইসগুলোর মধ্যে সরাসরি সিঙ্ক। কী শেয়ার করবেন বেছে নিন এবং পরিবারের প্রোফাইল পরিচালনা করুন।",
   "controls.title.skipBlockedAutoplay": "ব্লক করা স্বয়ংক্রিয় ভিডিও বাদ দিন",
-  "controls.description.skipBlockedAutoplay": "স্বয়ংক্রিয় চালানো যখন আপনার নিয়মে ব্লক করা ভিডিওতে পৌঁছায়, তখন পরের অনুমোদিত ভিডিওতে চলে যান (সর্বোচ্চ 3 বার চেষ্টা)",
+  "controls.description.skipBlockedAutoplay": "স্বয়ংক্রিয় চালানো যখন আপনার নিয়মে ব্লক করা ভিডিওতে পৌঁছায়, তখন পরের অনুমোদিত ভিডিওতে চলে যান",
   "controls.title.quietBlocking": "নীরব ব্লক",
   "controls.description.quietBlocking": "ব্লক করা ভিডিওতে FilterTube বিজ্ঞপ্তির বদলে সাধারণ “উপলভ্য নয়” স্ক্রিন দেখাবে",
   "controls.title.contentOnlyPlayback": "শুধু-কনটেন্ট প্লেব্যাক (পরীক্ষামূলক)",

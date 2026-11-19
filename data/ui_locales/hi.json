@@ -2749,7 +2749,7 @@
   "dashboard.preferences.error.changed": "प्रोफ़ाइल, अभिभावक की स्वीकृति या सेटिंग्स स्वतः-सिंक लिंक बदल गए, या जाँचे नहीं जा सके। समीक्षा करके दोबारा कोशिश करें।",
   "dashboard.sync.peerHero": "आपके सत्यापित डिवाइस के बीच सीधा सिंक। चुनें कि क्या साझा करना है और परिवार की प्रोफ़ाइल सँभालें।",
   "controls.title.skipBlockedAutoplay": "रोके गए ऑटोप्ले वीडियो छोड़ें",
-  "controls.description.skipBlockedAutoplay": "जब ऑटोप्ले ऐसे वीडियो पर पहुँचे जिसे आपके नियम रोकते हैं, तो अगले अनुमत वीडियो पर बढ़ें (3 कोशिशों तक)",
+  "controls.description.skipBlockedAutoplay": "जब ऑटोप्ले ऐसे वीडियो पर पहुँचे जिसे आपके नियम रोकते हैं, तो अगले अनुमत वीडियो पर बढ़ें",
   "controls.title.quietBlocking": "चुपचाप रोकना",
   "controls.description.quietBlocking": "रोके गए वीडियो पर FilterTube सूचना की जगह सादी “उपलब्ध नहीं” स्क्रीन दिखेगी",
   "controls.title.contentOnlyPlayback": "सिर्फ़ सामग्री वाला प्लेबैक (प्रयोगात्मक)",

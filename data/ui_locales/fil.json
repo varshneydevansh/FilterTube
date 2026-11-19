@@ -2749,7 +2749,7 @@
   "dashboard.preferences.error.changed": "Nagbago, o hindi masuri, ang profile, pag-apruba ng magulang, o mga link ng Settings Auto-sync. Suriin at subukan muli.",
   "dashboard.sync.peerHero": "Direktang pag-sync sa pagitan ng mga na-verify mong device. Piliin kung ano ang ibabahagi at pamahalaan ang mga profile ng pamilya.",
   "controls.title.skipBlockedAutoplay": "Laktawan ang mga naka-block na video sa autoplay",
-  "controls.description.skipBlockedAutoplay": "Kapag umabot ang autoplay sa video na bina-block ng mga panuntunan mo, tumuloy sa susunod na pinapayagang video (hanggang 3 subok)",
+  "controls.description.skipBlockedAutoplay": "Kapag umabot ang autoplay sa video na bina-block ng mga panuntunan mo, tumuloy sa susunod na pinapayagang video",
   "controls.title.quietBlocking": "Tahimik na pag-block",
   "controls.description.quietBlocking": "Ang mga naka-block na video ay magpapakita ng simpleng “hindi available” na screen sa halip na abiso ng FilterTube",
   "controls.title.contentOnlyPlayback": "Pag-play ng content lang (Eksperimental)",

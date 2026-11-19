@@ -2749,7 +2749,7 @@
   "dashboard.preferences.error.changed": "प्रोफाइल, माई-बाप के मंजूरी भा सेटिंग अपने-आप सिंक के लिंक बदल गइल, भा जाँचल ना जा सकल। देखीं आ फेर कोशिश करीं।",
   "dashboard.sync.peerHero": "रउआ के जाँचल डिवाइस के बीच सीधा सिंक। चुनीं कि का साझा करे के बा आ परिवार के प्रोफाइल सँभारीं।",
   "controls.title.skipBlockedAutoplay": "रोकल अपने-आप चले वाला वीडियो छोड़ीं",
-  "controls.description.skipBlockedAutoplay": "जब अपने-आप चलत वीडियो अइसन वीडियो पर पहुँचे जेकरा के रउआ के नियम रोकेला, त अगिला अनुमति वाला वीडियो पर बढ़ीं (3 कोशिश ले)",
+  "controls.description.skipBlockedAutoplay": "जब अपने-आप चलत वीडियो अइसन वीडियो पर पहुँचे जेकरा के रउआ के नियम रोकेला, त अगिला अनुमति वाला वीडियो पर बढ़ीं",
   "controls.title.quietBlocking": "चुपचाप रोकल",
   "controls.description.quietBlocking": "रोकल वीडियो पर FilterTube के सूचना के बदले सादा “उपलब्ध नइखे” स्क्रीन देखाई",
   "controls.title.contentOnlyPlayback": "खाली सामग्री वाला प्लेबैक (परीक्षण में)",

@@ -2749,7 +2749,7 @@
   "dashboard.preferences.error.changed": "Profil, persetujuan wong tuwa, utawa sambungan Sinkronisasi otomatis Setelan owah, utawa ora bisa dipriksa. Priksa banjur coba maneh.",
   "dashboard.sync.peerHero": "Sinkronisasi langsung antarane piranti sampeyan sing wis diverifikasi. Pilih apa sing dienggo bareng lan atur profil kulawarga.",
   "controls.title.skipBlockedAutoplay": "Liwati video puter otomatis sing diblokir",
-  "controls.description.skipBlockedAutoplay": "Yen puter otomatis tekan video sing diblokir aturan sampeyan, terusake menyang video sabanjure sing diidinake (nganti 3 kali nyoba)",
+  "controls.description.skipBlockedAutoplay": "Yen puter otomatis tekan video sing diblokir aturan sampeyan, terusake menyang video sabanjure sing diidinake",
   "controls.title.quietBlocking": "Mblokir kanthi meneng",
   "controls.description.quietBlocking": "Video sing diblokir nuduhake layar “ora kasedhiya” sing prasaja tinimbang kabar FilterTube",
   "controls.title.contentOnlyPlayback": "Muter konten wae (Eksperimental)",

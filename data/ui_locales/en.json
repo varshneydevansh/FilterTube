@@ -344,7 +344,7 @@
   "controls.title.disableAutoplay": "Disable Autoplay",
   "controls.description.disableAutoplay": "Disable or suppress autoplay UI",
   "controls.title.skipBlockedAutoplay": "Skip blocked autoplay videos",
-  "controls.description.skipBlockedAutoplay": "When autoplay reaches a video your rules block, continue to the next allowed video (up to 3 tries)",
+  "controls.description.skipBlockedAutoplay": "When autoplay or Next reaches a video your rules block, continue to the next allowed video",
   "controls.title.quietBlocking": "Quiet blocking",
   "controls.description.quietBlocking": "Blocked videos show a plain “not available” screen instead of the FilterTube notice",
   "controls.title.contentOnlyPlayback": "Content-only playback (Experimental)",

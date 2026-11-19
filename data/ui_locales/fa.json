@@ -2749,7 +2749,7 @@
   "dashboard.preferences.error.changed": "نمایه، تأیید والد یا پیوندهای همگام‌سازی خودکار تنظیمات تغییر کرده یا قابل بررسی نبود. بازبینی کنید و دوباره تلاش کنید.",
   "dashboard.sync.peerHero": "همگام‌سازی مستقیم بین دستگاه‌های تأییدشدهٔ شما. انتخاب کنید چه چیزی هم‌رسانی شود و پروفایل‌های خانواده را مدیریت کنید.",
   "controls.title.skipBlockedAutoplay": "رد کردن ویدیوهای مسدودشده در پخش خودکار",
-  "controls.description.skipBlockedAutoplay": "وقتی پخش خودکار به ویدیویی برسد که قواعد شما آن را مسدود می‌کند، به ویدیوی مجاز بعدی می‌رود (تا ۳ تلاش)",
+  "controls.description.skipBlockedAutoplay": "وقتی پخش خودکار به ویدیویی برسد که قواعد شما آن را مسدود می‌کند، به ویدیوی مجاز بعدی می‌رود",
   "controls.title.quietBlocking": "مسدودسازی بی‌صدا",
   "controls.description.quietBlocking": "ویدیوهای مسدودشده به‌جای اعلان FilterTube یک صفحهٔ سادهٔ «در دسترس نیست» نشان می‌دهند",
   "controls.title.contentOnlyPlayback": "پخش فقط محتوا (آزمایشی)",

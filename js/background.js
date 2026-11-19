@@ -4928,6 +4928,9 @@ browserAPI.runtime.onInstalled.addListener(function (details) {
             hideAllShorts: false,
             hideSponsoredCards: true,
             contentOnlyPlayback: true,
+            // #82: autoplay and Next move past a blocked video (playlists and Mixes always do).
+            // New installs only; an existing choice is never changed.
+            skipBlockedAutoplay: true,
             showQuickBlockButton: true,
             showBlockMenuItem: true,
             [SHOW_UPDATE_REFRESH_PROMPT_KEY]: true,

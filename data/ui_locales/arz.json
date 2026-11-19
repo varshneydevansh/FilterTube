@@ -2749,7 +2749,7 @@
   "dashboard.preferences.error.changed": "البروفايل أو موافقة الأهل أو روابط المزامنة التلقائية للإعدادات اتغيّرت أو ماقدرناش نتأكد منها. راجع وحاول تاني.",
   "dashboard.sync.peerHero": "مزامنة مباشرة بين أجهزتك الموثّقة. اختار اللي تشاركه وادير ملفات العيلة.",
   "controls.title.skipBlockedAutoplay": "تخطّي فيديوهات التشغيل التلقائي المحظورة",
-  "controls.description.skipBlockedAutoplay": "لما التشغيل التلقائي يوصل لفيديو قواعدك بتحظره، يكمّل على الفيديو المسموح اللي بعده (لحد 3 محاولات)",
+  "controls.description.skipBlockedAutoplay": "لما التشغيل التلقائي يوصل لفيديو قواعدك بتحظره، يكمّل على الفيديو المسموح اللي بعده",
   "controls.title.quietBlocking": "حظر بهدوء",
   "controls.description.quietBlocking": "الفيديوهات المحظورة هتظهر شاشة بسيطة «مش متاح» بدل إشعار FilterTube",
   "controls.title.contentOnlyPlayback": "تشغيل المحتوى بس (تجريبي)",

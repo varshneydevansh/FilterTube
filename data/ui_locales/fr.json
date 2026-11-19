@@ -2749,7 +2749,7 @@
   "dashboard.preferences.error.changed": "Le profil, l’approbation parentale ou les liens de synchronisation automatique des paramètres ont changé, ou n’ont pas pu être vérifiés. Vérifiez et réessayez.",
   "dashboard.sync.peerHero": "Synchronisation directe entre vos appareils vérifiés. Choisissez ce que vous partagez et gérez les profils de la famille.",
   "controls.title.skipBlockedAutoplay": "Passer les vidéos bloquées en lecture automatique",
-  "controls.description.skipBlockedAutoplay": "Quand la lecture automatique arrive sur une vidéo bloquée par vos règles, passer à la vidéo autorisée suivante (jusqu’à 3 essais)",
+  "controls.description.skipBlockedAutoplay": "Quand la lecture automatique arrive sur une vidéo bloquée par vos règles, passer à la vidéo autorisée suivante",
   "controls.title.quietBlocking": "Blocage discret",
   "controls.description.quietBlocking": "Les vidéos bloquées affichent un simple écran « indisponible » au lieu de l’avis FilterTube",
   "controls.title.contentOnlyPlayback": "Lecture du contenu uniquement (expérimental)",

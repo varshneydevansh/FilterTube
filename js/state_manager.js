@@ -94,7 +94,7 @@ const StateManager = (() => {
         hideEndscreenVideowall: false,
         hideEndscreenCards: false,
         disableAutoplay: false,
-        skipBlockedAutoplay: false,
+        skipBlockedAutoplay: true,
         quietBlocking: false,
         alwaysUseOriginalAudio: false,
         disableAnnotations: false,

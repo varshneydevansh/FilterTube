@@ -2749,7 +2749,7 @@
   "dashboard.preferences.error.changed": "પ્રોફાઇલ, માતાપિતાની મંજૂરી અથવા સેટિંગ્સ ઑટો-સમન્વય લિંક બદલાઈ, અથવા તપાસી શકાઈ નહીં. તપાસીને ફરી પ્રયાસ કરો.",
   "dashboard.sync.peerHero": "તમારા ચકાસેલા ડિવાઇસ વચ્ચે સીધું સિંક. શું શેર કરવું તે પસંદ કરો અને પરિવારની પ્રોફાઇલ સંભાળો.",
   "controls.title.skipBlockedAutoplay": "અવરોધિત ઑટોપ્લે વીડિયો છોડી દો",
-  "controls.description.skipBlockedAutoplay": "ઑટોપ્લે તમારા નિયમોથી અવરોધિત વીડિયો પર પહોંચે ત્યારે આગળના મંજૂર વીડિયો પર જાઓ (3 પ્રયાસ સુધી)",
+  "controls.description.skipBlockedAutoplay": "ઑટોપ્લે તમારા નિયમોથી અવરોધિત વીડિયો પર પહોંચે ત્યારે આગળના મંજૂર વીડિયો પર જાઓ",
   "controls.title.quietBlocking": "શાંત અવરોધ",
   "controls.description.quietBlocking": "અવરોધિત વીડિયો પર FilterTube સૂચનાને બદલે સાદી “ઉપલબ્ધ નથી” સ્ક્રીન દેખાશે",
   "controls.title.contentOnlyPlayback": "ફક્ત-સામગ્રી પ્લેબૅક (પ્રયોગાત્મક)",

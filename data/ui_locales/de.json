@@ -2749,7 +2749,7 @@
   "dashboard.preferences.error.changed": "Das Profil, die Elterngenehmigung oder die Verknüpfungen der automatischen Einstellungssynchronisierung haben sich geändert oder konnten nicht geprüft werden. Prüfe es und versuche es erneut.",
   "dashboard.sync.peerHero": "Direkte Synchronisierung zwischen deinen verifizierten Geräten. Wähle, was du teilst, und verwalte Familienprofile.",
   "controls.title.skipBlockedAutoplay": "Blockierte Autoplay-Videos überspringen",
-  "controls.description.skipBlockedAutoplay": "Wenn Autoplay ein Video erreicht, das deine Regeln blockieren, mit dem nächsten erlaubten Video fortfahren (bis zu 3 Versuche)",
+  "controls.description.skipBlockedAutoplay": "Wenn Autoplay ein Video erreicht, das deine Regeln blockieren, mit dem nächsten erlaubten Video fortfahren",
   "controls.title.quietBlocking": "Stilles Blockieren",
   "controls.description.quietBlocking": "Blockierte Videos zeigen statt des FilterTube-Hinweises einen schlichten „Nicht verfügbar“-Bildschirm",
   "controls.title.contentOnlyPlayback": "Nur Inhalte wiedergeben (experimentell)",

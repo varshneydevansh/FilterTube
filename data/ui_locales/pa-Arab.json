@@ -2749,7 +2749,7 @@
   "dashboard.preferences.error.changed": "پروفائل، والدین دی منظوری یا سیٹنگاں آٹو سنک لنک بدل گئے، یا جانچے نہیں جا سکے۔ جائزہ لو تے مُڑ کوشش کرو۔",
   "dashboard.sync.peerHero": "تہاڈے تصدیق شدہ ڈیوائساں وچکار سِدھا سنک۔ چنو کہ کیہ شیئر کرنا اے تے ٹبر دے پروفائل سنبھالو۔",
   "controls.title.skipBlockedAutoplay": "آپے چلن وچ روکیاں ویڈیوز چھڈ دیو",
-  "controls.description.skipBlockedAutoplay": "جدوں آپے چلن والی واری اوس ویڈیو تے اپڑے جہنوں تہاڈے اصول روکدے نیں تاں اگلی اجازت والی ویڈیو تے چلا جاوے (ودھ توں ودھ 3 کوششاں)",
+  "controls.description.skipBlockedAutoplay": "جدوں آپے چلن والی واری اوس ویڈیو تے اپڑے جہنوں تہاڈے اصول روکدے نیں تاں اگلی اجازت والی ویڈیو تے چلا جاوے",
   "controls.title.quietBlocking": "چپ چاپ روکنا",
   "controls.description.quietBlocking": "روکیاں ویڈیوز تے FilterTube دے نوٹس دی تھاں سادی ”دستیاب نہیں“ سکرین وکھائی دیوے گی",
   "controls.title.contentOnlyPlayback": "صرف مواد دا پلے بیک (آزمائشی)",

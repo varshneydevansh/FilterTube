@@ -219,7 +219,7 @@
                 {
                     key: 'skipBlockedAutoplay',
                     title: 'Skip blocked autoplay videos',
-                    description: 'When autoplay reaches a video your rules block, continue to the next allowed video (up to 3 tries)'
+                    description: 'When autoplay or Next reaches a video your rules block, continue to the next allowed video'
                 },
                 {
                     key: 'quietBlocking',

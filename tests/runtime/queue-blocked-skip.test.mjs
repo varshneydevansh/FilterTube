@@ -195,6 +195,9 @@ function makeController({ api = Q, playlist = ids(8), blocked = [], list = 'RDmi
     rowBlockedByPage: row => blocked.includes(row.videoId),
     hideRow: row => h.hidden.add(row.videoId),
     restoreRow: row => h.hidden.delete(row.videoId),
+    autoplayOn: () => true,
+    isEnded: () => h.media?.ended === true,
+    skipOutsideLists: () => false,
     isStillBlocked: videoId => h.admission.decision === 'blocked' && h.admission.videoId === videoId,
     media: () => h.media,
     isQuiet: () => quiet,
@@ -379,15 +382,13 @@ test('known-blocked rows hide in place and come back when the rules change', () 
 
 // --- Wiring -----------------------------------------------------------------------------------
 
-test('dom_fallback routes every blocked Watch through the queue model before the #82 autoplay skip', () => {
-  const glue = dom.slice(dom.indexOf('function handleCurrentWatchBlocked('), dom.indexOf('function enforceCurrentWatchOwnerBlock('));
-  assert.match(glue, /onBlocked\(videoId, settings, message\)\) return;[\s\S]*scheduleBlockedAutoplaySkip\(videoId, settings\)/);
+test('dom_fallback routes every blocked Watch through the one queue model', () => {
+  const glue = dom.slice(dom.indexOf('function handleCurrentWatchBlocked('), dom.indexOf('function isBlockedAutoplaySkipAllowed('));
+  assert.match(glue, /getQueueBlockedSkipController\(\)\?\.onBlocked\(videoId, settings, message\)/);
   const admission = dom.slice(dom.indexOf('function enforceCurrentWatchOwnerBlock('), dom.indexOf('const FILTERTUBE_CATEGORY_PENDING_TTL_MS'));
   assert.equal((admission.match(/handleCurrentWatchBlocked\(/g) || []).length, 4);
-  assert.doesNotMatch(admission, /scheduleBlockedAutoplaySkip\(/);
+  assert.doesNotMatch(dom, /scheduleBlockedAutoplaySkip|installBlockedAutoplaySkipSignals/);
   assert.doesNotMatch(admission, /\.click\(/);
-  // #82 still ignores playlists by itself.
-  assert.match(dom, /params\.has\('list'\)\) return false;/);
   assert.match(overlay, /'Nothing left in this queue that your filters allow': 'admission\.queueEndAllBlocked'/);
   for (const file of ['manifest.json', 'manifest.chrome.json', 'manifest.firefox.json', 'manifest.opera.json']) {
     const text = fs.readFileSync(new URL(`../../${file}`, import.meta.url), 'utf8');
@@ -409,4 +410,16 @@ test('the toast and end-of-queue line are translated in every ui_locale', () => 
   const en = JSON.parse(fs.readFileSync(new URL('en.json', dir), 'utf8'));
   assert.equal(en['admission.queueSkipped'], Q.SKIPPED_TEXT);
   assert.equal(en['admission.queueEndAllBlocked'], Q.END_LINE);
+});
+
+test('a stalled playlist advance goes on to the next allowed row', () => {
+  const playlist = ids(5);
+  const h = makeController({ playlist, blocked: [playlist[1]] });
+  h.navigate(1);
+  h.allow();
+  h.media = { ended: true, duration: 100, currentTime: 100 };
+  h.emit('ended', { target: { tagName: 'VIDEO' } });
+  h.now += 9500;
+  h.flush();
+  assert.deepEqual(h.clicks, [playlist[2]]);
 });

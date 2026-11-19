@@ -2749,7 +2749,7 @@
   "dashboard.preferences.error.changed": "个人资料、家长批准或者设置自动同步链接有变化，或者检查勿了。请查看以后再试。",
   "dashboard.sync.peerHero": "在侬验证过个设备之间做点对点同步。拣要分享点啥，再管理家庭档案。",
   "controls.title.skipBlockedAutoplay": "跳过拨屏蔽个自动播放视频",
-  "controls.description.skipBlockedAutoplay": "自动播放碰着拨侬个规则屏蔽个视频个辰光，继续放下一个允许个视频（最多试 3 趟）",
+  "controls.description.skipBlockedAutoplay": "自动播放碰着拨侬个规则屏蔽个视频个辰光，继续放下一个允许个视频",
   "controls.title.quietBlocking": "静悄悄屏蔽",
   "controls.description.quietBlocking": "拨屏蔽个视频只显示简单个“看勿了”画面，勿显示 FilterTube 提示",
   "controls.title.contentOnlyPlayback": "只放内容（试验中）",

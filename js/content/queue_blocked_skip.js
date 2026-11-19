@@ -1,7 +1,9 @@
 /*
- * What to do when the current Watch video in a site playlist or Mix turns out blocked only once
- * its Watch page loads (a description keyword, or other late metadata such as category or
- * language). Port of the Android NativeMainQueueBlockedSkip model (fde90885d).
+ * What to do when the current Watch video turns out blocked, often only once its Watch page loads
+ * (a description keyword, or other late metadata such as category or language). Port of the
+ * Android NativeMainQueueBlockedSkip model (fde90885d). Inside a site playlist or Mix the rows
+ * are the queue and skipping is always on. Outside a list, with "Skip blocked autoplay videos"
+ * (#82), the Up next / related videos are the queue, forward only.
  *
  * Model:
  *  - Every watch-to-watch navigation records how it was entered. The player's Next / Previous,
@@ -39,6 +41,10 @@
     const AUTOPLAY_WINDOW_MS = 20000;
     const SKIP_WINDOW_MS = 8000;
     const SKIP_DELAY_MS = 250;
+    const SKIP_RETRY_MS = 400;
+    // The site's own end-of-video countdown is shorter; only a stalled autoplay waits this long.
+    const AUTOPLAY_STALL_MS = 9000;
+    const SKIP_RETRIES = 8;
     const TOAST_MS = 3200;
     const VERDICT_LIMIT = 300;
     const SKIPPED_TEXT = 'Skipped a video your filters hide';
@@ -207,7 +213,8 @@
      *   isEnabled(settings), latestSettings(), signature(settings),
      *   rows(), rowVideoId(row), rowLink(row), rowIsSelected(row), rowBlockedByPage(row, settings),
      *   hideRow(row, reason), restoreRow(row),
-     *   isStillBlocked(videoId), media(), isQuiet(settings), text(key, fallback), loadLocale(),
+     *   skipOutsideLists(settings), relatedCandidates(videoId) -> [{ videoId, link, precheckBlocked }],
+ *   autoplayOn(), isEnded(), isStillBlocked(videoId), media(), isQuiet(settings), text(key, fallback), loadLocale(),
      *   refreshBlockedCard(videoId)
      * }
      */
@@ -222,6 +229,8 @@
             ended: null,
             popstateAt: 0,
             pendingSkip: null,
+            // Videos this tab just played: autoplay outside a list never goes back to one of them.
+            recent: [],
             timer: 0,
             generation: 0
         };
@@ -255,6 +264,8 @@
                 if (media && (media.ended || (duration > 0 && Number(media.currentTime) >= duration - 2))) recordEnded();
             } catch (e) {}
             cancelPendingSkip();
+            const leaving = host.currentVideoId();
+            if (leaving) state.recent = [leaving, ...state.recent.filter(id => id !== leaving)].slice(0, 50);
             state.selection = classifyNavigation({
                 at: now(),
                 fromVideoId: host.currentVideoId(),
@@ -266,6 +277,11 @@
                 pendingSkip: state.pendingSkip
             });
             state.pendingSkip = null;
+            state.lastNavigateAt = now();
+            if (state.stallTimer) {
+                try { host.clearTimeout(state.stallTimer); } catch (e) {}
+                state.stallTimer = 0;
+            }
             state.handledVideoId = null;
             state.endVideoId = null;
         }
@@ -278,7 +294,9 @@
                 doc.addEventListener('pointerdown', onInput, true);
                 doc.addEventListener('keydown', onInput, true);
                 doc.addEventListener('ended', event => {
-                    if (String(event?.target?.tagName || '').toLowerCase() === 'video') recordEnded();
+                    if (String(event?.target?.tagName || '').toLowerCase() !== 'video') return;
+                    recordEnded();
+                    scheduleStalledAutoplayCheck();
                 }, true);
                 doc.addEventListener('yt-navigate-start', onNavigateStart, true);
                 (host.window || doc.defaultView)?.addEventListener?.('popstate', () => { state.popstateAt = now(); }, true);
@@ -299,7 +317,16 @@
             if (selectedIndex < 0) selectedIndex = rows.findIndex(row => host.rowVideoId(row) === videoId && host.rowIsSelected(row));
             if (selectedIndex < 0) selectedIndex = rows.findIndex(row => host.rowVideoId(row) === videoId);
             const signature = host.signature(settings);
-            return candidatesInDirection(rows, selectedIndex, backward)
+            let ordered = candidatesInDirection(rows, selectedIndex, backward);
+            // The site may drop the current video's own row (a filtered row leaves the panel): place
+            // it by its playlist index instead, from the rows' own index= numbers.
+            if (selectedIndex < 0 && landing.index > 0) {
+                const rowIndex = row => parseWatchHref(host.rowLink(row)?.getAttribute?.('href')).index;
+                ordered = rows
+                    .filter(row => (backward ? rowIndex(row) > 0 && rowIndex(row) < landing.index : rowIndex(row) > landing.index))
+                    .sort((a, b) => (backward ? rowIndex(b) - rowIndex(a) : rowIndex(a) - rowIndex(b)));
+            }
+            return ordered
                 .map((row, index) => ({ row, index, rowVideoId: host.rowVideoId(row), link: host.rowLink(row) }))
                 .filter(item => item.rowVideoId && item.link)
                 .map(item => ({
@@ -345,8 +372,15 @@
             } catch (e) { render(); }
         }
 
-        function performSkip(videoId, step, settings) {
-            cancelPendingSkip();
+        /**
+         * Fire the decided skip after a short delay. The page may re-render the panel or the related
+         * list in between (a blocked row can leave the panel; a new Watch page brings new related
+         * videos), so the target is chosen again from the live candidates when it fires; a link that
+         * left the page is never clicked (a detached link would load the page in full). With no
+         * candidate yet (still loading), it retries briefly.
+         */
+        function performSkip(videoId, step, settings, rebuild, attempt = 0) {
+            if (attempt === 0) cancelPendingSkip();
             const generation = state.generation;
             state.timer = host.setTimeout(() => {
                 state.timer = 0;
@@ -354,37 +388,104 @@
                 try {
                     const latest = host.latestSettings?.() || settings;
                     if (!host.isEnabled(latest)) return;
+                    if (!host.currentList() && !host.skipOutsideLists?.(latest)) return;
                     if (host.currentVideoId() !== videoId || !host.isStillBlocked(videoId)) return;
-                    state.pendingSkip = { next: step.next, targetVideoId: step.target.videoId, at: now() };
+                    let target = step.target;
+                    if (typeof rebuild === 'function') target = firstAllowed(rebuild()) || null;
+                    if (!target || !target.link || target.link.isConnected === false) {
+                        if (attempt < SKIP_RETRIES) performSkip(videoId, step, settings, rebuild, attempt + 1);
+                        return;
+                    }
+                    state.pendingSkip = { next: step.next, targetVideoId: target.videoId, at: now() };
                     showToast(latest);
-                    // The row's own link: the site's SPA navigation to /watch?v=…&list=…&index=….
-                    step.target.link.click();
+                    // The target's own link: the site's SPA navigation (a playlist row opens
+                    // /watch?v=…&list=…&index=…; a related video opens as the site links it).
+                    target.link.click();
                 } catch (e) {}
-            }, SKIP_DELAY_MS);
+            }, attempt === 0 ? SKIP_DELAY_MS : SKIP_RETRY_MS);
         }
 
         /**
-         * The current Watch video was blocked. Returns true when the current URL is a playlist or
-         * Mix (this module owns what happens next), false otherwise (the caller keeps its own path).
+         * Autoplay that never starts. The site can end a video on its "Up next" card and stay there
+         * (#82: in Allow only selected the next pick may be one FilterTube refused, and the countdown
+         * never runs). With the site's own autoplay switched on, if nothing has moved
+         * AUTOPLAY_STALL_MS after the end and the user has not acted, go on to the first allowed
+         * video: the next allowed playlist row, or the first allowed Up next / related video.
+         */
+        function scheduleStalledAutoplayCheck() {
+            const ended = state.ended;
+            if (!ended || !host.autoplayOn) return;
+            if (state.stallTimer) {
+                try { host.clearTimeout(state.stallTimer); } catch (e) {}
+            }
+            state.stallTimer = host.setTimeout(() => {
+                state.stallTimer = 0;
+                try {
+                    const videoId = ended.videoId;
+                    const latest = host.latestSettings?.();
+                    const inList = Boolean(host.currentList());
+                    if (!host.isEnabled(latest) || latest?.disableAutoplay === true) return;
+                    if (!inList && !host.skipOutsideLists?.(latest)) return;
+                    if (host.currentVideoId() !== videoId || !host.autoplayOn()) return;
+                    if (host.isEnded && !host.isEnded()) return;
+                    if ((state.lastNavigateAt || 0) > ended.at || (state.input?.at || 0) > ended.at) return;
+                    const candidates = inList ? buildCandidates(videoId, false, latest) : buildRelatedCandidates(videoId);
+                    const target = firstAllowed(candidates);
+                    if (!target || !target.link || target.link.isConnected === false) return;
+                    state.pendingSkip = { next: selection(Entry.AUTOPLAY, videoId, null, 0), targetVideoId: target.videoId, at: now() };
+                    target.link.click();
+                } catch (e) {}
+            }, AUTOPLAY_STALL_MS);
+        }
+
+        /** Up next / related videos, forward only, for a blocked video outside any list. */
+        function buildRelatedCandidates(videoId) {
+            const signature = host.signature(host.latestSettings?.());
+            return (host.relatedCandidates?.(videoId) || [])
+                .filter(item => item && item.videoId && item.link && item.videoId !== videoId && !state.recent.includes(item.videoId))
+                .map((item, index) => ({
+                    key: `related:${index}`,
+                    videoId: item.videoId,
+                    link: item.link,
+                    precheckBlocked: Boolean(item.precheckBlocked) || Boolean(cache.lookup(item.videoId, signature))
+                }));
+        }
+
+        /**
+         * The current Watch video was blocked. Inside a playlist or Mix this is always on; elsewhere
+         * only while host.skipOutsideLists(settings) ("Skip blocked autoplay videos"). Returns
+         * true when this module decided what happens next.
          */
         function onBlocked(videoId, settings, reason) {
             if (!videoId) return false;
             const signature = host.signature(settings);
             if (signature) cache.remember(videoId, signature, reason);
-            if (!host.currentList()) return false;
-            if (!host.isEnabled(settings)) return true;
+            const inList = Boolean(host.currentList());
+            if (!host.isEnabled(settings)) return inList;
+            if (!inList && !host.skipOutsideLists?.(settings)) return false;
             const landing = { index: host.currentIndex(), list: host.currentList() };
             state.selection = boundTo(state.selection, videoId, landing);
             if (state.handledVideoId === videoId) return true;
             const sel = state.selection;
-            const applies = appliesTo(sel, videoId) && isQueueDriven(sel.entry);
-            const candidates = applies ? buildCandidates(videoId, isBackward(sel.entry), settings) : [];
-            const result = decide({ selection: sel, selectedVideoId: videoId, blocked: true, candidates, handledVideoId: state.handledVideoId });
+            // Outside a list there is no way back: Previous is the browser's history, so the card stays.
+            const applies = appliesTo(sel, videoId) && isQueueDriven(sel.entry) && (inList || !isBackward(sel.entry));
+            const candidates = !applies ? []
+                : (inList ? buildCandidates(videoId, isBackward(sel.entry), settings) : buildRelatedCandidates(videoId));
+            const result = decide({
+                selection: applies ? sel : null,
+                selectedVideoId: videoId,
+                blocked: true,
+                candidates,
+                handledVideoId: state.handledVideoId
+            });
             state.handledVideoId = result.handledVideoId;
             const step = result.step;
             if (step.kind === 'skip') {
-                performSkip(videoId, step, settings);
-            } else if (step.kind === 'endOfQueue') {
+                const backward = isBackward(sel.entry);
+                performSkip(videoId, step, settings, () => (host.currentList()
+                    ? buildCandidates(videoId, backward, host.latestSettings?.() || settings)
+                    : buildRelatedCandidates(videoId)));
+            } else if (step.kind === 'endOfQueue' && inList) {
                 state.endVideoId = videoId;
                 try { host.refreshBlockedCard?.(videoId); } catch (e) {}
             }
@@ -434,8 +535,14 @@
 
         return Object.freeze({
             install,
-            // A settings delivery or Disable: a skip that has not fired yet no longer applies.
-            cancel: cancelPendingSkip,
+            // A settings delivery or Disable. Deliveries are frequent (metadata learned, focus), so a
+            // pending skip is revoked only when the live settings no longer allow it; the skip also
+            // re-checks them when it fires.
+            cancel: () => {
+                if (!state.timer) return;
+                const latest = host.latestSettings?.();
+                if (!host.isEnabled(latest) || (!host.currentList() && !host.skipOutsideLists?.(latest))) cancelPendingSkip();
+            },
             onBlocked,
             onAllowed,
             cachedVerdict,

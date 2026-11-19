@@ -2749,7 +2749,7 @@
   "dashboard.preferences.error.changed": "تغيّر الملف الشخصي أو موافقة الوالد أو روابط المزامنة التلقائية للإعدادات، أو تعذّر التحقق منها. راجع وحاول مجددًا.",
   "dashboard.sync.peerHero": "مزامنة مباشرة بين أجهزتك الموثّقة. اختر ما تشاركه وأدِر ملفات العائلة الشخصية.",
   "controls.title.skipBlockedAutoplay": "تخطي فيديوهات التشغيل التلقائي المحظورة",
-  "controls.description.skipBlockedAutoplay": "عندما يصل التشغيل التلقائي إلى فيديو تحظره قواعدك، ينتقل إلى الفيديو المسموح التالي (حتى 3 محاولات)",
+  "controls.description.skipBlockedAutoplay": "عندما يصل التشغيل التلقائي إلى فيديو تحظره قواعدك، ينتقل إلى الفيديو المسموح التالي",
   "controls.title.quietBlocking": "حظر هادئ",
   "controls.description.quietBlocking": "تعرض الفيديوهات المحظورة شاشة بسيطة «غير متاح» بدلًا من إشعار FilterTube",
   "controls.title.contentOnlyPlayback": "تشغيل المحتوى فقط (تجريبي)",

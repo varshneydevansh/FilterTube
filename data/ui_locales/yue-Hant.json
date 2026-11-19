@@ -2749,7 +2749,7 @@
   "dashboard.preferences.error.changed": "個人檔案、家長批准或者設定自動同步連結已改變，或者檢查唔到。請檢視後再試。",
   "dashboard.sync.peerHero": "喺你已驗證嘅裝置之間做點對點同步。揀要分享啲乜，同埋管理家庭設定檔。",
   "controls.title.skipBlockedAutoplay": "跳過被封鎖嘅自動播放影片",
-  "controls.description.skipBlockedAutoplay": "自動播放去到被你嘅規則封鎖嘅影片時，繼續播下一條允許嘅影片（最多試 3 次）",
+  "controls.description.skipBlockedAutoplay": "自動播放去到被你嘅規則封鎖嘅影片時，繼續播下一條允許嘅影片",
   "controls.title.quietBlocking": "靜靜封鎖",
   "controls.description.quietBlocking": "被封鎖嘅影片會顯示簡單嘅「無法觀看」畫面，唔會顯示 FilterTube 通知",
   "controls.title.contentOnlyPlayback": "只播內容（實驗性）",

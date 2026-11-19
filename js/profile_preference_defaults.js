@@ -17,7 +17,7 @@
         ['hideVideoChannelRow', false, 'Hide channel row'], ['hideVideoDescription', false, 'Hide video description'],
         ['hideMerchTicketsOffers', false, 'Hide merchandise and ticket offers'], ['hideEndscreenVideowall', false, 'Hide end-screen video wall'],
         ['hideEndscreenCards', false, 'Hide end-screen cards'], ['disableAutoplay', false, 'Disable autoplay'],
-        ['skipBlockedAutoplay', false, 'Skip blocked autoplay videos'],
+        ['skipBlockedAutoplay', true, 'Skip blocked autoplay videos'],
         ['alwaysUseOriginalAudio', false, 'Always use original audio'], ['disableAnnotations', false, 'Disable annotations'],
         ['hideTopHeader', false, 'Hide top header'], ['hideNotificationBell', false, 'Hide notification bell'],
         ['hideExploreTrending', false, 'Hide Explore and Popular'], ['hideMoreFromYouTube', false, 'Hide More from the video service'],

@@ -2749,7 +2749,7 @@
   "dashboard.preferences.error.changed": "Profil, ebeveyn onayı veya Ayarlar otomatik eşitleme bağlantıları değişti ya da denetlenemedi. İnceleyip tekrar deneyin.",
   "dashboard.sync.peerHero": "Doğrulanmış cihazlarınız arasında doğrudan eşitleme. Neyi paylaşacağınızı seçin ve aile profillerini yönetin.",
   "controls.title.skipBlockedAutoplay": "Engellenen otomatik oynatma videolarını atla",
-  "controls.description.skipBlockedAutoplay": "Otomatik oynatma kurallarınızın engellediği bir videoya geldiğinde, izin verilen sonraki videoya geç (en fazla 3 deneme)",
+  "controls.description.skipBlockedAutoplay": "Otomatik oynatma kurallarınızın engellediği bir videoya geldiğinde, izin verilen sonraki videoya geç",
   "controls.title.quietBlocking": "Sessiz engelleme",
   "controls.description.quietBlocking": "Engellenen videolarda FilterTube bildirimi yerine sade bir “kullanılamıyor” ekranı gösterilir",
   "controls.title.contentOnlyPlayback": "Yalnızca içerik oynatma (Deneysel)",

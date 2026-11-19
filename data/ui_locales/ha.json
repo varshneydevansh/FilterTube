@@ -2749,7 +2749,7 @@
   "dashboard.preferences.error.changed": "Bayanin martaba, amincewar iyaye ko mahaɗan Auto-sync na Saituna sun canza, ko ba a iya dubawa. Duba ka sake gwadawa.",
   "dashboard.sync.peerHero": "Daidaitawa kai tsaye tsakanin na'urorinka da aka tabbatar. Zaɓi abin da za a raba kuma ka sarrafa bayanan martabar iyali.",
   "controls.title.skipBlockedAutoplay": "Tsallake bidiyoyin kunnawa kai tsaye da aka toshe",
-  "controls.description.skipBlockedAutoplay": "Idan kunnawa kai tsaye ta kai ga bidiyon da dokokinka suka toshe, ci gaba zuwa bidiyo na gaba da aka yarda da shi (har sau 3)",
+  "controls.description.skipBlockedAutoplay": "Idan kunnawa kai tsaye ta kai ga bidiyon da dokokinka suka toshe, ci gaba zuwa bidiyo na gaba da aka yarda da shi",
   "controls.title.quietBlocking": "Toshewa a natse",
   "controls.description.quietBlocking": "Bidiyoyin da aka toshe za su nuna allo mai sauƙi na “babu shi” maimakon sanarwar FilterTube",
   "controls.title.contentOnlyPlayback": "Kunna abun ciki kaɗai (na gwaji)",

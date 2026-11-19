@@ -2749,7 +2749,7 @@
   "dashboard.preferences.error.changed": "Hồ sơ, phê duyệt của phụ huynh hoặc liên kết Tự động đồng bộ cài đặt đã thay đổi, hoặc không thể kiểm tra. Hãy xem lại và thử lại.",
   "dashboard.sync.peerHero": "Đồng bộ ngang hàng giữa các thiết bị đã xác minh của bạn. Chọn nội dung cần chia sẻ và quản lý hồ sơ gia đình.",
   "controls.title.skipBlockedAutoplay": "Bỏ qua video tự động phát bị chặn",
-  "controls.description.skipBlockedAutoplay": "Khi tự động phát gặp video bị quy tắc của bạn chặn, chuyển sang video được phép tiếp theo (tối đa 3 lần thử)",
+  "controls.description.skipBlockedAutoplay": "Khi tự động phát gặp video bị quy tắc của bạn chặn, chuyển sang video được phép tiếp theo",
   "controls.title.quietBlocking": "Chặn âm thầm",
   "controls.description.quietBlocking": "Video bị chặn hiển thị màn hình “không có sẵn” đơn giản thay vì thông báo của FilterTube",
   "controls.title.contentOnlyPlayback": "Chỉ phát nội dung (Thử nghiệm)",

@@ -2481,6 +2481,20 @@ function getQueueBlockedSkipController() {
             if (FILTERTUBE_QUEUE_ROW_HIDE_MARKERS.some(marker => row.hasAttribute?.(marker))) return;
             toggleVisibility(row, false, '', true);
         },
+        skipOutsideLists: settings => isBlockedAutoplaySkipAllowed(settings),
+        // The site's own autoplay switch (desktop player, then the mobile site's).
+        autoplayOn: () => {
+            const toggle = document.querySelector('.ytp-autonav-toggle-button, ytm-autonav-toggle-button-container [aria-pressed], .ytm-autonav-toggle-button-container [aria-pressed]');
+            const value = toggle?.getAttribute?.('aria-checked') ?? toggle?.getAttribute?.('aria-pressed');
+            return value === 'true';
+        },
+        isEnded: () => {
+            const media = document.querySelector('video.html5-main-video');
+            const player = document.querySelector('#movie_player, .html5-video-player');
+            if (player?.classList?.contains('ad-showing')) return false;
+            return Boolean(media?.ended || player?.classList?.contains('ended-mode'));
+        },
+        relatedCandidates: videoId => getBlockedAutoplayRelatedCandidates(videoId),
         isStillBlocked: videoId => {
             const admission = getDirectAccessState();
             return admission.decision === 'blocked' && admission.videoId === videoId;
@@ -2507,15 +2521,55 @@ function getQueueBlockedSkipEndLine() {
     }
 }
 
-// Every blocked regular Watch video passes here after its pause and card. Inside a playlist or
-// Mix the queue model owns what happens next (always on there); elsewhere the opt-in
-// "Skip blocked autoplay videos" (#82) keeps its own rules.
+// Every blocked regular Watch video passes here after its pause and card; the queue model decides
+// whether autoplay / Next moves on (queue_blocked_skip.js).
 function handleCurrentWatchBlocked(videoId, settings, message) {
     try {
-        if (getQueueBlockedSkipController()?.onBlocked(videoId, settings, message)) return;
+        getQueueBlockedSkipController()?.onBlocked(videoId, settings, message);
     } catch (e) {
     }
-    if (typeof scheduleBlockedAutoplaySkip === 'function') scheduleBlockedAutoplaySkip(videoId, settings);
+}
+
+// Outside a playlist or Mix, "Skip blocked autoplay videos" (#82, on by default for new installs)
+// lets autoplay and Next move past a blocked video; Disable autoplay keeps the site from moving.
+function isBlockedAutoplaySkipAllowed(settings) {
+    return Boolean(
+        isFilterTubeFilteringEnabled(settings) &&
+        settings.skipBlockedAutoplay === true &&
+        settings.disableAutoplay !== true
+    );
+}
+
+const FILTERTUBE_AUTOPLAY_SKIP_CARD_SELECTOR = [
+    'ytd-watch-next-secondary-results-renderer yt-lockup-view-model',
+    'ytd-watch-next-secondary-results-renderer ytd-compact-video-renderer',
+    'ytm-single-column-watch-next-results-renderer ytm-video-with-context-renderer'
+].join(', ');
+
+// The Up next / related cards in page order, as skip candidates. A card FilterTube hides (or is still
+// checking in Allow only selected) is blocked; other playlists and Clips are not single videos.
+function getBlockedAutoplayRelatedCandidates(currentVideoId) {
+    const candidates = [];
+    const seen = new Set();
+    try {
+        for (const card of document.querySelectorAll(FILTERTUBE_AUTOPLAY_SKIP_CARD_SELECTOR)) {
+            const link = card.querySelector('a[href*="/watch?v="]');
+            const href = String(link?.getAttribute?.('href') || '');
+            if (!href || href.includes('/shorts/')) continue;
+            const match = href.match(/[?&]v=([a-zA-Z0-9_-]{11})/);
+            const videoId = match ? match[1] : '';
+            if (!videoId || videoId === currentVideoId || seen.has(videoId)) continue;
+            // Related cards now open as that video's own radio (list=RD<id>&start_radio=1); that
+            // still plays this video first. A link into another playlist is not a single video.
+            const list = (href.match(/[?&]list=([^&#]+)/) || [])[1] || '';
+            if (list && list !== `RD${videoId}`) continue;
+            seen.add(videoId);
+            const hidden = Boolean(card.closest?.('.filtertube-hidden, [data-filtertube-hidden], [data-filtertube-whitelist-pending="true"]'));
+            candidates.push({ videoId, link, precheckBlocked: hidden });
+        }
+    } catch (e) {
+    }
+    return candidates;
 }
 
 function enforceCurrentWatchOwnerBlock(settings) {
@@ -2532,10 +2586,7 @@ function enforceCurrentWatchOwnerBlock(settings) {
         }
         const directAccessState = getDirectAccessState();
         directAccessState.latestSettings = settings;
-        if (settings?.skipBlockedAutoplay === true && typeof installBlockedAutoplaySkipSignals === 'function') {
-            installBlockedAutoplaySkipSignals();
-        }
-        // Playlist navigation signals (Next, Previous, end of video) are recorded from the first pass on.
+        // Navigation signals (Next, Previous, end of video) are recorded from the first pass on.
         if (typeof getQueueBlockedSkipController === 'function') getQueueBlockedSkipController();
         if (directAccessState.routeTransitionPending) {
             clearCurrentVideoAdmissionPresentation();
@@ -2865,16 +2916,16 @@ function enforceCurrentWatchOwnerBlock(settings) {
         if (isEmbedRoute) return;
 
         // A rejection owns this video's admission; it never clicks anything here.
-        // handleCurrentWatchBlocked decides what happens next:
-        // - In a playlist or Mix (always on): a video the queue brought here
-        //   (Next, Previous, autoplay, media keys) moves once to the first
-        //   allowed row that way, never wrapping, at most 25 in a row; a video
-        //   the user opened directly keeps this card (queue_blocked_skip.js).
-        // - Elsewhere, only the opt-in skipBlockedAutoplay (#82): a regular
-        //   video reached by autoplay may continue to the next visible allowed
-        //   related video, at most 3 times in a row.
-        // Both skips are generation-guarded and re-check the live enabled state
-        // and video identity when they fire, so no delayed action survives
+        // handleCurrentWatchBlocked decides what happens next
+        // (queue_blocked_skip.js): a video the user opened directly keeps this
+        // card. One that autoplay or Next brought here moves once to the first
+        // allowed video that way, at most 25 in a row:
+        // - in a playlist or Mix (always on): the next allowed row (Previous
+        //   goes back), never wrapping;
+        // - elsewhere, with "Skip blocked autoplay videos" (#82): the first
+        //   allowed Up next / related video.
+        // Skips are generation-guarded and re-check the live enabled state and
+        // video identity when they fire, so no delayed action survives
         // Disable (#77).
         const shell = document.querySelector('ytm-watch, ytd-watch-flexy');
         if (shell) {
@@ -2919,178 +2970,13 @@ function getCurrentWatchVideoId() {
     }
 }
 
-// Issue #82: opt-in "Skip blocked autoplay videos" (skipBlockedAutoplay).
-// YouTube gives content scripts no stable autonav flag, so an arrival counts
-// as autoplay only when the main player ended (or was within 2 s of its end
-// at yt-navigate-start) on a different watch video less than 20 s earlier and
-// no trusted pointer/key input happened since. Direct URL loads never have
-// that signal; user clicks and Next presses are trusted input. Our own skips
-// continue the chain only for the exact video they navigated to.
-const FILTERTUBE_AUTOPLAY_SKIP_MAX = 3;
-const FILTERTUBE_AUTOPLAY_ARRIVAL_WINDOW_MS = 20000;
-const FILTERTUBE_AUTOPLAY_SKIP_DELAY_MS = 1200;
-const FILTERTUBE_AUTOPLAY_SKIP_CARD_SELECTOR = [
-    'ytd-watch-next-secondary-results-renderer yt-lockup-view-model',
-    'ytd-watch-next-secondary-results-renderer ytd-compact-video-renderer',
-    'ytm-single-column-watch-next-results-renderer ytm-video-with-context-renderer'
-].join(', ');
-
-function getBlockedAutoplaySkipState() {
-    return window.__filtertubeBlockedAutoplaySkipState || (window.__filtertubeBlockedAutoplaySkipState = {
-        generation: 0,
-        timer: 0,
-        signalsInstalled: false,
-        lastEndedVideoId: '',
-        lastEndedAt: 0,
-        lastUserInputAt: 0,
-        decidedKey: '',
-        chainTargetVideoId: '',
-        chainSkippedAt: 0,
-        chainCount: 0,
-        triedVideoIds: []
-    });
-}
-
-function isBlockedAutoplaySkipAllowed(settings) {
-    return Boolean(
-        isFilterTubeFilteringEnabled(settings) &&
-        settings.skipBlockedAutoplay === true &&
-        settings.disableAutoplay !== true
-    );
-}
-
-// Any settings delivery, Disable, or user input revokes a pending skip. A
-// later admission pass may decide again with the live settings; Disabled
-// passes never get that far, and user input also ends the autoplay signal.
+// A settings delivery or Disable revokes a skip that has not fired yet when the live settings no
+// longer allow it (queue_blocked_skip.js also re-checks them when a skip fires).
 function cancelBlockedAutoplaySkip() {
-    const state = getBlockedAutoplaySkipState();
-    state.generation++;
-    state.decidedKey = '';
-    if (state.timer) {
-        clearTimeout(state.timer);
-        state.timer = 0;
-    }
-}
-
-function recordBlockedAutoplayEnded(media) {
     try {
-        if (!media || String(media.tagName || '').toLowerCase() !== 'video') return;
-        const videoId = getCurrentWatchVideoId();
-        if (!videoId) return;
-        const state = getBlockedAutoplaySkipState();
-        state.lastEndedVideoId = videoId;
-        state.lastEndedAt = Date.now();
+        filterTubeQueueBlockedSkipController?.cancel();
     } catch (e) {
     }
-}
-
-function installBlockedAutoplaySkipSignals() {
-    const state = getBlockedAutoplaySkipState();
-    if (state.signalsInstalled) return;
-    state.signalsInstalled = true;
-    try {
-        document.addEventListener('ended', event => recordBlockedAutoplayEnded(event?.target), true);
-        document.addEventListener('yt-navigate-start', () => {
-            try {
-                const media = document.querySelector('video.html5-main-video');
-                const duration = Number(media?.duration);
-                if (media && (media.ended || (duration > 0 && Number(media.currentTime) >= duration - 2))) {
-                    recordBlockedAutoplayEnded(media);
-                }
-            } catch (e) {
-            }
-        }, true);
-        const onUserInput = event => {
-            if (event && event.isTrusted === false) return;
-            getBlockedAutoplaySkipState().lastUserInputAt = Date.now();
-            cancelBlockedAutoplaySkip();
-        };
-        document.addEventListener('pointerdown', onUserInput, true);
-        document.addEventListener('keydown', onUserInput, true);
-    } catch (e) {
-    }
-}
-
-function wasCurrentWatchReachedByAutoplay(videoId, now = Date.now()) {
-    const state = getBlockedAutoplaySkipState();
-    if (state.chainTargetVideoId === videoId && state.lastUserInputAt <= state.chainSkippedAt) return true;
-    return Boolean(
-        state.lastEndedAt &&
-        now - state.lastEndedAt <= FILTERTUBE_AUTOPLAY_ARRIVAL_WINDOW_MS &&
-        state.lastEndedVideoId &&
-        state.lastEndedVideoId !== videoId &&
-        state.lastUserInputAt <= state.lastEndedAt
-    );
-}
-
-function findBlockedAutoplaySkipTarget(currentVideoId, triedVideoIds) {
-    try {
-        for (const card of document.querySelectorAll(FILTERTUBE_AUTOPLAY_SKIP_CARD_SELECTOR)) {
-            if (card.closest?.('.filtertube-hidden, [data-filtertube-hidden], [data-filtertube-whitelist-pending="true"]')) continue;
-            if (typeof card.getClientRects === 'function' && card.getClientRects().length === 0) continue;
-            const link = card.querySelector('a[href*="/watch?v="]');
-            const href = String(link?.getAttribute?.('href') || '');
-            if (!href || href.includes('list=') || href.includes('/shorts/')) continue;
-            const match = href.match(/[?&]v=([a-zA-Z0-9_-]{11})/);
-            const videoId = match ? match[1] : '';
-            if (!videoId || videoId === currentVideoId || triedVideoIds.includes(videoId)) continue;
-            return { link, videoId };
-        }
-    } catch (e) {
-    }
-    return null;
-}
-
-// Called after the watch page has paused a blocked regular video and shown
-// its overlay. Shorts, embeds, playlists and YouTube Kids never reach here.
-function scheduleBlockedAutoplaySkip(videoId, settings) {
-    if (!videoId || !isBlockedAutoplaySkipAllowed(settings)) return false;
-    const params = new URLSearchParams(document.location?.search || '');
-    if (!String(document.location?.pathname || '').startsWith('/watch') || params.has('list')) return false;
-    const state = getBlockedAutoplaySkipState();
-    const decidedKey = `${videoId}:${state.lastEndedAt}:${state.chainSkippedAt}`;
-    if (state.decidedKey === decidedKey) return false;
-    state.decidedKey = decidedKey;
-    if (!wasCurrentWatchReachedByAutoplay(videoId)) {
-        state.chainTargetVideoId = '';
-        state.chainCount = 0;
-        state.triedVideoIds = [];
-        return false;
-    }
-    if (state.chainTargetVideoId !== videoId) {
-        // A fresh autoplay arrival starts a new chain.
-        state.chainCount = 0;
-        state.triedVideoIds = [];
-    }
-    if (!state.triedVideoIds.includes(videoId)) state.triedVideoIds.push(videoId);
-    if (state.chainCount >= FILTERTUBE_AUTOPLAY_SKIP_MAX) return false;
-
-    if (state.timer) clearTimeout(state.timer);
-    const generation = ++state.generation;
-    state.timer = setTimeout(() => {
-        state.timer = 0;
-        try {
-            // Re-read live state: Disable, settings changes and navigation
-            // that happened during the delay all revoke this action.
-            if (state.generation !== generation) return;
-            const latest = currentSettings;
-            if (!isBlockedAutoplaySkipAllowed(latest)) return;
-            if (getCurrentWatchVideoId() !== videoId) return;
-            if (new URLSearchParams(document.location?.search || '').has('list')) return;
-            const admission = getDirectAccessState();
-            if (admission.decision !== 'blocked' || admission.videoId !== videoId) return;
-            const target = findBlockedAutoplaySkipTarget(videoId, state.triedVideoIds);
-            if (!target) return;
-            state.chainTargetVideoId = target.videoId;
-            state.chainSkippedAt = Date.now();
-            state.chainCount++;
-            state.triedVideoIds.push(target.videoId);
-            const skipLink = target.link;
-            skipLink.click();
-        } catch (e) {
-        }
-    }, FILTERTUBE_AUTOPLAY_SKIP_DELAY_MS);
-    return true;
 }
 
 function getCurrentWatchCategoryOverlayHost() {
