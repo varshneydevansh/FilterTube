@@ -5,387 +5,329 @@ import { Panel } from "@/components/marketing-ui";
 export const metadata = {
   title: "Privacy policy",
   description:
-    "Unified FilterTube privacy policy for the browser extension, Android app, iOS and iPad app, TV app path, website, and optional Nanah peer-to-peer settings sync.",
+    "FilterTube privacy policy for the browser extension, the Android phone, tablet and TV app, the iPhone and iPad app, the website, and optional Nanah sync.",
 };
 
 const summaryCards = [
   {
-    label: "Core product model",
-    value: "A local tool, not an account service",
+    label: "Accounts",
+    value: "No FilterTube sign-up",
     detail:
-      "Your rules and profiles live in the app or extension on your device. FilterTube has no account area where we receive or inspect your viewing activity.",
+      "There is no FilterTube account. Your rules, profiles, PINs and history stay on your device.",
   },
   {
-    label: "Rules and history",
-    value: "Not uploaded to FilterTube",
+    label: "Servers",
+    value: "No FilterTube server keeps your data",
     detail:
-      "Your Blocklist and Whitelist rules, keywords, PIN state, watch history, and search history are not uploaded into a FilterTube account or dashboard.",
+      "We run no server that stores your settings or what you watch. Nanah's relay only helps your devices find each other.",
   },
   {
-    label: "Nanah sync",
-    value: "Open-source P2P",
+    label: "Extra services",
+    value: "Off until you turn them on",
     detail:
-      "Your devices meet at a known place on the internet so they can find each other, then transfer settings between themselves.",
+      "SponsorBlock, DeArrow, Return YouTube Dislike, LRCLIB and the PipePipe decoder are optional and off by default.",
   },
   {
     label: "Website analytics",
     value: "Website only",
     detail:
-      "Vercel Web Analytics is used only on filtertube.in. It is not included in the browser extension or native apps.",
+      "Vercel Web Analytics runs on filtertube.in. It is not in the extension or the apps.",
   },
 ];
 
-const platformCoverage = [
+const products = [
   {
     title: "Browser extension",
     body:
-      "Chrome/Chromium and other supported browser builds apply your rules on supported video-service pages. Extension settings stay in browser storage unless you export or sync them.",
+      "Chrome, Edge, Firefox, Opera and other supported browsers. Stores your rules, profiles, PIN checks, Study and Self-Control sessions, counters and settings in the browser's own storage on your computer.",
   },
   {
-    title: "Android phone and tablet app",
+    title: "Android phone, tablet and TV",
     body:
-      "The Android app provides native FilterTube controls, profiles, PIN protection, Main viewing, public Kids web-view access, local settings, and Nanah sync controls.",
+      "From Google Play or as a direct build from GitHub (Android TV and Fire TV use the same app). Stores rules, profiles, PIN checks, your in-app watch and search history, playlists, notes, Study plans and settings in the app's private storage.",
   },
   {
-    title: "iOS and iPad app",
+    title: "iPhone and iPad",
     body:
-      "The iOS/iPad app is covered by this same policy for App Store release. It follows the same local-first rule model using Apple web views and native controls.",
+      "A direct build installed with SideStore or AltStore. Stores the same kinds of data as Android in the app's private storage. It also includes a Safari extension, a Share extension and widgets, which read the same local settings.",
   },
   {
-    title: "TV and Fire TV app path",
+    title: "Website",
     body:
-      "TV is not an unrelated privacy product. It may ship as a separate package and store listing because TV UX and remote-control behavior are different, but the intended privacy model remains local-first.",
-  },
-  {
-    title: "Public website",
-    body:
-      "filtertube.in explains the product, hosts policy pages, and links to downloads and documentation. Website analytics are limited to this website.",
-  },
-  {
-    title: "Nanah protocol",
-    body:
-      "Nanah is open-source peer-to-peer sync. Its signaling endpoint is only a meeting place, not a FilterTube account, settings vault, device inventory, or analytics service.",
+      "filtertube.in explains the product and links to downloads. It stores nothing about you beyond what is described in the website section below.",
   },
 ];
 
-const noProductCollection = [
-  "Your Google password, service login token, private account credential, or payment details",
-  "Your complete video watch history or search history",
-  "Your general browsing history outside supported FilterTube surfaces",
-  "Your FilterTube Blocklist, Whitelist, keywords, profile settings, PIN state, Kids/Main viewing choice, theme, or route controls as something we can view online",
-  "Contacts, photos, camera stream, microphone recordings, precise location, or phone contacts",
-  "Advertising identifiers, ad-targeting profiles, data broker profiles, or cross-site tracking identifiers",
-  "Children's personal information for a FilterTube account, advertising profile, or recommendation model",
-];
-
-const localData = [
-  "Blocked channels, allowed channels, keywords, Whitelist entries, Blocklist entries, Shorts rules, comments controls, route rules, and watch-page controls",
-  "Profiles, profile type, PIN protection state, selected viewing space, Kids/Main preferences, theme preference, and native control preferences",
-  "Local counters or status information used to show what FilterTube filtered or which profile is active",
-  "Optional backup, export, and import files that you create and manage yourself",
-  "Optional Nanah pairing state when you choose a trusted sync flow",
-];
-
-const infrastructure = [
+const playback = [
   {
-    title: "No FilterTube account area",
+    title: "Where videos come from",
     detail:
-      "There is no FilterTube account page where your app or extension rules, profiles, watch history, search history, PINs, or video-service account details are uploaded for us to view.",
+      "The Android and iOS apps have their own player. The app requests videos, thumbnails, comments and other metadata directly from the video service, from your device. No FilterTube server sits in between.",
   },
   {
-    title: "Website hosting",
+    title: "What the video service sees",
     detail:
-      "filtertube.in is hosted on Vercel. The website has aggregate Vercel Web Analytics enabled for website traffic only.",
+      "Like any app or browser, the video service receives your IP address, the videos you request and normal device details. If you sign in to your Google account, those requests are tied to that account under Google's policies.",
   },
   {
-    title: "Nanah signaling",
+    title: "Signing in",
     detail:
-      "Nanah currently uses a public signaling endpoint so paired devices can find each other. The endpoint is a meeting place, not where your settings live.",
+      "Signing in is optional. It happens on Google's own sign-in page inside the app. FilterTube never asks for or stores your Google password; the signed-in session stays on your device.",
   },
   {
-    title: "Platform stores",
+    title: "Filtering",
     detail:
-      "Google Play, Apple App Store, browser stores, and TV app stores may process installs, reviews, integrity checks, crash diagnostics, and account information under their own policies.",
-  },
-  {
-    title: "Google video services",
-    detail:
-      "The underlying Main, Music, and Kids video services remain Google services. FilterTube controls its shell and local filtering rules; Google controls the underlying web service.",
-  },
-  {
-    title: "Support contact",
-    detail:
-      "If you email us or open a GitHub issue, we receive whatever you choose to include in that message so we can respond.",
+      "Your rules are checked on your device before anything is shown. Hidden items are never sent anywhere.",
   },
 ];
 
-const oldPolicyAnswers = [
+const optionalServices = [
   {
-    title: "Data collection",
+    title: "SponsorBlock (sponsor.ajay.app)",
     detail:
-      "FilterTube's app and extension filtering features do not collect your personal viewing data into a FilterTube account because filtering does not require one.",
+      "Apps only. Off by default. Skips sponsor segments. Receives the first few characters of a hash of the video ID, the categories you chose, and your IP address.",
   },
   {
-    title: "Data usage",
+    title: "DeArrow (dearrow.ajay.app and dearrow-thumb.ajay.app)",
     detail:
-      "Rules and settings are used locally to hide or block matching video content according to your choices.",
+      "Apps only. Titles and thumbnails are separate switches, both off by default. Titles send a hash prefix of the video ID; thumbnails send the full video ID and a time in the video. Both receive your IP address.",
   },
   {
-    title: "Data sharing",
+    title: "Return YouTube Dislike (returnyoutubedislikeapi.com)",
     detail:
-      "There is no FilterTube account copy of your rules or viewing history to provide to advertisers, analytics tools, or data brokers.",
+      "Apps only. Off by default. Shows dislike counts. Receives the full video ID and your IP address.",
   },
   {
-    title: "No data broker path",
+    title: "LRCLIB (lrclib.net)",
     detail:
-      "There is no FilterTube-held copy of your rules, profiles, watch history, or search history for advertising or broker use.",
+      "Apps only, in Sangeet. Off until you agree to it in the lyrics reader. Receives the song title, artist name, song length and your IP address.",
+  },
+  {
+    title: "PipePipe decoder (api.pipepipe.dev)",
+    detail:
+      "Apps only. Off by default. Helps the player unlock higher-quality streams. Receives the player version and short scrambled stream codes, plus your IP address. It never receives the video ID, stream addresses, your account, tokens or cookies.",
+  },
+];
+
+const syncDetails = [
+  {
+    title: "Nanah relay (nanah-signaling.varshney-devansh614.workers.dev)",
+    detail:
+      "A meeting place on Cloudflare Workers. It sees a pairing code, your IP address and sealed connection messages while two devices find each other. It does not store your settings.",
+  },
+  {
+    title: "Google STUN (stun.l.google.com)",
+    detail:
+      "Used during pairing to find a direct route between your devices. It sees your IP address and port only, never your settings.",
+  },
+  {
+    title: "End-to-end encrypted",
+    detail:
+      "Everything sent between your devices is encrypted on the sending device and opened on the receiving one. The relay and STUN server cannot read it.",
+  },
+  {
+    title: "Nearby on the same Wi-Fi",
+    detail:
+      "The apps can also pair and send rules, playlists and notes over your local network without the internet. Nothing is trusted until you match the safety phrase on both screens.",
+  },
+  {
+    title: "Internet Pickup (optional)",
+    detail:
+      "Parents can set up a pickup address on a server they run themselves. Updates wait there encrypted until the child's device collects them. FilterTube does not provide or see this server.",
+  },
+  {
+    title: "User-started only",
+    detail:
+      "Sync never runs as a hidden online backup. Pairing codes, safety phrases and sync links are private; don't share them with people you don't trust.",
+  },
+];
+
+const familyDetails = [
+  "Profiles, parent and child types, and PINs live only on the device. PINs are stored as a protected check, not as plain text.",
+  "Ask a parent: when a child asks to watch something or for more time, the request is saved on the device. If the parent uses another device, the request travels over Nanah, end-to-end encrypted.",
+  "Answers, time limits, Study plans and Self-Control sessions are kept on the devices involved. Nothing reaches FilterTube.",
+  "Notifications about asks are private on the lock screen and show no names or video titles.",
+];
+
+const devicePermissions = [
+  {
+    title: "Camera (iOS)",
+    detail:
+      "Used only to scan a Nanah pairing QR code. Frames are read on the device and never saved or sent.",
+  },
+  {
+    title: "Microphone and speech (iOS)",
+    detail:
+      "Used only when you tap Voice input in Search, to turn your words into search text you can check before searching. Recognition runs on the device when your iPhone or iPad supports it; otherwise Apple's speech service processes the audio under Apple's policy.",
+  },
+  {
+    title: "Local network (Android and iOS)",
+    detail:
+      "Finds your other FilterTube devices on the same Wi-Fi for Nearby pairing and transfers.",
+  },
+  {
+    title: "Photos, videos and music",
+    detail:
+      "Lets you add your own device files to the separate local library. Files stay where they are; the app only keeps a reference. Google Play builds use the system photo picker for videos.",
+  },
+  {
+    title: "Notifications",
+    detail:
+      "Playback controls, Ask a parent answers, Offline Media reminders and Study timers. Shown on the device only.",
+  },
+  {
+    title: "Browser camera (extension)",
+    detail:
+      "The extension can scan a pairing QR code with your webcam. The browser asks first, and frames stay on the computer.",
   },
 ];
 
 const browserPermissions = [
   {
-    title: "Storage",
-    detail:
-      "Saves your rules, profiles, and UI settings locally in browser storage.",
+    title: "storage",
+    detail: "Saves your rules, profiles and settings in the browser on your computer.",
   },
   {
-    title: "Active tab",
+    title: "unlimitedStorage",
     detail:
-      "Lets FilterTube respond when you interact with the current supported video-service tab.",
+      "Large rule sets, channel lists and Study packs can pass the browser's default size limit. It is still local storage.",
   },
   {
-    title: "Scripting",
+    title: "alarms",
     detail:
-      "Lets FilterTube run local filtering scripts on supported video-service pages so matching elements can be hidden according to your settings.",
+      "Ends Self-Control and Study sessions on time, even if the browser put the extension to sleep.",
   },
   {
-    title: "Tabs",
-    detail:
-      "Lets FilterTube respond to navigation changes on supported tabs and keep filtering behavior in sync as the video service changes routes.",
+    title: "activeTab",
+    detail: "Lets the popup act on the video tab you are looking at when you open it.",
   },
   {
-    title: "Downloads",
+    title: "scripting",
     detail:
-      "Supports user-started local backup/export files. Those files are created on your device.",
+      "Loads FilterTube's own filtering scripts into a supported video tab when that page needs them.",
   },
   {
-    title: "Host permissions",
+    title: "tabs",
     detail:
-      "Scopes filtering to supported Main, Music, Kids, and embedded-video hosts. The browser permission dialog lists the exact domains covered by the installed build.",
-  },
-];
-
-const appAccess = [
-  {
-    title: "Managed web views",
-    detail:
-      "Android and iOS/iPad load supported Main and public Kids pages in platform web views. Those pages are still Google web services.",
+      "Notices when a supported tab changes page so filtering keeps up, and opens the dashboard and help pages.",
   },
   {
-    title: "Native controls",
-    detail:
-      "FilterTube adds native controls for profiles, PIN, theme, sync, route rules, and filtering. Those controls store settings locally.",
+    title: "downloads",
+    detail: "Saves backup and export files that you ask for to your computer.",
   },
   {
-    title: "Background or mini-player behavior",
+    title: "Site access",
     detail:
-      "Any retained playback shell is an app experience around the web surface. It does not create a FilterTube copy of your media history.",
+      "YouTube, YouTube Music, YouTube Kids and youtube-nocookie.com embeds, plus Google Search results pages, where the guard hides video results that match your rules.",
   },
   {
-    title: "Crash and store systems",
+    title: "Optional site access",
     detail:
-      "App stores and operating systems may provide their own install, crash, review, integrity, and diagnostic systems under their policies.",
+      "Asked for only if you set up Internet Pickup, and only for the one address you enter. You can say no; everything else keeps working.",
   },
 ];
 
-const nanahDetails = [
+const otherServices = [
   {
-    title: "Open-source P2P protocol",
+    title: "Update check (direct builds)",
     detail:
-      "Nanah is open source at github.com/varshneydevansh/nanah. Its purpose is trusted settings transfer between your devices or profiles.",
+      "Direct Android and iOS builds ask api.github.com about once a day whether a newer release exists. GitHub sees your IP address and nothing else about you, and nothing downloads by itself. The first time, the app tells you and offers to turn it off. Google Play builds update through Play instead.",
   },
   {
-    title: "Known meeting place",
+    title: "Rule lists from a web address",
     detail:
-      "The signaling endpoint is like a known place in the vast internet where your devices can find each other to start talking.",
+      "If you add a shared rule list by its address, the app or extension downloads it from that site, which sees your IP address. Nothing is uploaded.",
   },
   {
-    title: "No retained sync payload",
+    title: "Community links",
     detail:
-      "FilterTube does not retain the settings payload being transferred through Nanah.",
+      "Discord, Reddit, Instagram, GitHub and similar buttons are plain links. Nothing is loaded from those sites until you tap one, and then they open in your browser.",
   },
   {
-    title: "No device-count analytics",
+    title: "Your phone's own backup",
     detail:
-      "FilterTube does not use Nanah signaling to track how many devices are syncing or to build a device inventory.",
+      "If Android backup or iCloud Backup is on, the system may include FilterTube's settings in your device backup with Google or Apple. On Android, pairing keys, sync identity and offline keys are left out.",
   },
   {
-    title: "User-started only",
+    title: "Stores",
     detail:
-      "Sync starts when you pair devices or profiles. It does not run as a hidden online backup.",
+      "Google Play, browser add-on stores, SideStore and AltStore handle installs, reviews and crash reports under their own policies.",
   },
   {
-    title: "Pairing safety",
+    title: "Support messages",
     detail:
-      "Pairing codes, safety phrases, and sync links should be treated as private. Do not share them with untrusted people.",
-  },
-];
-
-const dataMovement = [
-  {
-    title: "You open Main, Music, or Kids",
-    detail:
-      "Network activity for those services is between your device/web view/browser and Google. Their policies apply to their account, video, ad, cookie, and recommendation systems.",
-  },
-  {
-    title: "You export or back up settings",
-    detail:
-      "A backup/export file exists because you created it. It remains wherever you save, move, or share it.",
-  },
-  {
-    title: "You start Nanah sync",
-    detail:
-      "Trusted devices meet through the signaling point and transfer settings between themselves. The signaling point is not a FilterTube settings vault.",
-  },
-  {
-    title: "You visit filtertube.in",
-    detail:
-      "The website is hosted on Vercel and uses Vercel Web Analytics for website page views only.",
-  },
-  {
-    title: "You install through a store",
-    detail:
-      "The relevant store may process install, account, integrity, review, crash, and device information under its own policy.",
-  },
-  {
-    title: "You contact support",
-    detail:
-      "Emails, GitHub issues, screenshots, or logs contain whatever information you choose to send.",
+      "If you email us or open a GitHub issue, we receive what you choose to include so we can reply.",
   },
 ];
 
 const userControls = [
-  "Inspect, add, edit, or delete rules inside the FilterTube interface.",
-  "Delete or reset profiles and local rules from the app or extension.",
-  "Disable sync by not pairing devices or by resetting local sync state.",
-  "Delete backup/export files from wherever you saved them.",
-  "Clear extension/app storage or uninstall FilterTube to remove locally stored FilterTube data from that installation.",
-  "Ask us to delete support emails or GitHub issue content where technically possible.",
+  "See, edit or delete any rule, profile or history entry inside FilterTube.",
+  "Turn every optional service on or off per profile in Settings.",
+  "Turn off the update check in direct builds.",
+  "Unpair devices or reset sync at any time.",
+  "Delete backup and export files wherever you saved them.",
+  "Uninstall the app or extension to remove everything it stored on that device.",
+  "Ask us to delete support emails or issue content where we can.",
 ];
 
 const faq = [
   {
-    question: "Is there a FilterTube account where my settings are uploaded?",
+    question: "Is there a FilterTube account?",
     answer:
-      "No. Your rules, profiles, PINs, watch history, and search history are not uploaded into a FilterTube account or dashboard.",
+      "No. There is no FilterTube sign-up, and nothing about you is stored in a FilterTube account or dashboard.",
   },
   {
-    question: "Does FilterTube collect my video watch history?",
+    question: "Does FilterTube see what I watch or search?",
     answer:
-      "No. FilterTube applies rules locally to supported video-service pages. It does not upload a copy of your watch history to FilterTube.",
+      "No. Your history stays on your device. The video service sees your requests, as it would in any app. If you turn on an optional service, that service sees the details listed for it above.",
   },
   {
-    question: "Does FilterTube collect my search queries?",
+    question: "Can the extension read every website I visit?",
     answer:
-      "No. Search terms are handled by Google on its video services. FilterTube does not create a FilterTube search-history account or analytics profile.",
-  },
-  {
-    question: "Where are my Blocklist and Whitelist rules, keywords, and profiles stored?",
-    answer:
-      "They are stored locally in the app or extension installation, unless you explicitly export them or start a Nanah sync.",
-  },
-  {
-    question: "Can FilterTube read all websites I visit?",
-    answer:
-      "No. FilterTube is scoped to supported Main, Music, Kids, and embedded-video hosts needed for filtering. The browser permission dialog lists the exact domains covered by the installed build.",
-  },
-  {
-    question: "Does FilterTube track how many videos it blocks?",
-    answer:
-      "Any filter counters are local status information for the current installation. They are not uploaded into a FilterTube online analytics account.",
-  },
-  {
-    question: "Does Vercel Analytics run inside the extension or apps?",
-    answer:
-      "No. Vercel Analytics is only used on filtertube.in, the public website.",
-  },
-  {
-    question: "Does the website use ad trackers?",
-    answer:
-      "No. The website does not use Google Analytics, ad pixels, session replay, or cross-site ad targeting. It uses aggregate Vercel Web Analytics only for filtertube.in page views.",
+      "No. It runs on YouTube, YouTube Music, YouTube Kids, youtube-nocookie.com embeds and Google Search results pages. It asks for one more address only if you set up Internet Pickup.",
   },
   {
     question: "Is Nanah an online backup?",
     answer:
-      "No. Nanah is peer-to-peer settings transfer. The signaling point helps devices meet; it is not where your settings are stored.",
+      "No. It moves settings straight between your devices, end-to-end encrypted. The relay only helps them meet.",
   },
   {
-    question: "Can Nanah tell FilterTube how many devices are syncing?",
+    question: "Are there ads or trackers in the apps or extension?",
     answer:
-      "No. FilterTube does not use Nanah as a device inventory or device-count analytics system.",
+      "No. There are no ad SDKs, analytics SDKs or tracking identifiers in the apps or the extension.",
   },
   {
-    question: "Can FilterTube see my Google password?",
+    question: "Is FilterTube affiliated with Google or YouTube?",
     answer:
-      "No. Google sign-in is handled by Google inside the browser or platform web view. FilterTube does not ask for or store your Google password.",
-  },
-  {
-    question: "Does FilterTube control the video services' data collection?",
-    answer:
-      "No. The underlying Main, Music, and Kids video services remain Google services. Their account, playback, ads, cookies, and recommendations are governed by Google's policies.",
-  },
-  {
-    question: "What happens if I uninstall FilterTube?",
-    answer:
-      "Removing the extension or app removes the local FilterTube data stored in that installation. Backup/export files you created remain wherever you saved them until you delete them.",
-  },
-  {
-    question: "Can I use FilterTube without Nanah sync?",
-    answer:
-      "Yes. Nanah sync is optional. Filtering works without pairing devices.",
-  },
-  {
-    question: "Is FilterTube affiliated with Google or its video services?",
-    answer:
-      "No. FilterTube is independent and not endorsed by, sponsored by, or affiliated with Google or its Main, Music, and Kids video services.",
+      "No. FilterTube is independent and not endorsed by, sponsored by or affiliated with Google or YouTube.",
   },
 ];
 
-const storeSummary = [
+const changeLog = [
   {
-    label: "Data collection by app/extension",
-    value:
-      "No FilterTube account copy of core filtering rules, profiles, PINs, watch history, or search history.",
+    title: "19 November 2026",
+    detail:
+      "Rewritten to match the current apps and extension: the native player, Offline Media, the supporter subscription, Ask a parent, iOS camera, microphone, speech and local-network use, every optional service and what it receives, the update check, Internet Pickup, all extension permissions including Google Search, and a clearer children's section.",
   },
   {
-    label: "Data sharing by app/extension",
-    value:
-      "No advertising sharing path for app/extension rules or histories, because FilterTube does not receive an account copy of them.",
-  },
-  {
-    label: "Website analytics",
-    value: "Only filtertube.in uses aggregate Vercel Web Analytics.",
-  },
-  {
-    label: "Sync",
-    value:
-      "Optional open-source Nanah P2P. The signaling endpoint is only a meeting place.",
+    title: "4 May 2026",
+    detail:
+      "One policy for the extension, Android, iPhone and iPad, TV, the website and Nanah sync.",
   },
 ];
 
 const policyNav = [
-  ["Introduction", "#introduction"],
-  ["Covered products", "#coverage"],
-  ["Internet services involved", "#infrastructure"],
-  ["Data collection", "#collection"],
-  ["How filtering works", "#how-it-works"],
-  ["Browser permissions", "#browser-permissions"],
-  ["Android, iOS/iPad, and TV", "#native-apps"],
-  ["Nanah P2P sync", "#nanah"],
-  ["Website analytics", "#website"],
-  ["Google and video services", "#third-parties"],
-  ["Store disclosures", "#store-summary"],
-  ["Direct answers", "#faq"],
+  ["Products and local data", "#products"],
+  ["Playback in the apps", "#playback"],
+  ["Offline Media", "#offline-media"],
+  ["Optional services", "#optional-services"],
+  ["Sync and Nearby", "#sync"],
+  ["Ask a parent, profiles, PINs", "#family"],
+  ["Device permissions", "#device-permissions"],
+  ["Extension permissions", "#browser-permissions"],
+  ["Supporting FilterTube", "#support"],
+  ["Other connections", "#other-services"],
+  ["Children", "#children"],
   ["Contact", "#contact"],
 ];
 
@@ -420,10 +362,10 @@ function CardGrid({ items, columns = "md:grid-cols-2" }) {
     <div className={`grid gap-4 ${columns}`}>
       {items.map((item) => (
         <div
-          className="ft-tile rounded-[1.45rem] border border-[color:var(--color-line)] p-5"
+          className="ft-tile min-w-0 rounded-[1.45rem] border border-[color:var(--color-line)] p-5"
           key={item.title ?? item.label ?? item.question}
         >
-          <h3 className="font-medium text-[var(--color-ink)]">
+          <h3 className="break-words font-medium text-[var(--color-ink)]">
             {item.title ?? item.label ?? item.question}
           </h3>
           <p className="mt-3 text-sm leading-7 text-[var(--color-muted)]">
@@ -461,35 +403,34 @@ export default function PrivacyPage() {
               Privacy policy
             </h1>
             <p className="mt-6 max-w-[72ch] text-base leading-8 text-[var(--color-muted)] md:text-lg">
-              Last updated on May 4, 2026. This page covers the FilterTube
-              browser extension, Android app, iOS/iPad app, TV app path,
-              website, public Kids access, and optional Nanah
-              peer-to-peer settings sync.
+              Last updated: 19 November 2026. This policy covers the FilterTube
+              browser extension, the Android app for phone, tablet and TV, the
+              iPhone and iPad app, the website, and optional Nanah sync.
             </p>
             <div className="mt-6 flex flex-wrap gap-3">
               <a
                 className="inline-flex min-h-11 items-center rounded-[0.95rem] bg-[var(--color-ink)] px-5 py-3 text-sm font-medium text-[var(--color-cream)] transition duration-300 hover:-translate-y-0.5 active:translate-y-px"
                 href="#full-policy"
               >
-                Jump to detailed policy
+                Read the full policy
               </a>
               <a
                 className="inline-flex min-h-11 items-center rounded-[0.95rem] border border-[color:var(--color-line)] bg-[color:var(--color-glass)] px-5 py-3 text-sm font-medium text-[var(--color-ink)] transition duration-300 hover:-translate-y-0.5 active:translate-y-px"
-                href="#faq"
+                href="#optional-services"
               >
-                Direct answers
+                Optional services
               </a>
             </div>
           </div>
 
           <div className="rounded-[1.45rem] border border-[color:var(--color-line)] bg-[color:var(--color-glass)] p-5 md:p-6">
             <p className="max-w-[76ch] text-lg leading-8 text-[var(--color-ink)]">
-              FilterTube is a local control tool, not an account service. Your
-              rules, profiles, PINs, watch history, and search history are not
-              uploaded into a FilterTube dashboard for us to view. The website
-              has website-only analytics. Nanah is open-source peer-to-peer
-              sync: devices meet at a known place on the internet so they can
-              find each other, then talk directly.
+              FilterTube is a tool that runs on your device. There is no
+              FilterTube sign-up, and no FilterTube server keeps your data. Your
+              rules, profiles, PINs and history stay on your device. The apps
+              talk directly to the video service, and to a few other services
+              only when you turn them on. Each one is named below with exactly
+              what it receives.
             </p>
           </div>
 
@@ -533,203 +474,184 @@ export default function PrivacyPage() {
         <div className="mt-10">
           <Panel innerClassName="space-y-10 p-7 md:p-10">
             <div className="scroll-mt-28" id="full-policy" />
-            <PolicySection id="introduction" title="1. Introduction">
+            <PolicySection id="introduction" title="1. Who we are">
               <p>
-                FilterTube (&quot;we&quot;, &quot;our&quot;, or
-                &quot;the product&quot;) is a free, independent control layer
-                for calmer video viewing. It helps users, families, students,
-                and profile owners hide noisy or unwanted content on supported
-                video pages using rules they control.
+                FilterTube (&quot;we&quot;) is a free, independent tool that
+                helps parents and adults hide unwanted videos, channels and
+                topics using rules they control. It is made by one developer
+                in India.
               </p>
               <p>
-                The privacy model is intentionally simple: rules are stored on
-                your device and evaluated on your device. FilterTube does not
-                require a FilterTube account, online dashboard, uploaded rules
-                list, uploaded watch-history list, or product telemetry system
-                for core filtering.
+                We do not collect personal data. We have no FilterTube
+                accounts, no ad or analytics code in the apps or extension, and
+                no server that stores your settings or viewing.
               </p>
             </PolicySection>
 
-            <PolicySection id="coverage" title="2. Covered products and platforms">
-              <CardGrid columns="md:grid-cols-2 lg:grid-cols-3" items={platformCoverage} />
+            <PolicySection id="products" title="2. Each product and what it stores">
+              <p>
+                Everything below is stored on your device only. FilterTube
+                cannot see it.
+              </p>
+              <CardGrid items={products} />
             </PolicySection>
 
-            <PolicySection id="infrastructure" title="3. What internet services exist">
-              <p>
-                Saying &quot;local-first&quot; does not mean the whole internet
-                disappears. It means your filtering rules and viewing history
-                are not uploaded into a FilterTube account area for us to view.
-                These are the real internet-facing pieces involved:
-              </p>
-              <CardGrid columns="md:grid-cols-2 lg:grid-cols-3" items={infrastructure} />
+            <PolicySection id="playback" title="3. Playback in the apps">
+              <CardGrid items={playback} />
             </PolicySection>
 
-            <PolicySection id="collection" title="4. Product data collection">
+            <PolicySection id="offline-media" title="4. Offline Media">
               <p>
-                The browser extension and native apps do not upload your
-                filtering rules, profile settings, PIN state, watch history, or
-                search history into a FilterTube account, dashboard, or online
-                product system. FilterTube does not receive that information as
-                a product dataset.
-              </p>
-              <CardGrid items={oldPolicyAnswers} />
-              <p className="font-medium text-[var(--color-ink)]">
-                4.1 What FilterTube does not collect through the app or extension
-              </p>
-              <BulletList items={noProductCollection} />
-              <p className="pt-2 font-medium text-[var(--color-ink)]">
-                4.2 What stays locally on your device
-              </p>
-              <BulletList items={localData} />
-            </PolicySection>
-
-            <PolicySection id="how-it-works" title="5. How filtering works">
-              <p>
-                You define rules such as keywords, blocked channels, allowed
-                channels, Shorts visibility, comments visibility, watch-page
-                controls, route controls, profile rules, Kids/Main viewing
-                choices, and PIN-protected management surfaces. FilterTube reads
-                supported video-service page content locally and hides matching
-                elements according to your settings.
+                <span className="font-medium text-[var(--color-ink)]">
+                  Saved videos (direct builds only).
+                </span>{" "}
+                The direct Android and iOS builds can save videos and music for
+                offline viewing. Copies stay in the app's private storage, protected
+                by the device's own encryption; on Android they are also encrypted
+                with a key that never leaves that device. Each copy expires 30 days after it was saved or
+                last checked. While you are online, the app checks with the
+                video service that the video is still available and still
+                allowed by your rules, and removes it if not. Google Play
+                builds cannot save videos.
               </p>
               <p>
-                Matching content is hidden locally in the browser, Android web
-                view, or iOS/iPad web view. FilterTube does not need to upload
-                your rules or viewing activity to do this work.
+                <span className="font-medium text-[var(--color-ink)]">
+                  Your own files (all builds).
+                </span>{" "}
+                You can add videos and music already on your device to a
+                separate local library. They are never uploaded. Direct builds
+                can also send these files to your own nearby device over
+                Wi-Fi, encrypted.
               </p>
             </PolicySection>
 
-            <PolicySection id="browser-permissions" title="6. Browser extension permissions">
+            <PolicySection id="optional-services" title="5. Optional services">
               <p>
-                Browser permissions exist so the extension can operate on
-                supported video pages and manage optional local backup/export flows.
+                These community services add features to the apps. Each one is
+                off by default, set per profile, and can be turned off again at
+                any time. When one is on, your device contacts it directly; we
+                never see the request. Each service handles what it receives
+                under its own policy.
               </p>
-              <CardGrid columns="md:grid-cols-2 lg:grid-cols-3" items={browserPermissions} />
+              <CardGrid items={optionalServices} />
+              <p>
+                Nothing is sent to any of these services while it is off. For
+                child profiles, we suggest leaving them all off.
+              </p>
             </PolicySection>
 
-            <PolicySection id="native-apps" title="7. Android, iOS/iPad, and TV app behavior">
+            <PolicySection id="sync" title="6. Nanah sync and Nearby">
               <p>
-                Native apps provide a FilterTube shell around supported web
-                surfaces, plus native profile, PIN, sync, theme, and filtering
-                controls. TV and Fire TV may ship as a separate package because
-                remote-control UX is different, but TV is still part of the
-                FilterTube privacy model.
-              </p>
-              <CardGrid items={appAccess} />
-            </PolicySection>
-
-            <PolicySection id="nanah" title="8. Nanah peer-to-peer sync">
-              <p>
-                Nanah is optional, open-source, peer-to-peer settings sync. It
-                exists so a parent or user can move settings between trusted
-                devices or profiles without creating a FilterTube account.
-              </p>
-              <p>
-                Think of Nanah signaling as a known meeting place in the vast
-                internet. Your devices go there so they can find each other and
-                begin talking. The meeting place is not where your FilterTube
-                settings are kept.
-              </p>
-              <CardGrid columns="md:grid-cols-2 lg:grid-cols-3" items={nanahDetails} />
-              <p>
-                Current signaling endpoint:{" "}
-                <PolicyLink href="https://nanah-signaling.varshney-devansh614.workers.dev/">
-                  nanah-signaling.varshney-devansh614.workers.dev
-                </PolicyLink>
-                . Nanah source code and protocol work are public at{" "}
+                Nanah moves settings between devices you trust, without a
+                FilterTube account. It is optional and only runs when you pair
+                devices. Nanah&apos;s code is public at{" "}
                 <PolicyLink href="https://github.com/varshneydevansh/nanah">
                   github.com/varshneydevansh/nanah
                 </PolicyLink>
                 .
               </p>
+              <CardGrid columns="md:grid-cols-2 lg:grid-cols-3" items={syncDetails} />
             </PolicySection>
 
-            <PolicySection id="data-movement" title="9. When data can leave your device">
-              <p>
-                FilterTube rules are local by default. Data can still leave your
-                device in ordinary situations where you use a third-party web
-                service, create a file, start sync, or contact support.
-              </p>
-              <CardGrid columns="md:grid-cols-2 lg:grid-cols-3" items={dataMovement} />
+            <PolicySection id="family" title="7. Ask a parent, profiles and PINs">
+              <BulletList items={familyDetails} />
             </PolicySection>
 
-            <PolicySection id="website" title="10. Website analytics and hosting">
+            <PolicySection id="device-permissions" title="8. Device permissions">
               <p>
-                The public website, filtertube.in, uses Vercel Web Analytics so
-                we can see aggregate website page views and understand whether
-                people can find the pages they need. Vercel Analytics is not
-                included in the FilterTube browser extension, Android app,
-                iOS/iPad app, or TV app path.
+                The apps ask for a permission only when you use the feature
+                that needs it. Saying no turns off just that feature.
               </p>
-              <p>
-                The website does not use Google Analytics, advertising pixels,
-                session replay, or cross-site ad targeting. Like any hosted
-                website, basic hosting/CDN request handling may involve normal
-                infrastructure logs from Vercel or related providers.
-              </p>
+              <CardGrid columns="md:grid-cols-2 lg:grid-cols-3" items={devicePermissions} />
             </PolicySection>
 
-            <PolicySection id="third-parties" title="11. Google and third-party video services">
+            <PolicySection id="browser-permissions" title="9. Browser extension permissions">
               <p>
-                The underlying Main, Music, and Kids video services belong to
-                Google. FilterTube is independent and not affiliated with,
-                endorsed by, or sponsored by Google or those services.
+                Every permission the extension asks for, and why. All
+                filtering happens inside your browser.
               </p>
-              <p>
-                If you sign in, play videos, search, subscribe, comment, or
-                interact with Google video services, that activity is handled
-                by Google under its own policies. FilterTube controls
-                local filtering and native shell behavior; it does not control
-                Google's account, ad, cookie, playback, or recommendation
-                systems.
-              </p>
+              <CardGrid columns="md:grid-cols-2 lg:grid-cols-3" items={browserPermissions} />
             </PolicySection>
 
-            <PolicySection id="store-summary" title="12. Store disclosure summary">
+            <PolicySection id="support" title="10. Supporting FilterTube">
               <p>
-                For Google Play, App Store, and browser store review, the
-                practical disclosure is:
+                Every feature is free. Supporting is optional and changes no
+                feature.
               </p>
-              <CardGrid items={storeSummary} />
               <p>
-                Because the app and extension do not upload your rules,
-                profiles, watch history, or search history into a FilterTube
-                account or dashboard, FilterTube does not have that product data
-                sitting online for advertising or broker sharing.
+                <span className="font-medium text-[var(--color-ink)]">
+                  Google Play builds.
+                </span>{" "}
+                The optional supporter subscription uses Google Play Billing.
+                Google handles your payment details, purchase history and
+                renewals under its own privacy policy. The app only learns
+                from Google whether a subscription is active, and keeps that
+                on the device. We never receive your name, email or payment
+                details.
+              </p>
+              <p>
+                <span className="font-medium text-[var(--color-ink)]">
+                  Direct builds.
+                </span>{" "}
+                Support goes through Ko-fi. On iPhone and iPad it is a link
+                that opens in your browser. On Android, opening Support loads
+                Ko-fi&apos;s support panel from ko-fi.com, and checkout opens
+                in your browser. Ko-fi handles any payment under its own
+                policy.
               </p>
             </PolicySection>
 
-            <PolicySection id="children" title="13. Children's privacy">
+            <PolicySection id="other-services" title="11. Other connections">
+              <CardGrid columns="md:grid-cols-2 lg:grid-cols-3" items={otherServices} />
+            </PolicySection>
+
+            <PolicySection id="website" title="12. The website">
               <p>
-                FilterTube is a parent-managed filtering and control tool. It is
-                not operated as a child-data collection service, and it does not
-                create online FilterTube accounts or online FilterTube profiles
-                for children.
-              </p>
-              <p>
-                The underlying Kids content and accounts remain Google
-                services. Parents should review Google's children's video and
-                family privacy policies for those services.
+                filtertube.in is hosted on Vercel and uses Vercel Web
+                Analytics for counts of page views. It does not use Google
+                Analytics, ad pixels, session replay or cross-site tracking.
+                Vercel keeps normal server logs as part of hosting.
               </p>
             </PolicySection>
 
-            <PolicySection id="security" title="14. Data security">
+            <PolicySection id="children" title="13. Children">
               <p>
-                The local-first model reduces exposure by not sending rules,
-                profiles, PIN settings, or viewing history to a FilterTube app
-                online FilterTube account. Optional Nanah sync is designed
-                around trusted-device pairing rather than online account
-                storage.
+                FilterTube is a tool for parents and adults to set up. Children
+                can use profiles that a parent creates, but FilterTube collects
+                no personal data from children or anyone else. There are no
+                FilterTube accounts, no ads, no profiling and no tracking.
+                Child profiles are settings stored on the device.
               </p>
               <p>
-                No system can promise perfect security in every environment.
-                Keep your devices updated, protect profile PINs, and avoid
-                sharing backup files, pairing codes, safety phrases, or sync
-                links with untrusted people.
+                When a child watches in the app, the video service receives
+                those requests as described in section 3. Optional services
+                stay off unless a parent turns them on.
+              </p>
+              <p>
+                We built FilterTube with the aims of the US COPPA rule, the UK
+                Age Appropriate Design Code and India&apos;s Digital Personal
+                Data Protection Act in mind: collect nothing, keep everything
+                off by default, and leave the parent in charge. We have not had
+                this reviewed by a regulator. Parents with questions or
+                concerns can write to the contact below.
               </p>
             </PolicySection>
 
-            <PolicySection id="controls" title="15. Your rights and controls">
+            <PolicySection id="security" title="14. Keeping and protecting data">
+              <p>
+                Data stays on your device for as long as you keep it there,
+                and is removed when you delete it or uninstall. Backups you
+                export can be password-protected. Sync and Nearby transfers are
+                end-to-end encrypted. Saved offline videos expire after 30
+                days.
+              </p>
+              <p>
+                No system is perfectly secure. Keep your devices updated, use a
+                profile PIN, and keep backup files and pairing codes private.
+              </p>
+            </PolicySection>
+
+            <PolicySection id="controls" title="15. Your controls">
               <BulletList items={userControls} />
             </PolicySection>
 
@@ -737,66 +659,47 @@ export default function PrivacyPage() {
               <CardGrid items={faq} />
             </PolicySection>
 
-            <PolicySection id="open-source" title="17. Open-source transparency">
+            <PolicySection id="source" title="17. Source code">
               <p>
-                The FilterTube browser extension and website live in the public
-                repository at{" "}
+                The browser extension&apos;s source code is available under the
+                MIT licence at{" "}
                 <PolicyLink href="https://github.com/varshneydevansh/FilterTube">
                   github.com/varshneydevansh/FilterTube
                 </PolicyLink>
-                . Nanah is public at{" "}
-                <PolicyLink href="https://github.com/varshneydevansh/nanah">
-                  github.com/varshneydevansh/nanah
-                </PolicyLink>
                 .
               </p>
-              <p>
-                The FilterTube apps for Android, TV and iOS are free. The
-                privacy promise here is based on product behavior: local
-                filtering, no FilterTube sign-up or account (just like the
-                extension), no servers keeping your data, and optional P2P sync.
-              </p>
             </PolicySection>
 
-            <PolicySection id="changes" title="18. Changes to this privacy policy">
+            <PolicySection id="contact" title="18. Contact and grievances">
               <p>
-                We may update this page as FilterTube evolves across browser,
-                Android, iOS/iPad, TV, Kids, and sync surfaces. If a release
-                materially changes data handling, this page should be updated
-                before that behavior is relied on publicly.
-              </p>
-            </PolicySection>
-
-            <PolicySection id="standards" title="19. Privacy posture and policy standards">
-              <p>
-                FilterTube is built around data minimization, local processing,
-                user-controlled storage, and transparent optional sync. That
-                architecture is intended to align with the privacy expectations
-                commonly reflected in browser-store, Google Play, App Store,
-                GDPR, and CCPA-style privacy frameworks.
-              </p>
-              <p>
-                This page describes current product behavior and privacy
-                posture. It is not legal advice.
-              </p>
-            </PolicySection>
-
-            <PolicySection id="contact" title="20. Contact">
-              <p>
-                If you have questions about this Privacy Policy or FilterTube
-                data handling, contact{" "}
+                For privacy questions, requests or complaints, including
+                grievances under India&apos;s DPDP Act, email{" "}
                 <a
                   className="text-[var(--color-accent)] underline decoration-[color:var(--color-line)] underline-offset-4 transition duration-300 hover:decoration-[var(--color-accent)]"
                   href="mailto:hello@filtertube.in"
                 >
                   hello@filtertube.in
-                </a>{" "}
-                or open an issue in the{" "}
+                </a>
+                . We aim to reply within 30 days. You can also open an issue in
+                the{" "}
                 <PolicyLink href="https://github.com/varshneydevansh/FilterTube">
                   public GitHub repository
                 </PolicyLink>
-                .
+                , but please don&apos;t post private details there.
               </p>
+              <p>
+                FilterTube is independent and not affiliated with Google or
+                YouTube. This page describes how FilterTube works; it is not
+                legal advice.
+              </p>
+            </PolicySection>
+
+            <PolicySection id="changes" title="19. Changes">
+              <p>
+                If FilterTube starts handling data differently, we update this
+                page first and note it here.
+              </p>
+              <CardGrid items={changeLog} />
             </PolicySection>
           </Panel>
         </div>
