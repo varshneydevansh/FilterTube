@@ -229,7 +229,8 @@ export const kidsScreens = {
 };
 
 // Browser extension screens, used by the extension page. The 3.6.2 captures (current: true) come
-// from the owner's own browser, cropped so no browser toolbar, profile photo or site sidebar shows.
+// from the owner's own browser, cropped so no browser toolbar, profile photo or site sidebar shows;
+// the sync pairing QR code is blurred. The gallery crops match the Chrome Web Store screenshots.
 // Kids rules and Accounts & Sync are still 3.4.1 captures (current: false) until they are re-captured.
 const ext = (file) => `/apps/screenshots/${file}`;
 
@@ -241,11 +242,14 @@ export const extensionScreens = {
     { src: ext("extension-uljhan-card.webp"), title: "What was hidden", alt: "FilterTube extension Home card listing videos hidden today because they matched a blocked word, each with an Allow button", width: 590, height: 382, current: true },
   ],
   gallery: [
-    { src: ext("extension-home.webp"), title: "Home", alt: "FilterTube extension dashboard Home: Good afternoon, 144 things kept out today, time saved, Study today and the videos Uljhan tried today", caption: "What was kept out today, time saved, and your study plan at a glance.", width: 1838, height: 1321, current: true },
+    { src: ext("extension-home.webp"), title: "Home", alt: "FilterTube extension dashboard Home: Good afternoon, 144 things kept out today, 7h 28m saved, Study today and the videos Uljhan tried today, each with an Allow button", caption: "What was kept out today, time saved, and your study plan at a glance.", width: 1240, height: 672, current: true },
     { src: ext("extension-channel-rules.webp"), title: "Channel rules", alt: "FilterTube extension Channel Management with blocked channel rows coloured by where each rule came from, and the popup open beside it", caption: "Blocked channels, coloured by where each rule came from. The popup stays one click away.", width: 1840, height: 1323, current: true },
-    { src: ext("extension-content-controls-page.webp"), title: "Content controls", alt: "FilterTube extension Content Controls: switches to hide Clips, the home feed, comments, adverts, Playables and more", caption: "Switch off Clips, adverts, Playables and more, everywhere at once.", width: 1838, height: 1321, current: true },
-    { src: ext("extension-study-plan.webp"), title: "Study plan", alt: "FilterTube extension Study and focus: a plan for SAT and GMAT with exam channels switched on and topic chips beside them", caption: "Pick your exam and keep the channels and topics you want.", width: 1836, height: 1313, current: true },
+    { src: ext("extension-study-plan.webp"), title: "Study plan", alt: "FilterTube extension study plan for SAT and GMAT: exam channels such as College Board and Khan Academy switched on, with topic chips beside them", caption: "Pick your exam and keep the channels and topics you want.", width: 1280, height: 800, current: true },
     { src: ext("extension-study-feed.webp"), title: "Study feed", alt: "A study feed on the video site's home page: lessons from the plan's channels with SAT topic chips above them", caption: "The home page becomes a feed of lessons from your plan.", width: 1277, height: 918, current: true },
+    { src: ext("extension-content-controls.webp"), title: "Content controls", alt: "FilterTube extension Content Controls: switches to hide Clips, the home feed, comments, adverts, Playables and more", caption: "Switch off Clips, adverts, Playables and more, everywhere at once.", width: 1490, height: 808, current: true },
+    { src: ext("extension-private-sync.webp"), title: "Private sync", alt: "FilterTube extension Accounts & Sync: a pairing session waiting for the second device, a one-time pairing code, a blurred QR code, and the Pair, Verify and Send steps", caption: "Pair your own devices with a code, match the safety phrase, then send. The devices connect directly.", width: 1452, height: 788, current: true },
+    { src: ext("extension-collab-menu.webp"), title: "Block collaborators", alt: "A search result with three collaborating channels and the FilterTube menu open: Done, Block 2 Selected, a Block row for each channel, and Filter All buttons", caption: "On a collaboration, block one channel, a few, or all of them.", width: 1180, height: 358, current: true },
+    { src: ext("extension-length-date.webp"), title: "Length and date", alt: "FilterTube extension Duration Filter set to block videos shorter than 5 minutes, and Upload Date Filter set to only the past 30 days", caption: "Trim Shorts and clips by length or upload date instead of hiding them all.", width: 668, height: 360, current: true },
     { src: ext("extension-import-export.webp"), title: "Import and export", alt: "FilterTube extension Settings, Import / Export: download a backup, restore one, or import a channel and keyword list with a preview", caption: "Back up, restore, or preview a rule list before importing it.", width: 1839, height: 1319, current: true },
     { src: ext("extension-kids-rules.png"), title: "Kids rules", alt: "FilterTube extension preview: Kids rules", caption: "Keep channel rules for Kids separate from Main viewing.", width: 1722, height: 1263, current: false },
     { src: ext("extension-accounts-sync.png"), title: "Accounts & Sync", alt: "FilterTube extension preview: Accounts & Sync", caption: "Choose a device, verify the connection and decide what to sync.", width: 1718, height: 1258, current: false },
