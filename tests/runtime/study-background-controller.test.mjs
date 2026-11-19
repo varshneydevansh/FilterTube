@@ -200,6 +200,16 @@ test('message routing keeps UI-only actions away from web pages', async () => {
     assert.deepEqual(h.profile().study.progress, {}, 'or progress');
 });
 
+test('the study state names each pack with its chips and keywords (the study Home\'s subject chips)', async () => {
+    const h = harness({ study: { activePackIds: ['us_sat', 'global_gmat'] }, now: at(16, 16, 10) });
+    const packs = (await h.controller.getState()).packs;
+    const sat = packs.find(pack => pack.id === 'us_sat');
+    const gmat = packs.find(pack => pack.id === 'global_gmat');
+    assert.ok(sat.chips.includes('Math'));
+    assert.deepEqual(gmat.chips, [], 'GMAT has no chips of its own');
+    assert.ok(gmat.keywords.includes('critical reasoning'), 'so its keywords make them');
+});
+
 test('background.js wires the controller into the compiler, alarms and messages', () => {
     const source = fs.readFileSync('js/background.js', 'utf8');
     assert.match(source, /importScripts\([^)]*'shared\/study_engine\.js', 'shared\/study_clock_guard\.js', 'study_background\.js'/);

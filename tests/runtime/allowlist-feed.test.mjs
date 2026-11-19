@@ -364,3 +364,55 @@ test('the in-page feed and calm state never name the video site', () => {
     assert.ok(strings.length >= 15);
     for (const value of strings) assert.doesNotMatch(value, /youtube/i);
 });
+
+// The owner's SAT + GMAT feed (2026-11-19): greetings, a stream placeholder, campus tours and GRE drills
+// from plan channels that also teach other exams.
+const SAT_GMAT_TOPICS = ['sat', 'digital sat', 'psat', 'sat math', 'practice test', 'reading comprehension', 'gmat', 'gmat focus', 'critical reasoning', 'mba admissions'];
+
+test('study rank: plan topics first, neutral next, likely non-lessons last; greetings and other exams left out', () => {
+    const at = n => ({ publishedAt: n });
+    const items = [
+        { videoId: 'gre', title: 'Test Prep Expert Tackles FREE GRE Practice Test', ...at(9) },
+        { videoId: 'june', title: 'The History of Juneteenth', ...at(8) },
+        { videoId: 'teach', title: 'Happy Teacher Appreciation Week!', ...at(7) },
+        { videoId: 'live', title: 'Our live stream will begin shortly', ...at(6) },
+        { videoId: 'tour', title: 'Inside Look at Bard College | The Princeton Review', ...at(5) },
+        { videoId: 'web', title: 'Fostering a Sense of Community - Webinar', ...at(4) },
+        { videoId: 'cr', title: 'GMAT Critical Reasoning: Assumption questions', ...at(3) },
+        { videoId: 'both', title: 'Mastering the GMAT and GRE', ...at(2) },
+        { videoId: 'tips', title: 'Last Call Before the Test Date', ...at(1) },
+        { videoId: 'fair', title: 'MBA Spotlight Fair: Meet Admissions Teams', ...at(10) },
+        { videoId: 'mba', title: 'MBA admissions essays that work', ...at(0) }
+    ];
+    assert.deepEqual(Feed.rank(items, SAT_GMAT_TOPICS).map(item => item.videoId), ['cr', 'both', 'mba', 'tips', 'fair', 'tour', 'web']);
+    assert.equal(Feed.lessonTier('Happy Diwali from our team', Feed.topicPatterns(SAT_GMAT_TOPICS), Feed.planExams(SAT_GMAT_TOPICS)).drop, true);
+    assert.deepEqual([...Feed.planExams(SAT_GMAT_TOPICS)].sort(), ['gmat', 'psat', 'sat']);
+    assert.equal(Feed.lessonTier('How to act on the ACT', [], Feed.planExams(SAT_GMAT_TOPICS)).drop, true, 'ACT in capitals is an exam');
+    assert.equal(Feed.lessonTier('How to act fast', [], Feed.planExams(SAT_GMAT_TOPICS)).drop, false, '"act" is a word');
+});
+
+test('study rank never empties the feed, and allowed-only mode keeps everything the person chose', () => {
+    const only = [{ videoId: 'a', title: 'Happy Holidays!', publishedAt: 2 }, { videoId: 'b', title: 'GRE Verbal', publishedAt: 1 }];
+    assert.deepEqual(Feed.rank(only, SAT_GMAT_TOPICS).map(item => item.videoId), ['b', 'a'], 'all left out would be nothing: all stay, still ranked');
+    const own = [{ videoId: 'x', title: 'Happy Holidays!', publishedAt: 3 }, { videoId: 'y', title: 'calculus limits', publishedAt: 1 }, { videoId: 'z', title: 'AP Statistics', publishedAt: 2 }];
+    assert.deepEqual(Feed.rank(own, ['calculus'], { lessons: false }).map(item => item.videoId), ['y', 'x', 'z']);
+});
+
+test('the study Home label and subject chips come from the plan (StudyHomeFeed.chips, StudyPackLabels.short)', () => {
+    const sat = { id: 'us_sat', shortName: 'SAT', names: { en: 'SAT' }, chips: ['Math', 'Reading and writing', 'Practice test'], keywords: ['sat'] };
+    const gmat = { id: 'global_gmat', shortName: null, names: { en: 'GMAT (Focus Edition)' }, chips: [],
+        keywords: ['gmat', 'gmat focus', 'data insights', 'critical reasoning', 'reading comprehension', 'practice test', 'mock test', 'gmat official guide'] };
+    const upsc = { id: 'in_upsc', names: { en: 'UPSC Civil Services Examination' } };
+    assert.equal(Feed.shortExamName(gmat), 'GMAT');
+    assert.equal(Feed.shortExamName(upsc), 'UPSC');
+    assert.equal(Feed.studyLabel([sat]), 'SAT');
+    assert.equal(Feed.studyLabel([sat, gmat]), 'SAT + GMAT');
+    assert.equal(Feed.studyLabel([sat, gmat, upsc]), 'SAT + 2');
+    assert.equal(Feed.studyLabel([]), '');
+    const chips = Feed.homeChips([sat, gmat]);
+    assert.deepEqual(chips.map(chip => chip.label), ['Math', 'Reading and writing', 'Practice test', 'Data insights', 'Critical reasoning', 'Reading comprehension'],
+        'GMAT has no chips: its keywords without its own name, meta words or a repeat');
+    assert.deepEqual(chips.map(chip => chip.query).slice(0, 4), ['math sat', 'reading and writing sat', 'practice test sat', 'data insights gmat']);
+    assert.equal(Feed.chipQuery('SAT math', 'SAT'), 'sat math', 'no second exam word');
+    assert.ok(Feed.homeChips(Array.from({ length: 4 }, (_, i) => ({ id: `p${i}`, chips: Array.from({ length: 6 }, (_, j) => `c${i}${j}`) }))).length <= 14);
+});

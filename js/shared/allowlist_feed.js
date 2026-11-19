@@ -12,7 +12,9 @@
  * - Feed builder: each allowed channel's public uploads feed (same-origin videos.xml), newest first,
  *   plus a few searches for allowed words through the site's own search; at most 3 requests at once,
  *   paced, cached locally for 60 minutes. Ranked as StudyHomeFeed.rank (titles naming a topic first,
- *   then newest) and spaced as StudyFeedMix.spaced (one channel never fills the screen).
+ *   then newest); during study, non-lessons and other exams are left out (lessonTier below); in
+ *   allowed-only mode spaced as StudyFeedMix.spaced (one channel never fills the screen).
+ * - The study Home's label ("SAT + GMAT") and subject chips (StudyHomeFeed.chips), from the plan's packs.
  * Every built item still goes through the normal matcher in the isolated world before it shows.
  * Nothing here names the video site in UI text; there is no UI text here at all.
  */
@@ -205,14 +207,157 @@
 
     function relevance(title, patterns) { return patterns.reduce((count, pattern) => count + (pattern.test(String(title || '')) ? 1 : 0), 0); }
 
-    /** StudyHomeFeed.rank: titles naming a topic first, then the rest; newest first in each. */
-    function rank(items, topics) {
+    /*
+     * Lesson relevance (owner, 2026-11-19, from a SAT + GMAT feed full of greetings, GRE drills and campus
+     * tours). Android StudyHomeFeed.rank puts titles naming a plan topic first; the rest keeps upload order.
+     * The extension splits that rest further, still title-only like the app:
+     * - a clear non-lesson (a holiday greeting, a stream placeholder, a spelling bee) is left out;
+     * - a title naming another exam (GRE in a SAT + GMAT plan) and none of the plan's own is left out too,
+     *   even when a shared word ("practice test") matches: plan channels that also teach other exams
+     *   (Magoosh, Manhattan Prep, Kaplan) would otherwise fill the feed with them;
+     * - a likely non-lesson (a webinar for teachers, an admissions tour, a note to parents) goes last.
+     * Within each tier the newest comes first, as in the app. If leaving titles out would leave nothing,
+     * they all stay (ranked), so the feed is never empty because of this.
+     */
+    const DROP_TITLES = [
+        /\bhappy\b[^|]{0,40}\b(day|week|month|holidays?|new\s+year|thanksgiving|halloween|diwali|eid|christmas|hanukkah|easter|lunar\s+new\s+year)\b/iu,
+        /\b(merry\s+christmas|season['’]?s\s+greetings|juneteenth)\b/iu,
+        /\b(live\s*)?stream\s+will\s+(begin|start)\b/iu,
+        /\b(will\s+begin|starting)\s+(shortly|soon)\b/iu,
+        /\bspelling\s+bee\b/iu
+    ];
+    const LATER_TITLES = [
+        /\bwebinar\b/iu,
+        /\binside\s+look\b/iu,
+        /\b(campus|virtual|college)\s+tour\b/iu,
+        /\b(for|to)\s+(educators|teachers|parents)\b/iu,
+        /\b(educators|teachers)\s*:/iu,
+        /\bself[-\s]care\b/iu,
+        /\bparents\b/iu,
+        /^the\s+future\s+is\b/iu,
+        /\b(teacher|educator)s?['’]?\s+(appreciation|day)\b/iu
+    ];
+    // Uploads about the road around a test rather than the test (admissions fairs, college rankings, jobs,
+    // testimonials): after the neutral uploads, unless the title names a plan topic ("MBA admissions").
+    const SOFT_LATER_TITLES = [
+        /\badmissions?\b/iu,
+        /\b(best|top)\b[^|]{0,30}\bcolleges\b/iu,
+        /\b(job|jobs|career|hired)\b/iu,
+        /\b(fair|testimonial|mental\s+health)\b/iu
+    ];
+    // Exam names. Short ones that are also English words match only in capitals ("ACT", not "act").
+    const EXAMS = ['sat', 'psat', 'gre', 'gmat', 'lsat', 'mcat', 'toefl', 'ielts', 'pte', 'duolingo english test', 'ged', 'praxis',
+        'gate', 'jee', 'neet', 'upsc', 'clat', 'cuet', 'cfa', 'cpa', 'acca', 'gaokao', 'suneung'];
+    const CAPITAL_EXAMS = ['ACT', 'CAT', 'AP', 'IB', 'DAT', 'OAT', 'PCAT', 'SSC'];
+
+    function examPattern(name, capital) {
+        return new RegExp(`(?<![\\p{L}\\p{N}])${escapeRegExp(name).replace(/ /g, '\\s+')}(?![\\p{L}\\p{N}])`, capital ? 'u' : 'iu');
+    }
+    const EXAM_PATTERNS = [...EXAMS.map(name => ({ key: name, pattern: examPattern(name, false) })),
+        ...CAPITAL_EXAMS.map(name => ({ key: name.toLowerCase(), pattern: examPattern(name, true) }))];
+
+    /** The exams a plan studies: exam names among its topics ("sat", "digital sat", "gmat focus"). */
+    function planExams(topics) {
+        const out = new Set();
+        for (const topic of array(topics)) {
+            const value = text(topic);
+            for (const exam of EXAM_PATTERNS) if (exam.pattern.test(value) || exam.pattern.test(value.toUpperCase())) out.add(exam.key);
+        }
+        return out;
+    }
+
+    /** {tier, drop} for a title: 3 names a plan topic, 2 neutral, 1 a likely non-lesson; another exam only is dropped. */
+    function lessonTier(title, patterns, exams) {
+        const value = String(title || '');
+        if (DROP_TITLES.some(pattern => pattern.test(value))) return { tier: -1, drop: true };
+        const named = EXAM_PATTERNS.filter(exam => exam.pattern.test(value)).map(exam => exam.key);
+        // Only when the plan names its exams: an allow list without exam names keeps every exam.
+        const otherExamOnly = exams.size > 0 && named.length > 0 && !named.some(key => exams.has(key));
+        if (otherExamOnly) return { tier: 0, drop: true };
+        if (LATER_TITLES.some(pattern => pattern.test(value))) return { tier: 1, drop: false };
+        if (relevance(value, patterns) > 0) return { tier: 3, drop: false };
+        return { tier: SOFT_LATER_TITLES.some(pattern => pattern.test(value)) ? 1 : 2, drop: false };
+    }
+
+    /**
+     * StudyHomeFeed.rank with the lesson tiers above: plan topics first, then neutral uploads, then likely
+     * non-lessons; newest first in each. Clear non-lessons and other exams are left out, unless that would
+     * leave nothing at all. Without `lessons` (Allowed only, outside study) it is the app's two buckets only:
+     * the person chose those channels, so nothing of theirs is left out.
+     */
+    function rank(items, topics, { lessons = true } = {}) {
         const patterns = topicPatterns(topics);
-        return array(items).map((item, index) => ({ item, index, hit: relevance(item.title, patterns) > 0 ? 1 : 0 }))
-            .sort((a, b) => (b.hit - a.hit)
+        const exams = planExams(topics);
+        const scored = array(items).map((item, index) => (lessons
+            ? { item, index, ...lessonTier(item?.title, patterns, exams) }
+            : { item, index, tier: relevance(item?.title, patterns) > 0 ? 1 : 0, drop: false }));
+        const kept = scored.filter(entry => !entry.drop);
+        return (kept.length ? kept : scored)
+            .sort((a, b) => (b.tier - a.tier)
                 || ((b.item.publishedAt ?? -Infinity) - (a.item.publishedAt ?? -Infinity))
                 || (a.index - b.index))
             .map(entry => entry.item);
+    }
+
+    /*
+     * The study Home's subject chips (Android StudyHomeFeed.chips/query/fallbackChips): the chosen
+     * variant's chips, else the pack's, else its keywords without the meta words and the exam's own name.
+     * Each runs "<subject> <exam>" as a search. packs: [{id, shortName, names, chips, keywords}].
+     */
+    const MAX_CHIPS = 14;
+    const META = new Set(['pyq', 'previous year questions', 'previous year papers', 'past papers', 'mock test', 'mock tests', 'test series',
+        'tier 1', 'tier 2', 'answer writing', 'optional', 'ncert', 'syllabus', 'exam', 'exam preparation', 'preparation', 'revision',
+        'notes', 'tips', 'strategy', 'toppers', 'result']);
+
+    /** StudyPackLabels.short: "GMAT (Focus Edition)" -> "GMAT", "UPSC Civil Services" -> "UPSC". */
+    function shortExamName(pack) {
+        const own = text(pack?.shortName);
+        if (own) return own;
+        const names = isObject(pack?.names) ? pack.names : (isObject(pack?.name) ? pack.name : {});
+        const name = text(names.en || Object.values(names)[0] || pack?.id).split(': ').pop();
+        const plain = name.split(' (')[0].trim() || name.trim();
+        const words = plain.split(/\s+/);
+        return words.length >= 3 && /^[A-Z][A-Z0-9-]+$/.test(words[0]) && !/^\d/.test(words[1]) && words[1].toLowerCase() !== 'class'
+            ? words[0] : plain;
+    }
+
+    /** The plan's name for the study Home and the mode bar: "SAT", "SAT + GMAT", "SAT + 2". */
+    function studyLabel(packs) {
+        const names = array(packs).map(shortExamName).filter(Boolean);
+        if (!names.length) return '';
+        if (names.length <= 2) return names.join(' + ');
+        return `${names[0]} + ${names.length - 1}`;
+    }
+
+    function chipQuery(chip, exam) {
+        const subject = text(chip).toLowerCase();
+        const name = text(exam).toLowerCase();
+        return !name || subject.split(' ').includes(name) ? subject : `${subject} ${name}`;
+    }
+
+    function homeChips(packs) {
+        const out = [];
+        const seen = new Set();
+        for (const pack of array(packs)) {
+            const exam = shortExamName(pack);
+            let labels = array(pack?.chips).map(text).filter(Boolean);
+            if (!labels.length) {
+                const examWords = new Set([exam, pack?.id, ...Object.values(isObject(pack?.names) ? pack.names : {})]
+                    .flatMap(value => text(value).toLowerCase().split(/[^\p{L}\p{N}]+/u)).filter(word => word.length >= 2));
+                labels = array(pack?.keywords).map(text).filter(word => {
+                    const key = word.toLowerCase().replace(/\s+/g, ' ');
+                    return word && !META.has(key) && !key.endsWith(' pyq') && !key.split(' ').some(part => examWords.has(part));
+                }).map(word => word.charAt(0).toLocaleUpperCase() + word.slice(1));
+            }
+            for (const label of labels) {
+                const key = label.toLowerCase();
+                if (seen.has(key)) continue;
+                seen.add(key);
+                out.push({ label, query: chipQuery(label, exam) });
+                if (out.length >= MAX_CHIPS) return out;
+            }
+        }
+        return out;
     }
 
     /** StudyFeedMix.spaced: the same channel doesn't come back within `spacing` items while another can fill it. */
@@ -370,7 +515,11 @@
                 seen.add(item.videoId);
                 merged.push(item);
             }
-            const items = spaced(rank(merged, sources.topics));
+            // Study keeps the rank order (Android StudyHomeFeed ranks uploads and spaces only Shorts); the
+            // allowed-only feed is also spaced, so one busy channel doesn't fill the screen.
+            const items = sources.study === true
+                ? rank(merged, sources.topics, { lessons: true })
+                : spaced(rank(merged, sources.topics, { lessons: false }));
             return { key, items, attempted: stats.attempted, failed: stats.failed, fromCache: stats.fromCache,
                 nextOffset: offset + step.length < order.length ? offset + step.length : null,
                 unreachable: stats.attempted > 0 && stats.failed === stats.attempted && !items.length };
@@ -382,6 +531,6 @@
     return Object.freeze({
         CACHE_TTL_MS, CACHE_KEY, MAX_CONCURRENT, FIRST_BATCH, ITEMS_PER_CHANNEL,
         routeKind, keywordText, feedSources, parseUploadsFeed, parseSearchResults,
-        topicPatterns, rank, spaced, dailyOrder, createLimiter, createFeedBuilder
+        topicPatterns, rank, lessonTier, planExams, homeChips, shortExamName, studyLabel, chipQuery, spaced, dailyOrder, createLimiter, createFeedBuilder
     });
 }));

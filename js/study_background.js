@@ -568,7 +568,10 @@
                     names: object(pack?.names),
                     shortName: pack?.shortName || null,
                     kind: pack?.kind || null,
-                    variant: variant ? { id: variant.id, names: object(variant.names) } : null
+                    variant: variant ? { id: variant.id, names: object(variant.names) } : null,
+                    // For the study Home's subject chips (allowlist_feed.js homeChips, Android StudyHomeFeed.chips).
+                    chips: array(variant?.chips).length ? array(variant.chips) : array(pack?.chips),
+                    keywords: array(pack?.keywords)
                 };
             });
         }
