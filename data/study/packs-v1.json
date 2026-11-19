@@ -1,7 +1,7 @@
 {
  "schema": "filtertube_study_packs",
  "version": 1,
- "draftGenerated": "2026-11-16",
+ "draftGenerated": "2026-11-20",
  "packs": [
   {
    "id": "in_upsc_cse",
@@ -13935,10 +13935,11 @@
   },
   {
    "id": "global_coding_interview",
-   "kind": "study",
+   "kind": "interview",
    "name": {
-    "en": "Coding interview prep"
+    "en": "Coding interview prep (DSA)"
    },
+   "shortName": "DSA",
    "languages": [
     "en",
     "hi"
@@ -13947,16 +13948,15 @@
     "Data structures",
     "Algorithms",
     "LeetCode patterns",
-    "System design",
-    "Behavioural interviews",
+    "Mock coding interviews",
     "Competitive programming"
    ],
    "keywords": [
     "coding interview",
     "LeetCode",
+    "DSA",
     "data structures",
     "algorithms",
-    "DSA",
     "dynamic programming",
     "graphs",
     "binary search",
@@ -13964,16 +13964,42 @@
     "sliding window",
     "recursion",
     "backtracking",
-    "system design",
-    "low level design",
+    "heap",
+    "trie",
     "big O",
-    "Codeforces",
-    "competitive programming",
-    "FAANG interview",
-    "mock interview",
     "Blind 75",
     "NeetCode 150",
-    "Striver sheet"
+    "Striver sheet",
+    "FAANG interview",
+    "mock coding interview",
+    "placement preparation",
+    "problem solving patterns",
+    "DSA in Hindi",
+    "linked list",
+    "binary tree"
+   ],
+   "blockedWords": [
+    "salary reveal",
+    "vlog",
+    "day in the life",
+    "layoffs news",
+    "reaction",
+    "prank",
+    "meme"
+   ],
+   "chips": [
+    "Arrays & strings",
+    "Two pointers",
+    "Sliding window",
+    "Binary search",
+    "Linked lists",
+    "Trees",
+    "Graphs",
+    "Dynamic programming",
+    "Recursion & backtracking",
+    "Heaps",
+    "Mock interviews",
+    "Big O"
    ],
    "channels": [
     {
@@ -13986,126 +14012,48 @@
      "channelId": "UCJskGeByzRRSvmOyZOz61ig",
      "handle": "@takeUforward",
      "name": "take U forward",
+     "language": "en"
+    },
+    {
+     "channelId": "UCldyi11QYNXYXiLjVbyw5dA",
+     "handle": "@CodeHelp",
+     "name": "CodeHelp - by Babbar",
      "language": "hi"
     },
     {
-     "channelId": "UCmJz2DV1a3yfgrR7GqRtUUA",
-     "handle": "@BackToBackSWE",
-     "name": "Back To Back SWE",
-     "language": "en"
-    },
-    {
-     "channelId": "UCZCFT11CWBi3MHNlGf019nw",
-     "handle": "@abdul_bari",
-     "name": "Abdul Bari",
-     "language": "en"
-    },
-    {
-     "channelId": "UClEEsT7DkdVO_fkrBw0OTrA",
-     "handle": "@mycodeschool",
-     "name": "mycodeschool",
-     "language": "en"
-    },
-    {
-     "channelId": "UCRPMAqdtSgd0Ipeef7iFsKw",
-     "handle": "@gkcs",
-     "name": "Gaurav Sen",
-     "language": "en"
-    },
-    {
-     "channelId": "UCZgt6AzoyjslHTC9dz0UoTw",
-     "handle": "@ByteByteGo",
-     "name": "ByteByteGo",
-     "language": "en"
-    },
-    {
-     "channelId": "UC3kf-QFT6FZzDk9JsPg8Svg",
-     "handle": "@hello_interview",
-     "name": "Hello Interview",
-     "language": "en"
-    },
-    {
-     "channelId": "UCD8yeTczadqdARzQUp29PJw",
-     "handle": "@WilliamFiset-videos",
-     "name": "WilliamFiset",
-     "language": "en"
-    },
-    {
-     "channelId": "UCBr_Fu6q9iHYQCh13jmpbrg",
-     "handle": "@Errichto",
-     "name": "Errichto Algorithms",
-     "language": "en"
-    },
-    {
-     "channelId": "UCpvS3EykHW--l0ogUhMEjEw",
-     "handle": "@ColinGalen",
-     "name": "Colin Galen",
-     "language": "en"
-    },
-    {
-     "channelId": "UCKuDLsO0Wwef53qdHPjbU2Q",
-     "handle": "@tmwilliamlin168",
-     "name": "William Lin (tmwilliamlin168)",
-     "language": "en"
-    },
-    {
-     "channelId": "UCZLJf_R2sWyUtXSKiKlyvAw",
-     "handle": "@tusharroy2525",
-     "name": "Tushar Roy - Coding Made Simple",
-     "language": "en"
-    },
-    {
-     "channelId": "UC5WO7o71wvxMxEtLRkPhiQQ",
-     "handle": "@TheAdityaVerma",
-     "name": "Aditya Verma",
+     "channelId": "UCaw58edcO3ZqMw76Bvs0kGQ",
+     "handle": "@codestorywithMIK",
+     "name": "codestorywithMIK",
      "language": "hi"
     },
     {
-     "channelId": "UCKvwPt6BifPP54yzH99ff1g",
-     "handle": "@KevinNaughtonJr",
-     "name": "Kevin Naughton Jr.",
+     "channelId": "UCJublDh2UsiIKsAE1553miw",
+     "handle": "@GregHogg",
+     "name": "Greg Hogg",
      "language": "en"
     },
     {
-     "channelId": "UCxX9wt5FWQUAAz4UrysqK9A",
-     "handle": "@CSDojo",
-     "name": "CS Dojo",
+     "channelId": "UCnxhETjJtTPs37hOZ7vQ88g",
+     "handle": "@techdose4u",
+     "name": "Techdose",
      "language": "en"
     },
     {
-     "channelId": "UC8butISFwT-Wl7EV0hUK0BQ",
-     "handle": "@freecodecamp",
-     "name": "freeCodeCamp.org",
+     "channelId": "UC_XbXnLxbvT9RLmKcEa93dA",
+     "handle": "@AlgorithmsMadeEasy",
+     "name": "Algorithms Made Easy",
      "language": "en"
     },
     {
-     "channelId": "UCzDJwLWoYCUQowF_nG3m5OQ",
-     "handle": "@MichaelSambol",
-     "name": "Michael Sambol",
+     "channelId": "UCNc-Wa_ZNBAGzFkYbAHw9eg",
+     "handle": "@interviewingio",
+     "name": "interviewing.io",
      "language": "en"
     },
     {
-     "channelId": "UCM-yUTYGmrNvKOCcAl21g3w",
-     "handle": "@JennyslecturesCSIT",
-     "name": "Jenny's Lectures CS IT",
-     "language": "hi"
-    },
-    {
-     "channelId": "UCDJ2HAZ_hW-DMJj_U0zN38w",
-     "handle": "@ConceptAndCodingByShrayansh",
-     "name": "Concept && Coding - by Shrayansh",
-     "language": "hi"
-    },
-    {
-     "channelId": "UCh9nVJoWXmFb7sLApWGcLPQ",
-     "handle": "@codebasics",
-     "name": "codebasics",
-     "language": "en"
-    },
-    {
-     "channelId": "UCDzhFuVYou1D8w1ABZo3b9A",
-     "handle": "@iamluv",
-     "name": "Luv",
+     "channelId": "UCBwmMxybNva6P_5VmxjzwqA",
+     "handle": "@ApnaCollegeOfficial",
+     "name": "Apna College",
      "language": "hi"
     }
    ]
@@ -15361,6 +15309,6624 @@
      "handle": "@NeoNudgEd",
      "name": "NeoNudge",
      "language": "bn"
+    }
+   ]
+  },
+  {
+   "id": "tr_yds",
+   "kind": "study",
+   "name": {
+    "en": "YDS / YÖKDİL (foreign language exams)",
+    "tr": "YDS / YÖKDİL (Yabancı Dil Bilgisi Seviye Tespit Sınavı / Yükseköğretim Kurumları Yabancı Dil Sınavı)"
+   },
+   "shortName": "YDS",
+   "countries": [
+    "TR"
+   ],
+   "languages": [
+    "tr",
+    "en"
+   ],
+   "subjects": [
+    "İngilizce (YDS)",
+    "YÖKDİL Fen Bilimleri",
+    "YÖKDİL Sağlık Bilimleri",
+    "YÖKDİL Sosyal Bilimler",
+    "e-YDS"
+   ],
+   "keywords": [
+    "YDS",
+    "YÖKDİL",
+    "e-YDS",
+    "e-YÖKDİL",
+    "YDS İngilizce",
+    "YDS kelime",
+    "YDS gramer",
+    "tenses",
+    "passive voice",
+    "relative clauses",
+    "conjunctions",
+    "prepositions",
+    "cloze test",
+    "cümle tamamlama",
+    "çeviri soruları",
+    "paragraf tamamlama",
+    "anlam bütünlüğü",
+    "reading passage",
+    "YDS çıkmış sorular",
+    "YÖKDİL sağlık",
+    "YÖKDİL fen",
+    "YÖKDİL sosyal",
+    "YDS deneme",
+    "soru çözümü",
+    "konu anlatımı",
+    "ÖSYM",
+    "doçentlik dil şartı"
+   ],
+   "blockedWords": [
+    "sonuç açıklandı canlı",
+    "vlog",
+    "maaş",
+    "kadro ilanı",
+    "motivasyon shorts",
+    "tepki videosu",
+    "oyun"
+   ],
+   "chips": [
+    "Kelime",
+    "Gramer",
+    "Cloze test",
+    "Cümle tamamlama",
+    "Çeviri",
+    "Paragraf",
+    "Anlam bütünlüğünü bozan cümle",
+    "Okuma",
+    "Çıkmış sorular",
+    "Deneme"
+   ],
+   "channels": [
+    {
+     "channelId": "UCJYCJrrPwK-VEXkRGpVJ2gQ",
+     "handle": "@sinavkampi",
+     "name": "Sınav Kampı",
+     "language": "tr"
+    },
+    {
+     "channelId": "UC7isVkQINlzE96ONLgeM9HA",
+     "handle": "@AknDilEgitimYouTube",
+     "name": "Akın Dil Eğitim",
+     "language": "tr"
+    },
+    {
+     "channelId": "UCSNY9uNeVgmnv2Ao1fYQ_Gw",
+     "handle": "@testatolyesi",
+     "name": "Test Atölyesi",
+     "language": "tr"
+    },
+    {
+     "channelId": "UCye-9sRwEFjfsu_qZEWPsWQ",
+     "handle": "@HAKKIHOCA",
+     "name": "HAKKI HOCA",
+     "language": "tr"
+    },
+    {
+     "channelId": "UCJnMXL4FJ-BJV4Z20VeHLyA",
+     "handle": "@TheMasterofEnglishExams",
+     "name": "The Master of English Exams",
+     "language": "tr"
+    },
+    {
+     "channelId": "UCEjmgsFei7A6gICltbvfkmA",
+     "handle": "@berkhoca",
+     "name": "Berk Hoca",
+     "language": "tr"
+    },
+    {
+     "channelId": "UCfCwcWxdCzxPeiX81p9Zzrw",
+     "handle": "@eneshoca",
+     "name": "Enes Hoca",
+     "language": "tr"
+    },
+    {
+     "channelId": "UCdb6K3kvwoJPLo8yXwe_TVA",
+     "handle": "@ingilizceyasinalp",
+     "name": "İNGİLİZCE Yasin ALP",
+     "language": "tr"
+    },
+    {
+     "channelId": "UCXrAzlU7BWiyTMsQop5HVkg",
+     "handle": "@mehmethoca.ingilizce",
+     "name": "Mehmet Erdoğan İngilizce",
+     "language": "tr"
+    },
+    {
+     "channelId": "UCJ-W3ThMGrkOXXUCK2yXzGQ",
+     "handle": "@dilciburakhoca",
+     "name": "Dilci Burak Hoca",
+     "language": "tr"
+    },
+    {
+     "channelId": "UCH3-z0x0_2ZV45P9sXl9bLA",
+     "handle": "@demethocayds",
+     "name": "Demet Çakmak Demet Hoca YDS-YÖKDİL",
+     "language": "tr"
+    }
+   ]
+  },
+  {
+   "id": "tr_tus",
+   "kind": "study",
+   "name": {
+    "en": "TUS (medical specialty entrance exam)",
+    "tr": "TUS (Tıpta Uzmanlık Eğitimi Giriş Sınavı)"
+   },
+   "shortName": "TUS",
+   "countries": [
+    "TR"
+   ],
+   "languages": [
+    "tr"
+   ],
+   "subjects": [
+    "Temel Tıp Bilimleri Testi (Anatomi, Fizyoloji, Histoloji-Embriyoloji, Biyokimya, Mikrobiyoloji, Patoloji, Farmakoloji)",
+    "Klinik Tıp Bilimleri Testi (Dahiliye, Pediatri, Genel Cerrahi, Kadın Hastalıkları ve Doğum, küçük stajlar)"
+   ],
+   "keywords": [
+    "TUS",
+    "Tıpta Uzmanlık Sınavı",
+    "TUS hazırlık",
+    "temel tıp bilimleri",
+    "klinik tıp bilimleri",
+    "TUS dahiliye",
+    "TUS pediatri",
+    "TUS genel cerrahi",
+    "TUS kadın doğum",
+    "TUS farmakoloji",
+    "TUS mikrobiyoloji",
+    "TUS patoloji",
+    "TUS biyokimya",
+    "TUS anatomi",
+    "TUS fizyoloji",
+    "histoloji embriyoloji",
+    "küçük stajlar",
+    "TUS çıkmış sorular",
+    "TUS soru çözümü",
+    "TUS konu anlatımı",
+    "TUS deneme",
+    "YDUS",
+    "ÖSYM"
+   ],
+   "blockedWords": [
+    "TUS tercih canlı",
+    "vlog",
+    "doktor maaşları",
+    "nöbet vlog",
+    "motivasyon shorts",
+    "tepki videosu"
+   ],
+   "chips": [
+    "Dahiliye",
+    "Pediatri",
+    "Genel Cerrahi",
+    "Kadın Doğum",
+    "Farmakoloji",
+    "Mikrobiyoloji",
+    "Patoloji",
+    "Biyokimya",
+    "Anatomi",
+    "Fizyoloji",
+    "Çıkmış sorular"
+   ],
+   "channels": [
+    {
+     "channelId": "UCwnluZXfmss03OHzvJk8w-A",
+     "handle": "@drdahiliye",
+     "name": "Dr. Atilla Uslu (drdahiliye)",
+     "language": "tr"
+    },
+    {
+     "channelId": "UCcPZsRSBKMu9sMVZllxueZQ",
+     "handle": "@bilgibilekbuker",
+     "name": "Bilgi Bilek Büker",
+     "language": "tr"
+    },
+    {
+     "channelId": "UCcZzNoEM2K34ulGacW6Otnw",
+     "handle": "@tipakademisi_com",
+     "name": "Tıp Akademisi",
+     "language": "tr"
+    },
+    {
+     "channelId": "UCoA-m6z3iQtrhPf_CLmDHjw",
+     "handle": "@tipdemy",
+     "name": "Tipdemy TUS&DUS Online Eğitim Platformu",
+     "language": "tr"
+    },
+    {
+     "channelId": "UCBWlnsrEVjBpUPoo41h9fKw",
+     "handle": "@TustimeEgitim",
+     "name": "Tustime",
+     "language": "tr"
+    },
+    {
+     "channelId": "UC_6MtrvHHgU7LQx-_g6zkmg",
+     "handle": "@yavuzsahin2882",
+     "name": "Yavuz Sahin",
+     "language": "tr"
+    },
+    {
+     "channelId": "UCwwDjAjCVmh5_UQ83IgjKKw",
+     "handle": "@feyyazakay9054",
+     "name": "feyyaz akay",
+     "language": "tr"
+    },
+    {
+     "channelId": "UCKQ1qA2_jXyxssE6i3EGVGQ",
+     "handle": "@Artunkırker",
+     "name": "Dr. Artun KIRKER",
+     "language": "tr"
+    },
+    {
+     "channelId": "UCM76qdbBoF2A9zLWdMzz5BA",
+     "handle": "@İnformalYayınları",
+     "name": "İnformal Yayınları",
+     "language": "tr"
+    }
+   ]
+  },
+  {
+   "id": "sa_step",
+   "kind": "study",
+   "name": {
+    "en": "STEP (Standardized Test of English Proficiency)",
+    "ar": "اختبار كفايات اللغة الإنجليزية (STEP)"
+   },
+   "shortName": "STEP",
+   "countries": [
+    "SA"
+   ],
+   "languages": [
+    "ar",
+    "en"
+   ],
+   "subjects": [
+    "Reading Comprehension",
+    "Structure (Grammar)",
+    "Listening Comprehension",
+    "Compositional Analysis"
+   ],
+   "keywords": [
+    "STEP",
+    "ستيب",
+    "اختبار ستيب",
+    "اختبار كفايات اللغة الإنجليزية",
+    "قياس",
+    "هيئة تقويم التعليم والتدريب",
+    "STEP reading",
+    "STEP grammar",
+    "قرامر ستيب",
+    "ريدنق ستيب",
+    "الاستماع ستيب",
+    "التحليل الكتابي",
+    "النماذج الأكثر تكرارا",
+    "تجميعات ستيب",
+    "شرح نموذج",
+    "tenses",
+    "conditionals",
+    "relative clauses",
+    "reading comprehension",
+    "listening comprehension",
+    "STEP practice test"
+   ],
+   "blockedWords": [
+    "نتائج ستيب مباشر",
+    "فلوق",
+    "وظائف",
+    "رواتب",
+    "تحفيز شورتس",
+    "ردة فعل"
+   ],
+   "chips": [
+    "القراءة",
+    "القرامر",
+    "الاستماع",
+    "التحليل الكتابي",
+    "المفردات",
+    "النماذج المكررة",
+    "تجميعات ستيب",
+    "اختبار تجريبي"
+   ],
+   "channels": [
+    {
+     "channelId": "UCpQ4kQ7oeiJYyyDNMNRggsg",
+     "handle": "@dalilk4step",
+     "name": "دليلك للستيب",
+     "language": "ar"
+    },
+    {
+     "channelId": "UCjLoN3w5KqL_KXcMaXCbfVg",
+     "handle": "@StepEnglishTest",
+     "name": "اختبار ستيب بدون تعقيد",
+     "language": "ar"
+    },
+    {
+     "channelId": "UC_zf-4FVR3oZgXXeAjJB68A",
+     "handle": "@AyedAcademy",
+     "name": "Ayed Academy",
+     "language": "ar"
+    },
+    {
+     "channelId": "UC3mUjTQWC05SX7OpukCy5bQ",
+     "handle": "@moaeenplatform1434",
+     "name": "منصة مٌعين",
+     "language": "ar"
+    },
+    {
+     "channelId": "UC01V7OscYgzNpr5C-9EaKGA",
+     "handle": "@wecan4step",
+     "name": "منصة وي كان ستيب STEP",
+     "language": "ar"
+    }
+   ]
+  },
+  {
+   "id": "tr_ales",
+   "kind": "study",
+   "name": {
+    "en": "ALES (academic personnel and graduate education entrance exam)",
+    "tr": "ALES (Akademik Personel ve Lisansüstü Eğitimi Giriş Sınavı)"
+   },
+   "shortName": "ALES",
+   "countries": [
+    "TR"
+   ],
+   "languages": [
+    "tr"
+   ],
+   "subjects": [
+    "Sayısal Test (sayısal ve mantıksal akıl yürütme)",
+    "Sözel Test (sözel akıl yürütme)"
+   ],
+   "keywords": [
+    "ALES",
+    "Akademik Personel ve Lisansüstü Eğitimi Giriş Sınavı",
+    "ALES sayısal",
+    "ALES sözel",
+    "ALES matematik",
+    "sayısal mantık",
+    "sözel mantık",
+    "problemler",
+    "oran orantı",
+    "yüzde problemleri",
+    "sayı basamakları",
+    "bölme bölünebilme",
+    "geometri",
+    "paragraf",
+    "cümlede anlam",
+    "sözcükte anlam",
+    "ALES çıkmış sorular",
+    "ALES deneme",
+    "yüksek lisans",
+    "doktora",
+    "ÖSYM"
+   ],
+   "blockedWords": [
+    "ALES sonuçları canlı",
+    "vlog",
+    "kadro ilanı",
+    "maaş",
+    "motivasyon shorts",
+    "tepki videosu"
+   ],
+   "chips": [
+    "ALES Matematik",
+    "Sayısal mantık",
+    "Problemler",
+    "Geometri",
+    "Sözel mantık",
+    "Paragraf",
+    "Türkçe dil bilgisi",
+    "Çıkmış sorular",
+    "Deneme"
+   ],
+   "channels": [
+    {
+     "channelId": "UCWmoTRedHtRtMWTMpEJWUNw",
+     "handle": "@yektugmat_YasinKARA",
+     "name": "Yektug Mat YKS DGS ALES KPSS",
+     "language": "tr"
+    },
+    {
+     "channelId": "UCgluRgitNA6Q7s5WCFuM9rQ",
+     "handle": "@gercelmatematik",
+     "name": "Gerçel Matematik",
+     "language": "tr"
+    },
+    {
+     "channelId": "UCrMIvoVCPn4wMVsg1eDVcaA",
+     "handle": "@SifreliMatematik",
+     "name": "ŞİFRELİ MATEMATİK",
+     "language": "tr"
+    },
+    {
+     "channelId": "UCB1ajRQUDZEUA4gd2naEJJg",
+     "handle": "@zorluegitimtv",
+     "name": "Zorlu Eğitim",
+     "language": "tr"
+    },
+    {
+     "channelId": "UC6e39q7v9XueHSxqV_jzqUw",
+     "handle": "@taktiklerleturkce",
+     "name": "Taktiklerle Türkçe - Çağrı Sarı",
+     "language": "tr"
+    },
+    {
+     "channelId": "UCM76qdbBoF2A9zLWdMzz5BA",
+     "handle": "@İnformalYayınları",
+     "name": "İnformal Yayınları",
+     "language": "tr"
+    }
+   ]
+  },
+  {
+   "id": "tr_dgs",
+   "kind": "study",
+   "name": {
+    "en": "DGS (vertical transfer exam, associate to bachelor's)",
+    "tr": "DGS (Dikey Geçiş Sınavı)"
+   },
+   "shortName": "DGS",
+   "countries": [
+    "TR"
+   ],
+   "languages": [
+    "tr"
+   ],
+   "subjects": [
+    "Sayısal bölüm (matematik, problemler, sayısal mantık, geometri)",
+    "Sözel bölüm (paragraf, Türkçe, sözel mantık)"
+   ],
+   "keywords": [
+    "DGS",
+    "Dikey Geçiş Sınavı",
+    "DGS matematik",
+    "DGS sayısal",
+    "DGS sözel",
+    "DGS Türkçe",
+    "DGS geometri",
+    "sayısal mantık",
+    "sözel mantık",
+    "problemler",
+    "paragraf",
+    "cümlede anlam",
+    "ön lisans",
+    "lisansa geçiş",
+    "DGS çıkmış sorular",
+    "DGS deneme",
+    "DGS konu anlatımı",
+    "DGS soru çözümü",
+    "ÖSYM"
+   ],
+   "blockedWords": [
+    "DGS tercih canlı",
+    "sonuçlar canlı",
+    "vlog",
+    "maaş",
+    "motivasyon shorts",
+    "tepki videosu"
+   ],
+   "chips": [
+    "DGS Matematik",
+    "Problemler",
+    "Sayısal mantık",
+    "Geometri",
+    "Paragraf",
+    "Sözel mantık",
+    "Türkçe",
+    "Çıkmış sorular",
+    "Deneme"
+   ],
+   "channels": [
+    {
+     "channelId": "UCWmoTRedHtRtMWTMpEJWUNw",
+     "handle": "@yektugmat_YasinKARA",
+     "name": "Yektug Mat YKS DGS ALES KPSS",
+     "language": "tr"
+    },
+    {
+     "channelId": "UCgluRgitNA6Q7s5WCFuM9rQ",
+     "handle": "@gercelmatematik",
+     "name": "Gerçel Matematik",
+     "language": "tr"
+    },
+    {
+     "channelId": "UCrMIvoVCPn4wMVsg1eDVcaA",
+     "handle": "@SifreliMatematik",
+     "name": "ŞİFRELİ MATEMATİK",
+     "language": "tr"
+    },
+    {
+     "channelId": "UCB1ajRQUDZEUA4gd2naEJJg",
+     "handle": "@zorluegitimtv",
+     "name": "Zorlu Eğitim",
+     "language": "tr"
+    },
+    {
+     "channelId": "UC6e39q7v9XueHSxqV_jzqUw",
+     "handle": "@taktiklerleturkce",
+     "name": "Taktiklerle Türkçe - Çağrı Sarı",
+     "language": "tr"
+    },
+    {
+     "channelId": "UC9ThdHOfp8u7eg7-L39Lz-A",
+     "handle": "@EyupHoca",
+     "name": "Eyüp Hoca'yla Türkçe ve Edebiyat",
+     "language": "tr"
+    },
+    {
+     "channelId": "UCM76qdbBoF2A9zLWdMzz5BA",
+     "handle": "@İnformalYayınları",
+     "name": "İnformal Yayınları",
+     "language": "tr"
+    }
+   ]
+  },
+  {
+   "id": "eg_prep_certificate",
+   "kind": "study",
+   "name": {
+    "en": "Preparatory Certificate (Grade 9 / 3rd preparatory exams)",
+    "ar": "الشهادة الإعدادية (الصف الثالث الإعدادي)"
+   },
+   "shortName": "الشهادة الإعدادية",
+   "countries": [
+    "EG"
+   ],
+   "languages": [
+    "ar",
+    "en"
+   ],
+   "subjects": [
+    "اللغة العربية",
+    "اللغة الإنجليزية",
+    "الرياضيات (جبر وهندسة)",
+    "العلوم",
+    "الدراسات الاجتماعية"
+   ],
+   "keywords": [
+    "الشهادة الإعدادية",
+    "تالتة اعدادي",
+    "الصف الثالث الاعدادي",
+    "Prep 3",
+    "3rd preparatory",
+    "رياضيات تالتة اعدادي",
+    "جبر",
+    "هندسة",
+    "حساب المثلثات",
+    "معادلة الخط المستقيم",
+    "الإحصاء",
+    "علوم تالتة اعدادي",
+    "القوى الكهربية والمغناطيسية",
+    "الانتخاب الطبيعي",
+    "انجليزي تالتة اعدادي",
+    "براجراف",
+    "عربي تالتة اعدادي",
+    "نحو",
+    "دراسات اجتماعية",
+    "حل كتاب الامتحان",
+    "كتاب المعاصر",
+    "امتحانات المحافظات",
+    "الترم الأول",
+    "الترم الثاني",
+    "مراجعة نهائية"
+   ],
+   "blockedWords": [
+    "نتيجة الشهادة الاعدادية لايف",
+    "فلوج",
+    "تريند",
+    "مقالب",
+    "ردة فعل",
+    "تحفيز شورتس"
+   ],
+   "chips": [
+    "عربي",
+    "إنجليزي",
+    "جبر",
+    "هندسة",
+    "علوم",
+    "دراسات",
+    "مراجعة نهائية",
+    "حل كتاب الامتحان",
+    "امتحانات المحافظات",
+    "نماذج الوزارة"
+   ],
+   "channels": [
+    {
+     "channelId": "UCTLGSi_pWyjN4BVtkQb31ow",
+     "handle": "@elkheta-middle33",
+     "name": "الخطة التعليمية - الثالث الإعدادي",
+     "language": "ar"
+    },
+    {
+     "channelId": "UCmU8Jcx37jt1gDnjTzoTrkQ",
+     "handle": "@M.r_Ahmed_Ali",
+     "name": "تسهيل الرياضيات مع مستر احمد علي",
+     "language": "ar"
+    },
+    {
+     "channelId": "UCjw7HAluSrUZbM0EN4qa6-g",
+     "handle": "@MohamedHanyMath",
+     "name": "الرياضيات ببساطة - مستر محمد هاني",
+     "language": "ar"
+    },
+    {
+     "channelId": "UCIB71HywHBhXOMA-Agx1iBA",
+     "handle": "@MohamedReda008",
+     "name": "إشرحلي رياضة",
+     "language": "ar"
+    },
+    {
+     "channelId": "UCybwyqQ1rAyqIRkEEapw6Eg",
+     "handle": "@ahmed-srour-math",
+     "name": "يلا نفهم math + احمد سرور",
+     "language": "ar"
+    },
+    {
+     "channelId": "UCtvMBlKIZaesWw0CJeV9mGQ",
+     "handle": "@Mr.FadyNabil",
+     "name": "Mr Fady Nabil",
+     "language": "en"
+    },
+    {
+     "channelId": "UCJVfujlAhpvC9tbRAHGth7Q",
+     "handle": "@Mrm2023",
+     "name": "مستر محمود عبد العزيز",
+     "language": "ar"
+    },
+    {
+     "channelId": "UCNIIQYzP0SVQuKEx3E8pGbA",
+     "handle": "@nesreen31",
+     "name": "إنجليزي ببساطة مع مس نسرين إسماعيل",
+     "language": "ar"
+    },
+    {
+     "channelId": "UCvnB0du5BD3NiW_33X5lhRw",
+     "handle": "@aleulum-luebati",
+     "name": "العلوم لعبتي",
+     "language": "ar"
+    },
+    {
+     "channelId": "UCyq5PHfjifI9LWi3tbaTQNQ",
+     "handle": "@MrAhmed-Amin",
+     "name": "مستر احمد امين - Mr Ahmed Amin",
+     "language": "ar"
+    },
+    {
+     "channelId": "UCdJ2qqlt3QpCzdsVAM9Jzpw",
+     "handle": "@mrnasralaam",
+     "name": "Mr Nasr Alaam",
+     "language": "ar"
+    },
+    {
+     "channelId": "UCUFMQkAx3yTOljrG9SXxfvQ",
+     "handle": "@mr.alizalouk",
+     "name": "هبسطهالك - أ/ علي زعلوك",
+     "language": "ar"
+    },
+    {
+     "channelId": "UCYPc_zH48eXXJuWw2fvzHIg",
+     "handle": "@magico-arabic",
+     "name": "أ.مصطفى سعيد_Mostafa saeed",
+     "language": "ar"
+    },
+    {
+     "channelId": "UCEC5GTLxeehhb-JCDawS43w",
+     "handle": "@Mrs.MarinaAtef",
+     "name": "مارينا عاطف - Marina Atef",
+     "language": "ar"
+    }
+   ]
+  },
+  {
+   "id": "ir_konkur_arshad",
+   "kind": "study",
+   "name": {
+    "en": "Konkur Arshad (master's entrance exam)",
+    "fa": "کنکور کارشناسی ارشد"
+   },
+   "shortName": "کنکور ارشد",
+   "countries": [
+    "IR"
+   ],
+   "languages": [
+    "fa"
+   ],
+   "subjects": [
+    "زبان عمومی",
+    "دروس تخصصی رشته (کامپیوتر، عمران، روانشناسی و ...)",
+    "ریاضیات",
+    "استعداد تحصیلی (برخی رشته‌ها)"
+   ],
+   "keywords": [
+    "کنکور ارشد",
+    "کنکور کارشناسی ارشد",
+    "ارشد",
+    "سازمان سنجش",
+    "کنکور ارشد کامپیوتر",
+    "کنکور ارشد عمران",
+    "کنکور ارشد روانشناسی",
+    "زبان عمومی ارشد",
+    "ساختمان داده",
+    "طراحی الگوریتم",
+    "سیستم عامل",
+    "معماری کامپیوتر",
+    "ریاضیات گسسته",
+    "تحلیل سازه",
+    "مقاومت مصالح",
+    "مکانیک سیالات",
+    "آسیب شناسی روانی",
+    "روانشناسی رشد",
+    "نکته و تست",
+    "منابع کنکور ارشد",
+    "برنامه ریزی کنکور ارشد",
+    "Konkur arshad"
+   ],
+   "blockedWords": [
+    "انتخاب رشته لایو",
+    "ولاگ",
+    "مهاجرت",
+    "حقوق و دستمزد",
+    "انگیزشی شورت",
+    "ری اکشن"
+   ],
+   "chips": [
+    "زبان عمومی",
+    "ساختمان داده",
+    "سیستم عامل",
+    "هوش مصنوعی",
+    "تحلیل سازه",
+    "مقاومت مصالح",
+    "روانشناسی",
+    "نکته و تست",
+    "منابع ارشد",
+    "تجربه رتبه برتر"
+   ],
+   "channels": [
+    {
+     "channelId": "UCYLfn2CU0CeUSxt5i290dxw",
+     "handle": "@konkurcomputer",
+     "name": "کنکور ارشد کامپیوتر",
+     "language": "fa"
+    },
+    {
+     "channelId": "UCZAlfx6qPOvANSFvrLuS7tQ",
+     "handle": "@pouyakhn",
+     "name": "کنکور کامپیوتر | پویا خانی | CSHUB",
+     "language": "fa"
+    },
+    {
+     "channelId": "UCW4cUG32Vs78uh_weoRIo9g",
+     "handle": "@ravanshenasi_konkor",
+     "name": "کنکور روانشناسی",
+     "language": "fa"
+    },
+    {
+     "channelId": "UCz0GoCDhMDGXgWPFLPdZ3IQ",
+     "handle": "@CivilLearning-AlirezaBaghi",
+     "name": "alirezabaghi",
+     "language": "fa"
+    }
+   ]
+  },
+  {
+   "id": "de_jura",
+   "kind": "study",
+   "name": {
+    "en": "First State Law Exam (Erste Juristische Prüfung)",
+    "de": "Erste Juristische Prüfung / Staatsexamen"
+   },
+   "shortName": "Staatsexamen",
+   "countries": [
+    "DE"
+   ],
+   "languages": [
+    "de"
+   ],
+   "subjects": [
+    "Zivilrecht",
+    "Strafrecht",
+    "Öffentliches Recht",
+    "Zivilprozessrecht",
+    "Strafprozessrecht",
+    "Verwaltungsrecht",
+    "Staatsrecht"
+   ],
+   "keywords": [
+    "Staatsexamen Jura",
+    "Erste Juristische Prüfung",
+    "Pflichtfachprüfung",
+    "Examensvorbereitung",
+    "Repetitorium",
+    "Examensklausur",
+    "Gutachtenstil",
+    "BGB AT",
+    "Schuldrecht AT",
+    "Schuldrecht BT",
+    "Sachenrecht",
+    "Strafrecht AT",
+    "Strafrecht BT",
+    "StGB",
+    "Grundrechte",
+    "Staatsorganisationsrecht",
+    "Verwaltungsrecht AT",
+    "Polizeirecht",
+    "Kommunalrecht",
+    "Baurecht",
+    "ZPO",
+    "StPO",
+    "BGH Rechtsprechung",
+    "Fallbearbeitung",
+    "Prüfungsschema",
+    "Zweites Staatsexamen"
+   ],
+   "blockedWords": [
+    "Vlog",
+    "Gehalt Anwalt",
+    "Day in my life",
+    "Reaktion",
+    "True Crime",
+    "Motivation",
+    "Lifestyle"
+   ],
+   "chips": [
+    "BGB AT",
+    "Schuldrecht",
+    "Sachenrecht",
+    "Strafrecht AT",
+    "Strafrecht BT",
+    "Staatsorganisationsrecht",
+    "Grundrechte",
+    "Verwaltungsrecht",
+    "ZPO",
+    "Klausurtechnik",
+    "Gutachtenstil",
+    "Examensklausur"
+   ],
+   "channels": [
+    {
+     "channelId": "UCLcxdFu1cTuAd1kIaB4eqdQ",
+     "handle": "@ParagraphEinunddreiig",
+     "name": "Paragraph Einunddreißig",
+     "language": "de"
+    },
+    {
+     "channelId": "UCEqUJULHcf8HI7H1ptNqc-A",
+     "handle": "@jura.examio",
+     "name": "jura@examio",
+     "language": "de"
+    },
+    {
+     "channelId": "UCE97IV31ihhBqi6FQlaykCw",
+     "handle": "@juraonline288",
+     "name": "Jura Online",
+     "language": "de"
+    },
+    {
+     "channelId": "UCpMsSoxcURGFBawgZ0Kx5zA",
+     "handle": "@Der_Jurastudent",
+     "name": "Der Jurastudent",
+     "language": "de"
+    },
+    {
+     "channelId": "UCZyhIw6BTlJcQ8FlQOgExag",
+     "handle": "@JuraIntensivKanal",
+     "name": "Jura Intensiv",
+     "language": "de"
+    },
+    {
+     "channelId": "UCc-sOgZIqUiTKVeWomabqzg",
+     "handle": "@endlichjura",
+     "name": "endlich jura.",
+     "language": "de"
+    },
+    {
+     "channelId": "UC4AEimjAxzJm3_dX2Yxb20A",
+     "handle": "@Jura-Vorlesungen",
+     "name": "Vorlesungen Prof. Dr. Matthias Fervers",
+     "language": "de"
+    },
+    {
+     "channelId": "UCkHRWVx4JnCGJo1CRVSXTsw",
+     "handle": "@6MinutenJura",
+     "name": "6 Minuten Jura",
+     "language": "de"
+    },
+    {
+     "channelId": "UCUQPTJjr0xeTXNhaDWvy-aw",
+     "handle": "@RechtEinfachJura",
+     "name": "Recht Einfach",
+     "language": "de"
+    }
+   ]
+  },
+  {
+   "id": "it_medicina",
+   "kind": "study",
+   "name": {
+    "en": "Medicine access: semestre filtro (Chemistry, Physics, Biology exams)",
+    "it": "Semestre filtro Medicina (accesso a Medicina, Odontoiatria, Veterinaria)"
+   },
+   "shortName": "Semestre filtro",
+   "countries": [
+    "IT"
+   ],
+   "nearby": [
+    "SM"
+   ],
+   "languages": [
+    "it"
+   ],
+   "subjects": [
+    "Chimica e propedeutica biochimica",
+    "Fisica",
+    "Biologia"
+   ],
+   "keywords": [
+    "semestre filtro",
+    "semestre filtro medicina",
+    "accesso medicina",
+    "esame chimica semestre filtro",
+    "esame fisica semestre filtro",
+    "esame biologia semestre filtro",
+    "propedeutica biochimica",
+    "syllabus DM",
+    "test medicina",
+    "domande a completamento",
+    "simulazione semestre filtro",
+    "quiz chimica",
+    "quiz fisica",
+    "quiz biologia",
+    "graduatoria nazionale",
+    "corso affine",
+    "odontoiatria",
+    "veterinaria",
+    "IMAT",
+    "Universitaly"
+   ],
+   "blockedWords": [
+    "vlog",
+    "day in my life",
+    "reaction",
+    "stipendio medico",
+    "polemica",
+    "motivazione",
+    "lifestyle"
+   ],
+   "chips": [
+    "Chimica",
+    "Propedeutica biochimica",
+    "Fisica",
+    "Biologia",
+    "Genetica",
+    "Biologia cellulare",
+    "Stechiometria",
+    "Meccanica",
+    "Fluidi",
+    "Quiz",
+    "Simulazioni",
+    "Graduatoria"
+   ],
+   "channels": [
+    {
+     "channelId": "UCFgOaH7jRUriAGfeEyCWQNg",
+     "handle": "@teachcornerofficial",
+     "name": "TeachCorner",
+     "language": "it"
+    },
+    {
+     "channelId": "UCQwuZv4oCTOWO2fESUexJDQ",
+     "handle": "@corduatestmedicina",
+     "name": "Cordua",
+     "language": "it"
+    },
+    {
+     "channelId": "UCms1f59cRJ7rAHya5qf9utQ",
+     "handle": "@testbusters_official",
+     "name": "Testbusters",
+     "language": "it"
+    },
+    {
+     "channelId": "UCP5iRlYJ2StoGvaVELlQsKg",
+     "handle": "@wauniversity57",
+     "name": "WAUniversity",
+     "language": "it"
+    },
+    {
+     "channelId": "UCwuTpmH3CapEEpNYddCfM1Q",
+     "handle": "@AgoraScienzeBiomediche",
+     "name": "Agora Scienze Biomediche",
+     "language": "it"
+    }
+   ]
+  },
+  {
+   "id": "it_concorsi",
+   "kind": "study",
+   "name": {
+    "en": "Italian public-service competitions (concorsi pubblici)",
+    "it": "Concorsi pubblici"
+   },
+   "shortName": "Concorsi",
+   "countries": [
+    "IT"
+   ],
+   "languages": [
+    "it"
+   ],
+   "subjects": [
+    "Diritto amministrativo",
+    "Diritto costituzionale",
+    "Pubblico impiego",
+    "Codice dei contratti pubblici",
+    "CAD (Codice dell'amministrazione digitale)",
+    "Contabilità pubblica",
+    "Logica e quesiti situazionali",
+    "Informatica",
+    "Inglese"
+   ],
+   "keywords": [
+    "concorsi pubblici",
+    "concorso RIPAM",
+    "inPA",
+    "diritto amministrativo concorsi",
+    "legge 241/1990",
+    "procedimento amministrativo",
+    "accesso agli atti",
+    "diritto costituzionale",
+    "pubblico impiego",
+    "D.Lgs. 165/2001",
+    "codice dei contratti pubblici",
+    "D.Lgs. 36/2023",
+    "CAD",
+    "anticorruzione",
+    "trasparenza",
+    "TUEL enti locali",
+    "contabilità pubblica",
+    "quiz logica",
+    "quesiti situazionali",
+    "banca dati quiz",
+    "concorso funzionari",
+    "concorso assistenti"
+   ],
+   "blockedWords": [
+    "stipendio",
+    "graduatoria live",
+    "vlog",
+    "polemica",
+    "reaction",
+    "motivazione"
+   ],
+   "chips": [
+    "Diritto amministrativo",
+    "Costituzione",
+    "Legge 241/90",
+    "Pubblico impiego",
+    "Contratti pubblici",
+    "CAD",
+    "Anticorruzione",
+    "Logica",
+    "Quiz",
+    "RIPAM",
+    "Situazionali",
+    "Enti locali"
+   ],
+   "channels": [
+    {
+     "channelId": "UCKFy8G9piKMNZSWHPT06I-Q",
+     "handle": "@simonechiarelli",
+     "name": "Simone Chiarelli",
+     "language": "it"
+    },
+    {
+     "channelId": "UCl4TGcOH7sdI6rTyt16u8yw",
+     "handle": "@tipreparoalconcorsopubblico",
+     "name": "TI PREPARO AL CONCORSO PUBBLICO",
+     "language": "it"
+    },
+    {
+     "channelId": "UCcQHyFwvt4fobc8yOFrQFGg",
+     "handle": "@Concorsandoit",
+     "name": "Concorsando.it",
+     "language": "it"
+    },
+    {
+     "channelId": "UCl2Fj8RzdBn1CfAqH65thHg",
+     "handle": "@DirittoConMetodo",
+     "name": "Diritto con Metodo",
+     "language": "it"
+    },
+    {
+     "channelId": "UCncTdubhEG1olSsHRViXa_g",
+     "handle": "@batquiz8431",
+     "name": "BatQuiz",
+     "language": "it"
+    },
+    {
+     "channelId": "UCPYJ1xMT4xNcZ0bQDRmttOg",
+     "handle": "@centrostudipierocalamandrei",
+     "name": "Centro Studi Piero Calamandrei",
+     "language": "it"
+    },
+    {
+     "channelId": "UCi0FT0yRInBNC0S6D_U3fow",
+     "handle": "@MetodoCotruvo",
+     "name": "Metodo Cotruvo",
+     "language": "it"
+    }
+   ]
+  },
+  {
+   "id": "pl_osmoklasisty",
+   "kind": "study",
+   "name": {
+    "en": "Eighth-grade exam (egzamin ósmoklasisty)",
+    "pl": "Egzamin ósmoklasisty"
+   },
+   "shortName": "E8",
+   "countries": [
+    "PL"
+   ],
+   "languages": [
+    "pl",
+    "en"
+   ],
+   "subjects": [
+    "Język polski",
+    "Matematyka",
+    "Język obcy nowożytny"
+   ],
+   "keywords": [
+    "egzamin ósmoklasisty",
+    "E8",
+    "CKE",
+    "arkusz CKE",
+    "próbny egzamin ósmoklasisty",
+    "informator CKE",
+    "lektury obowiązkowe",
+    "rozprawka",
+    "opowiadanie",
+    "przemówienie",
+    "części mowy",
+    "matematyka E8",
+    "ułamki",
+    "procenty",
+    "potęgi i pierwiastki",
+    "równania",
+    "geometria",
+    "koło i okrąg",
+    "graniastosłupy",
+    "statystyka",
+    "angielski E8",
+    "egzamin ósmoklasisty angielski",
+    "odpowiedzi",
+    "zadania otwarte"
+   ],
+   "blockedWords": [
+    "wyniki na żywo",
+    "vlog",
+    "reakcja",
+    "prank",
+    "shorts",
+    "motywacja"
+   ],
+   "chips": [
+    "Język polski",
+    "Lektury",
+    "Rozprawka",
+    "Opowiadanie",
+    "Matematyka",
+    "Ułamki",
+    "Procenty",
+    "Geometria",
+    "Równania",
+    "Język angielski",
+    "Arkusze CKE",
+    "Próbny egzamin"
+   ],
+   "channels": [
+    {
+     "channelId": "UCAd8nhQdyPPZO6JO2m-POLg",
+     "handle": "@cnb",
+     "name": "Czarno na Białym - Egzamin Ósmoklasisty 2026",
+     "language": "pl"
+    },
+    {
+     "channelId": "UCGue5sty8gwiF4jsJPAe-ug",
+     "handle": "@Paulina_od_Matematyki",
+     "name": "Paulina od Matematyki",
+     "language": "pl"
+    },
+    {
+     "channelId": "UCI7QFkkgU5CxmhDTm-6xMag",
+     "handle": "@matematykagryzie_pl",
+     "name": "matematykagryzie",
+     "language": "pl"
+    },
+    {
+     "channelId": "UC4fR_p3O3pkiDu8sNvAVODw",
+     "handle": "@szkoadomowaonline",
+     "name": "Szkoła Domowa Online",
+     "language": "pl"
+    },
+    {
+     "channelId": "UC2Ycmo15s0jQOH0pWlRiniQ",
+     "handle": "@EgzaminatorPodpowiada",
+     "name": "Egzaminator podpowiada - Marek Filipkowski",
+     "language": "pl"
+    },
+    {
+     "channelId": "UCZjnts5GXrtcA8SYxPrmJvw",
+     "handle": "@kursyzangielskiego",
+     "name": "kursy z angielskiego",
+     "language": "pl"
+    }
+   ]
+  },
+  {
+   "id": "ru_oge",
+   "kind": "study",
+   "name": {
+    "en": "OGE (grade 9 state exam)",
+    "ru": "ОГЭ (основной государственный экзамен)"
+   },
+   "shortName": "ОГЭ",
+   "countries": [
+    "RU"
+   ],
+   "languages": [
+    "ru"
+   ],
+   "subjects": [
+    "Русский язык",
+    "Математика",
+    "Обществознание",
+    "Информатика",
+    "География",
+    "Биология",
+    "Физика",
+    "Химия",
+    "История",
+    "Литература",
+    "Иностранный язык"
+   ],
+   "keywords": [
+    "ОГЭ",
+    "ОГЭ 2027",
+    "ГИА-9",
+    "ФИПИ",
+    "открытый банк заданий ФИПИ",
+    "демоверсия ОГЭ",
+    "разбор варианта ОГЭ",
+    "пробник СтатГрад",
+    "ОГЭ математика",
+    "ОГЭ русский язык",
+    "изложение ОГЭ",
+    "сочинение ОГЭ",
+    "итоговое собеседование",
+    "ОГЭ геометрия",
+    "задание 22 ОГЭ",
+    "ОГЭ обществознание",
+    "ОГЭ информатика",
+    "ОГЭ физика",
+    "ОГЭ биология",
+    "ОГЭ география",
+    "9 класс"
+   ],
+   "blockedWords": [
+    "слив ответов",
+    "ответы ОГЭ слив",
+    "реакция",
+    "влог",
+    "мотивация",
+    "розыгрыш",
+    "стрим"
+   ],
+   "chips": [
+    "Русский язык",
+    "Изложение",
+    "Сочинение 13.3",
+    "Математика",
+    "Геометрия",
+    "Обществознание",
+    "Информатика",
+    "Физика",
+    "Биология",
+    "Вариант ФИПИ",
+    "Демоверсия",
+    "Пробник"
+   ],
+   "channels": [
+    {
+     "channelId": "UCtVwzgYDMYr-JaK-uPanVPg",
+     "handle": "@umschmathoge",
+     "name": "Математика ОГЭ и ЕГЭ Умскул",
+     "language": "ru"
+    },
+    {
+     "channelId": "UCQtGECr_BS5SrJAWvPLZYXg",
+     "handle": "@umsch_bm",
+     "name": "Математика с Надеждой | ОГЭ ЕГЭ (база) | Умскул",
+     "language": "ru"
+    },
+    {
+     "channelId": "UC-Da5fgPQcgHLjr_f4Yq5pg",
+     "handle": "@exponentaa",
+     "name": "Стас Экспонента | Математика ОГЭ",
+     "language": "ru"
+    },
+    {
+     "channelId": "UCYuXeKQk2WuTRnDfxJo1MQg",
+     "handle": "@MolodoyRepet",
+     "name": "Дядя Артем | Математика ОГЭ и ЕГЭ | 100балльный",
+     "language": "ru"
+    },
+    {
+     "channelId": "UCjMGamuUxH7TM7YvHdKzhsA",
+     "handle": "@abidybi_math",
+     "name": "Матеша с абидуби",
+     "language": "ru"
+    },
+    {
+     "channelId": "UCmRJO0vrwCgO4j7mMsfRRew",
+     "handle": "@umskrusoge",
+     "name": "Русский язык ОГЭ 2027 Умскул | Анастасия Гласная",
+     "language": "ru"
+    },
+    {
+     "channelId": "UC73Vs2ohuNs2MpgujYGABdA",
+     "handle": "@shkolkovo-OGE",
+     "name": "Подготовка к ОГЭ - Школково",
+     "language": "ru"
+    },
+    {
+     "channelId": "UC2puXfiErZnwivjSA_ssfDA",
+     "handle": "@umskobshoge",
+     "name": "Обществознание ОГЭ и ЕГЭ с Равилем | Умскул",
+     "language": "ru"
+    },
+    {
+     "channelId": "UCs5PbGoNMX0pyQLuE-l-LDA",
+     "handle": "@Egor_Kant_Soc",
+     "name": "Егор Кант | Обществознание ОГЭ | ШКОЛКОВО",
+     "language": "ru"
+    },
+    {
+     "channelId": "UCedKvyGG9iMvyVsUf5VZOww",
+     "handle": "@umsch_i_oge",
+     "name": "Информатика ОГЭ 2027 Умскул",
+     "language": "ru"
+    },
+    {
+     "channelId": "UCpcWzrRjh_YIA0lE7_s5Vbg",
+     "handle": "@PhysicsOGE",
+     "name": "Азат Адеев | ОГЭ по физике | 100балльный репетитор",
+     "language": "ru"
+    }
+   ]
+  },
+  {
+   "id": "jp_boki",
+   "kind": "study",
+   "name": {
+    "en": "Nissho Bookkeeping (Boki) certification",
+    "ja": "日商簿記検定"
+   },
+   "shortName": "簿記",
+   "countries": [
+    "JP"
+   ],
+   "languages": [
+    "ja"
+   ],
+   "subjects": [
+    "商業簿記",
+    "工業簿記",
+    "会計学",
+    "原価計算"
+   ],
+   "keywords": [
+    "日商簿記",
+    "簿記検定",
+    "簿記3級",
+    "簿記2級",
+    "簿記1級",
+    "仕訳",
+    "勘定科目",
+    "試算表",
+    "精算表",
+    "財務諸表",
+    "貸借対照表",
+    "損益計算書",
+    "商業簿記",
+    "工業簿記",
+    "原価計算",
+    "連結会計",
+    "本支店会計",
+    "減価償却",
+    "第1問",
+    "第2問",
+    "第3問",
+    "過去問",
+    "予想問題",
+    "ネット試験",
+    "統一試験",
+    "CBT",
+    "Boki",
+    "bookkeeping"
+   ],
+   "blockedWords": [
+    "vlog",
+    "ルーティン",
+    "合格発表 ライブ",
+    "年収",
+    "転職",
+    "副業",
+    "FP",
+    "雑談"
+   ],
+   "chips": [
+    "簿記3級",
+    "簿記2級",
+    "簿記1級",
+    "仕訳",
+    "商業簿記",
+    "工業簿記",
+    "連結会計",
+    "精算表",
+    "財務諸表",
+    "原価計算",
+    "過去問",
+    "ネット試験"
+   ],
+   "channels": [
+    {
+     "channelId": "UC4ZBlcSK0j_SrNxNMCv_qEg",
+     "handle": "@boki-accounting",
+     "name": "【簿記・会計】公認会計士たぬ吉の資格塾",
+     "language": "ja"
+    },
+    {
+     "channelId": "UCXVW9JOKt0LFLUYzeF4aKiw",
+     "handle": "@manetoku",
+     "name": "【簿記】マネトク（独学応援ちゃんねる！）",
+     "language": "ja"
+    },
+    {
+     "channelId": "UCMloPqkIo3OV7_Q00t2X60g",
+     "handle": "@deruboki",
+     "name": "カゼ太郎の”でる簿記”　～最短で受かりたい人へ～",
+     "language": "ja"
+    },
+    {
+     "channelId": "UC96tOJQea7cJ7Oqj3WjGsXQ",
+     "handle": "@pubbokich",
+     "name": "パブロフ簿記",
+     "language": "ja"
+    },
+    {
+     "channelId": "UCDLj0XdF1yJ9UTf25aArb5w",
+     "handle": "@finac_learning",
+     "name": "FINACラーニング",
+     "language": "ja"
+    }
+   ]
+  },
+  {
+   "id": "jp_it_passport",
+   "kind": "study",
+   "name": {
+    "en": "IT Passport / Fundamental IT Engineer (IPA)",
+    "ja": "ITパスポート試験・基本情報技術者試験"
+   },
+   "shortName": "ITパス",
+   "countries": [
+    "JP"
+   ],
+   "languages": [
+    "ja"
+   ],
+   "subjects": [
+    "ストラテジ系",
+    "マネジメント系",
+    "テクノロジ系",
+    "科目A",
+    "科目B"
+   ],
+   "keywords": [
+    "ITパスポート",
+    "iパス",
+    "基本情報技術者試験",
+    "FE",
+    "IPA",
+    "情報処理技術者試験",
+    "ストラテジ系",
+    "マネジメント系",
+    "テクノロジ系",
+    "科目A",
+    "科目B",
+    "擬似言語",
+    "アルゴリズム",
+    "情報セキュリティ",
+    "ネットワーク",
+    "データベース",
+    "2進数",
+    "プロジェクトマネジメント",
+    "サービスマネジメント",
+    "経営戦略",
+    "用語",
+    "過去問",
+    "公開問題",
+    "CBT",
+    "IT passport",
+    "fundamental information technology engineer"
+   ],
+   "blockedWords": [
+    "vlog",
+    "年収",
+    "転職",
+    "副業",
+    "案件",
+    "ゲーム実況",
+    "雑談",
+    "エンジニア 給料"
+   ],
+   "chips": [
+    "ITパスポート",
+    "基本情報",
+    "ストラテジ系",
+    "マネジメント系",
+    "テクノロジ系",
+    "科目A",
+    "科目B",
+    "セキュリティ",
+    "ネットワーク",
+    "データベース",
+    "アルゴリズム",
+    "過去問"
+   ],
+   "channels": [
+    {
+     "channelId": "UCUARkmYU3gZK7WueJ-GlGig",
+     "handle": "@ITsukima",
+     "name": "ITすきま教室【ITパスポート.基本情報技術者試験.高校情報】",
+     "language": "ja"
+    },
+    {
+     "channelId": "UCIBlbPP3I-C9tYLMHLUYQXQ",
+     "handle": "@kihonzyouhou",
+     "name": "【基本情報技術者試験YouTuber】すーさん",
+     "language": "ja"
+    },
+    {
+     "channelId": "UCzFX915xfJlF842zPPBsDBA",
+     "handle": "@mimi_study",
+     "name": "みみスタ",
+     "language": "ja"
+    },
+    {
+     "channelId": "UCZyA0j0zb8S6pCu-qOKQlpA",
+     "handle": "@bun_ai",
+     "name": "文系でもわかる! IT勉強会",
+     "language": "ja"
+    },
+    {
+     "channelId": "UCzvRZGLkXwmUedtcZIMTp9A",
+     "handle": "@sasara_IT19",
+     "name": "it19movie",
+     "language": "ja"
+    }
+   ]
+  },
+  {
+   "id": "jp_takken",
+   "kind": "study",
+   "name": {
+    "en": "Takken (Real Estate Transaction Specialist exam)",
+    "ja": "宅地建物取引士資格試験（宅建）"
+   },
+   "shortName": "宅建",
+   "countries": [
+    "JP"
+   ],
+   "languages": [
+    "ja"
+   ],
+   "subjects": [
+    "権利関係",
+    "宅建業法",
+    "法令上の制限",
+    "税・その他"
+   ],
+   "keywords": [
+    "宅建",
+    "宅建士",
+    "宅地建物取引士",
+    "宅建試験",
+    "権利関係",
+    "民法",
+    "借地借家法",
+    "区分所有法",
+    "不動産登記法",
+    "宅建業法",
+    "重要事項説明",
+    "37条書面",
+    "報酬額",
+    "法令上の制限",
+    "都市計画法",
+    "建築基準法",
+    "農地法",
+    "国土利用計画法",
+    "税・その他",
+    "5点免除",
+    "登録講習",
+    "過去問",
+    "一問一答",
+    "予想問題",
+    "合格点",
+    "RETIO"
+   ],
+   "blockedWords": [
+    "vlog",
+    "年収",
+    "転職",
+    "不動産投資",
+    "物件紹介",
+    "ルームツアー",
+    "合格発表 ライブ",
+    "雑談"
+   ],
+   "chips": [
+    "権利関係",
+    "民法",
+    "宅建業法",
+    "法令上の制限",
+    "税・その他",
+    "借地借家法",
+    "都市計画法",
+    "建築基準法",
+    "5点免除",
+    "過去問",
+    "直前対策"
+   ],
+   "channels": [
+    {
+     "channelId": "UC2tunZXxelGam73VcK3E-ug",
+     "handle": "@fudousandaigaku",
+     "name": "棚田行政書士の不動産大学【公式チャンネル・宅建】",
+     "language": "ja"
+    },
+    {
+     "channelId": "UC9FTrf3ryoNxs01o_a2FE6g",
+     "handle": "@yuki_takken",
+     "name": "マジでイケてる宅建講座【ゆーき大学】",
+     "language": "ja"
+    },
+    {
+     "channelId": "UCd5F1M_XJeh20xbeT9DXTkA",
+     "handle": "@acokacho",
+     "name": "あこ課長の宅建講座",
+     "language": "ja"
+    },
+    {
+     "channelId": "UC98PlmYNo7PJSgTLWVKXoDg",
+     "handle": "@こざりえの宅建合格講座-t2m",
+     "name": "こざりえの裏技宅建合格チャンネル",
+     "language": "ja"
+    },
+    {
+     "channelId": "UCLPbvf6dLK3ta73C-fxSSKA",
+     "handle": "@宅建吉野塾",
+     "name": "宅建吉野塾",
+     "language": "ja"
+    },
+    {
+     "channelId": "UCtACEwINENHCLHFbKLrZwHA",
+     "handle": "@TakkenMiyazakijyuku",
+     "name": "宅建みやざき塾",
+     "language": "ja"
+    },
+    {
+     "channelId": "UCdpEkbBOa_79o1B0QTxA1SA",
+     "handle": "@tokyojoetakken",
+     "name": "国際弁護士Tokyo Joeの宅建講座",
+     "language": "ja"
+    },
+    {
+     "channelId": "UCTpJtlssiM3x9jIJXgm-Gew",
+     "handle": "@yui-takken",
+     "name": "yuiの宅建講座",
+     "language": "ja"
+    }
+   ]
+  },
+  {
+   "id": "kr_toeic",
+   "kind": "study",
+   "name": {
+    "en": "TOEIC (Korea)",
+    "ko": "토익 (TOEIC)"
+   },
+   "shortName": "TOEIC",
+   "countries": [
+    "KR"
+   ],
+   "languages": [
+    "ko",
+    "en"
+   ],
+   "subjects": [
+    "LC (Listening Comprehension)",
+    "RC (Reading Comprehension)"
+   ],
+   "keywords": [
+    "토익",
+    "TOEIC",
+    "정기토익",
+    "토익 LC",
+    "토익 RC",
+    "파트1",
+    "파트2",
+    "파트3",
+    "파트4",
+    "파트5",
+    "파트6",
+    "파트7",
+    "토익 문법",
+    "토익 어휘",
+    "토익 빈출단어",
+    "토익 기출",
+    "실전 모의고사",
+    "시험 총평",
+    "토익 900",
+    "토익 독학",
+    "고득점",
+    "리스닝",
+    "ETS",
+    "YBM"
+   ],
+   "blockedWords": [
+    "브이로그",
+    "먹방",
+    "연봉",
+    "취업 썰",
+    "게임",
+    "토익스피킹 후기 썰",
+    "광고",
+    "라이브 잡담"
+   ],
+   "chips": [
+    "LC",
+    "RC",
+    "파트1",
+    "파트2",
+    "파트3·4",
+    "파트5",
+    "파트6",
+    "파트7",
+    "토익 단어",
+    "문법",
+    "실전 모의고사",
+    "시험 총평"
+   ],
+   "channels": [
+    {
+     "channelId": "UCTdflp7iCb0qj61On66yOAw",
+     "handle": "@HackersEnglish",
+     "name": "토익은 역시 1위 해커스토익",
+     "language": "ko"
+    },
+    {
+     "channelId": "UCb4MVtZtinKBSrZOcRkThTQ",
+     "handle": "@powertoeic",
+     "name": "박혜원토익",
+     "language": "ko"
+    },
+    {
+     "channelId": "UCeRI1uV1_5iS-cM37LvoWOw",
+     "handle": "@9naturaltoeic",
+     "name": "구자연 토익",
+     "language": "ko"
+    },
+    {
+     "channelId": "UCrzozbSN31T21L2eJbOIn7A",
+     "handle": "@재옥쌤",
+     "name": "토익의 모든것",
+     "language": "ko"
+    },
+    {
+     "channelId": "UCnuFj8bq_5zFs-RLxoPYM9g",
+     "handle": "@madtoeic_",
+     "name": "미친토익",
+     "language": "ko"
+    },
+    {
+     "channelId": "UC5YmN9A4tB0yoE5IrTUsBnQ",
+     "handle": "@dy.kim_TOEIC",
+     "name": "토익김동영",
+     "language": "ko"
+    },
+    {
+     "channelId": "UCSD1bhdvFKZp9imNRC7KPnQ",
+     "handle": "@giltoeic",
+     "name": "길토익TV",
+     "language": "ko"
+    },
+    {
+     "channelId": "UCFJAXRUMqxNhSa2jUXjHlWg",
+     "handle": "@merry_toeic",
+     "name": "메리토익",
+     "language": "ko"
+    }
+   ]
+  },
+  {
+   "id": "kr_ged",
+   "kind": "study",
+   "name": {
+    "en": "Korean GED (Geomjeong-gosi equivalency exams)",
+    "ko": "검정고시 (초졸·중졸·고졸)"
+   },
+   "shortName": "검정고시",
+   "countries": [
+    "KR"
+   ],
+   "languages": [
+    "ko"
+   ],
+   "subjects": [
+    "국어",
+    "수학",
+    "영어",
+    "사회",
+    "과학",
+    "한국사",
+    "도덕",
+    "선택과목"
+   ],
+   "keywords": [
+    "검정고시",
+    "고졸 검정고시",
+    "중졸 검정고시",
+    "초졸 검정고시",
+    "고졸학력인정",
+    "중졸학력인정",
+    "검정고시 기출문제",
+    "검정고시 해설강의",
+    "검정고시 국어",
+    "검정고시 수학",
+    "검정고시 영어",
+    "검정고시 사회",
+    "검정고시 과학",
+    "검정고시 한국사",
+    "검정고시 도덕",
+    "기본이론",
+    "EBS 검정고시",
+    "1회 검정고시",
+    "2회 검정고시",
+    "GED Korea"
+   ],
+   "blockedWords": [
+    "브이로그",
+    "먹방",
+    "합격 썰",
+    "자퇴 브이로그",
+    "게임",
+    "연애",
+    "광고",
+    "라이브 잡담"
+   ],
+   "chips": [
+    "고졸 검정고시",
+    "중졸 검정고시",
+    "국어",
+    "수학",
+    "영어",
+    "사회",
+    "과학",
+    "한국사",
+    "도덕",
+    "기출문제",
+    "해설강의"
+   ],
+   "channels": [
+    {
+     "channelId": "UCaezpLs_97wTKzF3Aa_pSIw",
+     "handle": "@gumstart",
+     "name": "검정고시 No.1 검스타트",
+     "language": "ko"
+    },
+    {
+     "channelId": "UCmKnCUSijV_dqG_w-PtfeVw",
+     "handle": "@blackgosimaster",
+     "name": "검정고시마스터 SHIN (블랙고시마스터신)",
+     "language": "ko"
+    },
+    {
+     "channelId": "UCJDd7TFbA3iZFVJUvacAfyg",
+     "handle": "@EduwillBlack",
+     "name": "에듀윌 검정고시",
+     "language": "ko"
+    },
+    {
+     "channelId": "UCMHkReXYveKC4FtQoZeDdUg",
+     "handle": "@한양학원-m9g",
+     "name": "한양PLUS(한양학원)",
+     "language": "ko"
+    },
+    {
+     "channelId": "UCeUYEYOUIEVvJaiRSTN5eRg",
+     "handle": "@hackersgumjung",
+     "name": "해커스검정고시",
+     "language": "ko"
+    }
+   ]
+  },
+  {
+   "id": "us_ged",
+   "kind": "study",
+   "name": {
+    "en": "GED (high school equivalency test)"
+   },
+   "shortName": "GED",
+   "countries": [
+    "US"
+   ],
+   "nearby": [
+    "CA"
+   ],
+   "languages": [
+    "en"
+   ],
+   "subjects": [
+    "Mathematical Reasoning",
+    "Reasoning Through Language Arts (RLA)",
+    "Science",
+    "Social Studies"
+   ],
+   "keywords": [
+    "GED",
+    "GED test",
+    "GED math",
+    "GED RLA",
+    "reasoning through language arts",
+    "GED science",
+    "GED social studies",
+    "GED practice test",
+    "TI-30XS calculator",
+    "GED formula sheet",
+    "algebra",
+    "geometry",
+    "percent word problems",
+    "ratios",
+    "reading comprehension",
+    "extended response essay",
+    "HiSET",
+    "high school equivalency",
+    "GED Ready",
+    "data and graphs",
+    "US history civics"
+   ],
+   "blockedWords": [
+    "vlog",
+    "prank",
+    "drama",
+    "reaction",
+    "giveaway",
+    "motivation shorts",
+    "graduation party"
+   ],
+   "chips": [
+    "GED Math",
+    "RLA",
+    "Science",
+    "Social Studies",
+    "Calculator TI-30XS",
+    "Algebra",
+    "Geometry",
+    "Reading",
+    "Extended response",
+    "Practice test"
+   ],
+   "channels": [
+    {
+     "channelId": "UCzNsl5b79KIzS3V9qAzulWw",
+     "handle": "@GEDTestingService",
+     "name": "GED Testing Service",
+     "language": "en"
+    },
+    {
+     "channelId": "UCfyrcva57Cq9k8XWQsNPbGw",
+     "handle": "@TestPrepChampions",
+     "name": "Test Prep Champions",
+     "language": "en"
+    },
+    {
+     "channelId": "UCfe7jQHxoVudjPvfYzTxreQ",
+     "handle": "@GetSumMath",
+     "name": "Get Sum Math",
+     "language": "en"
+    },
+    {
+     "channelId": "UCrsMqAkDe1ZusStK12pZkCw",
+     "handle": "@PurelyPersistent",
+     "name": "Purely Persistent - GED and HiSET Prep",
+     "language": "en"
+    },
+    {
+     "channelId": "UCGAyu7Z7LIXQJ9lH4H-FTLw",
+     "handle": "@mistercohensclass",
+     "name": "David Cohen",
+     "language": "en"
+    },
+    {
+     "channelId": "UCyv5PFvHmwg9OkRrkqrByoQ",
+     "handle": "@Ultimate-GED",
+     "name": "UltimateGED",
+     "language": "en"
+    }
+   ]
+  },
+  {
+   "id": "us_fe_exam",
+   "kind": "study",
+   "name": {
+    "en": "NCEES FE / PE engineering licensure exams"
+   },
+   "shortName": "FE/PE",
+   "countries": [
+    "US"
+   ],
+   "nearby": [
+    "CA"
+   ],
+   "languages": [
+    "en"
+   ],
+   "subjects": [
+    "FE Civil",
+    "FE Mechanical",
+    "FE Electrical and Computer",
+    "FE Other Disciplines",
+    "PE Civil",
+    "PE Mechanical",
+    "PE Electrical Power",
+    "Mathematics",
+    "Statics",
+    "Engineering Economics"
+   ],
+   "keywords": [
+    "FE exam",
+    "Fundamentals of Engineering",
+    "PE exam",
+    "Principles and Practice of Engineering",
+    "NCEES",
+    "EIT",
+    "FE Reference Handbook",
+    "FE civil",
+    "FE mechanical",
+    "FE electrical",
+    "PE power",
+    "PE civil",
+    "PE mechanical HVAC",
+    "statics",
+    "strength of materials",
+    "fluid mechanics",
+    "thermodynamics",
+    "surveying",
+    "water resources",
+    "engineering economics",
+    "three-phase circuits",
+    "practice problems",
+    "exam day"
+   ],
+   "blockedWords": [
+    "vlog",
+    "salary reveal",
+    "day in the life",
+    "reaction",
+    "job alert",
+    "motivation shorts"
+   ],
+   "chips": [
+    "FE Civil",
+    "FE Mechanical",
+    "FE Electrical",
+    "PE exam",
+    "Statics",
+    "Mechanics of materials",
+    "Fluid mechanics",
+    "Engineering economics",
+    "Reference handbook",
+    "Practice problems"
+   ],
+   "channels": [
+    {
+     "channelId": "UCSjxG7QNqwsp4RgjGP-ROMA",
+     "handle": "@NCEESMedia",
+     "name": "NCEES Media",
+     "language": "en"
+    },
+    {
+     "channelId": "UCi5EevloEiXIk6VNWYaNNSQ",
+     "handle": "@Genieprep",
+     "name": "Genie Prep",
+     "language": "en"
+    },
+    {
+     "channelId": "UCUM-MRYR2IHnUWEhz-oNh1Q",
+     "handle": "@Prepineer",
+     "name": "Prepineer",
+     "language": "en"
+    },
+    {
+     "channelId": "UCR1wtr3PSI9G591G23J_Mlw",
+     "handle": "@directhubfeexam",
+     "name": "DIRECTHUB FE EXAM PREP",
+     "language": "en"
+    },
+    {
+     "channelId": "UC4faRvIMWi-f79pFFKp5b2w",
+     "handle": "@studyforfe",
+     "name": "Study for FE",
+     "language": "en"
+    },
+    {
+     "channelId": "UCpwfguRrSM1kIax97-y_Pog",
+     "handle": "@MarkMattsonPE",
+     "name": "Mark Mattson",
+     "language": "en"
+    },
+    {
+     "channelId": "UCy5dChpJOpYMdc-7JJff-qg",
+     "handle": "@electricalpereview",
+     "name": "Electrical PE Review",
+     "language": "en"
+    },
+    {
+     "channelId": "UCI0twE6lRXqBhOcNPzy7o7A",
+     "handle": "@MechanicalPEExamPrep",
+     "name": "Mechanical PE Exam Prep",
+     "language": "en"
+    }
+   ]
+  },
+  {
+   "id": "us_finra",
+   "kind": "study",
+   "name": {
+    "en": "FINRA SIE / Series 7 / Series 63 securities exams"
+   },
+   "shortName": "SIE/S7",
+   "countries": [
+    "US"
+   ],
+   "languages": [
+    "en"
+   ],
+   "subjects": [
+    "SIE (Securities Industry Essentials)",
+    "Series 7 General Securities Representative",
+    "Series 63 Uniform Securities Agent State Law",
+    "Series 65/66"
+   ],
+   "keywords": [
+    "SIE exam",
+    "Series 7",
+    "Series 63",
+    "Series 65",
+    "Series 66",
+    "FINRA exam",
+    "NASAA",
+    "securities industry essentials",
+    "options strategies",
+    "covered call",
+    "municipal bonds",
+    "treasury bonds",
+    "margin accounts",
+    "customer accounts",
+    "suitability",
+    "regulation",
+    "investment companies",
+    "practice questions",
+    "breakeven",
+    "debt securities",
+    "equity securities"
+   ],
+   "blockedWords": [
+    "stock picks",
+    "day trading",
+    "crypto signals",
+    "get rich",
+    "vlog",
+    "salary reveal",
+    "motivation shorts"
+   ],
+   "chips": [
+    "SIE",
+    "Series 7",
+    "Series 63",
+    "Options",
+    "Bonds",
+    "Municipal securities",
+    "Margin accounts",
+    "Customer accounts",
+    "Regulations",
+    "Practice questions"
+   ],
+   "channels": [
+    {
+     "channelId": "UCBD1Olrt3__F_-sjOeJNb4Q",
+     "handle": "@Series7Whisperer",
+     "name": "Series 7 Whisperer",
+     "language": "en"
+    },
+    {
+     "channelId": "UCwaKeOPjgCxhovW9tvh4FcA",
+     "handle": "@Series7Guru",
+     "name": "Series 7 Guru",
+     "language": "en"
+    },
+    {
+     "channelId": "UCu9jZXMCrMbTivZoUriQjqA",
+     "handle": "@PassMasters",
+     "name": "Pass Masters",
+     "language": "en"
+    },
+    {
+     "channelId": "UCsGyvItuX_jWbRoNWI50vtQ",
+     "handle": "@testgeekexamprep",
+     "name": "TestGeek Exam Prep",
+     "language": "en"
+    },
+    {
+     "channelId": "UC6xhy8yfKnVpshqM3Or7Mgg",
+     "handle": "@SeriesDesk",
+     "name": "The Series Desk – SIE & Series 7 Prep",
+     "language": "en"
+    }
+   ]
+  },
+  {
+   "id": "ca_cpa_cfe",
+   "kind": "study",
+   "name": {
+    "en": "CPA Canada CFE / CPA PEP",
+    "fr": "EFC / Programme de formation professionnelle des CPA"
+   },
+   "shortName": "CPA CFE",
+   "countries": [
+    "CA"
+   ],
+   "languages": [
+    "en",
+    "fr"
+   ],
+   "subjects": [
+    "Financial Reporting",
+    "Strategy and Governance",
+    "Management Accounting",
+    "Audit and Assurance",
+    "Finance",
+    "Taxation",
+    "Core 1",
+    "Core 2",
+    "Capstone 1",
+    "Capstone 2"
+   ],
+   "keywords": [
+    "CPA Canada",
+    "CFE",
+    "Common Final Examination",
+    "CPA PEP",
+    "Core 1",
+    "Core 2",
+    "Capstone",
+    "case writing",
+    "debrief",
+    "IFRS",
+    "ASPE",
+    "CAS audit",
+    "assurance",
+    "Canadian tax",
+    "performance management",
+    "QQC analysis",
+    "AO assessment opportunity",
+    "KBC",
+    "VTL",
+    "Day 2 ETA",
+    "Day 3 case",
+    "Knotia handbook",
+    "mock case"
+   ],
+   "blockedWords": [
+    "vlog",
+    "day in the life",
+    "salary",
+    "Big Four life",
+    "motivation shorts",
+    "immigration news"
+   ],
+   "chips": [
+    "CFE Day 1",
+    "CFE Day 2",
+    "CFE Day 3",
+    "Case writing",
+    "Financial reporting",
+    "Assurance",
+    "Tax",
+    "Finance",
+    "Performance management",
+    "Core modules"
+   ],
+   "channels": [
+    {
+     "channelId": "UChRszfA29Gilmuqt0wLJNjg",
+     "handle": "@GevorgCPA",
+     "name": "Gevorg CPA",
+     "language": "en"
+    },
+    {
+     "channelId": "UCY0X8Omqt0DPMBCoyjkwxaA",
+     "handle": "@cpa_wsb",
+     "name": "CPA Western School of Business",
+     "language": "en"
+    },
+    {
+     "channelId": "UCF2ZGDBAvhOWcfICHq5S4pQ",
+     "handle": "@ShumzCPA",
+     "name": "Shumz CPA",
+     "language": "en"
+    },
+    {
+     "channelId": "UCxuzUtrhR0INzXPPF0jMqGw",
+     "handle": "@canadacpaonlineacademy4451",
+     "name": "CanadaCPAOnlineAcademy",
+     "language": "en"
+    },
+    {
+     "channelId": "UCwyZ2lnLcF4XcUVZqD6YAKA",
+     "handle": "@passprofessionalaccounting8508",
+     "name": "PASS: Professional Accounting Supplementary School",
+     "language": "en"
+    }
+   ]
+  },
+  {
+   "id": "ca_mccqe",
+   "kind": "study",
+   "name": {
+    "en": "MCCQE Part I (Medical Council of Canada Qualifying Exam)",
+    "fr": "EACMC partie I"
+   },
+   "shortName": "MCCQE",
+   "countries": [
+    "CA"
+   ],
+   "languages": [
+    "en"
+   ],
+   "subjects": [
+    "Medicine",
+    "Surgery",
+    "Pediatrics",
+    "Obstetrics and Gynecology",
+    "Psychiatry",
+    "Population Health and Ethics",
+    "Clinical Decision Making"
+   ],
+   "keywords": [
+    "MCCQE",
+    "MCCQE Part I",
+    "MCCQE1",
+    "Medical Council of Canada",
+    "Toronto Notes",
+    "MCC objectives",
+    "clinical decision making",
+    "CDM",
+    "ethics and legal",
+    "CMPA",
+    "population health",
+    "IMG Canada",
+    "NAC OSCE",
+    "high yield",
+    "pulmonology",
+    "cardiology",
+    "ECG interpretation",
+    "ABG interpretation",
+    "child psychiatry",
+    "toxicology",
+    "qbank questions"
+   ],
+   "blockedWords": [
+    "vlog",
+    "match day reaction",
+    "immigration news",
+    "salary",
+    "motivation shorts",
+    "day in the life"
+   ],
+   "chips": [
+    "MCCQE1",
+    "Toronto Notes",
+    "Ethics",
+    "Psychiatry",
+    "Pediatrics",
+    "OB/GYN",
+    "Emergency",
+    "ECG",
+    "Clinical decision making",
+    "NAC OSCE"
+   ],
+   "channels": [
+    {
+     "channelId": "UCoAgjeqDGIvlOnhiyALxeyw",
+     "handle": "@medicalcouncilcanada",
+     "name": "Medical Council of Canada",
+     "language": "en"
+    },
+    {
+     "channelId": "UCeRsidsFcCrF-YSHOa08DnA",
+     "handle": "@canadaqbank",
+     "name": "CanadaQBank",
+     "language": "en"
+    },
+    {
+     "channelId": "UCILnFwTsrpMYmPIkzQi2TlQ",
+     "handle": "@smartestdoctor",
+     "name": "MCCQE1 COURSE - HARB ACADEMY",
+     "language": "en"
+    },
+    {
+     "channelId": "UC23B81k2AWMEyv-Tp-gQRTg",
+     "handle": "@TorontoNotesMCCQE1",
+     "name": "Toronto Notes Simplified-MCCQE1",
+     "language": "en"
+    },
+    {
+     "channelId": "UCzz-4B9SD3DxcZD-_1gVPQw",
+     "handle": "@drkainatmirzamc",
+     "name": "Dr Kainat Mirza MC",
+     "language": "en"
+    }
+   ]
+  },
+  {
+   "id": "vn_dgnl",
+   "kind": "study",
+   "name": {
+    "en": "University competency assessment (HSA / V-ACT)",
+    "vi": "Kỳ thi Đánh giá năng lực (HSA ĐHQGHN / V-ACT ĐHQG-HCM)"
+   },
+   "shortName": "ĐGNL",
+   "countries": [
+    "VN"
+   ],
+   "languages": [
+    "vi"
+   ],
+   "subjects": [
+    "Toán học và xử lý số liệu",
+    "Văn học - Ngôn ngữ",
+    "Khoa học / Tiếng Anh (HSA)",
+    "Tiếng Việt",
+    "Tiếng Anh",
+    "Toán học",
+    "Tư duy khoa học (V-ACT)"
+   ],
+   "keywords": [
+    "đánh giá năng lực",
+    "ĐGNL",
+    "HSA",
+    "V-ACT",
+    "ĐHQGHN",
+    "ĐHQG-HCM",
+    "tư duy định lượng",
+    "tư duy định tính",
+    "khoa học",
+    "giải đề HSA",
+    "giải đề V-ACT",
+    "đề thi thử ĐGNL",
+    "luyện thi ĐGNL",
+    "logic",
+    "suy luận khoa học",
+    "phân tích số liệu",
+    "Văn học Ngôn ngữ",
+    "tiếng Anh ĐGNL",
+    "tổng ôn ĐGNL",
+    "competency assessment"
+   ],
+   "blockedWords": [
+    "điểm chuẩn",
+    "review trường",
+    "vlog",
+    "drama",
+    "tuyển dụng",
+    "tin tức",
+    "phốt"
+   ],
+   "chips": [
+    "Tư duy định lượng",
+    "Tư duy định tính",
+    "Khoa học",
+    "Tiếng Việt",
+    "Tiếng Anh",
+    "Logic",
+    "Phân tích số liệu",
+    "Giải đề HSA",
+    "Giải đề V-ACT",
+    "Đề thi thử"
+   ],
+   "channels": [
+    {
+     "channelId": "UCbagbtOQLjFvC0ad0auKS0A",
+     "handle": "@cpenteam",
+     "name": "Luyện Thi Đánh Giá Năng Lực - Cpen Team",
+     "language": "vi"
+    },
+    {
+     "channelId": "UC8u66lpjWrr4zEtA7fK06sA",
+     "handle": "@luyenthidgnl.empire01",
+     "name": "Luyện Thi Đánh Giá Năng Lực-Empire Team",
+     "language": "vi"
+    },
+    {
+     "channelId": "UCXl9CpwLoZZLsoHZ4cq4ibg",
+     "handle": "@CoAiLinh",
+     "name": "Cô Ái Linh",
+     "language": "vi"
+    },
+    {
+     "channelId": "UC_3mk0WXhVVsrULLpxOzVgQ",
+     "handle": "@dgnlmapstudy",
+     "name": "Luyện thi Đánh giá Năng lực Mapstudy",
+     "language": "vi"
+    },
+    {
+     "channelId": "UCBtBkUlRXBekdeZg4GymRcQ",
+     "handle": "@ÔnThiĐGNLHCM_ThầyCông",
+     "name": "Ôn Thi Đánh Giá Năng Lực ĐHQG_Thầy Bùi Văn Công",
+     "language": "vi"
+    },
+    {
+     "channelId": "UCyHIFtuL2bqRffZouQPKr2Q",
+     "handle": "@othkeducation",
+     "name": "OTHK Education",
+     "language": "vi"
+    },
+    {
+     "channelId": "UCxYfMSZR00O1KSN_EjtC13A",
+     "handle": "@hsaeducationtsa",
+     "name": "LUYỆN THI QUỐC GIA ĐÁNH GIÁ NĂNG LỰC HSA EDUCATION",
+     "language": "vi"
+    },
+    {
+     "channelId": "UCSMuJehngkGVR_mTQGwbxMw",
+     "handle": "@QuocAnhVuO20",
+     "name": "Quoc Anh Vu",
+     "language": "vi"
+    },
+    {
+     "channelId": "UCiY16y63X8Arj7MqaBy5iLA",
+     "handle": "@gen3team",
+     "name": "Luyện Thi ĐGNL - Gen3 (V-SAT, V-ACT, HSA)",
+     "language": "vi"
+    }
+   ]
+  },
+  {
+   "id": "vn_vao10",
+   "kind": "study",
+   "name": {
+    "en": "Grade 10 entrance exam (Vietnam)",
+    "vi": "Thi tuyển sinh vào lớp 10 THPT"
+   },
+   "shortName": "Vào 10",
+   "countries": [
+    "VN"
+   ],
+   "languages": [
+    "vi"
+   ],
+   "subjects": [
+    "Toán",
+    "Ngữ văn",
+    "Ngoại ngữ (Tiếng Anh)"
+   ],
+   "keywords": [
+    "thi vào lớp 10",
+    "ôn thi vào 10",
+    "tuyển sinh lớp 10",
+    "đề thi vào 10",
+    "Toán 9",
+    "Ngữ văn 9",
+    "Tiếng Anh 9",
+    "hệ phương trình",
+    "phương trình bậc hai",
+    "hình học 9",
+    "bất đẳng thức",
+    "nghị luận xã hội",
+    "nghị luận văn học",
+    "đọc hiểu",
+    "viết đoạn văn",
+    "ngữ pháp tiếng Anh",
+    "giải đề",
+    "thi chuyên",
+    "lớp 9"
+   ],
+   "blockedWords": [
+    "điểm chuẩn",
+    "vlog",
+    "drama",
+    "tin tức",
+    "prank",
+    "phốt"
+   ],
+   "chips": [
+    "Toán 9",
+    "Hình học",
+    "Hệ phương trình",
+    "Bất đẳng thức",
+    "Ngữ văn 9",
+    "Nghị luận xã hội",
+    "Đọc hiểu",
+    "Tiếng Anh 9",
+    "Ngữ pháp",
+    "Giải đề vào 10"
+   ],
+   "channels": [
+    {
+     "channelId": "UCQ1ZVmWxah7qqxpz9nVu8oA",
+     "handle": "@thaynguyendinhkhiemtoan89",
+     "name": "Thầy Nguyễn Đình Khiêm - Luyện Thi Toán 8,9",
+     "language": "vi"
+    },
+    {
+     "channelId": "UCaSb4SR6fLLiBKXuKp-v0qw",
+     "handle": "@hocvancominhhien",
+     "name": "Học Văn Cô Minh Hiên",
+     "language": "vi"
+    },
+    {
+     "channelId": "UCL2c9VXhnzCqfMWkKTtm2Sw",
+     "handle": "@kimoanh-hocvan-vanhoc",
+     "name": "Kim Oanh - Học Văn - Văn Học",
+     "language": "vi"
+    },
+    {
+     "channelId": "UC9JR374wkf1nO3ml2lS4CEA",
+     "handle": "@ChillChillCũng9",
+     "name": "Chill Chill Cũng 9 - Ôn thi vào 10 cùng cô Hà",
+     "language": "vi"
+    },
+    {
+     "channelId": "UCFVRvdW9A4ieVgQI4SMB2sw",
+     "handle": "@MaiTiengAnh-THCS",
+     "name": "Mai Tiếng Anh - Chinh Phục Kỳ Thi Vào 10",
+     "language": "vi"
+    }
+   ]
+  },
+  {
+   "id": "th_civil_service",
+   "kind": "study",
+   "name": {
+    "en": "Thai civil service exam (OCSC Part A)",
+    "th": "สอบ ก.พ. ภาค ก (ความรู้ความสามารถทั่วไป)"
+   },
+   "shortName": "ก.พ.",
+   "countries": [
+    "TH"
+   ],
+   "languages": [
+    "th"
+   ],
+   "subjects": [
+    "ความสามารถในการคิดวิเคราะห์",
+    "ภาษาอังกฤษ",
+    "ความรู้และลักษณะการเป็นข้าราชการที่ดี"
+   ],
+   "keywords": [
+    "สอบ ก.พ.",
+    "ภาค ก",
+    "ก.พ. e-Exam",
+    "ก.พ. Paper & Pencil",
+    "ความสามารถในการคิดวิเคราะห์",
+    "คณิตศาสตร์",
+    "อนุกรม",
+    "ร้อยละ",
+    "ตาราง",
+    "เงื่อนไขสัญลักษณ์",
+    "เงื่อนไขภาษา",
+    "อุปมาอุปไมย",
+    "สรุปความ",
+    "ภาษาอังกฤษ ก.พ.",
+    "Reading",
+    "grammar",
+    "ข้าราชการที่ดี",
+    "พ.ร.บ. ระเบียบบริหารราชการแผ่นดิน",
+    "วิธีปฏิบัติราชการทางปกครอง",
+    "การบริหารกิจการบ้านเมืองที่ดี",
+    "เฉลยข้อสอบ ก.พ.",
+    "OCSC"
+   ],
+   "blockedWords": [
+    "ประกาศผลสอบ",
+    "งานราชการเปิดสอบ",
+    "เงินเดือน",
+    "vlog",
+    "ข่าว",
+    "ดราม่า"
+   ],
+   "chips": [
+    "คณิตศาสตร์ ก.พ.",
+    "อนุกรม",
+    "โจทย์ปัญหา",
+    "เงื่อนไขสัญลักษณ์",
+    "เงื่อนไขภาษา",
+    "อุปมาอุปไมย",
+    "ภาษาไทย",
+    "อังกฤษ ก.พ.",
+    "กฎหมาย ก.พ.",
+    "เฉลยข้อสอบ"
+   ],
+   "channels": [
+    {
+     "channelId": "UCjRB4O0OVcewcX7xW6hr3jw",
+     "handle": "@brotherMP",
+     "name": "พี่แมง ป.",
+     "language": "th"
+    },
+    {
+     "channelId": "UCmPP5SW2YstymMGrVLF8xWA",
+     "handle": "@GoodBrainGB",
+     "name": "พี่น็อต GoodBrain ติวสอบราชการ",
+     "language": "th"
+    },
+    {
+     "channelId": "UCIPXXWJJkTgJjjXHSbYBaEg",
+     "handle": "@themastergorpor",
+     "name": "พี่ก็อต พี่นัท The Masters ติวสอบราชการ",
+     "language": "th"
+    },
+    {
+     "channelId": "UCqDrzBXs02PlriN6IkqL3Ug",
+     "handle": "@gurubus",
+     "name": "สอบราชการ ก.พ. ท้องถิ่น ครูผู้ช่วย By GURU Academy",
+     "language": "th"
+    },
+    {
+     "channelId": "UCuIadQbYMTlaymrYm--gB9Q",
+     "handle": "@kimtutor",
+     "name": "พี่ขิม ติวสอบราชการ",
+     "language": "th"
+    },
+    {
+     "channelId": "UCW3x2m_LQ4kDBH_aA_z05hQ",
+     "handle": "@rawitutor",
+     "name": "พี่รวิ ติวสอบราชการ",
+     "language": "th"
+    },
+    {
+     "channelId": "UCOu0hAmLO1AkkSvuZhy56fQ",
+     "handle": "@tutorying",
+     "name": "ดร.หญิง ติวสอบ ก.พ.",
+     "language": "th"
+    },
+    {
+     "channelId": "UCx3j-NFHuYqy_Sz_nJ4mXGQ",
+     "handle": "@Kerdpithak",
+     "name": "ติวสอบ ก.พ. สอน ภาค ก. ออนไลน์",
+     "language": "th"
+    }
+   ]
+  },
+  {
+   "id": "id_tka",
+   "kind": "study",
+   "name": {
+    "en": "Academic Ability Test (TKA)",
+    "id": "Tes Kemampuan Akademik (TKA)"
+   },
+   "shortName": "TKA",
+   "countries": [
+    "ID"
+   ],
+   "languages": [
+    "id"
+   ],
+   "subjects": [
+    "Bahasa Indonesia",
+    "Matematika",
+    "Bahasa Inggris",
+    "Mapel pilihan (Matematika Lanjutan, Fisika, Kimia, Biologi, Ekonomi, Sosiologi, Geografi, Sejarah, dll.)"
+   ],
+   "keywords": [
+    "TKA",
+    "Tes Kemampuan Akademik",
+    "TKA SMA",
+    "TKA SMP",
+    "TKA SD",
+    "soal TKA",
+    "pembahasan TKA",
+    "latihan soal TKA",
+    "tryout TKA",
+    "simulasi TKA",
+    "Matematika wajib",
+    "Matematika lanjutan",
+    "Bahasa Indonesia",
+    "Bahasa Inggris",
+    "Fisika",
+    "Kimia",
+    "Biologi",
+    "Ekonomi",
+    "Pusmendik",
+    "asesmen"
+   ],
+   "blockedWords": [
+    "pengumuman",
+    "vlog",
+    "prank",
+    "gosip",
+    "drama",
+    "giveaway"
+   ],
+   "chips": [
+    "Matematika",
+    "Bahasa Indonesia",
+    "Bahasa Inggris",
+    "Matematika Lanjutan",
+    "Fisika",
+    "Kimia",
+    "Biologi",
+    "Ekonomi",
+    "Soal asli TKA",
+    "Tryout TKA"
+   ],
+   "channels": [
+    {
+     "channelId": "UCUackBn4egyRRLT_nOZPdtw",
+     "handle": "@Pusmendik",
+     "name": "Pusat Asesmen Pendidikan",
+     "language": "id"
+    },
+    {
+     "channelId": "UCjCkDKQ9Xv8eOuoVfei3vFg",
+     "handle": "@kimatika_official",
+     "name": "Kimatika",
+     "language": "id"
+    },
+    {
+     "channelId": "UCAe69wlClVVHexL0l0gdHKQ",
+     "handle": "@PrivatAlFaiz",
+     "name": "Privat Al Faiz",
+     "language": "id"
+    },
+    {
+     "channelId": "UC7LUZwQD6AZPTY-LlUdhEoA",
+     "handle": "@ruangtentor",
+     "name": "Ruang Tentor",
+     "language": "id"
+    },
+    {
+     "channelId": "UCX40x4W2M-ctCvR_x1vGA2Q",
+     "handle": "@Bimbel.ArRaihan",
+     "name": "Bimbingan Belajar Ar-Raihan",
+     "language": "id"
+    },
+    {
+     "channelId": "UCUZEaYZU0SoDTLO3ikc7SPA",
+     "handle": "@Lab.Bahasa",
+     "name": "Lab.Bahasa",
+     "language": "id"
+    },
+    {
+     "channelId": "UC7JnhGvWu3KPdcnJY33nCHQ",
+     "handle": "@kakarifin21",
+     "name": "kak arifin",
+     "language": "id"
+    },
+    {
+     "channelId": "UCpno89exl0H-9-jKk_ltBjA",
+     "handle": "@sofiaelevateacademy",
+     "name": "Sofia Elevate Academy",
+     "language": "id"
+    },
+    {
+     "channelId": "UCsf01NMcujvSj5i2yEzN3-A",
+     "handle": "@timath1982",
+     "name": "TI Math Channel",
+     "language": "id"
+    },
+    {
+     "channelId": "UC9gAN7QcvzskXgvRF8BBHMg",
+     "handle": "@irHam-BaSkoRo",
+     "name": "Irham Baskoro",
+     "language": "id"
+    }
+   ]
+  },
+  {
+   "id": "id_bumn",
+   "kind": "study",
+   "name": {
+    "en": "BUMN Joint Recruitment (RBB)",
+    "id": "Rekrutmen Bersama BUMN (RBB)"
+   },
+   "shortName": "RBB BUMN",
+   "countries": [
+    "ID"
+   ],
+   "languages": [
+    "id"
+   ],
+   "subjects": [
+    "Tes Kemampuan Dasar (TKD)",
+    "Tes AKHLAK (core values BUMN)",
+    "Wawasan Kebangsaan",
+    "Bahasa Inggris",
+    "Learning Agility"
+   ],
+   "keywords": [
+    "Rekrutmen Bersama BUMN",
+    "RBB",
+    "BUMN",
+    "FHCI",
+    "TKD BUMN",
+    "tes AKHLAK",
+    "core values AKHLAK",
+    "wawasan kebangsaan",
+    "tes bahasa Inggris BUMN",
+    "TOEFL",
+    "learning agility",
+    "psikotes",
+    "tes verbal",
+    "tes numerik",
+    "tes logika",
+    "TPA",
+    "tes potensi akademik",
+    "soal BUMN",
+    "pembahasan soal BUMN",
+    "tes online BUMN"
+   ],
+   "blockedWords": [
+    "gaji BUMN",
+    "lowongan kerja",
+    "pengumuman",
+    "vlog",
+    "prank",
+    "drama"
+   ],
+   "chips": [
+    "TKD",
+    "Verbal",
+    "Numerik",
+    "Figural",
+    "Logika",
+    "AKHLAK",
+    "Wawasan Kebangsaan",
+    "Bahasa Inggris",
+    "Learning Agility",
+    "Psikotes"
+   ],
+   "channels": [
+    {
+     "channelId": "UCyuS6wdKMnL9mkhtkAYcuBw",
+     "handle": "@fhcibumn5207",
+     "name": "FHCI BUMN",
+     "language": "id"
+    },
+    {
+     "channelId": "UCV49hwTPeVC8mTzCfon7Ycg",
+     "handle": "@berasn",
+     "name": "berASN",
+     "language": "id"
+    },
+    {
+     "channelId": "UCGBpDH-2jW1n2yjvFXFlWYA",
+     "handle": "@TestPsikotes",
+     "name": "Vinny Alvii",
+     "language": "id"
+    },
+    {
+     "channelId": "UCvnFkKtId20wY6vOSHt_sDA",
+     "handle": "@materisoalcpns",
+     "name": "Multimedia Pendidikan",
+     "language": "id"
+    }
+   ]
+  },
+  {
+   "id": "id_kedinasan",
+   "kind": "study",
+   "name": {
+    "en": "Civil-service academies entrance (SKD Sekolah Kedinasan)",
+    "id": "Seleksi Sekolah Kedinasan (SKD)"
+   },
+   "shortName": "SKD Kedinasan",
+   "countries": [
+    "ID"
+   ],
+   "languages": [
+    "id"
+   ],
+   "subjects": [
+    "Tes Wawasan Kebangsaan (TWK)",
+    "Tes Intelegensia Umum (TIU)",
+    "Tes Karakteristik Pribadi (TKP)"
+   ],
+   "keywords": [
+    "sekolah kedinasan",
+    "SKD kedinasan",
+    "SKD",
+    "CAT BKN",
+    "TWK",
+    "TIU",
+    "TKP",
+    "PKN STAN",
+    "IPDN",
+    "STIS",
+    "Poltekip",
+    "Poltekim",
+    "STMKG",
+    "passing grade SKD",
+    "tryout SKD",
+    "Pancasila",
+    "UUD 1945",
+    "bela negara",
+    "silogisme",
+    "deret angka",
+    "analogi verbal",
+    "soal cerita",
+    "pelayanan publik",
+    "jejaring kerja"
+   ],
+   "blockedWords": [
+    "pengumuman kelulusan",
+    "gaji",
+    "vlog",
+    "prank",
+    "drama",
+    "kehidupan taruna"
+   ],
+   "chips": [
+    "TWK",
+    "TIU",
+    "TKP",
+    "Pancasila",
+    "UUD 1945",
+    "Silogisme",
+    "Deret angka",
+    "Analogi",
+    "Soal cerita",
+    "Tryout SKD"
+   ],
+   "channels": [
+    {
+     "channelId": "UCvTmhU44LWsrw_xOLscYUhg",
+     "handle": "@SangTutor",
+     "name": "Sang Tutor",
+     "language": "id"
+    },
+    {
+     "channelId": "UCAe69wlClVVHexL0l0gdHKQ",
+     "handle": "@PrivatAlFaiz",
+     "name": "Privat Al Faiz",
+     "language": "id"
+    },
+    {
+     "channelId": "UCCN-SNF5rc_ohsJEL3CoYGA",
+     "handle": "@ayocpns",
+     "name": "AYOCPNS - Belajar Persiapan CPNS, PPPK & BUMN",
+     "language": "id"
+    },
+    {
+     "channelId": "UC2gO02aUDchrBKpu47QwM8Q",
+     "handle": "@IvoneMargiati",
+     "name": "Ivone Margiati",
+     "language": "id"
+    },
+    {
+     "channelId": "UCRn3C2-3OHtLL_s7_WsnAfg",
+     "handle": "@mentorasn",
+     "name": "Mentor ASN",
+     "language": "id"
+    },
+    {
+     "channelId": "UCwDHCAIoByZk-AML1QgUXAA",
+     "handle": "@TanyaCPNS",
+     "name": "Dhedi R Ghazali",
+     "language": "id"
+    },
+    {
+     "channelId": "UCLaS62jvRFAv5OzpfjJX8nw",
+     "handle": "@asnbelajar01",
+     "name": "ASN Belajar",
+     "language": "id"
+    },
+    {
+     "channelId": "UCzv-cmnJtzaHSPFIlPQ6ZJA",
+     "handle": "@Ajengseptin",
+     "name": "Ajeng Septin",
+     "language": "id"
+    }
+   ]
+  },
+  {
+   "id": "ph_bar",
+   "kind": "study",
+   "name": {
+    "en": "Philippine Bar Examinations",
+    "fil": "Philippine Bar Examinations"
+   },
+   "shortName": "Bar",
+   "countries": [
+    "PH"
+   ],
+   "languages": [
+    "en",
+    "fil"
+   ],
+   "subjects": [
+    "Political and Public International Law",
+    "Commercial and Taxation Laws",
+    "Civil Law",
+    "Labor Law and Social Legislation",
+    "Criminal Law",
+    "Remedial Law, Legal and Judicial Ethics with Practical Exercises"
+   ],
+   "keywords": [
+    "bar exam",
+    "Philippine bar",
+    "bar review",
+    "bar lecture",
+    "political law",
+    "constitutional law",
+    "public international law",
+    "civil law",
+    "obligations and contracts",
+    "oblicon",
+    "property",
+    "succession",
+    "taxation",
+    "commercial law",
+    "corporation code",
+    "labor law",
+    "criminal law",
+    "revised penal code",
+    "remedial law",
+    "civil procedure",
+    "legal ethics",
+    "Supreme Court cases",
+    "case digest",
+    "bar syllabus"
+   ],
+   "blockedWords": [
+    "bar results",
+    "topnotcher",
+    "vlog",
+    "news",
+    "politics",
+    "showbiz"
+   ],
+   "chips": [
+    "Political Law",
+    "Civil Law",
+    "Oblicon",
+    "Taxation",
+    "Commercial Law",
+    "Labor Law",
+    "Criminal Law",
+    "Remedial Law",
+    "Legal Ethics",
+    "Bar Q&A"
+   ],
+   "channels": [
+    {
+     "channelId": "UC9cnexV0zopcQYC73bbqQ5A",
+     "handle": "@DeanRockysLectures",
+     "name": "Dean Rocky's Lectures",
+     "language": "en"
+    },
+    {
+     "channelId": "UCF588mQuSdlNNw5DxbFig9A",
+     "handle": "@TheHowsofLaw",
+     "name": "The Hows of Law",
+     "language": "fil"
+    },
+    {
+     "channelId": "UCs_3c3cWhAG0qVnG6KQS5Lw",
+     "handle": "@LexMasteryPH",
+     "name": "Lex Mastery PH",
+     "language": "en"
+    },
+    {
+     "channelId": "UCx4jNuvKTDCKHAjV5fq6ekA",
+     "handle": "@DarchyWagasChannel",
+     "name": "Darchy Wagas",
+     "language": "en"
+    },
+    {
+     "channelId": "UCO9ORuWB-sbTmnEkqPXMqsw",
+     "handle": "@vlsglawprof",
+     "name": "Vien Lawrence Gabato",
+     "language": "en"
+    }
+   ]
+  },
+  {
+   "id": "ng_neco",
+   "kind": "study",
+   "name": {
+    "en": "NECO SSCE (Senior School Certificate Examination)"
+   },
+   "shortName": "NECO",
+   "countries": [
+    "NG"
+   ],
+   "languages": [
+    "en"
+   ],
+   "subjects": [
+    "English Language",
+    "General Mathematics",
+    "Civic Education",
+    "Biology",
+    "Chemistry",
+    "Physics",
+    "Further Mathematics",
+    "Economics",
+    "Government",
+    "Literature-in-English",
+    "Geography",
+    "Commerce",
+    "Financial Accounting",
+    "Agricultural Science",
+    "Computer Studies"
+   ],
+   "keywords": [
+    "NECO",
+    "NECO SSCE",
+    "SSCE internal",
+    "NECO GCE",
+    "SSCE external",
+    "NECO past questions",
+    "NECO mathematics",
+    "NECO English",
+    "NECO physics",
+    "NECO chemistry",
+    "NECO biology practical",
+    "NECO further mathematics",
+    "NECO economics",
+    "NECO government",
+    "civic education",
+    "senior secondary school",
+    "SS3",
+    "WAEC NECO syllabus",
+    "theory and objectives",
+    "practical specimen"
+   ],
+   "blockedWords": [
+    "expo",
+    "runz",
+    "NECO result checker",
+    "leaked questions",
+    "answers before exam",
+    "scholarship scam",
+    "job alert"
+   ],
+   "chips": [
+    "English",
+    "Mathematics",
+    "Physics",
+    "Chemistry",
+    "Biology",
+    "Economics",
+    "Government",
+    "Literature",
+    "Civic Education",
+    "Practicals",
+    "Past questions"
+   ],
+   "channels": [
+    {
+     "channelId": "UCSCFZLrE20qg7qn3H9LvF6w",
+     "handle": "@global-mathsbymr.adebanjo",
+     "name": "Global-Mathematics by Mr.Adebanjo",
+     "language": "en"
+    },
+    {
+     "channelId": "UCXFUIQnv3AbWO-HDQ2-TOHw",
+     "handle": "@MyschoolNigeria",
+     "name": "Myschool",
+     "language": "en"
+    },
+    {
+     "channelId": "UCrVfk3a44epYgdf_9zr9uzg",
+     "handle": "@300plusacademy",
+     "name": "300 plus",
+     "language": "en"
+    },
+    {
+     "channelId": "UC9aurmpggkIqjQn2wt4lH_Q",
+     "handle": "@TheScienceChefAcademy",
+     "name": "The Science Chef Academy",
+     "language": "en"
+    },
+    {
+     "channelId": "UCjeXQ5VITD6h8_jnQC02VqA",
+     "handle": "@DTWTUTORIALS",
+     "name": "DTW TUTORIALS",
+     "language": "en"
+    },
+    {
+     "channelId": "UCGpKjGyEq8MepUcnym1w2tQ",
+     "handle": "@O3schools",
+     "name": "O3SCHOOLS",
+     "language": "en"
+    },
+    {
+     "channelId": "UCBllaHLv5L8dIwTKKpRNseQ",
+     "handle": "@yourstudypath",
+     "name": "Download Your Study Path App",
+     "language": "en"
+    }
+   ]
+  },
+  {
+   "id": "ng_ican",
+   "kind": "study",
+   "name": {
+    "en": "ICAN professional exams (Chartered Accountancy, Nigeria)"
+   },
+   "shortName": "ICAN",
+   "countries": [
+    "NG"
+   ],
+   "languages": [
+    "en"
+   ],
+   "subjects": [
+    "Business, Management and Finance",
+    "Financial Accounting",
+    "Management Information",
+    "Business Law",
+    "Corporate Reporting",
+    "Advanced Audit, Assurance and Forensics",
+    "Strategic Financial Management",
+    "Advanced Taxation",
+    "Public Sector Accounting and Finance",
+    "Performance Management",
+    "Case Study",
+    "ATS (Accounting Technicians Scheme)"
+   ],
+   "keywords": [
+    "ICAN",
+    "ICAN Nigeria",
+    "Chartered Accountant Nigeria",
+    "ICAN foundation",
+    "ICAN skills level",
+    "ICAN professional level",
+    "ICAN case study",
+    "pre-seen analysis",
+    "ATS",
+    "ATSWA",
+    "financial reporting",
+    "corporate reporting",
+    "IFRS",
+    "IAS",
+    "consolidation",
+    "advanced taxation",
+    "Nigeria Tax Act",
+    "capital allowance",
+    "performance management",
+    "variance analysis",
+    "strategic financial management",
+    "audit and assurance",
+    "public sector accounting",
+    "ICAN past questions"
+   ],
+   "blockedWords": [
+    "ICAN result live",
+    "induction ceremony",
+    "job vacancy",
+    "salary",
+    "motivation shorts",
+    "forex"
+   ],
+   "chips": [
+    "Financial Reporting",
+    "Corporate Reporting",
+    "Audit & Assurance",
+    "Taxation",
+    "Performance Management",
+    "Financial Management",
+    "Case Study",
+    "ATS",
+    "IFRS",
+    "Business Law"
+   ],
+   "channels": [
+    {
+     "channelId": "UCGHBcFkf73PwhjjVm14qofw",
+     "handle": "@Ezikan",
+     "name": "EZIKAN ACADEMY",
+     "language": "en"
+    },
+    {
+     "channelId": "UCOM4jqFIgRGyD33Vqsz26eA",
+     "handle": "@ApexProfessionalAssociat-vn1ed",
+     "name": "Apex Professional Associates",
+     "language": "en"
+    },
+    {
+     "channelId": "UCqnfnrpz_E6R310C1o9yslQ",
+     "handle": "@EquityProfessional",
+     "name": "Equity Professional",
+     "language": "en"
+    },
+    {
+     "channelId": "UCPJtfvH-lPlExNeCEU6wJiA",
+     "handle": "@ICANOnlineTutors",
+     "name": "ICAN Online Tutors",
+     "language": "en"
+    },
+    {
+     "channelId": "UCVjSBYdO7pKyLM_Xvs2aWLw",
+     "handle": "@odisalassociates",
+     "name": "Odisal Associates",
+     "language": "en"
+    }
+   ]
+  },
+  {
+   "id": "gh_bece",
+   "kind": "study",
+   "name": {
+    "en": "BECE (Basic Education Certificate Examination, Ghana)"
+   },
+   "shortName": "BECE",
+   "countries": [
+    "GH"
+   ],
+   "languages": [
+    "en"
+   ],
+   "subjects": [
+    "English Language",
+    "Mathematics",
+    "Integrated Science",
+    "Social Studies",
+    "Computing",
+    "Career Technology",
+    "Creative Arts and Design",
+    "Religious and Moral Education",
+    "Ghanaian Language",
+    "French"
+   ],
+   "keywords": [
+    "BECE",
+    "BECE Ghana",
+    "JHS 3",
+    "junior high school",
+    "BECE past questions",
+    "BECE mock",
+    "BECE mathematics",
+    "BECE integrated science",
+    "BECE English",
+    "BECE social studies",
+    "BECE computing",
+    "career technology",
+    "RME",
+    "creative arts and design",
+    "WAEC Ghana",
+    "common core programme",
+    "ratio and proportion",
+    "percentages",
+    "area and perimeter",
+    "pasco"
+   ],
+   "blockedWords": [
+    "BECE apor",
+    "leaked questions",
+    "placement result live",
+    "school placement",
+    "vlog",
+    "prank"
+   ],
+   "chips": [
+    "Mathematics",
+    "Integrated Science",
+    "English",
+    "Social Studies",
+    "Computing",
+    "Career Technology",
+    "RME",
+    "Creative Arts",
+    "Mock questions",
+    "Past questions"
+   ],
+   "channels": [
+    {
+     "channelId": "UCfmHsaZ0PzCOT6wZpEwQ-UA",
+     "handle": "@Taxonomyonlinemathematics",
+     "name": "Taxonomy online mathematics",
+     "language": "en"
+    },
+    {
+     "channelId": "UCMKe4QvDnee3l2-N86xMbaQ",
+     "handle": "@learnritehere",
+     "name": "LEARNRITEHERE",
+     "language": "en"
+    },
+    {
+     "channelId": "UC7RHVtbktuF-6NjzkaEDhCQ",
+     "handle": "@naseglearn",
+     "name": "Wiz Naaseg",
+     "language": "en"
+    },
+    {
+     "channelId": "UCNtrowkUwb8ah6rJ-2YL-ZQ",
+     "handle": "@studyrevisegh",
+     "name": "StudyRevise - Exam Prep for WASSCE  and Cambridge",
+     "language": "en"
+    }
+   ]
+  },
+  {
+   "id": "ke_kjsea",
+   "kind": "study",
+   "name": {
+    "en": "KJSEA / KPSEA (Kenya Grade 9 and Grade 6 assessments)"
+   },
+   "shortName": "KJSEA",
+   "countries": [
+    "KE"
+   ],
+   "languages": [
+    "en",
+    "sw"
+   ],
+   "subjects": [
+    "Mathematics",
+    "English",
+    "Kiswahili",
+    "Integrated Science",
+    "Social Studies",
+    "Agriculture",
+    "Pre-Technical Studies",
+    "Creative Arts and Sports",
+    "Religious Education",
+    "Science and Technology (KPSEA)"
+   ],
+   "keywords": [
+    "KJSEA",
+    "KPSEA",
+    "KNEC",
+    "grade 9",
+    "grade 6",
+    "junior school",
+    "CBC",
+    "CBE",
+    "competency based curriculum",
+    "integrated science",
+    "pre-technical studies",
+    "creative arts and sports",
+    "social studies",
+    "Kiswahili insha",
+    "sarufi",
+    "agriculture project",
+    "KJSEA past papers",
+    "marking scheme",
+    "indices and logarithms",
+    "probability",
+    "mean of grouped data"
+   ],
+   "blockedWords": [
+    "leaked papers",
+    "revealed questions",
+    "KJSEA results live",
+    "form one placement",
+    "TSC news",
+    "vlog"
+   ],
+   "chips": [
+    "Mathematics",
+    "Integrated Science",
+    "English",
+    "Kiswahili",
+    "Social Studies",
+    "Pre-Technical",
+    "Agriculture",
+    "Creative Arts",
+    "KPSEA",
+    "Marking schemes"
+   ],
+   "channels": [
+    {
+     "channelId": "UCnz_JXC5lG6RFz4zpr-a92Q",
+     "handle": "@trsamson9412",
+     "name": "Tr Samson",
+     "language": "en"
+    },
+    {
+     "channelId": "UCz8eyce8xXmGKH0WejYAx0A",
+     "handle": "@TeacherMwitiAyubMurungi",
+     "name": "TEACHER AYUB MWITI",
+     "language": "en"
+    },
+    {
+     "channelId": "UCUoiHoypOlvOFjK9-7Z1aeg",
+     "handle": "@kenyascienceacademy",
+     "name": "KENYA SCIENCE ACADEMY",
+     "language": "en"
+    },
+    {
+     "channelId": "UCdmtX68nPvlQImby4xUuTew",
+     "handle": "@cbcworld001",
+     "name": "Cbc online skul",
+     "language": "en"
+    },
+    {
+     "channelId": "UCCQoKBTsmQhaw4s_gzIbvZQ",
+     "handle": "@elimudemy",
+     "name": "Elimudemy",
+     "language": "en"
+    },
+    {
+     "channelId": "UC-qT6IQSWyi7l_ihagJPc1A",
+     "handle": "@schoolmateke",
+     "name": "School Mate",
+     "language": "en"
+    }
+   ]
+  },
+  {
+   "id": "ke_kasneb_cpa",
+   "kind": "study",
+   "name": {
+    "en": "KASNEB CPA (Certified Public Accountant, Kenya)"
+   },
+   "shortName": "CPA-K",
+   "countries": [
+    "KE"
+   ],
+   "nearby": [
+    "UG",
+    "TZ",
+    "RW"
+   ],
+   "languages": [
+    "en"
+   ],
+   "subjects": [
+    "Financial Accounting",
+    "Business Law",
+    "Economics",
+    "Quantitative Analysis",
+    "Management Accounting",
+    "Financial Reporting",
+    "Public Finance and Taxation",
+    "Auditing and Assurance",
+    "Financial Management",
+    "Advanced Financial Reporting",
+    "Advanced Financial Management",
+    "Advanced Auditing and Assurance",
+    "Advanced Public Finance and Taxation",
+    "Leadership and Management"
+   ],
+   "keywords": [
+    "KASNEB",
+    "CPA Kenya",
+    "CPA foundation",
+    "CPA intermediate",
+    "CPA advanced",
+    "financial reporting",
+    "consolidation IFRS 10",
+    "group accounts",
+    "financial management",
+    "WACC",
+    "capital budgeting",
+    "auditing and assurance",
+    "assurance engagement",
+    "public finance and taxation",
+    "management accounting",
+    "quantitative analysis",
+    "probability",
+    "descriptive statistics",
+    "advanced financial management",
+    "KASNEB past papers",
+    "revision blocks",
+    "April exams",
+    "August exams",
+    "December exams"
+   ],
+   "blockedWords": [
+    "KASNEB results live",
+    "graduation ceremony",
+    "job vacancy",
+    "salary",
+    "betting",
+    "motivation shorts"
+   ],
+   "chips": [
+    "Financial Accounting",
+    "Financial Reporting",
+    "Financial Management",
+    "Auditing",
+    "Taxation",
+    "Management Accounting",
+    "Quantitative Analysis",
+    "AFM",
+    "AFR",
+    "Past papers"
+   ],
+   "channels": [
+    {
+     "channelId": "UCpn7ug6HXVe5HyvyGyzYppA",
+     "handle": "@johnmark6JM",
+     "name": "CPA JOHNMARK",
+     "language": "en"
+    },
+    {
+     "channelId": "UCI2nOeW-iW6EBdvt9wcgcHg",
+     "handle": "@mDarasaEXTRA",
+     "name": "mDarasa Digital College",
+     "language": "en"
+    },
+    {
+     "channelId": "UCY7hA7MkCH0InX_yhByrEpg",
+     "handle": "@cpacleophasonlineplatform",
+     "name": "CPA CLEOPHAS",
+     "language": "en"
+    },
+    {
+     "channelId": "UCkQOvwrwsqFLwHW3-cfddqw",
+     "handle": "@simonmakan",
+     "name": "CPA MAKAN, CIPS COLLEGE",
+     "language": "en"
+    },
+    {
+     "channelId": "UCuaVH1_53iXMH1fHomt1UFw",
+     "handle": "@DekowMohamedofficial",
+     "name": "CPA DEKOW MOHAMED",
+     "language": "en"
+    }
+   ]
+  },
+  {
+   "id": "et_exit_exam",
+   "kind": "study",
+   "name": {
+    "en": "Ethiopian University Exit Exam",
+    "am": "የዩኒቨርሲቲ መውጫ ፈተና"
+   },
+   "shortName": "Exit Exam",
+   "countries": [
+    "ET"
+   ],
+   "languages": [
+    "am",
+    "en",
+    "om"
+   ],
+   "subjects": [
+    "Accounting and Finance",
+    "Management",
+    "Economics",
+    "Nursing",
+    "Midwifery",
+    "Public Health",
+    "Computer Science",
+    "Information Technology",
+    "Civil Engineering",
+    "Law"
+   ],
+   "keywords": [
+    "exit exam",
+    "Ethiopian exit exam",
+    "university exit exam",
+    "መውጫ ፈተና",
+    "model exit exam",
+    "exit exam questions and answers",
+    "accounting and finance exit exam",
+    "management exit exam",
+    "economics exit exam",
+    "nursing exit exam",
+    "COC",
+    "licensure exam",
+    "health science exit exam",
+    "computer science exit exam",
+    "MoE",
+    "2018 E.C.",
+    "Yekatit 2018",
+    "Sene 2018",
+    "HRM",
+    "strategic management",
+    "macroeconomics"
+   ],
+   "blockedWords": [
+    "exit exam result live",
+    "ውጤት",
+    "job vacancy",
+    "scholarship",
+    "TikTok",
+    "vlog"
+   ],
+   "chips": [
+    "Accounting",
+    "Management",
+    "Economics",
+    "Nursing",
+    "Health science",
+    "Computer Science",
+    "Model exam",
+    "Past questions",
+    "መውጫ ፈተና",
+    "2018 E.C."
+   ],
+   "channels": [
+    {
+     "channelId": "UCGQmPtHZz-WHjADf0B15aIA",
+     "handle": "@genanewtutorials",
+     "name": "Genanew Tutorials",
+     "language": "am"
+    },
+    {
+     "channelId": "UCgYA56Hkac0wAivTfE1wRNw",
+     "handle": "@ErmiE-learning",
+     "name": "Ermi E-learning",
+     "language": "am"
+    },
+    {
+     "channelId": "UCmxL07a3zfN1ZGEpt3UYeOA",
+     "handle": "@Tegbew",
+     "name": "Melis Tube (Management Exit Exam Tutorial)",
+     "language": "am"
+    },
+    {
+     "channelId": "UCxQu0bppUwYblBcOiwAZoGw",
+     "handle": "@EthioEconomicsSchool",
+     "name": "Ethio Economics School",
+     "language": "am"
+    },
+    {
+     "channelId": "UCqsHbmJunDe7uUEW0uzdFvw",
+     "handle": "@DSNursing",
+     "name": "DS NURSING ACADEMY",
+     "language": "am"
+    },
+    {
+     "channelId": "UCEmYYVdYgm5ZoCenkyE0nnw",
+     "handle": "@milkiHSTC1219",
+     "name": "Milki Health Science TC",
+     "language": "om"
+    },
+    {
+     "channelId": "UCTc9EgPiTACrBYTi5ezMyPQ",
+     "handle": "@ABIsNurseHubE.T",
+     "name": "ABI's Nurse Hub E.T",
+     "language": "am"
+    }
+   ]
+  },
+  {
+   "id": "interview_system_design",
+   "kind": "interview",
+   "name": {
+    "en": "System design interview prep"
+   },
+   "shortName": "System design",
+   "languages": [
+    "en",
+    "hi"
+   ],
+   "subjects": [
+    "High-level design",
+    "Low-level design",
+    "Distributed systems",
+    "System design mock interviews"
+   ],
+   "keywords": [
+    "system design interview",
+    "system design",
+    "high level design",
+    "low level design",
+    "HLD",
+    "LLD",
+    "distributed systems",
+    "scalability",
+    "caching",
+    "load balancer",
+    "database sharding",
+    "consistent hashing",
+    "message queue",
+    "Kafka",
+    "microservices",
+    "rate limiter",
+    "design URL shortener",
+    "design WhatsApp",
+    "CAP theorem",
+    "object oriented design",
+    "design patterns",
+    "system design mock interview",
+    "AI system design",
+    "back of the envelope estimation"
+   ],
+   "blockedWords": [
+    "salary reveal",
+    "vlog",
+    "day in the life",
+    "layoffs news",
+    "reaction",
+    "meme"
+   ],
+   "chips": [
+    "Design framework",
+    "Scalability",
+    "Caching",
+    "Databases",
+    "Load balancing",
+    "Message queues",
+    "Consistent hashing",
+    "Rate limiter",
+    "Low-level design",
+    "Mock interviews",
+    "AI system design"
+   ],
+   "channels": [
+    {
+     "channelId": "UCZgt6AzoyjslHTC9dz0UoTw",
+     "handle": "@ByteByteGo",
+     "name": "ByteByteGo",
+     "language": "en"
+    },
+    {
+     "channelId": "UC3kf-QFT6FZzDk9JsPg8Svg",
+     "handle": "@hello_interview",
+     "name": "Hello Interview",
+     "language": "en"
+    },
+    {
+     "channelId": "UCRPMAqdtSgd0Ipeef7iFsKw",
+     "handle": "@gkcs",
+     "name": "Gaurav Sen",
+     "language": "en"
+    },
+    {
+     "channelId": "UCjm_qVkCPjOVDz9BWjNqO9A",
+     "handle": "@aced_io",
+     "name": "Aced (formerly Exponent)",
+     "language": "en"
+    },
+    {
+     "channelId": "UCbvDQKzAJ5GwCjTrv4FWkxg",
+     "handle": "@jordanhasnolife5163",
+     "name": "Jordan has no life",
+     "language": "en"
+    },
+    {
+     "channelId": "UCDJ2HAZ_hW-DMJj_U0zN38w",
+     "handle": "@ConceptAndCodingByShrayansh",
+     "name": "Concept && Coding - by Shrayansh",
+     "language": "en"
+    },
+    {
+     "channelId": "UC_b1GUJv_2QiMP4BxC9-Dxg",
+     "handle": "@AsliEngineering",
+     "name": "Arpit Bhayani",
+     "language": "en"
+    }
+   ]
+  },
+  {
+   "id": "interview_devops_cloud",
+   "kind": "interview",
+   "name": {
+    "en": "DevOps, cloud & SRE interview prep"
+   },
+   "shortName": "DevOps",
+   "languages": [
+    "en",
+    "hi"
+   ],
+   "subjects": [
+    "Linux & networking",
+    "CI/CD",
+    "Containers & Kubernetes",
+    "Infrastructure as code",
+    "Cloud (AWS/Azure/GCP)",
+    "Monitoring & SRE"
+   ],
+   "keywords": [
+    "DevOps interview questions",
+    "cloud interview",
+    "SRE interview",
+    "Kubernetes interview questions",
+    "Docker",
+    "Kubernetes",
+    "Terraform",
+    "Ansible",
+    "Jenkins",
+    "GitHub Actions",
+    "CI/CD pipeline",
+    "AWS",
+    "Azure",
+    "GCP",
+    "Linux commands",
+    "networking basics",
+    "Prometheus",
+    "Grafana",
+    "Helm",
+    "Argo CD",
+    "scenario based questions",
+    "DevOps project",
+    "cloud architect interview",
+    "DevSecOps"
+   ],
+   "blockedWords": [
+    "salary reveal",
+    "vlog",
+    "day in the life",
+    "layoffs news",
+    "reaction",
+    "meme"
+   ],
+   "chips": [
+    "Linux",
+    "Git",
+    "Docker",
+    "Kubernetes",
+    "CI/CD",
+    "Terraform",
+    "AWS",
+    "Azure",
+    "Monitoring",
+    "SRE",
+    "Scenario questions",
+    "Projects"
+   ],
+   "channels": [
+    {
+     "channelId": "UCdngmbVKX1Tgre699-XLlUA",
+     "handle": "@TechWorldwithNana",
+     "name": "TechWorld with Nana",
+     "language": "en"
+    },
+    {
+     "channelId": "UCnnQ3ybuyFdzvgv2Ky5jnAA",
+     "handle": "@AbhishekVeeramalla",
+     "name": "Abhishek.Veeramalla",
+     "language": "en"
+    },
+    {
+     "channelId": "UClboKaFwE4JHnga2hVmOasQ",
+     "handle": "@TrainWithShubham",
+     "name": "TrainWithShubham",
+     "language": "hi"
+    },
+    {
+     "channelId": "UCSWj8mqQCcrcBlXPi4ThRDQ",
+     "handle": "@KodeKloud",
+     "name": "KodeKloud",
+     "language": "en"
+    },
+    {
+     "channelId": "UCBdfli20jrAscmR9COL35qg",
+     "handle": "@cloudwithraj",
+     "name": "Cloud With Raj",
+     "language": "en"
+    },
+    {
+     "channelId": "UC4MdpjzjPuop_qWNAvR23JA",
+     "handle": "@DevOpsDirective",
+     "name": "DevOps Directive",
+     "language": "en"
+    },
+    {
+     "channelId": "UCraiFqWi0qSIxXxXN4IHFBQ",
+     "handle": "@BeABetterDev",
+     "name": "Be A Better Dev",
+     "language": "en"
+    }
+   ]
+  },
+  {
+   "id": "interview_data_science",
+   "kind": "interview",
+   "name": {
+    "en": "Data science, ML & analytics interview prep"
+   },
+   "shortName": "Data science",
+   "languages": [
+    "en",
+    "hi"
+   ],
+   "subjects": [
+    "SQL",
+    "Statistics & probability",
+    "Machine learning",
+    "Product sense & A/B testing",
+    "Python for data",
+    "ML system design"
+   ],
+   "keywords": [
+    "data science interview",
+    "machine learning interview",
+    "data analyst interview",
+    "SQL interview questions",
+    "window functions",
+    "statistics",
+    "probability",
+    "hypothesis testing",
+    "A/B testing",
+    "regression",
+    "classification",
+    "decision trees",
+    "gradient boosting",
+    "neural networks",
+    "pandas",
+    "product sense",
+    "metrics case",
+    "ML system design",
+    "data engineer interview",
+    "Spark",
+    "Power BI",
+    "Excel",
+    "LLM interview",
+    "feature engineering"
+   ],
+   "blockedWords": [
+    "salary reveal",
+    "vlog",
+    "day in the life",
+    "layoffs news",
+    "reaction",
+    "meme"
+   ],
+   "chips": [
+    "SQL",
+    "Statistics",
+    "Probability",
+    "A/B testing",
+    "Machine learning",
+    "Deep learning",
+    "Python & pandas",
+    "Product case",
+    "ML system design",
+    "Data engineering",
+    "Mock interviews"
+   ],
+   "channels": [
+    {
+     "channelId": "UCQSMCVUX1HgrwxJhO_7VrJQ",
+     "handle": "@DataInterview",
+     "name": "DataInterview",
+     "language": "en"
+    },
+    {
+     "channelId": "UCW8Ews7tdKKkBT6GdtQaXvQ",
+     "handle": "@stratascratch",
+     "name": "StrataScratch",
+     "language": "en"
+    },
+    {
+     "channelId": "UCk7NcgnqCmui1AV7MTXZwOw",
+     "handle": "@ankitbansal6",
+     "name": "Ankit Bansal",
+     "language": "en"
+    },
+    {
+     "channelId": "UCnz-ZXXER4jOvuED5trXfEA",
+     "handle": "@techTFQ",
+     "name": "techTFQ",
+     "language": "en"
+    },
+    {
+     "channelId": "UCtYLUTtgS3k1Fg4y5tAhLbw",
+     "handle": "@statquest",
+     "name": "StatQuest with Josh Starmer",
+     "language": "en"
+    },
+    {
+     "channelId": "UCUcpVoi5KkJmnE3bvEhHR0Q",
+     "handle": "@ritvikmath",
+     "name": "ritvikmath",
+     "language": "en"
+    },
+    {
+     "channelId": "UCh9nVJoWXmFb7sLApWGcLPQ",
+     "handle": "@codebasics",
+     "name": "codebasics",
+     "language": "en"
+    },
+    {
+     "channelId": "UCNU_lfiiWBdtULKOw6X0Dig",
+     "handle": "@krishnaik06",
+     "name": "Krish Naik",
+     "language": "en"
+    },
+    {
+     "channelId": "UC7cs8q-gJRlGwj4A8OmCmXg",
+     "handle": "@AlexTheAnalyst",
+     "name": "Alex The Analyst",
+     "language": "en"
+    }
+   ]
+  },
+  {
+   "id": "interview_product",
+   "kind": "interview",
+   "name": {
+    "en": "Product management interview prep"
+   },
+   "shortName": "PM",
+   "languages": [
+    "en"
+   ],
+   "subjects": [
+    "Product sense",
+    "Product design",
+    "Execution & metrics",
+    "Strategy",
+    "Estimation",
+    "Behavioural"
+   ],
+   "keywords": [
+    "product manager interview",
+    "PM interview",
+    "product sense",
+    "product design question",
+    "CIRCLES framework",
+    "metrics question",
+    "north star metric",
+    "root cause analysis",
+    "execution interview",
+    "product strategy",
+    "estimation question",
+    "guesstimate",
+    "prioritization",
+    "A/B testing",
+    "behavioral PM interview",
+    "Google PM interview",
+    "Meta PM interview",
+    "Amazon leadership principles",
+    "AI product manager",
+    "technical PM",
+    "PM mock interview",
+    "product critique"
+   ],
+   "blockedWords": [
+    "salary reveal",
+    "vlog",
+    "day in the life",
+    "layoffs news",
+    "reaction",
+    "meme"
+   ],
+   "chips": [
+    "Product sense",
+    "Product design",
+    "Metrics",
+    "Root cause",
+    "Strategy",
+    "Estimation",
+    "Prioritisation",
+    "Behavioural",
+    "AI PM",
+    "Mock interviews"
+   ],
+   "channels": [
+    {
+     "channelId": "UCjm_qVkCPjOVDz9BWjNqO9A",
+     "handle": "@aced_io",
+     "name": "Aced (formerly Exponent)",
+     "language": "en"
+    },
+    {
+     "channelId": "UCFJy5E_3XknWv42cvedoALw",
+     "handle": "@IGotAnOfferPM",
+     "name": "IGotAnOffer: Product management",
+     "language": "en"
+    },
+    {
+     "channelId": "UCACGk1l_5XEznD5Bcig-KqA",
+     "handle": "@ProductAlliance",
+     "name": "Product Alliance",
+     "language": "en"
+    },
+    {
+     "channelId": "UCyZwZKn-YKWTLvbctQREP0w",
+     "handle": "@ProductManagementExercises",
+     "name": "Product Management Exercises",
+     "language": "en"
+    },
+    {
+     "channelId": "UCJTZjVzcmibOemSAkJlzL7Q",
+     "handle": "@Prepfully",
+     "name": "Prepfully",
+     "language": "en"
+    }
+   ]
+  },
+  {
+   "id": "interview_consulting",
+   "kind": "interview",
+   "name": {
+    "en": "Consulting case interview prep"
+   },
+   "shortName": "Case",
+   "languages": [
+    "en"
+   ],
+   "subjects": [
+    "Case interviews",
+    "Market sizing",
+    "Frameworks & structuring",
+    "Case math",
+    "Fit interviews",
+    "Online assessments"
+   ],
+   "keywords": [
+    "case interview",
+    "consulting interview",
+    "case study",
+    "market sizing",
+    "guesstimate",
+    "profitability case",
+    "market entry case",
+    "pricing case",
+    "M&A case",
+    "issue tree",
+    "MECE",
+    "hypothesis driven",
+    "case math",
+    "chart interpretation",
+    "McKinsey PEI",
+    "fit interview",
+    "McKinsey Solve",
+    "BCG Casey",
+    "BCG online case",
+    "Bain case",
+    "mock case interview",
+    "interviewer led case",
+    "candidate led case"
+   ],
+   "blockedWords": [
+    "salary reveal",
+    "vlog",
+    "day in the life",
+    "layoffs news",
+    "reaction",
+    "meme"
+   ],
+   "chips": [
+    "Case structure",
+    "Profitability",
+    "Market sizing",
+    "Market entry",
+    "Pricing",
+    "M&A cases",
+    "Case math",
+    "Charts",
+    "Fit questions",
+    "McKinsey Solve",
+    "Mock cases"
+   ],
+   "channels": [
+    {
+     "channelId": "UCrDscHOUEz_YZWGXIYL7w4g",
+     "handle": "@Managementconsulted",
+     "name": "Management Consulted",
+     "language": "en"
+    },
+    {
+     "channelId": "UCrxXuHCTLVGUy0_zI6E8aNg",
+     "handle": "@rocketblocks",
+     "name": "rocketblocks",
+     "language": "en"
+    },
+    {
+     "channelId": "UCIJI3d_oQvKMdNbwBi3OFXA",
+     "handle": "@HackingtheCaseInterview",
+     "name": "Hacking the Case Interview",
+     "language": "en"
+    },
+    {
+     "channelId": "UCGo4-qWsTYnGKhXeghZE6hA",
+     "handle": "@mconsultingprep",
+     "name": "MConsultingPrep Official Channel",
+     "language": "en"
+    },
+    {
+     "channelId": "UCNDQnkGCQ4r4JikUnXF7o7w",
+     "handle": "@Igotanoffer",
+     "name": "IGotAnOffer: Consulting",
+     "language": "en"
+    },
+    {
+     "channelId": "UCBeUWFTGiqPHMnENybTpPww",
+     "handle": "@firmsconsulting",
+     "name": "firmsconsulting",
+     "language": "en"
+    }
+   ]
+  },
+  {
+   "id": "interview_finance",
+   "kind": "interview",
+   "name": {
+    "en": "Finance interview prep (IB, accounting, CFA/equity research)"
+   },
+   "shortName": "Finance",
+   "languages": [
+    "en"
+   ],
+   "subjects": [
+    "Accounting",
+    "Valuation",
+    "DCF",
+    "M&A and LBO",
+    "Financial modelling",
+    "Equity research",
+    "Fit interviews"
+   ],
+   "keywords": [
+    "investment banking interview",
+    "walk me through a DCF",
+    "three financial statements",
+    "accounting interview questions",
+    "enterprise value",
+    "equity value",
+    "valuation multiples",
+    "comparable companies",
+    "precedent transactions",
+    "merger model",
+    "LBO",
+    "financial modeling",
+    "Excel",
+    "stock pitch",
+    "equity research interview",
+    "CFA level 1",
+    "CFA",
+    "WACC",
+    "working capital",
+    "cash flow statement",
+    "superday",
+    "HireVue",
+    "fit questions",
+    "why investment banking"
+   ],
+   "blockedWords": [
+    "salary reveal",
+    "vlog",
+    "day in the life",
+    "trading signals",
+    "stock tips",
+    "crypto pump",
+    "reaction"
+   ],
+   "chips": [
+    "3 statements",
+    "Accounting",
+    "DCF",
+    "Valuation",
+    "Comps",
+    "M&A",
+    "LBO",
+    "Excel modelling",
+    "Stock pitch",
+    "CFA",
+    "Fit questions"
+   ],
+   "variantLabel": {
+    "en": "Track"
+   },
+   "variants": [
+    {
+     "id": "investment_banking",
+     "name": {
+      "en": "Investment banking"
+     },
+     "default": true,
+     "chips": [
+      "Fit questions",
+      "3 statements",
+      "DCF",
+      "Valuation",
+      "M&A",
+      "LBO"
+     ],
+     "keywords": [
+      "investment banking interview",
+      "walk me through a DCF",
+      "merger model",
+      "LBO",
+      "superday",
+      "HireVue"
+     ],
+     "channels": [
+      "@financialmodeling",
+      "@AfzalHussein",
+      "@wallstreetprep",
+      "@rareliquid"
+     ]
+    },
+    {
+     "id": "accounting",
+     "name": {
+      "en": "Accounting"
+     },
+     "chips": [
+      "3 statements",
+      "Accounting",
+      "Excel modelling"
+     ],
+     "keywords": [
+      "accounting interview questions",
+      "journal entries",
+      "cash flow statement",
+      "balance sheet",
+      "Excel"
+     ],
+     "channels": [
+      "@AccountingStuff",
+      "@CorporateFinanceInstitute",
+      "@KenjiExplains"
+     ]
+    },
+    {
+     "id": "cfa_equity_research",
+     "name": {
+      "en": "CFA & equity research"
+     },
+     "chips": [
+      "CFA",
+      "Stock pitch",
+      "Valuation",
+      "Comps"
+     ],
+     "keywords": [
+      "equity research interview",
+      "stock pitch",
+      "CFA level 1",
+      "valuation multiples",
+      "financial modeling"
+     ],
+     "channels": [
+      "@MarkMeldrum",
+      "@thevaluationschool",
+      "@wallstreetprep"
+     ]
+    }
+   ],
+   "variantsShareTopics": true,
+   "channels": [
+    {
+     "channelId": "UC4LeewYWZ3ruS3Bc64ldXuw",
+     "handle": "@financialmodeling",
+     "name": "Mergers & Inquisitions / Breaking Into Wall Street",
+     "language": "en"
+    },
+    {
+     "channelId": "UCLpcyeOMyhRUifU3cn1AEhQ",
+     "handle": "@AfzalHussein",
+     "name": "Afzal Hussein",
+     "language": "en"
+    },
+    {
+     "channelId": "UCUcnLrPvGAv-n97hLGqe-qA",
+     "handle": "@wallstreetprep",
+     "name": "Wall Street Prep",
+     "language": "en"
+    },
+    {
+     "channelId": "UC9IZYXzt4dl13MAycfoyMdQ",
+     "handle": "@rareliquid",
+     "name": "rareliquid",
+     "language": "en"
+    },
+    {
+     "channelId": "UCYJLdSmyKoXCbnd-pklMn5Q",
+     "handle": "@AccountingStuff",
+     "name": "Accounting Stuff",
+     "language": "en"
+    },
+    {
+     "channelId": "UCbuXgEwysYUdXDbD6lgFAVg",
+     "handle": "@CorporateFinanceInstitute",
+     "name": "Corporate Finance Institute",
+     "language": "en"
+    },
+    {
+     "channelId": "UCkHdBeQ4DuvBXTahMYZVlMA",
+     "handle": "@KenjiExplains",
+     "name": "Kenji Explains",
+     "language": "en"
+    },
+    {
+     "channelId": "UCAHr-sT0AjrD3sBwr1eRUNg",
+     "handle": "@MarkMeldrum",
+     "name": "Mark Meldrum",
+     "language": "en"
+    },
+    {
+     "channelId": "UCJTY6z_SrU39MIcJxEtmduA",
+     "handle": "@thevaluationschool",
+     "name": "The Valuation School",
+     "language": "en"
+    }
+   ]
+  },
+  {
+   "id": "interview_hr",
+   "kind": "interview",
+   "name": {
+    "en": "HR & behavioural interview prep"
+   },
+   "shortName": "Behavioural",
+   "languages": [
+    "en"
+   ],
+   "subjects": [
+    "Common interview questions",
+    "Behavioural (STAR) answers",
+    "Questions to ask",
+    "Salary negotiation",
+    "Résumé & job search"
+   ],
+   "keywords": [
+    "job interview questions",
+    "HR interview",
+    "behavioral interview",
+    "STAR method",
+    "tell me about yourself",
+    "strengths and weaknesses",
+    "why should we hire you",
+    "where do you see yourself in 5 years",
+    "why do you want this job",
+    "questions to ask the interviewer",
+    "situational questions",
+    "competency based interview",
+    "values based interview",
+    "salary negotiation",
+    "phone interview",
+    "video interview",
+    "body language",
+    "resume tips",
+    "cover letter",
+    "career change interview",
+    "fresher interview",
+    "follow up email"
+   ],
+   "blockedWords": [
+    "prank",
+    "reaction",
+    "celebrity interview",
+    "funny interview fails",
+    "vlog",
+    "gossip"
+   ],
+   "chips": [
+    "Tell me about yourself",
+    "STAR method",
+    "Strengths & weaknesses",
+    "Why this job",
+    "Behavioural questions",
+    "Questions to ask",
+    "Body language",
+    "Salary negotiation",
+    "Résumé tips",
+    "Career change"
+   ],
+   "channels": [
+    {
+     "channelId": "UCrtPXCqjm9c7nqgJL-vBSZg",
+     "handle": "@CareerVidz",
+     "name": "CareerVidz",
+     "language": "en"
+    },
+    {
+     "channelId": "UCeNm7lbfRg9wiBDSLQ-M8RA",
+     "handle": "@SelfMadeMillennial",
+     "name": "Self Made Millennial",
+     "language": "en"
+    },
+    {
+     "channelId": "UCXUyg1vYSupswhi0zNeD-5w",
+     "handle": "@LindaRaynier",
+     "name": "Linda Raynier",
+     "language": "en"
+    },
+    {
+     "channelId": "UCP1UlYJH_QL4m5HVyikcxfQ",
+     "handle": "@andylacivita",
+     "name": "Andrew LaCivita",
+     "language": "en"
+    },
+    {
+     "channelId": "UCbZTfDwLrq_sl77NYfvnvhQ",
+     "handle": "@BenTalksTalent",
+     "name": "Ben Talks Talent - Interview Tips",
+     "language": "en"
+    },
+    {
+     "channelId": "UCs-7SAP1mhEQF1NlubjSzqQ",
+     "handle": "@jeffhsipepi",
+     "name": "Jeff H Sipe - Practice Interviews",
+     "language": "en"
+    }
+   ]
+  },
+  {
+   "id": "mx_enarm",
+   "kind": "study",
+   "name": {
+    "en": "ENARM (Mexico medical residency exam)",
+    "es": "Examen Nacional para Aspirantes a Residencias Médicas (ENARM)"
+   },
+   "shortName": "ENARM",
+   "countries": [
+    "MX"
+   ],
+   "nearby": [
+    "GT",
+    "HN",
+    "SV",
+    "NI",
+    "CR",
+    "PA",
+    "CO",
+    "VE",
+    "EC",
+    "PE",
+    "BO",
+    "CU",
+    "DO"
+   ],
+   "languages": [
+    "es",
+    "en"
+   ],
+   "subjects": [
+    "Medicina interna",
+    "Pediatría",
+    "Ginecología y obstetricia",
+    "Cirugía general",
+    "Urgencias",
+    "Salud pública",
+    "Inglés médico"
+   ],
+   "keywords": [
+    "ENARM",
+    "examen nacional de residencias médicas",
+    "CIFRHS",
+    "casos clínicos ENARM",
+    "repaso ENARM",
+    "GPC guías de práctica clínica",
+    "medicina interna",
+    "cardiología",
+    "endocrinología",
+    "nefrología",
+    "infectología",
+    "pediatría",
+    "neonatología",
+    "ginecología",
+    "obstetricia",
+    "cirugía general",
+    "trauma ATLS",
+    "urgencias",
+    "salud pública",
+    "epidemiología",
+    "vacunación PRONAM",
+    "inglés médico",
+    "simulacro ENARM",
+    "ENARM 2027"
+   ],
+   "blockedWords": [
+    "vlog",
+    "resultados ENARM en vivo",
+    "sedes y fechas",
+    "sueldo residente",
+    "día en la vida",
+    "motivación",
+    "reacción",
+    "polémica"
+   ],
+   "chips": [
+    "Medicina interna",
+    "Pediatría",
+    "Ginecología",
+    "Obstetricia",
+    "Cirugía",
+    "Urgencias",
+    "Salud pública",
+    "Casos clínicos",
+    "GPC",
+    "Inglés médico"
+   ],
+   "channels": [
+    {
+     "channelId": "UCD9RcE5kAFdlL17qeSlDtPA",
+     "handle": "@puntoenarm5071",
+     "name": "Punto ENARM",
+     "language": "es"
+    },
+    {
+     "channelId": "UCKcyZsqDsZIHs6vxR5r3aIg",
+     "handle": "@DrGale",
+     "name": "Dr Gale",
+     "language": "es"
+    },
+    {
+     "channelId": "UCUn7X7zNm3JcejYzKX2jfRQ",
+     "handle": "@DrRe",
+     "name": "Dr. Re",
+     "language": "es"
+    },
+    {
+     "channelId": "UCt2B031GPkLRPPW1l8w3b_w",
+     "handle": "@DrGarcia",
+     "name": "Dr Garcia",
+     "language": "es"
+    },
+    {
+     "channelId": "UCIRRqNMg6eFBn6o9sUkkPfw",
+     "handle": "@medicoqueserespeta1561",
+     "name": "Médico Que Se Respeta",
+     "language": "es"
+    },
+    {
+     "channelId": "UCyzFkQTO0gpZvrbmlRguIow",
+     "handle": "@enarmjorgeromeh",
+     "name": "ENARM - DR. JORGE ROMEH",
+     "language": "es"
+    },
+    {
+     "channelId": "UCLUbigQE2hw3Hzno6u4X_rg",
+     "handle": "@DoctorVagoMx",
+     "name": "Doctor Vago",
+     "language": "es"
+    }
+   ]
+  },
+  {
+   "id": "br_residencia_medica",
+   "kind": "study",
+   "name": {
+    "en": "Medical residency exams (Brazil: ENARE/ENAMED, USP, SUS-SP)",
+    "pt": "Provas de Residência Médica (ENARE / ENAMED)"
+   },
+   "shortName": "Residência",
+   "countries": [
+    "BR"
+   ],
+   "languages": [
+    "pt"
+   ],
+   "subjects": [
+    "Clínica Médica",
+    "Cirurgia Geral",
+    "Pediatria",
+    "Ginecologia e Obstetrícia",
+    "Medicina Preventiva e Social"
+   ],
+   "keywords": [
+    "residência médica",
+    "prova de residência",
+    "ENARE",
+    "ENAMED",
+    "Revalida",
+    "acesso direto R1",
+    "R+",
+    "USP",
+    "SUS-SP",
+    "UNIFESP",
+    "PSU-MG",
+    "AMRIGS",
+    "clínica médica",
+    "cirurgia geral",
+    "pediatria",
+    "ginecologia e obstetrícia",
+    "medicina preventiva",
+    "SUS",
+    "questões comentadas",
+    "revisão de véspera",
+    "banca",
+    "simulado",
+    "correção de prova"
+   ],
+   "blockedWords": [
+    "vlog",
+    "rotina de residente",
+    "black friday",
+    "desconto",
+    "nota de corte ao vivo",
+    "depoimento aprovado",
+    "salário médico",
+    "motivação"
+   ],
+   "chips": [
+    "Clínica médica",
+    "Cirurgia",
+    "Pediatria",
+    "Ginecologia",
+    "Obstetrícia",
+    "Preventiva",
+    "ENARE",
+    "ENAMED",
+    "Questões comentadas",
+    "Revisão"
+   ],
+   "channels": [
+    {
+     "channelId": "UCdHMuOHKICxcHwecxN8P-AA",
+     "handle": "@GrupoMedcof",
+     "name": "Grupo Medcof - Black November",
+     "language": "pt"
+    },
+    {
+     "channelId": "UCyNuIBnEwzsgA05XK1P6Dmw",
+     "handle": "@estrategiamed",
+     "name": "Estratégia MED",
+     "language": "pt"
+    },
+    {
+     "channelId": "UC-iql8FFY14XV4T1q37Olpg",
+     "handle": "@MedwayResidencia",
+     "name": "Medway",
+     "language": "pt"
+    },
+    {
+     "channelId": "UCTruz-IVYaRxwYCFG2Jq7BA",
+     "handle": "@EuMédicoResidente",
+     "name": "Eu Médico Residente",
+     "language": "pt"
+    },
+    {
+     "channelId": "UCf0DuABU6rJE8xwsUjfCU-Q",
+     "handle": "@AristoResidênciaMédica",
+     "name": "Aristo Residência Médica",
+     "language": "pt"
+    },
+    {
+     "channelId": "UCY_eVVI1DMI4CNCLAizE1_Q",
+     "handle": "@MedAULABrasil",
+     "name": "Grupo MedAula: Residência Médica e Prova de título",
+     "language": "pt"
+    }
+   ]
+  },
+  {
+   "id": "pe_docente",
+   "kind": "study",
+   "name": {
+    "en": "Teacher appointment and promotion exams (Peru: Nombramiento / Ascenso Docente)",
+    "es": "Concurso de Nombramiento y Ascenso Docente (Minedu)"
+   },
+   "shortName": "Docente",
+   "countries": [
+    "PE"
+   ],
+   "languages": [
+    "es"
+   ],
+   "subjects": [
+    "Habilidades generales (comprensión lectora, razonamiento lógico)",
+    "Conocimientos pedagógicos, curriculares y disciplinares",
+    "Casuística pedagógica"
+   ],
+   "keywords": [
+    "nombramiento docente",
+    "ascenso docente",
+    "prueba nacional",
+    "PUN",
+    "Minedu",
+    "carrera pública magisterial",
+    "casuística",
+    "casos pedagógicos",
+    "conocimientos pedagógicos",
+    "CNEB currículo nacional",
+    "Marco de Buen Desempeño Docente",
+    "evaluación formativa",
+    "planificación curricular",
+    "competencias y capacidades",
+    "enfoques transversales",
+    "demanda cognitiva",
+    "conflicto cognitivo",
+    "Ley 29944",
+    "comprensión lectora",
+    "razonamiento lógico",
+    "resolución examen ascenso",
+    "simulacro docente",
+    "acceso a cargos directivos"
+   ],
+   "blockedWords": [
+    "CTS docente",
+    "aumento sueldo",
+    "noticias Minedu",
+    "bono",
+    "huelga",
+    "última hora",
+    "pago",
+    "vlog"
+   ],
+   "chips": [
+    "Casuística",
+    "Comprensión lectora",
+    "Razonamiento lógico",
+    "CNEB",
+    "Evaluación formativa",
+    "Planificación curricular",
+    "Didáctica",
+    "MBDD",
+    "Inicial",
+    "Primaria",
+    "Secundaria",
+    "EPT"
+   ],
+   "channels": [
+    {
+     "channelId": "UCxnH-WXJsvxQYHy4pNYDhZA",
+     "handle": "@augeeduca",
+     "name": "AUGE Group – Teacher Professional Development",
+     "language": "es"
+    },
+    {
+     "channelId": "UCB81ci4E5HlfI4KVJv94mRg",
+     "handle": "@GrupoDocentePerú",
+     "name": "GRUPO DOCENTE PERÚ",
+     "language": "es"
+    },
+    {
+     "channelId": "UCBWrQSynZUOn0Lr0q7M90GQ",
+     "handle": "@DAVIDRENGIFO",
+     "name": "DAVID RENGIFO",
+     "language": "es"
+    },
+    {
+     "channelId": "UC3jRaGh5331Yc6_JMsIY6xA",
+     "handle": "@centrodealtorendimientodocente",
+     "name": "CENTRO DE ALTO RENDIMIENTO DOCENTE",
+     "language": "es"
+    },
+    {
+     "channelId": "UCO7uwIZ4Ioig-yg2L3jAtnA",
+     "handle": "@CarlosGuarnizVargas",
+     "name": "Carlos Guarniz Vargas",
+     "language": "es"
+    },
+    {
+     "channelId": "UCqOW49KIPdu0Ee53XJ9PFsw",
+     "handle": "@SoportePedagogicoMaestro",
+     "name": "EC Soporte Pedagógico Maestro",
+     "language": "es"
+    },
+    {
+     "channelId": "UCi-Bzx4BrPQMLBay4ISZQ7Q",
+     "handle": "@zuzshilahfaribahaprendeconmigo",
+     "name": "Zuzshilah Faribah",
+     "language": "es"
+    }
+   ]
+  },
+  {
+   "id": "gb_11_plus",
+   "kind": "study",
+   "name": {
+    "en": "11+ (grammar school entrance)"
+   },
+   "shortName": "11+",
+   "countries": [
+    "GB"
+   ],
+   "languages": [
+    "en"
+   ],
+   "subjects": [
+    "Maths",
+    "English",
+    "Verbal reasoning",
+    "Non-verbal reasoning"
+   ],
+   "keywords": [
+    "11 plus",
+    "11+ exam",
+    "eleven plus",
+    "grammar school entrance",
+    "GL Assessment 11+",
+    "CEM 11+",
+    "11+ maths",
+    "11+ English",
+    "11+ comprehension",
+    "11+ vocabulary",
+    "verbal reasoning",
+    "non-verbal reasoning",
+    "NVR",
+    "VR",
+    "spatial reasoning",
+    "11+ creative writing",
+    "11+ mock test",
+    "11+ past papers",
+    "Year 5 11+",
+    "word problems",
+    "fractions decimals percentages",
+    "ratio",
+    "synonyms antonyms",
+    "cloze",
+    "odd one out",
+    "sequences"
+   ],
+   "blockedWords": [
+    "results day reaction",
+    "vlog",
+    "prank",
+    "unboxing",
+    "challenge",
+    "gaming",
+    "school tour vlog"
+   ],
+   "chips": [
+    "Maths",
+    "English comprehension",
+    "Vocabulary",
+    "Verbal reasoning",
+    "Non-verbal reasoning",
+    "Spatial reasoning",
+    "Creative writing",
+    "GL Assessment",
+    "CEM",
+    "Mock tests"
+   ],
+   "channels": [
+    {
+     "channelId": "UC6F0atXs2NI8LB0GfyE_-wA",
+     "handle": "@TDTutoring",
+     "name": "TD Tutoring",
+     "language": "en"
+    },
+    {
+     "channelId": "UCX-5EAgqIMzElNHoLQa8Srg",
+     "handle": "@11PlusMathsGenius",
+     "name": "11 Plus Maths Genius",
+     "language": "en"
+    },
+    {
+     "channelId": "UCaHAWY6bhOFrvr7K5LRCzcA",
+     "handle": "@AtomLearning",
+     "name": "Atom Learning",
+     "language": "en"
+    },
+    {
+     "channelId": "UCb7E1JCno_UttM3wtS4wiEQ",
+     "handle": "@ExamPapersPlus",
+     "name": "Exam Papers Plus",
+     "language": "en"
+    },
+    {
+     "channelId": "UC7zQCs9P0BdlnJRRSTtzQAg",
+     "handle": "@The11PlusTutorsinEssex",
+     "name": "The 11 Plus Tutors in Essex",
+     "language": "en"
+    },
+    {
+     "channelId": "UCkBVTRh1H9xtibOqMb9_OzQ",
+     "handle": "@mrsglasson",
+     "name": "Mrs Glasson's English Tuition",
+     "language": "en"
+    }
+   ]
+  },
+  {
+   "id": "gb_sqe",
+   "kind": "study",
+   "name": {
+    "en": "SQE (Solicitors Qualifying Examination)"
+   },
+   "shortName": "SQE",
+   "countries": [
+    "GB"
+   ],
+   "nearby": [
+    "IE"
+   ],
+   "languages": [
+    "en"
+   ],
+   "subjects": [
+    "FLK1: Business Law and Practice, Dispute Resolution, Contract Law, Tort, Legal System of England and Wales, Constitutional and Administrative Law and EU Law, Legal Services",
+    "FLK2: Property Law and Practice, Wills and the Administration of Estates, Solicitors Accounts, Land Law, Trusts Law, Criminal Liability, Criminal Law and Practice",
+    "Ethics and Professional Conduct",
+    "SQE2 practical legal skills"
+   ],
+   "keywords": [
+    "SQE",
+    "SQE1",
+    "SQE2",
+    "Solicitors Qualifying Examination",
+    "FLK1",
+    "FLK2",
+    "functioning legal knowledge",
+    "SQE MCQ",
+    "single best answer",
+    "business law and practice",
+    "dispute resolution",
+    "contract law",
+    "tort",
+    "legal system of England and Wales",
+    "constitutional and administrative law",
+    "legal services",
+    "property law and practice",
+    "land law",
+    "trusts law",
+    "wills and administration of estates",
+    "inheritance tax",
+    "solicitors accounts",
+    "criminal liability",
+    "criminal law and practice",
+    "professional conduct",
+    "SRA",
+    "advocacy",
+    "client interview",
+    "legal drafting",
+    "SQE mock"
+   ],
+   "blockedWords": [
+    "day in the life vlog",
+    "salary reveal",
+    "training contract rejection reaction",
+    "storytime",
+    "law firm vlog",
+    "prank"
+   ],
+   "chips": [
+    "FLK1",
+    "FLK2",
+    "Contract",
+    "Tort",
+    "Business Law",
+    "Dispute Resolution",
+    "Land Law",
+    "Trusts",
+    "Wills & Probate",
+    "Criminal Practice",
+    "Ethics",
+    "SQE2 skills"
+   ],
+   "channels": [
+    {
+     "channelId": "UCos4eApiIinBsJNfiLHqwbQ",
+     "handle": "@iGlinavos",
+     "name": "Dr Yannis",
+     "language": "en"
+    },
+    {
+     "channelId": "UCx5-9EB5a3EAq2s5HEiOlAg",
+     "handle": "@CELESQE",
+     "name": "CELE SQE",
+     "language": "en"
+    },
+    {
+     "channelId": "UCxj5o96SMvoHnEJLl8Tl34A",
+     "handle": "@futuresolicitor",
+     "name": "Future Solicitor",
+     "language": "en"
+    },
+    {
+     "channelId": "UCW1Wx4ReY-aCGe3cAHcT2Qw",
+     "handle": "@SQE1window",
+     "name": "SQE1window",
+     "language": "en"
+    }
+   ]
+  },
+  {
+   "id": "au_gamsat",
+   "kind": "study",
+   "name": {
+    "en": "GAMSAT (Graduate Medical School Admissions Test)"
+   },
+   "shortName": "GAMSAT",
+   "countries": [
+    "AU"
+   ],
+   "nearby": [
+    "GB",
+    "IE",
+    "NZ"
+   ],
+   "languages": [
+    "en"
+   ],
+   "subjects": [
+    "Section 1: Reasoning in Humanities and Social Sciences",
+    "Section 2: Written Communication",
+    "Section 3: Reasoning in Biological and Physical Sciences"
+   ],
+   "keywords": [
+    "GAMSAT",
+    "GAMSAT Section 1",
+    "GAMSAT Section 2",
+    "GAMSAT Section 3",
+    "reasoning in humanities",
+    "written communication",
+    "GAMSAT essay",
+    "task A task B",
+    "reasoning in biological and physical sciences",
+    "GAMSAT chemistry",
+    "organic chemistry",
+    "GAMSAT physics",
+    "GAMSAT biology",
+    "ACER practice test",
+    "ACER worked solutions",
+    "graph interpretation",
+    "GAMSAT maths",
+    "Des O'Neill",
+    "GEMSAS",
+    "graduate medicine",
+    "postgraduate medicine entry"
+   ],
+   "blockedWords": [
+    "med school vlog",
+    "day in the life",
+    "score reaction",
+    "storytime",
+    "prank",
+    "unboxing"
+   ],
+   "chips": [
+    "Section 1",
+    "Section 2 essays",
+    "Section 3",
+    "Chemistry",
+    "Organic chemistry",
+    "Physics",
+    "Biology",
+    "Graph interpretation",
+    "ACER practice tests",
+    "Strategy"
+   ],
+   "channels": [
+    {
+     "channelId": "UCYg8D2iUs0bzb8Jwo_7-tAA",
+     "handle": "@GoldStandardGAMSAT",
+     "name": "Gold Standard GAMSAT",
+     "language": "en"
+    },
+    {
+     "channelId": "UClhTnalN9xvl15zTh3M9PbQ",
+     "handle": "@jims.gamsat",
+     "name": "Jim's GAMSAT",
+     "language": "en"
+    },
+    {
+     "channelId": "UCruuxoOK19vkSH4Do1eAiEg",
+     "handle": "@gamsattutorials",
+     "name": "GAMSAT Tutorials",
+     "language": "en"
+    },
+    {
+     "channelId": "UCnYC-EVXAKZNZm4zLP5XSog",
+     "handle": "@barrystutoring",
+     "name": "Barry's Tutoring",
+     "language": "en"
+    },
+    {
+     "channelId": "UCz1XQ7hrI_3ZmVJQQ3CgBvg",
+     "handle": "@90plusgamsat",
+     "name": "Michael John Sunderland",
+     "language": "en"
+    }
+   ]
+  },
+  {
+   "id": "fr_pass_las",
+   "kind": "study",
+   "name": {
+    "en": "PASS / LAS (first-year health studies, France)",
+    "fr": "PASS / L.AS (Parcours d'accès spécifique santé / Licence accès santé)"
+   },
+   "shortName": "PASS/LAS",
+   "countries": [
+    "FR"
+   ],
+   "nearby": [
+    "BE",
+    "MA",
+    "TN",
+    "SN"
+   ],
+   "languages": [
+    "fr"
+   ],
+   "subjects": [
+    "Biologie cellulaire",
+    "Biochimie",
+    "Chimie générale et organique",
+    "Biophysique",
+    "Biostatistiques",
+    "Anatomie",
+    "Histologie et embryologie",
+    "Physiologie",
+    "Génétique",
+    "Sciences humaines et sociales (SHS)",
+    "Initiation à la connaissance du médicament"
+   ],
+   "keywords": [
+    "PASS",
+    "LAS",
+    "L.AS",
+    "PASS médecine",
+    "première année de médecine",
+    "MMOPK",
+    "médecine maïeutique odontologie pharmacie kinésithérapie",
+    "tutorat santé",
+    "biologie cellulaire",
+    "biochimie",
+    "chimie organique",
+    "biophysique",
+    "biostatistiques",
+    "anatomie",
+    "histologie",
+    "embryologie",
+    "physiologie",
+    "génétique",
+    "SHS",
+    "UE santé",
+    "QCM corrigés",
+    "colle",
+    "concours blanc",
+    "méthode de travail PASS",
+    "fiches de révision"
+   ],
+   "blockedWords": [
+    "vlog",
+    "réaction résultats",
+    "storytime",
+    "salaire médecin",
+    "prank",
+    "drama"
+   ],
+   "chips": [
+    "Biologie cellulaire",
+    "Biochimie",
+    "Chimie organique",
+    "Biophysique",
+    "Biostatistiques",
+    "Anatomie",
+    "Histologie",
+    "Physiologie",
+    "SHS",
+    "QCM",
+    "Méthodologie"
+   ],
+   "channels": [
+    {
+     "channelId": "UCvtLRvlK5IPs_7qTui-n4kg",
+     "handle": "@tonprofanty",
+     "name": "Ton Prof Anty",
+     "language": "fr"
+    },
+    {
+     "channelId": "UCje-nnlmPKaJ7YrzqF01eEw",
+     "handle": "@SOSCHIMIE",
+     "name": "M. DOUMBOUYA",
+     "language": "fr"
+    },
+    {
+     "channelId": "UCmvt9CAasqees4LcbDUym_w",
+     "handle": "@TutoratSantédeCaen",
+     "name": "Tutorat Santé de Caen",
+     "language": "fr"
+    },
+    {
+     "channelId": "UC3ejCV1lnT8VvOyDZWhW4XQ",
+     "handle": "@tutovideo6632",
+     "name": "TutoVidéo",
+     "language": "fr"
+    },
+    {
+     "channelId": "UCFuBzkL9eI9v0KOOvwy8zfA",
+     "handle": "@tutoratassociatifmarseilla4679",
+     "name": "Tutorat Associatif Marseillais (TAM)",
+     "language": "fr"
+    },
+    {
+     "channelId": "UCZ06WYB0eNTfGPaxwOX5VXw",
+     "handle": "@HermioneMédecine",
+     "name": "Hermione Médecine",
+     "language": "fr"
+    }
+   ]
+  },
+  {
+   "id": "fr_crpe",
+   "kind": "study",
+   "name": {
+    "en": "CRPE (primary school teacher recruitment exam)",
+    "fr": "CRPE (Concours de recrutement de professeurs des écoles)"
+   },
+   "shortName": "CRPE",
+   "countries": [
+    "FR"
+   ],
+   "languages": [
+    "fr"
+   ],
+   "subjects": [
+    "Français",
+    "Mathématiques",
+    "Sciences et technologie",
+    "Histoire-géographie-EMC",
+    "Arts",
+    "Langues vivantes",
+    "Oral : leçon et entretien (système éducatif)"
+   ],
+   "keywords": [
+    "CRPE",
+    "concours professeur des écoles",
+    "CRPE 2027",
+    "CRPE L3",
+    "CRPE bac+3",
+    "épreuve de français CRPE",
+    "épreuve de mathématiques CRPE",
+    "grammaire CRPE",
+    "orthographe",
+    "dictée CRPE",
+    "Thalès",
+    "Pythagore",
+    "proportionnalité",
+    "problèmes CRPE",
+    "Scratch tableur",
+    "sciences et technologie CRPE",
+    "histoire géographie EMC",
+    "didactique",
+    "leçon oral CRPE",
+    "entretien jury",
+    "système éducatif",
+    "sujets corrigés CRPE",
+    "annales CRPE",
+    "troisième concours",
+    "Licence professorat des écoles"
+   ],
+   "blockedWords": [
+    "vlog",
+    "salaire prof",
+    "réaction résultats",
+    "storytime",
+    "routine",
+    "drama"
+   ],
+   "chips": [
+    "Français",
+    "Mathématiques",
+    "Grammaire",
+    "Orthographe",
+    "Dictée",
+    "Sciences",
+    "Histoire-géo",
+    "EMC",
+    "Arts",
+    "Oral",
+    "Didactique",
+    "Sujets corrigés"
+   ],
+   "channels": [
+    {
+     "channelId": "UCz-ykcyJTRkkq3GAGOIstRw",
+     "handle": "@ObjectifCRPE",
+     "name": "Objectif CRPE",
+     "language": "fr"
+    },
+    {
+     "channelId": "UCeqALSY62ZZxqy6YH2mIDeA",
+     "handle": "@Institut-ForProf",
+     "name": "ForProf",
+     "language": "fr"
+    },
+    {
+     "channelId": "UCG-9srNnNu2UtonIBSHn10g",
+     "handle": "@maths-crpe",
+     "name": "MATHS-CRPE",
+     "language": "fr"
+    },
+    {
+     "channelId": "UCIcz1EzxH4bJvBOcIZBIofA",
+     "handle": "@NovelProCRPE",
+     "name": "Maths CRPE NovelPro",
+     "language": "fr"
+    },
+    {
+     "channelId": "UCsOU0lJQWu2frKP-JxCtL3Q",
+     "handle": "@MathsCRPEavecThéo",
+     "name": "Maths CRPE avec Théo",
+     "language": "fr"
+    },
+    {
+     "channelId": "UCo67do2CBQE2IS-cTkBs8nA",
+     "handle": "@vocation-crpe",
+     "name": "Vocation CRPE",
+     "language": "fr"
+    },
+    {
+     "channelId": "UC6PR7R1jl3sY-cxSMxUovTQ",
+     "handle": "@LaFéeBulleuseRévisionsCRPE",
+     "name": "La Fée Bulleuse – Révisions CRPE",
+     "language": "fr"
+    },
+    {
+     "channelId": "UCXGmwDupxoPWfE_524XUqyw",
+     "handle": "@Droles2Formations",
+     "name": "Droles2Formations",
+     "language": "fr"
+    }
+   ]
+  },
+  {
+   "id": "de_tms",
+   "kind": "study",
+   "name": {
+    "en": "TMS / TMSnat (medical studies aptitude test)",
+    "de": "TMS / TMSnat (Test für Medizinische Studiengänge)"
+   },
+   "shortName": "TMS",
+   "countries": [
+    "DE"
+   ],
+   "languages": [
+    "de"
+   ],
+   "subjects": [
+    "Naturwissenschaftliche Kenntnisse (TMSnat)",
+    "Medizinisch-naturwissenschaftliches Grundverständnis",
+    "Quantitative und formale Probleme",
+    "Textverständnis",
+    "Fakten lernen",
+    "Diagramme und Tabellen",
+    "Arithmetisches Problemlösen (TMSnat)",
+    "Muster zuordnen / Schlauchfiguren / Figuren lernen / Konzentriertes Arbeiten (TMS bis 2026)"
+   ],
+   "keywords": [
+    "TMS",
+    "TMSnat",
+    "Medizinertest",
+    "Test für Medizinische Studiengänge",
+    "TMS Vorbereitung",
+    "TMSnat 2027",
+    "Medizinisch-naturwissenschaftliches Grundverständnis",
+    "MedNat",
+    "Quantitative und formale Probleme",
+    "Quanti",
+    "Textverständnis",
+    "Fakten lernen",
+    "Figuren lernen",
+    "Diagramme und Tabellen",
+    "Muster zuordnen",
+    "Kreuzblick",
+    "Schlauchfiguren",
+    "Konzentriertes und sorgfältiges Arbeiten",
+    "Naturwissenschaftliche Kenntnisse",
+    "Arithmetisches Problemlösen",
+    "HAM-Nat",
+    "Prozentrang",
+    "TMS Lernplan",
+    "Medizinstudium Zulassung"
+   ],
+   "blockedWords": [
+    "Vlog",
+    "Uni-Alltag",
+    "Straßenumfrage",
+    "Reaktion Ergebnis",
+    "Storytime",
+    "Gehalt Arzt"
+   ],
+   "chips": [
+    "TMSnat",
+    "MedNat",
+    "Quanti",
+    "Textverständnis",
+    "Fakten lernen",
+    "Diagramme & Tabellen",
+    "Naturwissenschaften",
+    "Arithmetik",
+    "Muster zuordnen",
+    "Schlauchfiguren",
+    "Lernplan"
+   ],
+   "channels": [
+    {
+     "channelId": "UCkZzZ3tJrLPuSjUhXprolug",
+     "handle": "@MediMoodYT",
+     "name": "MediMood",
+     "language": "de"
+    },
+    {
+     "channelId": "UCxWhhoB_0cyKRrEmyoSur-g",
+     "handle": "@milandjoudi",
+     "name": "Milan Djoudi",
+     "language": "de"
+    },
+    {
+     "channelId": "UCPXWsQuRSGAhUNOTWUJd0qA",
+     "handle": "@sternzeichenarzt",
+     "name": "Jonas TMSnat",
+     "language": "de"
+    },
+    {
+     "channelId": "UC_RrvbCXjAwfDtOqnvlMR7Q",
+     "handle": "@mission.medat2025",
+     "name": "Mission Medizin",
+     "language": "de"
+    }
+   ]
+  },
+  {
+   "id": "in_cuet",
+   "kind": "study",
+   "name": {
+    "en": "CUET-UG (Common University Entrance Test)",
+    "hi": "सीयूईटी-यूजी (कॉमन यूनिवर्सिटी एंट्रेंस टेस्ट)"
+   },
+   "shortName": "CUET",
+   "countries": [
+    "IN"
+   ],
+   "languages": [
+    "en",
+    "hi"
+   ],
+   "subjects": [
+    "Languages (Section I)",
+    "Domain subjects (Section II)",
+    "General Aptitude Test (Section III)"
+   ],
+   "keywords": [
+    "CUET",
+    "CUET UG",
+    "CUET 2027",
+    "Common University Entrance Test",
+    "NTA CUET",
+    "CUET General Test",
+    "CUET English",
+    "CUET domain subjects",
+    "CUET accountancy",
+    "CUET economics",
+    "CUET business studies",
+    "CUET physics",
+    "CUET chemistry",
+    "CUET biology",
+    "CUET maths",
+    "CUET history",
+    "CUET political science",
+    "CUET geography",
+    "CUET PYQ",
+    "CUET mock test",
+    "NCERT",
+    "quantitative aptitude",
+    "logical reasoning",
+    "reading comprehension",
+    "current affairs",
+    "सीयूईटी",
+    "सामान्य परीक्षा"
+   ],
+   "blockedWords": [
+    "college review",
+    "campus tour",
+    "result reaction",
+    "vlog",
+    "admission news",
+    "cutoff live",
+    "counselling live",
+    "motivation shorts"
+   ],
+   "chips": [
+    "English",
+    "General Test",
+    "Accountancy",
+    "Economics",
+    "Business Studies",
+    "Physics",
+    "Chemistry",
+    "Biology",
+    "Maths",
+    "History",
+    "Political Science",
+    "PYQs"
+   ],
+   "channels": [
+    {
+     "channelId": "UCFLLwUH0-IbbzpdbHUByYeQ",
+     "handle": "@CUETWallahPW",
+     "name": "CUET Wallah",
+     "language": "hi"
+    },
+    {
+     "channelId": "UC4h5zkgRfnFLjFZtts1N6iA",
+     "handle": "@cuetadda247",
+     "name": "Adda247 CUET",
+     "language": "en"
+    },
+    {
+     "channelId": "UCfCUos54GTjOPiSy4M0BRwQ",
+     "handle": "@deeceelinecuet",
+     "name": "Deeceeline CUET",
+     "language": "en"
+    },
+    {
+     "channelId": "UCbMIJSs7JAvINQECgjO0ewA",
+     "handle": "@NextToppers-CUET",
+     "name": "Next Toppers - CUET",
+     "language": "hi"
+    },
+    {
+     "channelId": "UCP8aDlwf6VGsFLlTFQtA1sQ",
+     "handle": "@drishticuetvideo",
+     "name": "Drishti CUET",
+     "language": "hi"
+    },
+    {
+     "channelId": "UCxyytoDstrm7BlX7a5ZFDPA",
+     "handle": "@CUETHindiMedium",
+     "name": "Adda247 CUET Hindi Medium",
+     "language": "hi"
+    },
+    {
+     "channelId": "UCht---962mP7_Cq7GbmP0aA",
+     "handle": "@PWCUET-HindiMedium",
+     "name": "CUET Hindi Medium by PW",
+     "language": "hi"
+    },
+    {
+     "channelId": "UCE-o1wtpRvNl-Bi4XYc6aIA",
+     "handle": "@cuetandfun",
+     "name": "CUET and Fun",
+     "language": "en"
+    }
+   ]
+  },
+  {
+   "id": "in_neet_pg",
+   "kind": "study",
+   "name": {
+    "en": "NEET PG / INI-CET (medical postgraduate entrance)",
+    "hi": "नीट पीजी / आईएनआई-सीईटी"
+   },
+   "shortName": "NEET PG",
+   "countries": [
+    "IN"
+   ],
+   "nearby": [
+    "NP"
+   ],
+   "languages": [
+    "en",
+    "hi"
+   ],
+   "subjects": [
+    "Anatomy",
+    "Physiology",
+    "Biochemistry",
+    "Pathology",
+    "Pharmacology",
+    "Microbiology",
+    "Forensic Medicine",
+    "PSM / Community Medicine",
+    "ENT",
+    "Ophthalmology",
+    "Medicine",
+    "Surgery",
+    "Obstetrics & Gynaecology",
+    "Paediatrics",
+    "Orthopaedics",
+    "Dermatology",
+    "Psychiatry",
+    "Radiology",
+    "Anaesthesia"
+   ],
+   "keywords": [
+    "NEET PG",
+    "INI-CET",
+    "INICET",
+    "AIIMS PG",
+    "NBEMS",
+    "FMGE",
+    "NEXT",
+    "NEET PG 2027",
+    "clinical MCQs",
+    "image based questions",
+    "PYQ",
+    "grand test",
+    "rapid revision",
+    "anatomy",
+    "physiology",
+    "biochemistry",
+    "pathology",
+    "pharmacology",
+    "microbiology",
+    "forensic medicine",
+    "PSM",
+    "community medicine",
+    "ophthalmology",
+    "ENT",
+    "medicine",
+    "surgery",
+    "OBG",
+    "paediatrics",
+    "radiology",
+    "dermatology"
+   ],
+   "blockedWords": [
+    "topper interview",
+    "result reaction",
+    "vlog",
+    "day in the life",
+    "counselling live",
+    "salary",
+    "motivation shorts",
+    "app launch"
+   ],
+   "chips": [
+    "Anatomy",
+    "Physiology",
+    "Pathology",
+    "Pharmacology",
+    "Microbiology",
+    "PSM",
+    "Medicine",
+    "Surgery",
+    "OBG",
+    "Paediatrics",
+    "Radiology",
+    "PYQs"
+   ],
+   "channels": [
+    {
+     "channelId": "UCdbMxSVAgPENqhYVeYkAA2w",
+     "handle": "@PrepLaddermedpg",
+     "name": "PrepLadder NEET PG I FMGE I INI-CET",
+     "language": "en"
+    },
+    {
+     "channelId": "UCkdqtg0tEcRb1wMCFr2wN2A",
+     "handle": "@marrowmed",
+     "name": "Marrow",
+     "language": "en"
+    },
+    {
+     "channelId": "UCB7hjHN7-kcToQAWDY8TrIw",
+     "handle": "@damsdelhi",
+     "name": "DAMS : NEET PG, MBBS, FMGE, USMLE Prep",
+     "language": "en"
+    },
+    {
+     "channelId": "UCFqYI_5ksnEuDYtkKQHmrUg",
+     "handle": "@DocTutorials",
+     "name": "DocTutorials - NEET PG | INI CET",
+     "language": "en"
+    },
+    {
+     "channelId": "UCZPJKEqdaXCM9U-x6_1Ik7w",
+     "handle": "@medednext",
+     "name": "PW MedEd NEET PG | FMGE | INICET",
+     "language": "en"
+    },
+    {
+     "channelId": "UCopuYMzvJudDmPiZld7JB4w",
+     "handle": "@cerebellumacademy",
+     "name": "Cerebellum Academy",
+     "language": "en"
+    },
+    {
+     "channelId": "UC7Q7OMQisTXIcEbl4RkalIw",
+     "handle": "@dbmci_official",
+     "name": "Dr. Bhatia Medical Coaching Institute, DBMCI",
+     "language": "en"
+    },
+    {
+     "channelId": "UCs26mhp-QYeLlH7pZIvp2_Q",
+     "handle": "@drnikitananwani",
+     "name": "Dr. Nikita Nanwani",
+     "language": "en"
+    }
+   ]
+  },
+  {
+   "id": "pk_ppsc_fpsc",
+   "kind": "study",
+   "name": {
+    "en": "PPSC / FPSC / KPPSC / SPSC (public service commission tests)",
+    "ur": "پبلک سروس کمیشن ٹیسٹ (پی پی ایس سی / ایف پی ایس سی)"
+   },
+   "shortName": "PSC",
+   "countries": [
+    "PK"
+   ],
+   "languages": [
+    "ur",
+    "en"
+   ],
+   "subjects": [
+    "General Knowledge",
+    "Pakistan Studies",
+    "Islamic Studies",
+    "Current Affairs",
+    "English",
+    "Urdu",
+    "Mathematics",
+    "Everyday Science",
+    "Computer",
+    "Subject-specific (lecturer / educator)"
+   ],
+   "keywords": [
+    "PPSC",
+    "FPSC",
+    "KPPSC",
+    "SPSC",
+    "BPSC",
+    "AJKPSC",
+    "one paper MCQs",
+    "past papers",
+    "solved paper",
+    "lecturer test",
+    "educators test",
+    "sub inspector",
+    "assistant director",
+    "general knowledge",
+    "Pakistan studies",
+    "Islamic studies",
+    "current affairs",
+    "everyday science",
+    "English grammar",
+    "mathematics MCQs",
+    "computer MCQs",
+    "پبلک سروس کمیشن",
+    "پاسٹ پیپرز",
+    "جنرل نالج",
+    "مطالعہ پاکستان",
+    "اسلامیات"
+   ],
+   "blockedWords": [
+    "job alert",
+    "jobs update",
+    "salary",
+    "result live",
+    "merit list",
+    "vlog",
+    "prank",
+    "motivation shorts"
+   ],
+   "chips": [
+    "جنرل نالج",
+    "مطالعہ پاکستان",
+    "اسلامیات",
+    "کرنٹ افیئرز",
+    "انگلش",
+    "اردو",
+    "ریاضی",
+    "سائنس",
+    "کمپیوٹر",
+    "پاسٹ پیپرز",
+    "MCQs",
+    "One Paper"
+   ],
+   "channels": [
+    {
+     "channelId": "UCCnyILbE80x0m_CZzju5YRA",
+     "handle": "@jobspreparationwith-sirtauqeer",
+     "name": "Jobs Preparation with Sir Tauqeer",
+     "language": "ur"
+    },
+    {
+     "channelId": "UCBlGsg2uitZrKuDyuj2X3Jw",
+     "handle": "@mkpreparations",
+     "name": "MK Preparations",
+     "language": "ur"
+    },
+    {
+     "channelId": "UC251rJLyPzsfBVUMbMl8N-A",
+     "handle": "@testpreparationmcqss",
+     "name": "Test Preparation MCQ's",
+     "language": "ur"
+    },
+    {
+     "channelId": "UCB7M2dSZpcvXMzbQlWYHW0g",
+     "handle": "@PakMcqsOfficial1",
+     "name": "PakMcqs Official",
+     "language": "ur"
+    },
+    {
+     "channelId": "UCmnpyAvmiBeJfsTq_TBhiGw",
+     "handle": "@widespots",
+     "name": "WideSpot Test Preparation",
+     "language": "ur"
+    },
+    {
+     "channelId": "UCCl-Evh5FBQ-7h5lSRIKQMw",
+     "handle": "@PPSCLatestPastPapers",
+     "name": "PPSC Latest Past Papers",
+     "language": "ur"
+    },
+    {
+     "channelId": "UCjki-5LR_WTJaCNseq9HFDA",
+     "handle": "@ppscpreparationmaster4047",
+     "name": "PPSC PREPARATION MASTER",
+     "language": "ur"
+    }
+   ]
+  },
+  {
+   "id": "pk_icap_ca",
+   "kind": "study",
+   "name": {
+    "en": "ICAP Chartered Accountancy (PRC / CAF / CFAP)",
+    "ur": "آئی کیپ چارٹرڈ اکاؤنٹنسی"
+   },
+   "shortName": "ICAP CA",
+   "countries": [
+    "PK"
+   ],
+   "languages": [
+    "en",
+    "ur"
+   ],
+   "subjects": [
+    "PRC-1 Fundamentals of Accounting",
+    "PRC-2 Quantitative Analysis for Business",
+    "PRC-3 Business and Economic Insights",
+    "CAF-1 Financial Accounting and Reporting",
+    "CAF-2 Taxation Principles and Compliance",
+    "CAF-3 Data, Systems and Risks",
+    "CAF-4 Business Law Dynamics",
+    "CAF-5 Management Accounting",
+    "CAF-6 Corporate Reporting",
+    "CAF-7 Business Insights and Analysis",
+    "CAF-8 Audit and Assurance",
+    "CFAP papers",
+    "Strategic Case Study"
+   ],
+   "keywords": [
+    "ICAP",
+    "CA Pakistan",
+    "chartered accountancy",
+    "PRC",
+    "CAF",
+    "CFAP",
+    "SCS",
+    "FAR",
+    "financial accounting and reporting",
+    "IFRS",
+    "IAS",
+    "taxation",
+    "income tax",
+    "sales tax",
+    "audit and assurance",
+    "cost and management accounting",
+    "CMA",
+    "business law",
+    "corporate reporting",
+    "data systems and risks",
+    "DSR",
+    "quantitative analysis",
+    "economics",
+    "past paper",
+    "revision class",
+    "ICAP exam"
+   ],
+   "blockedWords": [
+    "result reaction",
+    "vlog",
+    "convocation",
+    "batch admission",
+    "salary",
+    "job alert",
+    "motivation shorts",
+    "podcast"
+   ],
+   "chips": [
+    "PRC",
+    "CAF",
+    "CFAP",
+    "FAR",
+    "Taxation",
+    "Audit",
+    "Cost & Management Accounting",
+    "Corporate Reporting",
+    "Business Law",
+    "IFRS",
+    "Past papers",
+    "Revision"
+   ],
+   "channels": [
+    {
+     "channelId": "UCtDvXyP8tZ0QjUi-WCzMjnw",
+     "handle": "@icappakistan",
+     "name": "ICAP",
+     "language": "en"
+    },
+    {
+     "channelId": "UCoGjYtwekBFCrizOpUcHO1A",
+     "handle": "@crescentlahore",
+     "name": "Crescent College of Accountancy",
+     "language": "en"
+    },
+    {
+     "channelId": "UCFQO35JhRJonoiNBMP2QrYQ",
+     "handle": "@armbusinessschool9999",
+     "name": "ARM Business School",
+     "language": "en"
+    },
+    {
+     "channelId": "UChXgiFifFP3kfWk8vFkP7Kw",
+     "handle": "@ahmedrazamir5147",
+     "name": "Ahmed Raza Mir",
+     "language": "en"
+    },
+    {
+     "channelId": "UCSfWVeywRf9ZaB-FGxat2mQ",
+     "handle": "@muhammadimrangasuracapakis7040",
+     "name": "Muhammad Imran Gasura, CA Pakistan",
+     "language": "en"
+    },
+    {
+     "channelId": "UCBOgv0uttC_UKwnAvrrlOFw",
+     "handle": "@aliimranaca",
+     "name": "Ali Imran ACA",
+     "language": "en"
+    }
+   ]
+  },
+  {
+   "id": "bd_bank_jobs",
+   "kind": "study",
+   "name": {
+    "en": "Bangladesh bank recruitment exams (Combined Bank / Bangladesh Bank AD)",
+    "bn": "ব্যাংক নিয়োগ পরীক্ষা"
+   },
+   "shortName": "Bank Job",
+   "countries": [
+    "BD"
+   ],
+   "languages": [
+    "bn",
+    "en"
+   ],
+   "subjects": [
+    "বাংলা",
+    "English",
+    "গণিত",
+    "Analytical Ability",
+    "সাধারণ জ্ঞান",
+    "Banking Knowledge",
+    "ICT",
+    "Focus Writing",
+    "Translation"
+   ],
+   "keywords": [
+    "bank job",
+    "combined bank",
+    "senior officer",
+    "officer cash",
+    "Bangladesh Bank AD",
+    "BB AD",
+    "BSCS",
+    "bank math",
+    "bank written",
+    "focus writing",
+    "translation",
+    "analytical ability",
+    "English grammar",
+    "vocabulary",
+    "বাংলা ব্যাকরণ",
+    "ব্যাংক জব",
+    "ব্যাংক প্রস্তুতি",
+    "সমন্বিত ব্যাংক",
+    "সিনিয়র অফিসার",
+    "বিগত সালের প্রশ্ন",
+    "গণিত",
+    "শতকরা",
+    "লাভ ক্ষতি",
+    "সাধারণ জ্ঞান",
+    "ICT"
+   ],
+   "blockedWords": [
+    "job circular",
+    "নিয়োগ বিজ্ঞপ্তি",
+    "result live",
+    "ফলাফল",
+    "vlog",
+    "salary",
+    "motivation shorts",
+    "admit card"
+   ],
+   "chips": [
+    "গণিত",
+    "English",
+    "বাংলা ব্যাকরণ",
+    "Analytical",
+    "সাধারণ জ্ঞান",
+    "ব্যাংকিং",
+    "ICT",
+    "Focus Writing",
+    "অনুবাদ",
+    "প্রশ্ন সমাধান"
+   ],
+   "channels": [
+    {
+     "channelId": "UC9g7FhWqVpmSBiYM0eailBw",
+     "handle": "@KhairulsMath",
+     "name": "Khairul's Math",
+     "language": "bn"
+    },
+    {
+     "channelId": "UCs9doJQoP4AyhV-eX3dpZ2w",
+     "handle": "@JakirSirOfficial-u9z",
+     "name": "Jakir Sir জাকির স্যার",
+     "language": "bn"
+    },
+    {
+     "channelId": "UCCYH5FiNopfAXs3cMOqgefA",
+     "handle": "@biddabari.bankhead",
+     "name": "Biddabari Bankhead",
+     "language": "bn"
+    },
+    {
+     "channelId": "UCwY35Ejq1bgAsSfwoJQPT5Q",
+     "handle": "@turningpointjobaid",
+     "name": "Turning Point Job Aid",
+     "language": "bn"
+    },
+    {
+     "channelId": "UCQQE5yiNxG1QBUuZFGa7jOA",
+     "handle": "@victorsbcs-bank",
+     "name": "Victors- Bank, BCS & More",
+     "language": "bn"
+    },
+    {
+     "channelId": "UCNwRJTetNrsiqv6hndUlsdw",
+     "handle": "@sheikhmehedihasan3231",
+     "name": "Alokbortika Bank BCS",
+     "language": "bn"
+    },
+    {
+     "channelId": "UCt6qyQkHHb9AHF1BKSl0_Lw",
+     "handle": "@bcsbankuniversity",
+     "name": "BCS, BANK & UNIVERSITY",
+     "language": "bn"
+    }
+   ]
+  },
+  {
+   "id": "np_tsc",
+   "kind": "study",
+   "name": {
+    "en": "Teacher Service Commission exam (TSC Nepal)",
+    "ne": "शिक्षक सेवा आयोग परीक्षा"
+   },
+   "shortName": "TSC",
+   "countries": [
+    "NP"
+   ],
+   "languages": [
+    "ne"
+   ],
+   "subjects": [
+    "प्रथम पत्र (सामान्य ज्ञान, शिक्षा ऐन/नियमावली, शैक्षिक सुशासन)",
+    "द्वितीय पत्र (विषयगत)",
+    "शिक्षण अनुमतिपत्र"
+   ],
+   "keywords": [
+    "TSC",
+    "शिक्षक सेवा आयोग",
+    "शिक्षक सेवा तयारी",
+    "TSC 2083",
+    "प्रथम पत्र",
+    "द्वितीय पत्र",
+    "प्राथमिक तह",
+    "निम्न माध्यमिक",
+    "माध्यमिक तह",
+    "प्रा.वि.",
+    "नि.मा.वि.",
+    "मा.वि.",
+    "शिक्षक लाइसेन्स",
+    "teaching license",
+    "model set",
+    "model question",
+    "MCQ",
+    "सामान्य ज्ञान",
+    "शिक्षा ऐन",
+    "शिक्षा नियमावली",
+    "शैक्षिक सुशासन",
+    "सिकाइका तत्त्व",
+    "शिक्षाको परिचय",
+    "पाठ्यक्रम",
+    "मूल्याङ्कन"
+   ],
+   "blockedWords": [
+    "नतिजा",
+    "result live",
+    "vlog",
+    "सरुवा",
+    "तलब",
+    "job vacancy",
+    "motivation shorts",
+    "news"
+   ],
+   "chips": [
+    "प्रथम पत्र",
+    "द्वितीय पत्र",
+    "सामान्य ज्ञान",
+    "शिक्षा ऐन",
+    "शैक्षिक सुशासन",
+    "बाल मनोविज्ञान",
+    "मोडेल सेट",
+    "प्रा.वि.",
+    "नि.मा.वि.",
+    "मा.वि.",
+    "शिक्षक लाइसेन्स"
+   ],
+   "channels": [
+    {
+     "channelId": "UC1clnefK2dt_GQGdey5CYew",
+     "handle": "@AayogGyan",
+     "name": "Aayog Gyan",
+     "language": "ne"
+    },
+    {
+     "channelId": "UC0ZRpCzIBK5umS819s7gzhw",
+     "handle": "@unioneducation2",
+     "name": "Union Education",
+     "language": "ne"
+    },
+    {
+     "channelId": "UCMsfI13rBg3ZkKDT8m03UOg",
+     "handle": "@team.sandesh",
+     "name": "TSC CLASS BY TEAM SANDESH",
+     "language": "ne"
+    },
+    {
+     "channelId": "UCPw6YAQcbbRwNNmTHu8w80A",
+     "handle": "@supportbync",
+     "name": "Support By NC Nepali GK & Exam Strategy",
+     "language": "ne"
+    },
+    {
+     "channelId": "UCih9u5sq95vjQsSiZacG0_A",
+     "handle": "@RameshBabuBhattarai",
+     "name": "Union Education-Ramesh Babu Bhattarai",
+     "language": "ne"
+    },
+    {
+     "channelId": "UC2fEwiu5Bc_aQq71MfcDiSw",
+     "handle": "@aayogtayarinepal",
+     "name": "आयोग तयारी नेपाल",
+     "language": "ne"
+    },
+    {
+     "channelId": "UCHiBxG7NYeOMkw6UURQm4uA",
+     "handle": "@meroexam",
+     "name": "TSC PSC Preparation Nepal",
+     "language": "ne"
+    }
+   ]
+  },
+  {
+   "id": "lk_grade5_scholarship",
+   "kind": "study",
+   "name": {
+    "en": "Grade 5 Scholarship Examination",
+    "si": "5 ශ්‍රේණිය ශිෂ්‍යත්ව විභාගය",
+    "ta": "தரம் 5 புலமைப்பரிசில் பரீட்சை"
+   },
+   "shortName": "Grade 5",
+   "countries": [
+    "LK"
+   ],
+   "languages": [
+    "si",
+    "ta"
+   ],
+   "subjects": [
+    "පළමු පත්‍රය (බුද්ධි පරීක්ෂණ)",
+    "දෙවන පත්‍රය (භාෂාව, ගණිතය, පරිසරය)"
+   ],
+   "keywords": [
+    "grade 5 scholarship",
+    "scholarship exam",
+    "ශිෂ්‍යත්ව විභාගය",
+    "5 ශ්‍රේණිය",
+    "5 වසර ශිෂ්‍යත්වය",
+    "ශිෂ්‍යත්ව ප්‍රශ්න පත්‍ර",
+    "ආදර්ශ ප්‍රශ්න පත්‍ර",
+    "පසුගිය ප්‍රශ්න පත්‍ර",
+    "ගණිතය",
+    "පරිසරය",
+    "සිංහල ව්‍යාකරණ",
+    "රචනා",
+    "බුද්ධි පරීක්ෂණ",
+    "තේරවිලි",
+    "paper I",
+    "paper II",
+    "IQ questions",
+    "தரம் 5",
+    "புலமைப்பரிசில்",
+    "நுண்ணறிவு",
+    "model paper",
+    "past paper",
+    "doenets"
+   ],
+   "blockedWords": [
+    "ප්‍රතිඵල",
+    "result live",
+    "cutoff marks",
+    "vlog",
+    "cartoon",
+    "songs",
+    "prank",
+    "motivation shorts"
+   ],
+   "chips": [
+    "ගණිතය",
+    "සිංහල",
+    "පරිසරය",
+    "බුද්ධි පරීක්ෂණ",
+    "රචනා",
+    "ව්‍යාකරණ",
+    "ආදර්ශ ප්‍රශ්න පත්‍ර",
+    "පසුගිය ප්‍රශ්න පත්‍ර",
+    "நுண்ணறிவு",
+    "கணிதம்"
+   ],
+   "channels": [
+    {
+     "channelId": "UCLc-qH-UEjNmo1sBi6mFdhA",
+     "handle": "@paheapi",
+     "name": "pahe api",
+     "language": "si"
+    },
+    {
+     "channelId": "UC5J_M0wDvrtBJXlT_06tx3A",
+     "handle": "@GayaniWeerathunga",
+     "name": "Gayani Weerathunga for Grade 5 Scholarship",
+     "language": "si"
+    },
+    {
+     "channelId": "UCaw2Xe3xdJMt8Ly1y09FSLA",
+     "handle": "@SarathAnandaGuruthuma",
+     "name": "Sarath Ananda Guruthuma",
+     "language": "si"
+    },
+    {
+     "channelId": "UCvcOW2cWuu7UKsGLb6VzTFQ",
+     "handle": "@DilupRoshanEdu",
+     "name": "Dilup Roshan",
+     "language": "si"
+    },
+    {
+     "channelId": "UCdK8_kpFDx-nvi5r9e9C28A",
+     "handle": "@NanakirulaEducation-qy8lg",
+     "name": "Nanakirula Education",
+     "language": "si"
+    },
+    {
+     "channelId": "UCAElp9hGKRLcfXVv1zY0mdA",
+     "handle": "@IQTamilSPg5",
+     "name": "IQ Tamil SP",
+     "language": "ta"
+    },
+    {
+     "channelId": "UCHeIFV8dR6IpiwajOwShcOw",
+     "handle": "@titeducation2087",
+     "name": "TIT EDUCATION",
+     "language": "ta"
     }
    ]
   },

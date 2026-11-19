@@ -40,10 +40,10 @@ function branchFilter(edits) {
 
 // ---- Catalog -------------------------------------------------------------------------------------
 
-test('the catalog carries variantsShareTopics, the 2026-11-16 country packs and the Kids age packs', () => {
-    assert.equal(bundled.draftGenerated, '2026-11-16');
+test('the catalog carries variantsShareTopics, the 2026-11-16 and 2026-11-20 packs and the Kids age packs', () => {
+    assert.equal(bundled.draftGenerated, '2026-11-20');
     assert.equal(bundled.packs.find(item => item.id === 'in_jee').variantsShareTopics, true);
-    assert.deepEqual(bundled.packs.filter(item => item.variantsShareTopics !== undefined).map(item => item.id), ['in_jee']);
+    assert.deepEqual(bundled.packs.filter(item => item.variantsShareTopics !== undefined).map(item => item.id), ['in_jee', 'interview_finance']);
     assert.equal(pack('in_jee').variantsShareTopics, true, 'the loader reads it');
     assert.equal(pack('in_gate').variantsShareTopics, false);
     for (const id of ['pk_ecat', 'bd_medical_admission', 'bd_engineering_admission', 'tr_lgs', 'cls_tr_lise_9_12', 'br_concursos', 'br_oab',
@@ -71,7 +71,9 @@ const crossBranchChannels = {
     cls_in_cbse_11_12: ['ncertofficial'],
     cls_pk_fsc_11_12: ['youthacademy-11th'],
     cls_bd_hsc_11_12: ['hscictclass', 'easyictschool1858'],
-    cls_eg_secondary_10_12: ['madrasetnasecondary', 'elkheta-senior11', 'elkheta-seniors', 'mr.mohamed_tarek']
+    cls_eg_secondary_10_12: ['madrasetnasecondary', 'elkheta-senior11', 'elkheta-seniors', 'mr.mohamed_tarek'],
+    // Every finance interview channel belongs to a track (Wall Street Prep to two).
+    interview_finance: []
 };
 
 test('every channel of a pack with branches is claimed by a branch or teaches every branch', () => {

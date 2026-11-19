@@ -166,20 +166,23 @@
     const RULES = Object.freeze([
         ['skills', ['coding', 'programming', 'interview']],
         ['defence', ['nda', 'cds', 'afcat', 'agniveer', 'ssb']],
-        ['engineering', ['gate', 'jee', 'ioe', 'bitsat', 'ecat', 'engineering']],
-        ['medical', ['neet', 'mbbs', 'mdcat', 'mcat', 'usmle', 'ucat', 'plab', 'nclex', 'mecee', 'gamsat', 'medical']],
+        ['engineering', ['gate', 'jee', 'ioe', 'bitsat', 'ecat', 'engineering', 'fe', 'passport']],
+        ['medical', ['neet', 'mbbs', 'mdcat', 'mcat', 'usmle', 'ucat', 'plab', 'nclex', 'mecee', 'gamsat', 'medical',
+            'tus', 'medicina', 'enarm', 'residencia', 'mccqe', 'tms', 'pass', 'las']],
         ['civil', ['upsc', 'psc', 'lok', 'sewa', 'css', 'bcs', 'wbcs', 'tnpsc', 'kpsc', 'mpsc', 'appsc',
-            'tspsc', 'cpns', 'kpss', 'civil', 'concursos', 'oposiciones']],
-        ['jobs', ['banking', 'ssc', 'rrb', 'police', 'ibps', 'sbi']],
-        ['law', ['clat', 'cat', 'lsat', 'bar', 'gmat', 'judiciary', 'ailet', 'law', 'oab']],
-        ['finance', ['ca', 'icai', 'cs', 'icsi', 'cma', 'icmai', 'cfa', 'frm', 'acca', 'cima', 'cpa']],
-        ['teaching', ['ctet', 'tet', 'ugc', 'net', 'kvs', 'praxis']],
-        ['languages', ['ielts', 'toefl', 'gre', 'pte', 'det', 'jlpt', 'hsk', 'topik', 'eiken', 'duolingo']],
+            'tspsc', 'cpns', 'kpss', 'civil', 'concursos', 'oposiciones', 'concorsi', 'kedinasan', 'ppsc', 'fpsc']],
+        ['jobs', ['banking', 'ssc', 'rrb', 'police', 'ibps', 'sbi', 'bank', 'bumn']],
+        ['law', ['clat', 'cat', 'lsat', 'bar', 'gmat', 'judiciary', 'ailet', 'law', 'oab', 'jura', 'sqe', 'lnat', 'takken']],
+        ['finance', ['ca', 'icai', 'cs', 'icsi', 'cma', 'icmai', 'cfa', 'frm', 'acca', 'cima', 'cpa', 'boki', 'ican', 'kasneb', 'finra', 'icap']],
+        ['teaching', ['ctet', 'tet', 'ugc', 'net', 'kvs', 'praxis', 'docente', 'crpe', 'teacher', 'tsc']],
+        ['languages', ['ielts', 'toefl', 'gre', 'pte', 'det', 'jlpt', 'hsk', 'topik', 'eiken', 'duolingo', 'yds', 'step', 'toeic']],
         ['school', ['sat', 'act', 'ap', 'common', 'suneung', 'abitur', 'baccalaureat', 'bac', 'pau',
             'enem', 'admision', 'admission', 'saber11', 'paes', 'utbk', 'snbt', 'upcat', 'thpt', 'tcas', 'spm', 'yks', 'konkur',
             'thanaweya', 'qudurat', 'tahsili', 'ege', 'nmt', 'matura', 'maturita', 'vestibular', 'ingreso', 'cpge', 'provincial',
             'hsc', 'vce', 'atar', 'ncea', 'national', 'gcse', 'level', 'ib', 'cbse', 'waec', 'wassce', 'jamb', 'utme', 'kcse',
-            'nsc', 'matric', 'uneb', 'gce', 'al', 'eju', 'gaokao', 'lgs', 'brevet', 'comipems', 'koukou', 'juken']]
+            'nsc', 'matric', 'uneb', 'gce', 'al', 'eju', 'gaokao', 'lgs', 'brevet', 'comipems', 'koukou', 'juken',
+            'prep', 'certificate', 'osmoklasisty', 'oge', 'dgnl', 'vao10', 'tka', 'bece', 'neco', 'kjsea', 'ged', 'ales', 'dgs', 'exit',
+            'cuet', 'plus', 'scholarship']]
     ]);
 
     /** Name words for packs no id rule knows (a pack added later): the same fields, by the English name. */

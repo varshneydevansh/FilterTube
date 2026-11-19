@@ -58,7 +58,7 @@ test('the bundled catalog has at least 3 approved channels per pack and fits the
   for (const hidden of ['cn_gaokao', 'cn_kaoyan', 'tz_necta', 'my_stpm', 'cm_gce_bac']) assert.equal(ids.includes(hidden), false, hidden);
   // us_praxis was thin until 2026-11-16, when it got five verified channels (app StudyPackCatalogTest).
   assert.ok(bundled.packs.find(pack => pack.id === 'us_praxis').channels.length >= 3);
-  assert.deepEqual([...new Set(bundled.packs.map(pack => pack.kind))].sort(), ['class', 'kids_age', 'kids_classic', 'study']);
+  assert.deepEqual([...new Set(bundled.packs.map(pack => pack.kind))].sort(), ['class', 'interview', 'kids_age', 'kids_classic', 'study']);
   assert.equal(catalog.packs.length, bundled.packs.length, 'the loader reads every bundled pack');
 });
 
@@ -76,7 +76,7 @@ test('the bundled catalog is the generator output for the v2 draft, and the same
 });
 
 test('v2: class packs carry grade, board, subjects and grade keywords; the picker has Exams and School tabs', () => {
-  assert.equal(bundled.draftGenerated, '2026-11-16');
+  assert.equal(bundled.draftGenerated, '2026-11-20');
   assert.ok(bundled.packs.length >= 130, 'v2 has 145 packs before thin ones are hidden');
   const cbse = Packs.packById(catalog, 'cls_in_cbse_6_8');
   assert.equal(cbse.kind, 'class');
@@ -158,7 +158,7 @@ test('packs for a country: own first, then nearby, then global; kids packs are s
   assert.equal(new Set(nepal).size, nepal.length, 'no pack repeats');
   assert.equal(nepal.includes('us_bar'), false, 'unrelated countries are not listed');
   assert.ok(nepal.every(id => !id.startsWith('kids_') && !id.startsWith('classic_')));
-  assert.deepEqual(Packs.forCountry(catalog, '').map(pack => pack.id), catalog.packs.filter(Packs.isGlobal).filter(p => p.kind === 'study' || p.kind === 'class').map(p => p.id));
+  assert.deepEqual(Packs.forCountry(catalog, '').map(pack => pack.id), catalog.packs.filter(Packs.isGlobal).filter(p => p.kind === 'study' || p.kind === 'class' || p.kind === 'interview').map(p => p.id));
   assert.deepEqual(Packs.kidsPacks(catalog).map(pack => pack.kind).filter((kind, i, all) => all.indexOf(kind) === i).sort(), ['kids_age', 'kids_classic']);
 });
 
