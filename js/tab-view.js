@@ -13685,11 +13685,12 @@ document.addEventListener('DOMContentLoaded', async () => {
                 await io.createAutoBackup('before_blocktube_import');
             }
 
-            const importResult = await io.importV3(payload, {
+            const importResult = await runImportWithAuthorization(currentAuth => io.importV3(payload, {
                 strategy: 'merge',
                 scope: 'auto',
-                auth
-            });
+                auth: currentAuth
+            }), auth);
+            if (!importResult) return null;
 
             // Do not send imported identifiers through the ordinary post-entry
             // queue. Every import format uses the explicitly started,
@@ -26581,14 +26582,65 @@ document.addEventListener('DOMContentLoaded', async () => {
             details,
             targetProfile
         });
-        const result = await adapter.applyIncomingEnvelope(envelope, {
+        const result = await runImportWithAuthorization(currentAuth => adapter.applyIncomingEnvelope(envelope, {
             strategy: strategyOverride || details.strategy,
             scope: details.scope,
-            auth,
+            auth: currentAuth,
             targetProfileId: details.scope === 'full' ? null : normalizeString(targetProfile.profileId) || null
-        });
+        }), auth);
+        if (!result) throw new Error('Master unlock cancelled');
         await refreshFilterTubeUiAfterNanahImport();
         return result;
+    }
+
+    // Lossless backup contract: the PIN a changed protected backup or a weakening import needs.
+    async function promptImportAuthorizationPin(code) {
+        const changed = code === (window.FilterTubeIO || {}).BACKUP_CHANGED_PIN_REQUIRED;
+        const pin = await showPromptModal({
+            title: changed
+                ? tabViewUiText('dashboard.backup.integrity.changedOutside', 'This backup was changed outside FilterTube')
+                : tabViewUiText('dashboard.backup.weakening.title', 'PIN needed'),
+            message: changed
+                ? tabViewUiText('dashboard.backup.integrity.pinMessage', 'Enter the PIN to import it.')
+                : tabViewUiText('dashboard.backup.weakening.message', 'This would loosen a protected profile. Enter the Master PIN or the parent\'s PIN to continue.'),
+            placeholder: tabViewUiText('dashboard.backup.prompt.masterPin.placeholder', 'Master PIN'),
+            inputType: 'password',
+            confirmText: tabViewUiText('dashboard.backup.action.authorize', 'Authorize'),
+            cancelText: tabViewUiText('dashboard.modal.cancel', 'Cancel')
+        });
+        return normalizeString(pin);
+    }
+
+    /** Runs an import; when it answers with a PIN request, asks once per request and retries. null: cancelled. */
+    async function runImportWithAuthorization(run, auth) {
+        const io = window.FilterTubeIO || {};
+        const pinCodes = [io.BACKUP_CHANGED_PIN_REQUIRED, io.WEAKENING_PIN_REQUIRED].filter(Boolean);
+        let currentAuth = auth ? { ...auth } : null;
+        for (let attempt = 0; ; attempt += 1) {
+            try {
+                return await run(currentAuth);
+            } catch (e) {
+                if (!pinCodes.includes(e?.code) || attempt >= 2) throw e;
+                const pin = await promptImportAuthorizationPin(e.code);
+                if (!pin) return null;
+                currentAuth = { ...(currentAuth || {}), authorizationPin: pin };
+            }
+        }
+    }
+
+    /** Shows "This backup was changed outside FilterTube" when it applies; false when the user stops. */
+    async function confirmBackupIntegrityNotice(io, payload, auth) {
+        if (typeof io.inspectBackupIntegrity !== 'function') return true;
+        const report = await io.inspectBackupIntegrity(payload, { auth });
+        if (!report?.changedOutside) return true;
+        return showConfirmModal({
+            title: tabViewUiText('dashboard.backup.integrity.changedOutside', 'This backup was changed outside FilterTube'),
+            message: report.protected
+                ? tabViewUiText('dashboard.backup.integrity.protectedMessage', 'It holds a protected profile, so the PIN is needed before anything is imported.')
+                : tabViewUiText('dashboard.backup.integrity.unprotectedMessage', 'Import it only if you trust where it came from.'),
+            confirmText: tabViewUiText('dashboard.modal.continue', 'Continue'),
+            cancelText: tabViewUiText('dashboard.modal.cancel', 'Cancel')
+        });
     }
 
     function formatManagedNanahBlockedReason(reason, fallback = 'validation failed') {
@@ -30420,9 +30472,13 @@ document.addEventListener('DOMContentLoaded', async () => {
                     restoreTrustedNanahState
                 }
             };
-            const importResult = restoreTrustedNanahState
-                ? await withNanahTrustedIdentityRestore(() => io.importV3(payload, importOptions))
-                : await io.importV3(payload, importOptions);
+            if (!(await confirmBackupIntegrityNotice(io, payload, importOptions.auth))) return;
+            const runImport = options => (restoreTrustedNanahState
+                ? withNanahTrustedIdentityRestore(() => io.importV3(payload, options))
+                : io.importV3(payload, options));
+            const importResult = await runImportWithAuthorization(
+                currentAuth => runImport({ ...importOptions, auth: currentAuth }), importOptions.auth);
+            if (!importResult) return;
 
             await StateManager.loadSettings({ notify: false, resetEnrichment: false, scheduleEnrichment: false });
             const enrichmentStarter = StateManager.startImportedChannelEnrichment

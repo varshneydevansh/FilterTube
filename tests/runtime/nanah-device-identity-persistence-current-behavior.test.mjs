@@ -200,10 +200,12 @@ test('overlapping trusted restores are refused while the existing restore retain
 });
 
 const importCall = section('            const importOptions = {', '            await StateManager.loadSettings(');
+// The dispatcher's integrity notice and PIN retry (lossless backup contract) pass straight through here.
+const importAuthorizationStubs = { confirmBackupIntegrityNotice: async () => true, runImportWithAuthorization: (run, auth) => run(auth) };
 test('actual trusted-backup import dispatcher waits before invoking the identity-writing importer', async () => {
   const f = fixture({ delayedWrite: true });
   let imports = 0;
-  Object.assign(f.box, { restoreTrustedNanahState: true, auth: { actorProfileId: 'parent' }, payload: { synthetic: true },
+  Object.assign(f.box, importAuthorizationStubs, { restoreTrustedNanahState: true, auth: { actorProfileId: 'parent' }, payload: { synthetic: true },
     io: { importV3: async (payload, options) => {
       imports++;
       assert.equal(options.auth.restoreTrustedNanahState, true);
@@ -228,7 +230,7 @@ test('actual trusted-backup import dispatcher waits before invoking the identity
 
 test('actual settings-only import dispatcher preserves its existing path without an identity-restore barrier', async () => {
   const f = fixture({ stored: 'existing-device' });
-  Object.assign(f.box, { restoreTrustedNanahState: false, auth: null, payload: { synthetic: true },
+  Object.assign(f.box, importAuthorizationStubs, { restoreTrustedNanahState: false, auth: null, payload: { synthetic: true },
     io: { importV3: async (_, options) => {
       assert.equal(options.auth.restoreTrustedNanahState, false);
       assert.equal(f.box.nanahTrustedIdentityRestoreInProgress, false);
