@@ -239,7 +239,7 @@ test('import export paths currently enforce Master PIN only for Default full-tar
   assert.doesNotMatch(encryptedBlock, /targetProfileId/);
 });
 
-test('Nanah scoped apply currently writes profiles directly without an internal lock authority', () => {
+test('Nanah scoped apply writes profiles directly behind the weakening PIN gate only', () => {
   const source = read('js/nanah_sync_adapter.js');
   const block = sliceBetween(
     source,
@@ -249,6 +249,8 @@ test('Nanah scoped apply currently writes profiles directly without an internal 
 
   assert.match(block, /const resolvedTargetProfileId = normalizeString\(targetProfileId\) \|\| activeId/);
   assert.match(block, /await io\.saveProfilesV4\(\{/);
+  // Lossless backup contract: a weakening change needs the master or parent PIN (io_manager decides).
+  assert.match(block, /await requireScopedWriteAuthorization\(io, profilesV4, profiles, auth\);\s*const saved = await io\.saveProfilesV4/);
   assert.doesNotMatch(block, /isUiLocked|ensureAdminUnlocked|ensureProfileUnlocked|Security|Pin|PIN|isProfileSessionAuthorized/);
 });
 

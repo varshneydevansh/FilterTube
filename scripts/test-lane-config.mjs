@@ -160,6 +160,7 @@ const SAFETY_AND_PREFERENCE_TESTS = Object.freeze([
   'tests/runtime/profile-preference-reset.test.mjs',
   'tests/runtime/quiet-blocking-overlay.test.mjs',
   'tests/runtime/kids-quiet-blocking.test.mjs',
+  'tests/runtime/lossless-backup.test.mjs',
 ]);
 const AUTO_SYNC_TESTS = Object.freeze([
   'tests/runtime/auto-sync-two-endpoint.test.mjs',

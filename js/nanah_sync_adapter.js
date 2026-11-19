@@ -1489,6 +1489,7 @@
         }
 
         if (typeof beforeProfileWrite === 'function') await beforeProfileWrite(resolvedTargetProfileId);
+        await requireScopedWriteAuthorization(io, profilesV4, profiles, auth);
         const saved = await io.saveProfilesV4({
             ...profilesV4,
             profiles
@@ -2236,6 +2237,8 @@
             : (managedPortable || await io.exportV3({ scope: normalizedScope, auth, includeKidsPersonaLinks: true }));
         // Copy once and Merge never send a running study lock (the same rule as the PIN); Move account does.
         if (normalizedScope !== 'full') withoutStudyLocks(payload);
+        // The backup-file integrity block does not travel: the pairing authenticates a transfer.
+        if (payload && typeof payload === 'object') delete payload.integrity;
         return {
             app: APP_ID,
             scope: normalizedScope,
@@ -2349,7 +2352,8 @@
             return applyScopedPortablePayload(io, extracted.portable, {
                 strategy: effectiveStrategy,
                 targetProfileId,
-                beforeProfileWrite
+                beforeProfileWrite,
+                auth
             });
         }
         return io.importV3(extracted.portable, {
@@ -2361,7 +2365,9 @@
             // Device sync keeps YouTube Kids profile links (as on Android); manual backups never do.
             adoptKidsPersonaLinks: true,
             // Move account carries the study lock; Copy once and Merge never do.
-            carryStudyLock: effectiveScope === 'full'
+            carryStudyLock: effectiveScope === 'full',
+            // A transfer is authenticated by the pairing, not by a backup-file integrity block.
+            verifyIntegrity: false
         });
     }
 

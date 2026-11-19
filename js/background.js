@@ -30,6 +30,14 @@ try {
 }
 
 try {
+    if (typeof importScripts === 'function' && !globalThis.FilterTubeBackupIntegrity) {
+        importScripts('shared/backup_integrity.js');
+    }
+} catch (e) {
+    console.warn('FilterTube Background: Failed to load backup integrity helpers', e);
+}
+
+try {
     if (typeof importScripts === 'function' && !globalThis.FilterTubeImportedChannelEnrichment) {
         importScripts('imported_channel_enrichment.js');
     }
@@ -1097,6 +1105,17 @@ async function createAutoBackupInBackground(triggerType, options = {}) {
     payload.meta.backupType = 'auto';
     payload.meta.trigger = triggerType || 'unknown';
     payload.meta.backupLocation = 'FilterTube Backup';
+    // Lossless backup contract: this device's preferences (allowlist) and the integrity block.
+    const backupIntegrity = globalThis.FilterTubeBackupIntegrity || null;
+    if (backupIntegrity && payload.profilesV4) {
+        const preferenceValues = await storageGet([...backupIntegrity.EXTENSION_PREFERENCE_KEYS]);
+        payload.profilesV4 = {
+            ...payload.profilesV4,
+            appPreferences: backupIntegrity.withExtensionPreferences(
+                safeObject(settings?.ftProfilesV4)?.appPreferences, safeObject(preferenceValues))
+        };
+    }
+    if (backupIntegrity && backupIntegrity.available()) await backupIntegrity.attach(payload);
 
     const safePart = (value) => {
         const raw = typeof value === 'string' ? value.trim() : '';

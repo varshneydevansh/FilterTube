@@ -1,0 +1,141 @@
+{
+  "root": {
+    "meta": {
+      "version": 3,
+      "application": "FilterTube"
+    },
+    "profilesV4": {
+      "schemaVersion": 4,
+      "activeProfileId": "default",
+      "profiles": {
+        "default": {
+          "name": "Default",
+          "settings": {
+            "hideShorts": true,
+            "note": "a/b ü"
+          },
+          "main": {
+            "keywords": [
+              "x",
+              "y"
+            ]
+          }
+        }
+      }
+    }
+  },
+  "pin": "2468",
+  "plain": {
+    "meta": {
+      "version": 3,
+      "application": "FilterTube"
+    },
+    "profilesV4": {
+      "schemaVersion": 4,
+      "activeProfileId": "default",
+      "profiles": {
+        "default": {
+          "name": "Default",
+          "settings": {
+            "hideShorts": true,
+            "note": "a/b ü"
+          },
+          "main": {
+            "keywords": [
+              "x",
+              "y"
+            ]
+          }
+        }
+      }
+    },
+    "integrity": {
+      "format": "filtertube-integrity",
+      "version": 1,
+      "alg": "sha256",
+      "protected": false,
+      "digest": "56fe58d98cfd189fe6961c902fe03d6ca1663a2e03462ccd8a91100a51371ac2"
+    }
+  },
+  "hmac": {
+    "meta": {
+      "version": 3,
+      "application": "FilterTube"
+    },
+    "profilesV4": {
+      "schemaVersion": 4,
+      "activeProfileId": "default",
+      "profiles": {
+        "default": {
+          "name": "Default",
+          "settings": {
+            "hideShorts": true,
+            "note": "a/b ü"
+          },
+          "main": {
+            "keywords": [
+              "x",
+              "y"
+            ]
+          }
+        }
+      }
+    },
+    "integrity": {
+      "format": "filtertube-integrity",
+      "version": 1,
+      "alg": "hmac-sha256",
+      "protected": true,
+      "kdf": {
+        "name": "pbkdf2-sha256",
+        "iterations": 1000,
+        "salt": "AAECAwQFBgcICQoLDA0ODw=="
+      },
+      "digest": "d2b46fa7755d85bea7ec1872739db12f7b2e1d7eb64597da51096b20fef001ee"
+    }
+  },
+  "edited": {
+    "meta": {
+      "version": 3,
+      "application": "FilterTube"
+    },
+    "profilesV4": {
+      "schemaVersion": 4,
+      "activeProfileId": "default",
+      "profiles": {
+        "default": {
+          "name": "Default",
+          "settings": {
+            "hideShorts": true,
+            "note": "a/b ü"
+          },
+          "main": {
+            "keywords": [
+              "x"
+            ]
+          }
+        }
+      }
+    },
+    "integrity": {
+      "format": "filtertube-integrity",
+      "version": 1,
+      "alg": "hmac-sha256",
+      "protected": true,
+      "kdf": {
+        "name": "pbkdf2-sha256",
+        "iterations": 1000,
+        "salt": "AAECAwQFBgcICQoLDA0ODw=="
+      },
+      "digest": "d2b46fa7755d85bea7ec1872739db12f7b2e1d7eb64597da51096b20fef001ee"
+    }
+  },
+  "expect": {
+    "plain": "valid",
+    "hmacWithPin": "valid",
+    "hmacWrongPin": "mismatch",
+    "hmacNoPin": "needs_pin",
+    "edited": "mismatch",
+    "missing": "missing"
+  }
+}

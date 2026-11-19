@@ -1,0 +1,124 @@
+[
+  {
+    "value": null,
+    "canonical": "null"
+  },
+  {
+    "value": true,
+    "canonical": "true"
+  },
+  {
+    "value": false,
+    "canonical": "false"
+  },
+  {
+    "value": 0,
+    "canonical": "0"
+  },
+  {
+    "value": 7,
+    "canonical": "7"
+  },
+  {
+    "value": -12,
+    "canonical": "-12"
+  },
+  {
+    "value": 9007199254740991,
+    "canonical": "9007199254740991"
+  },
+  {
+    "value": 1.5,
+    "canonical": "1.5"
+  },
+  {
+    "value": -0.25,
+    "canonical": "-0.25"
+  },
+  {
+    "value": 1e+21,
+    "canonical": "1e+21"
+  },
+  {
+    "value": 1e-7,
+    "canonical": "1e-7"
+  },
+  {
+    "value": "",
+    "canonical": "\"\""
+  },
+  {
+    "value": "a/b",
+    "canonical": "\"a/b\""
+  },
+  {
+    "value": "quote \" and \\ backslash",
+    "canonical": "\"quote \\\" and \\\\ backslash\""
+  },
+  {
+    "value": "tab\tnew\nline\r\b\f\u0001\u001f",
+    "canonical": "\"tab\\tnew\\nline\\r\\b\\f\\u0001\\u001f\""
+  },
+  {
+    "value": "é ü 日本 हिन्दी",
+    "canonical": "\"é ü 日本 हिन्दी\""
+  },
+  {
+    "value": "😀 non-BMP",
+    "canonical": "\"😀 non-BMP\""
+  },
+  {
+    "value": "  ",
+    "canonical": "\"  \""
+  },
+  {
+    "value": [],
+    "canonical": "[]"
+  },
+  {
+    "value": {},
+    "canonical": "{}"
+  },
+  {
+    "value": [
+      3,
+      1,
+      2
+    ],
+    "canonical": "[3,1,2]"
+  },
+  {
+    "value": {
+      "9": 6,
+      "10": 5,
+      "b": 1,
+      "a": 2,
+      "B": 3,
+      "_": 4
+    },
+    "canonical": "{\"9\":6,\"10\":5,\"B\":3,\"_\":4,\"a\":2,\"b\":1}"
+  },
+  {
+    "value": {
+      "nested": {
+        "z": [
+          {
+            "y": 1,
+            "x": 2
+          }
+        ],
+        "a": null
+      }
+    },
+    "canonical": "{\"nested\":{\"a\":null,\"z\":[{\"x\":2,\"y\":1}]}}"
+  },
+  {
+    "value": {
+      "é": 1,
+      "e": 2,
+      "😀": 3,
+      "ｚ": 4
+    },
+    "canonical": "{\"e\":2,\"é\":1,\"😀\":3,\"ｚ\":4}"
+  }
+]

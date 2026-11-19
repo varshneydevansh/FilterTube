@@ -356,6 +356,311 @@
         }
     }
 
+    // ---- Lossless backup contract: integrity check and PIN gate for weakening imports ----
+
+    function codedError(code, message, details = null) {
+        const error = new Error(message);
+        error.code = code;
+        if (details) error.details = details;
+        return error;
+    }
+
+    function profilePinVerifierOf(profile) {
+        const security = safeObject(safeObject(profile).security);
+        const verifier = security.profilePinVerifier || security.pinVerifier || null;
+        return verifier && typeof verifier === 'object' ? verifier : null;
+    }
+
+    function stableJson(value) {
+        const api = backupIntegrity();
+        if (api) return api.ftc1(value === undefined ? null : value);
+        return JSON.stringify(value === undefined ? null : value);
+    }
+
+    /** Checks PINs against verifiers, each PIN/verifier pair once per import. */
+    function pinChecker() {
+        const results = new Map();
+        return async (pin, verifier) => {
+            const normalized = normalizeString(pin);
+            if (!normalized || !verifier) return false;
+            const key = `${normalized}\u0000${stableJson(verifier)}`;
+            if (!results.has(key)) {
+                results.set(key, verifyPinAgainstVerifier(normalized, verifier).catch(() => false));
+            }
+            return results.get(key);
+        };
+    }
+
+    function authPins(auth) {
+        const root = safeObject(auth);
+        return Array.from(new Set([root.authorizationPin, root.localMasterPin, root.parentPin, root.incomingMasterPin]
+            .map(normalizeString).filter(Boolean)));
+    }
+
+    function hasRunningStudyLock(profile) {
+        const lock = safeObject(profile).study ? safeObject(safeObject(profile).study).lock : null;
+        return !!(lock && typeof lock === 'object' && !Array.isArray(lock) && Object.keys(lock).length);
+    }
+
+    /** A local profile is protected by the master PIN, its own or its parent's PIN, locked, or a running Study lock. */
+    function isProtectedLocalProfile(tree, profileId) {
+        const profiles = safeObject(safeObject(tree).profiles);
+        const profile = safeObject(profiles[profileId]);
+        if (extractMasterPinVerifier(tree)) return true;
+        if (profilePinVerifierOf(profile)) return true;
+        const parentId = normalizeString(profile.parentProfileId);
+        if (parentId && profilePinVerifierOf(profiles[parentId])) return true;
+        return profile.locked === true || hasRunningStudyLock(profile);
+    }
+
+    function listItemKeys(list, kind) {
+        const keys = [];
+        for (const entry of safeArray(list)) {
+            if (kind === 'channel') {
+                const ids = channelIdentityKeys(entry);
+                keys.push(ids.length ? ids : [stableJson(entry)]);
+            } else if (kind === 'keyword') {
+                keys.push([keywordKey(entry) || stableJson(entry)]);
+            } else {
+                const id = typeof entry === 'string' ? normalizeString(entry) : stableJson(entry);
+                if (id) keys.push([id]);
+            }
+        }
+        return keys;
+    }
+
+    /** True when some entry of "from" has no identity key in "to". */
+    function listLosesEntries(from, to, kind) {
+        const present = new Set(listItemKeys(to, kind).flat());
+        return listItemKeys(from, kind).some(ids => !ids.some(id => present.has(id)));
+    }
+
+    function surfaceList(surface, key, alias) {
+        const root = safeObject(surface);
+        if (Object.prototype.hasOwnProperty.call(root, key)) return root[key];
+        return alias ? root[alias] : undefined;
+    }
+
+    function selectionWeakens(before, after) {
+        const b = safeObject(before);
+        if (b.enabled !== true) return false;
+        const a = safeObject(after);
+        if (a.enabled !== true || normalizeString(a.mode) !== normalizeString(b.mode)) return true;
+        const kept = new Set(safeArray(a.selected).map(value => stableJson(value)));
+        return safeArray(b.selected).some(value => !kept.has(stableJson(value)));
+    }
+
+    function contentFiltersWeaken(before, after) {
+        const b = safeObject(before);
+        const a = safeObject(after);
+        return Object.keys(b).some(group => {
+            const rule = safeObject(b[group]);
+            if (rule.enabled !== true) return false;
+            return stableJson(rule) !== stableJson(safeObject(a[group]));
+        });
+    }
+
+    function profileFilters(profile, key) {
+        const settings = safeObject(safeObject(profile).settings);
+        if (Object.prototype.hasOwnProperty.call(settings, key)) return settings[key];
+        return safeObject(safeObject(profile).main)[key];
+    }
+
+    // Switches whose "on" filters more: turning one off is weakening.
+    const FILTERING_SWITCHES = ['enabled', 'syncKidsToMain', 'disableAutoplay'];
+
+    /** Why an import result weakens one protected profile ([] when it does not). */
+    function profileWeakeningReasons(beforeTree, afterTree, profileId) {
+        const before = safeObject(safeObject(safeObject(beforeTree).profiles)[profileId]);
+        const afterProfiles = safeObject(safeObject(afterTree).profiles);
+        if (!Object.prototype.hasOwnProperty.call(afterProfiles, profileId)) return ['deleted'];
+        const after = safeObject(afterProfiles[profileId]);
+        const reasons = [];
+        const add = reason => { if (!reasons.includes(reason)) reasons.push(reason); };
+        const bMain = safeObject(before.main), aMain = safeObject(after.main);
+        const bKids = safeObject(before.kids), aKids = safeObject(after.kids);
+        const bSettings = safeObject(before.settings), aSettings = safeObject(after.settings);
+
+        // Block rules removed.
+        if (listLosesEntries(surfaceList(bMain, 'channels', 'blockedChannels'), surfaceList(aMain, 'channels', 'blockedChannels'), 'channel')
+            || listLosesEntries(surfaceList(bMain, 'keywords', 'blockedKeywords'), surfaceList(aMain, 'keywords', 'blockedKeywords'), 'keyword')
+            || listLosesEntries(surfaceList(bMain, 'videoIds', 'blockedVideoIds'), surfaceList(aMain, 'videoIds', 'blockedVideoIds'), 'id')
+            || listLosesEntries(bKids.blockedChannels, aKids.blockedChannels, 'channel')
+            || listLosesEntries(bKids.blockedKeywords, aKids.blockedKeywords, 'keyword')
+            || listLosesEntries(bKids.videoIds, aKids.videoIds, 'id')) add('block_rule_removed');
+        // Allow rules added.
+        if (listLosesEntries(aMain.whitelistChannels, bMain.whitelistChannels, 'channel')
+            || listLosesEntries(aMain.whitelistKeywords, bMain.whitelistKeywords, 'keyword')
+            || listLosesEntries(aMain.allowedVideoIds, bMain.allowedVideoIds, 'id')
+            || listLosesEntries(aKids.whitelistChannels, bKids.whitelistChannels, 'channel')
+            || listLosesEntries(aKids.whitelistKeywords, bKids.whitelistKeywords, 'keyword')) add('allow_rule_added');
+        // Content, category and language filter rules.
+        if (contentFiltersWeaken(profileFilters(before, 'contentFilters'), profileFilters(after, 'contentFilters'))
+            || contentFiltersWeaken(bKids.contentFilters, aKids.contentFilters)
+            || selectionWeakens(profileFilters(before, 'categoryFilters'), profileFilters(after, 'categoryFilters'))
+            || selectionWeakens(bKids.categoryFilters, aKids.categoryFilters)
+            || selectionWeakens(bSettings.languageFilters, aSettings.languageFilters)
+            || selectionWeakens(bKids.languageFilters, aKids.languageFilters)) add('filter_rule_removed');
+        // Modes toward less filtering.
+        if ((bMain.mode === 'whitelist' && aMain.mode !== 'whitelist')
+            || (bKids.mode === 'whitelist' && aKids.mode !== 'whitelist')
+            || (bMain.layered === true && aMain.layered !== true)
+            || (bKids.layered === true && aKids.layered !== true)
+            || (bKids.strictMode !== false && aKids.strictMode === false)) add('mode');
+        // Viewing access and time limit.
+        if ((bSettings.allowMainViewing === false && aSettings.allowMainViewing !== false)
+            || (bSettings.allowKidsViewing === false && aSettings.allowKidsViewing !== false)) add('viewing_access');
+        if (bSettings.timeLimitPolicy && stableJson(bSettings.timeLimitPolicy) !== stableJson(aSettings.timeLimitPolicy)) add('time_limit');
+        // Hide switches and other filtering switches turned off.
+        for (const key of new Set([...Object.keys(bSettings), ...Object.keys(aSettings)])) {
+            const filtering = /^hide[A-Z]/.test(key) || FILTERING_SWITCHES.includes(key);
+            if (!filtering) continue;
+            const wasOn = key === 'enabled' ? bSettings[key] !== false : bSettings[key] === true;
+            const isOn = key === 'enabled' ? aSettings[key] !== false : aSettings[key] === true;
+            if (wasOn && !isOn) add('switch_off');
+        }
+        // Study lock, locked, PINs and who owns the profile.
+        if (hasRunningStudyLock(before) && stableJson(safeObject(before.study).lock) !== stableJson(safeObject(after.study).lock)) add('study_lock');
+        if ((before.locked === true) !== (after.locked === true)) add('locked');
+        const bSecurity = safeObject(before.security), aSecurity = safeObject(after.security);
+        if (stableJson(profilePinVerifierOf(before)) !== stableJson(profilePinVerifierOf(after))
+            || stableJson(bSecurity.masterPinVerifier || bSecurity.masterPin || null) !== stableJson(aSecurity.masterPinVerifier || aSecurity.masterPin || null)) add('pin');
+        if (normalizeString(before.type) !== normalizeString(after.type)
+            || normalizeString(before.parentProfileId) !== normalizeString(after.parentProfileId)) add('owner');
+        return reasons;
+    }
+
+    /** The protected local profiles an import result would weaken, with the reasons. */
+    function findWeakenedProfiles(beforeTree, afterTree) {
+        const weakened = [];
+        for (const profileId of Object.keys(safeObject(safeObject(beforeTree).profiles))) {
+            if (!isProtectedLocalProfile(beforeTree, profileId)) continue;
+            const reasons = profileWeakeningReasons(beforeTree, afterTree, profileId);
+            if (reasons.length) weakened.push({ profileId, reasons });
+        }
+        return weakened;
+    }
+
+    /**
+     * Throws (code FT_IMPORT_WEAKENING_PIN_REQUIRED) unless every weakened protected profile is authorized by
+     * the local master PIN or that profile's parent PIN (an account profile without a parent: its own PIN).
+     * A parent-approved Nanah apply (auth.localManagedApplyBinding) authorizes the bound profile.
+     */
+    async function requireWeakeningAuthorization(beforeTree, afterTree, auth = null) {
+        const weakened = findWeakenedProfiles(beforeTree, afterTree);
+        if (!weakened.length) return { weakened };
+        const check = pinChecker();
+        const pins = authPins(auth);
+        const masterVerifier = extractMasterPinVerifier(beforeTree);
+        const anyPin = async verifier => {
+            for (const pin of pins) if (await check(pin, verifier)) return true;
+            return false;
+        };
+        if (masterVerifier && await anyPin(masterVerifier)) return { weakened, authorizedBy: 'master' };
+        const profiles = safeObject(safeObject(beforeTree).profiles);
+        const binding = safeObject(safeObject(auth).localManagedApplyBinding);
+        for (const { profileId } of weakened) {
+            const profile = safeObject(profiles[profileId]);
+            const parentId = normalizeString(profile.parentProfileId);
+            if (binding.targetProfileId && binding.targetProfileId === profileId
+                && normalizeString(binding.localParentProfileId) === parentId) continue;
+            // The parent's PIN (the master PIN tried above stands for the Default profile). With no master
+            // and no parent PIN, the profile's own PIN; a profile with no PIN anywhere has nothing to ask.
+            const ownerVerifiers = [];
+            if (parentId && parentId !== DEFAULT_PROFILE_ID && profilePinVerifierOf(profiles[parentId])) ownerVerifiers.push(profilePinVerifierOf(profiles[parentId]));
+            if (parentId === DEFAULT_PROFILE_ID && !masterVerifier && profilePinVerifierOf(profiles[parentId])) ownerVerifiers.push(profilePinVerifierOf(profiles[parentId]));
+            // A child's own PIN is its switching PIN and never authorizes loosening it.
+            if (!masterVerifier && !ownerVerifiers.length && normalizeString(profile.type) !== 'child'
+                && profilePinVerifierOf(profile)) ownerVerifiers.push(profilePinVerifierOf(profile));
+            if (!masterVerifier && !ownerVerifiers.length) continue;
+            let ownerAuthorized = false;
+            for (const verifier of ownerVerifiers) if (await anyPin(verifier)) { ownerAuthorized = true; break; }
+            if (ownerAuthorized) continue;
+            throw codedError(WEAKENING_PIN_REQUIRED,
+                'This import removes protection from a protected profile. Enter the Master PIN or the parent\'s PIN to continue.',
+                { weakened });
+        }
+        return { weakened, authorizedBy: 'parent' };
+    }
+
+    /**
+     * The integrity status of a backup file: { status, protected, changedOutside }.
+     * changedOutside: the notice "This backup was changed outside FilterTube" is due.
+     */
+    async function inspectBackupIntegrity(json, { auth = null } = {}) {
+        const original = convertedBackupOriginals.get(json) || json;
+        const root = safeObject(original);
+        const api = backupIntegrity();
+        const block = root[INTEGRITY_KEY];
+        const tree = root.profilesV4 || (root.schemaVersion === 4 ? root : null);
+        const incomingProtected = (api ? api.isProtectedTree(tree) : !!extractMasterPinVerifier(tree))
+            || safeObject(block).protected === true;
+        let status = 'missing';
+        if (block !== undefined) {
+            status = api ? await api.verifyWithAnyPin(root, authPins(auth)) : 'needs_pin';
+        }
+        const changedOutside = status === 'mismatch' || status === 'malformed'
+            || (incomingProtected && status !== 'valid');
+        return { status, protected: incomingProtected, changedOutside };
+    }
+
+    /**
+     * A protected backup that is not "valid" applies only after the PIN: the local master PIN when this
+     * device has one, otherwise the backup's own master PIN (no master anywhere: one of the backup's
+     * account-profile PINs; a child's switching PIN never counts). With no such PIN at all there is
+     * nothing to ask for, and the dashboard still shows the notice before importing.
+     */
+    async function requireBackupIntegrity(json, { auth = null, localProfilesV4 = null } = {}) {
+        const report = await inspectBackupIntegrity(json, { auth });
+        if (!report.changedOutside || !report.protected) return report;
+        const original = safeObject(convertedBackupOriginals.get(json) || json);
+        const incomingTree = original.profilesV4 || (original.schemaVersion === 4 ? original : null);
+        const localMaster = extractMasterPinVerifier(localProfilesV4);
+        const incomingMaster = extractMasterPinVerifier(incomingTree);
+        const verifiers = localMaster ? [localMaster]
+            : (incomingMaster ? [incomingMaster]
+                : Object.values(safeObject(safeObject(incomingTree).profiles))
+                    .filter(profile => normalizeString(safeObject(profile).type) !== 'child')
+                    .map(profilePinVerifierOf).filter(Boolean));
+        if (!verifiers.length) return report;
+        const check = pinChecker();
+        for (const pin of authPins(auth)) {
+            for (const verifier of verifiers) {
+                if (await check(pin, verifier)) return { ...report, authorized: true };
+            }
+        }
+        throw codedError(BACKUP_CHANGED_PIN_REQUIRED,
+            'This backup was changed outside FilterTube. Enter the PIN to import it.',
+            { status: report.status, needs: localMaster ? 'local_master' : (incomingMaster ? 'backup_master' : 'backup_profile') });
+    }
+
+    /** Device preferences this extension exports in profilesV4.appPreferences.extension (allowlist). */
+    async function readExtensionPreferences() {
+        const api = backupIntegrity();
+        if (!api) return null;
+        const stored = await readStorage([...api.EXTENSION_PREFERENCE_KEYS]);
+        return stored && typeof stored === 'object' ? stored : {};
+    }
+
+    /** Adds appPreferences (other platforms' namespaces unchanged) to an export's profile tree. */
+    async function withAppPreferences(profilesV4, storedTree) {
+        const api = backupIntegrity();
+        if (!api || !profilesV4 || typeof profilesV4 !== 'object') return profilesV4;
+        const values = await readExtensionPreferences();
+        if (!values) return profilesV4;
+        return {
+            ...profilesV4,
+            [APP_PREFERENCES_KEY]: api.withExtensionPreferences(safeObject(storedTree)[APP_PREFERENCES_KEY], values)
+        };
+    }
+
+    /** Adds the root integrity block; HMAC with the master PIN when the exporter checked it. */
+    async function attachIntegrity(payload, { pin = null } = {}) {
+        const api = backupIntegrity();
+        if (!api || !api.available()) return payload;
+        return api.attach(payload, { pin: normalizeString(pin) || null });
+    }
+
     function deriveProfilesV3FromV4(profilesV4, profileId, { source = 'export' } = {}) {
         const root = (profilesV4 && typeof profilesV4 === 'object' && !Array.isArray(profilesV4)) ? profilesV4 : null;
         const profiles = safeObject(root?.profiles);
@@ -2513,8 +2818,12 @@
             payload.profilesV4[KIDS_PERSONA_LINKS_KEY] = includeKidsPersonaLinks
                 ? kidsLinksFor(profilesV4?.[KIDS_PERSONA_LINKS_KEY], exportedIds)
                 : { schemaVersion: 1, links: [] };
+            payload.profilesV4 = await withAppPreferences(payload.profilesV4, profilesV4);
         }
-        return attachBackupPrivateData(payload, Object.keys(safeObject(payload.profilesV4?.profiles)));
+        await attachBackupPrivateData(payload, Object.keys(safeObject(payload.profilesV4?.profiles)));
+        // The master PIN checked above keys an HMAC; without it the block is a plain content hash.
+        const integrityPin = (activeId === DEFAULT_PROFILE_ID && masterVerifier) ? normalizeString(auth?.localMasterPin) : null;
+        return attachIntegrity(payload, { pin: integrityPin });
     }
 
     /**
@@ -2533,6 +2842,7 @@
         delete snapshot.savedVideoNotes;
         delete snapshot.localPlaylists;
         delete snapshot.meta;
+        delete snapshot[INTEGRITY_KEY];
         const profile = safeObject(profileTree[profileId]);
         const main = safeObject(profile.main);
         const kids = safeObject(profile.kids);
@@ -2572,6 +2882,8 @@
         };
         if (Object.prototype.hasOwnProperty.call(root, 'savedVideoNotes')) converted.savedVideoNotes = root.savedVideoNotes;
         if (Object.prototype.hasOwnProperty.call(root, 'localPlaylists')) converted.localPlaylists = root.localPlaylists;
+        // The integrity block covers the file as written; the import checks it against the original.
+        convertedBackupOriginals.set(converted, data);
         return converted;
     }
 
@@ -2682,8 +2994,10 @@
         return coordinator.run(() => importV3Unlocked(json, options), options.nanahStorageLockToken ?? null);
     }
 
-    async function importV3Unlocked(json, { strategy = 'merge', scope = 'auto', auth = null, targetProfileId = null, beforeProfileWrite = null, adoptKidsPersonaLinks = false, carryStudyLock = false } = {}) {
-        json = convertAppProfileBackup(json);
+    async function importV3Unlocked(json, { strategy = 'merge', scope = 'auto', auth = null, targetProfileId = null, beforeProfileWrite = null, adoptKidsPersonaLinks = false, carryStudyLock = false, verifyIntegrity = true } = {}) {
+        const convertedJson = convertAppProfileBackup(json);
+        if (convertedJson !== json && !convertedBackupOriginals.has(convertedJson)) convertedBackupOriginals.set(convertedJson, json);
+        json = convertedJson;
         const parsed = normalizeIncomingV3(json);
         if (!parsed.ok) {
             throw new Error(parsed.error || 'Invalid file');
@@ -2752,6 +3066,12 @@
                 'Backup Master PIN required'
             );
         }
+
+        // Backup files: a protected backup that was changed (or cannot be verified) needs the PIN.
+        // Nanah transfers are authenticated by the pairing and skip this (verifyIntegrity: false).
+        const integrityReport = (verifyIntegrity !== false && parsed.version === 3)
+            ? await requireBackupIntegrity(json, { auth, localProfilesV4 })
+            : null;
 
         const rawMeta = safeObject(rawRoot.meta);
         if (trustedRestoreActiveId !== null && trustedRestoreActiveId !== localActiveId) {
@@ -3070,8 +3390,13 @@
                             };
                         }
 
+                        // Root keys this extension does not model (appPreferences included) are kept;
+                        // for the same key the incoming value wins.
+                        const incomingRootExtras = { ...sanitizedIncoming };
+                        for (const key of ['schemaVersion', 'activeProfileId', 'profiles', KIDS_PERSONA_LINKS_KEY]) delete incomingRootExtras[key];
                         nextV4 = {
                             ...nextV4,
+                            ...incomingRootExtras,
                             schemaVersion: 4,
                             profiles: mergedProfiles
                         };
@@ -3202,13 +3527,15 @@
             };
 
             if (typeof beforeProfileWrite === 'function') await beforeProfileWrite(targetProfileId);
-            importMutationStarted = true;
             const nextProfilesV4 = {
                 ...nextV4,
                 schemaVersion: 4,
                 activeProfileId: writeActiveId,
                 profiles
             };
+            // Weakening a protected profile needs the master PIN or that profile's parent PIN.
+            await requireWeakeningAuthorization(localProfilesV4BeforeImport, nextProfilesV4, auth);
+            importMutationStarted = true;
             // A backup never brings YouTube Kids links; this device keeps its own for the remaining profiles.
             delete nextProfilesV4[KIDS_PERSONA_LINKS_KEY];
             if (localProfilesV4BeforeImport && Object.prototype.hasOwnProperty.call(localProfilesV4BeforeImport, KIDS_PERSONA_LINKS_KEY)) {
@@ -3217,11 +3544,22 @@
             requireStorageSuccess(await saveProfilesV4(nextProfilesV4), 'Active profile write');
         }
 
-        if (shouldTouchLegacyV3 && parsed.theme && SettingsAPI.setThemePreference) {
+        // This device's own app preferences (allowlisted, minus device-bound keys); the theme comes
+        // from settings.theme when the backup has one. An import without a theme leaves it alone.
+        const incomingAppPreferences = (shouldTouchLegacyV3 && effectiveScope === 'full' && backupIntegrity())
+            ? backupIntegrity().extensionPreferencesToApply(safeObject(parsed.profilesV4)[APP_PREFERENCES_KEY])
+            : {};
+        if (!isThemeValue(incomingAppPreferences[THEME_PREFERENCE_KEY]) || parsed.theme) delete incomingAppPreferences[THEME_PREFERENCE_KEY];
+        const importedTheme = parsed.theme || incomingAppPreferences[THEME_PREFERENCE_KEY] || null;
+        delete incomingAppPreferences[THEME_PREFERENCE_KEY];
+        if (shouldTouchLegacyV3 && importedTheme && SettingsAPI.setThemePreference) {
             try {
-                await SettingsAPI.setThemePreference(parsed.theme);
+                await SettingsAPI.setThemePreference(importedTheme);
             } catch (e) {
             }
+        }
+        if (Object.keys(incomingAppPreferences).length) {
+            requireStorageSuccess(await writeStorage(incomingAppPreferences), 'App preferences write');
         }
 
         if (Object.keys(nextChannelMap).length > 0) {
@@ -3328,7 +3666,8 @@
             result,
             restoredNanahState,
             migrationReport: parsed.migrationReport || null,
-            receipt
+            receipt,
+            ...(integrityReport ? { integrity: integrityReport } : {})
         };
         } catch (error) {
             if (importMutationStarted) {
@@ -3451,6 +3790,8 @@
             backupData.meta.backupType = 'auto';
             backupData.meta.trigger = triggerType;
             backupData.meta.backupLocation = await getBackupDirectory();
+            if (backupData.profilesV4) backupData.profilesV4 = await withAppPreferences(backupData.profilesV4, profilesV4);
+            await attachIntegrity(backupData);
 
             // Generate filename with timestamp
             const safePart = (value) => {
@@ -3638,6 +3979,11 @@
         importV3,
         importV3Encrypted,
         convertAppProfileBackup,
+        inspectBackupIntegrity,
+        findWeakenedProfiles,
+        requireWeakeningAuthorization,
+        BACKUP_CHANGED_PIN_REQUIRED,
+        WEAKENING_PIN_REQUIRED,
         previewBlockTubeMigration,
         loadProfilesV3,
         saveProfilesV3,
