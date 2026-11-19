@@ -5,6 +5,11 @@
  * 10 minutes in this tab's memory only, never stored.
  * Every video still passes the page's normal matcher (dom_fallback.js shouldHideContent): blocked words
  * in a layered profile, channel rules. Copy comes from data/ui_locales through admission_overlay.js.
+ * The shelf is the search page's part of the narrowed mode (narrowed_mode.js): it always says, in one calm
+ * line, that anything else waits until study ends (or stays hidden in allowed-only mode), and when the
+ * channels have nothing for the query it says so (Android StudySearch "Nothing from your study plan for")
+ * with "Search all" and a way back, so the page is never blank. A redraw for the same results changes
+ * nothing: the cards and their thumbnails stay.
  */
 (function (root, factory) {
     const api = factory();
@@ -26,9 +31,15 @@
     const SHOW_MAX = 18;
     const COPY = Object.freeze({
         study: { title: ['search.channels.studyTitle', 'Showing your study channels'], all: ['search.channels.studyAll', 'Search all your study channels for “{query}”'],
-            offline: ['search.channels.studyOffline', 'Your study channels couldn’t be reached. Check your connection and try again.'] },
+            offline: ['search.channels.studyOffline', 'Your study channels couldn’t be reached. Check your connection and try again.'],
+            line: ['search.channels.studyLine', 'Lessons from your plan lead. Anything else waits until study ends.'],
+            none: ['search.channels.studyNone', 'Nothing from your study plan for “{query}”'],
+            back: ['admission.studyBack', 'Back to study'] },
         allowed: { title: ['search.channels.allowedTitle', 'Showing your allowed channels'], all: ['search.channels.allowedAll', 'Search all your allowed channels for “{query}”'],
-            offline: ['search.channels.allowedOffline', 'Your allowed channels couldn’t be reached. Check your connection and try again.'] }
+            offline: ['search.channels.allowedOffline', 'Your allowed channels couldn’t be reached. Check your connection and try again.'],
+            line: ['search.channels.allowedLine', 'Only your allowed channels and words show. Anything else stays hidden in allowed-only mode.'],
+            none: ['search.channels.allowedNone', 'Nothing from your allowed channels for “{query}”'],
+            back: ['search.channels.backHome', 'Back to Home'] }
     });
 
     /** The query of a results page URL; '' elsewhere. */
@@ -62,10 +73,14 @@
 #${SHELF_ID}{--ft-paper:#fffdfa;--ft-line:#ddd5ca;--ft-ink:#2b2622;--ft-muted:#625f58;--ft-brick:#a93e31;--ft-wash:#f7f5f1;
   margin:12px 0 20px;padding:16px 18px 18px;background:var(--ft-paper);color:var(--ft-ink);border:1.5px solid var(--ft-line);
   border-radius:18px 16px 19px 15px;box-shadow:0 1px 0 var(--ft-line);font-family:Outfit,Roboto,system-ui,sans-serif;max-width:1096px}
-html[dark] #${SHELF_ID}{--ft-paper:#151c24;--ft-line:#2a3440;--ft-ink:#eef2f5;--ft-muted:#b8c3ce;--ft-brick:#e0796b;--ft-wash:#1b232c}
-#${SHELF_ID} .ft-cs-head{display:flex;align-items:center;gap:10px;margin:0 0 12px}
-#${SHELF_ID} .ft-cs-title{font:600 18px/1.3 'FilterTube Delius',Outfit,system-ui,sans-serif;margin:0}
-#${SHELF_ID} .ft-cs-mark{width:26px;height:4px;border-radius:3px;background:var(--ft-brick);transform:rotate(-2deg)}
+html[dark] #${SHELF_ID}{--ft-paper:#151c24;--ft-line:#2a3440;--ft-ink:#eef2f5;--ft-muted:#b8c3ce;--ft-brick:#e0796b;--ft-wash:#1b232c;--ft-sage:#7fb89a}
+#${SHELF_ID}{--ft-sage:#3e7d5b}
+#${SHELF_ID} .ft-cs-head{margin:0 0 14px}
+#${SHELF_ID} .ft-cs-title{font:400 20px/1.3 'FilterTube Delius','Delius',Outfit,system-ui,sans-serif;margin:0}
+#${SHELF_ID} .ft-cs-title::after{content:"";display:block;width:44px;height:3px;margin-top:6px;border-radius:3px;background:var(--ft-sage)}
+#${SHELF_ID} .ft-cs-line{margin:6px 0 0;color:var(--ft-muted);font:400 14px/1.5 Roboto,system-ui,sans-serif;max-width:72ch}
+#${SHELF_ID} .ft-cs-actions{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px}
+#${SHELF_ID} .ft-cs-actions:empty{display:none}
 #${SHELF_ID} .ft-cs-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:14px}
 #${SHELF_ID} a.ft-cs-card{display:block;color:inherit;text-decoration:none;border-radius:12px;padding:6px;outline-offset:2px}
 #${SHELF_ID} a.ft-cs-card:hover{background:var(--ft-wash)}
@@ -76,8 +91,8 @@ html[dark] #${SHELF_ID}{--ft-paper:#151c24;--ft-line:#2a3440;--ft-ink:#eef2f5;--
 #${SHELF_ID} .ft-cs-length{position:absolute;right:6px;bottom:6px;padding:1px 6px;border-radius:6px;background:rgba(20,20,20,.78);color:#fff;font:500 12px/1.5 Roboto,system-ui,sans-serif}
 #${SHELF_ID} .ft-cs-name{margin:8px 2px 2px;font:500 14px/1.35 Roboto,system-ui,sans-serif;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
 #${SHELF_ID} .ft-cs-meta{margin:0 2px;color:var(--ft-muted);font:400 12.5px/1.4 Roboto,system-ui,sans-serif}
-#${SHELF_ID} .ft-cs-more{margin-top:14px;padding:8px 14px;border-radius:999px;border:1.5px solid var(--ft-line);background:transparent;color:var(--ft-ink);font:500 14px/1.2 Outfit,Roboto,system-ui,sans-serif;cursor:pointer}
-#${SHELF_ID} .ft-cs-more:hover{border-color:var(--ft-brick);color:var(--ft-brick)}
+#${SHELF_ID} .ft-cs-more{padding:8px 14px;border-radius:999px;border:1.5px solid var(--ft-line);background:transparent;color:var(--ft-ink);font:500 14px/1.2 Outfit,Roboto,system-ui,sans-serif;cursor:pointer}
+#${SHELF_ID} .ft-cs-more:hover{border-color:var(--ft-sage);background:var(--ft-wash)}
 #${SHELF_ID} .ft-cs-more:focus-visible{outline:2px solid var(--ft-ink);outline-offset:2px}
 #${SHELF_ID} .ft-cs-note{margin:0;color:var(--ft-muted);font:400 14px/1.45 Roboto,system-ui,sans-serif}
 @media (prefers-reduced-motion: reduce){#${SHELF_ID} a.ft-cs-card:active{transform:none}}`;
@@ -193,52 +208,76 @@ html[dark] #${SHELF_ID}{--ft-paper:#151c24;--ft-line:#2a3440;--ft-ink:#eef2f5;--
             return link;
         }
 
+        function button(label, onClick) {
+            const node = doc.createElement('button');
+            node.type = 'button';
+            node.className = 'ft-cs-more';
+            node.textContent = label;
+            node.addEventListener('click', onClick);
+            return node;
+        }
+
+        /** The shelf for one search, made once; the same search drawn again keeps it (and its thumbnails). */
         function draw(scope, query, outcome, items, all) {
             const target = host();
             if (!target) return false;
             ensureStyle();
-            remove();
             const copy = COPY[scope.kind] || COPY.allowed;
             const rules = Rules();
             const unreachable = outcome.asked > 0 && outcome.failed >= outcome.asked;
-            if (!items.length && !unreachable) return true;
+            const shown = unreachable ? [] : items.slice(0, SHOW_MAX);
+            const widen = !all && !!scope.groups && rules.channelCount(scope) > outcome.asked;
+            const signature = JSON.stringify([scope.kind, scope.key, query, all, unreachable, widen, shown.map(item => item.videoId)]);
+            const existing = doc.getElementById(SHELF_ID);
+            if (existing && existing.dataset.signature === signature) {
+                if (existing.parentElement !== target) target.prepend(existing);
+                return true;
+            }
+            existing?.remove();
             const shelf = doc.createElement('section');
             shelf.id = SHELF_ID;
-            shelf.setAttribute('aria-label', t(copy.title[0], copy.title[1]));
+            shelf.dataset.signature = signature;
+            shelf.dataset.kind = scope.kind;
+            const titleText = shown.length || unreachable ? t(copy.title[0], copy.title[1]) : t(copy.none[0], copy.none[1], { query });
+            shelf.setAttribute('aria-label', titleText);
             const head = doc.createElement('div');
             head.className = 'ft-cs-head';
-            const mark = doc.createElement('span');
-            mark.className = 'ft-cs-mark';
-            mark.setAttribute('aria-hidden', 'true');
             const title = doc.createElement('h2');
             title.className = 'ft-cs-title';
-            title.textContent = t(copy.title[0], copy.title[1]);
-            head.append(mark, title);
+            title.textContent = titleText;
+            const line = doc.createElement('p');
+            line.className = 'ft-cs-line';
+            line.textContent = unreachable ? t(copy.offline[0], copy.offline[1]) : t(copy.line[0], copy.line[1]);
+            head.append(title, line);
             shelf.appendChild(head);
-            if (unreachable) {
-                const note = doc.createElement('p');
-                note.className = 'ft-cs-note';
-                note.textContent = t(copy.offline[0], copy.offline[1]);
-                shelf.appendChild(note);
-            } else {
+            if (shown.length) {
                 const grid = doc.createElement('div');
                 grid.className = 'ft-cs-grid';
-                items.slice(0, SHOW_MAX).forEach(item => grid.appendChild(card(item)));
+                shown.forEach(item => grid.appendChild(card(item)));
                 shelf.appendChild(grid);
             }
-            if (!all && rules.channelCount(scope) > outcome.asked) {
-                const more = doc.createElement('button');
-                more.type = 'button';
-                more.className = 'ft-cs-more';
-                more.textContent = t(copy.all[0], copy.all[1], { query });
-                more.addEventListener('click', () => {
+            const actions = doc.createElement('div');
+            actions.className = 'ft-cs-actions';
+            if (widen) {
+                actions.appendChild(button(t(copy.all[0], copy.all[1], { query }), () => {
                     widened.add(rules.searchKey(scope, query, false));
                     run();
-                });
-                shelf.appendChild(more);
+                }));
             }
+            if (unreachable) actions.appendChild(button(t('feed.built.retry', 'Try again'), () => { cache?.clear?.(); run(); }));
+            if (!shown.length) actions.appendChild(button(t(copy.back[0], copy.back[1]), () => { win.location.assign('/'); }));
+            shelf.appendChild(actions);
             target.prepend(shelf);
             return true;
+        }
+
+        /** Allowed only with words but no channel ids: no channels to ask, the calm line still shows. */
+        function lineOnlyScope(current) {
+            if (!current || current.enabled === false || current.profileType === 'kids') return null;
+            const phase = current.study?.phase;
+            if (phase === 'rest') return null;
+            if (phase === 'study') return { kind: 'study', key: 'study|line', groups: null };
+            return current.listMode === 'whitelist' ? { kind: 'allowed', key: 'allowed|line', groups: null } : null;
         }
 
         async function run() {
@@ -253,10 +292,11 @@ html[dark] #${SHELF_ID}{--ft-paper:#151c24;--ft-line:#2a3440;--ft-ink:#eef2f5;--
                 return;
             }
             attemptsWithoutSettings = 0;
-            const scope = rules && query && fetcher ? rules.scope(current) : null;
+            const asked = rules && query && fetcher ? rules.scope(current) : null;
+            const scope = asked || (rules && query ? lineOnlyScope(current) : null);
             if (!scope) { remove(); return; }
-            const all = widened.has(rules.searchKey(scope, query, false));
-            const outcome = await search(scope, query, all);
+            const all = asked ? widened.has(rules.searchKey(scope, query, false)) : true;
+            const outcome = asked ? await search(scope, query, all) : { perChannel: [], asked: 0, failed: 0 };
             if (id !== runId) return;
             const items = admitted(rules.merge(outcome.perChannel, [], item => item.videoId), current, hides());
             // The results list is drawn after navigation; try a few times.
@@ -269,6 +309,7 @@ html[dark] #${SHELF_ID}{--ft-paper:#151c24;--ft-line:#2a3440;--ft-ink:#eef2f5;--
         function start() {
             const schedule = () => win.setTimeout(() => { run().catch(() => {}); }, 0);
             doc.addEventListener('yt-navigate-finish', schedule);
+            doc.addEventListener('filtertube-narrowed-change', schedule);
             win.addEventListener('popstate', schedule);
             if (doc.readyState === 'loading') doc.addEventListener('DOMContentLoaded', schedule, { once: true });
             else schedule();
