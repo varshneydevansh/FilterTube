@@ -40,7 +40,7 @@ const sections = [
   {
     title: "Optional services",
     body: [
-      "Some features use community services such as SponsorBlock, DeArrow, Return YouTube Dislike, LRCLIB and the PipePipe decoder. They are off by default. If you turn one on, its own terms and policy apply, and we can't promise it will stay available.",
+      "Some features use community services such as SponsorBlock, DeArrow, Return YouTube Dislike, LRCLIB and the PipePipe decoder. They are off by default, except the PipePipe decoder, which is on by default and can be turned off in Settings. When one is on, its own terms and policy apply, and we can't promise it will stay available.",
     ],
   },
   {

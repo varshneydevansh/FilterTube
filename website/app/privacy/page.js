@@ -23,9 +23,9 @@ const summaryCards = [
   },
   {
     label: "Extra services",
-    value: "Off until you turn them on",
+    value: "Off until you turn them on, except one",
     detail:
-      "SponsorBlock, DeArrow, Return YouTube Dislike, LRCLIB and the PipePipe decoder are optional and off by default.",
+      "SponsorBlock, DeArrow, Return YouTube Dislike and LRCLIB are optional and off by default. The PipePipe decoder is on by default so videos start smoothly; you can turn it off in Settings → Integrations.",
   },
   {
     label: "Website analytics",
@@ -105,7 +105,7 @@ const optionalServices = [
   {
     title: "PipePipe decoder (api.pipepipe.dev)",
     detail:
-      "Apps only. Off by default. Helps the player unlock higher-quality streams. Receives the player version and short scrambled stream codes, plus your IP address. It never receives the video ID, stream addresses, your account, tokens or cookies.",
+      "Apps only. On by default; you can turn it off in Settings → Integrations. Helps the player start videos smoothly and play higher-quality streams. Receives the player version and short scrambled stream codes, plus your IP address. It never receives the video ID, stream addresses, your account, tokens or cookies. It is also used in Kids profiles, where it follows the parent profile's setting and receives the same data, without video IDs.",
   },
 ];
 
@@ -307,7 +307,7 @@ const changeLog = [
   {
     title: "19 November 2026",
     detail:
-      "Rewritten to match the current apps and extension: the native player, Offline Media, the supporter subscription, Ask a parent, iOS camera, microphone, speech and local-network use, every optional service and what it receives, the update check, Internet Pickup, all extension permissions including Google Search, and a clearer children's section.",
+      "Rewritten to match the current apps and extension: the native player, Offline Media, the supporter subscription, Ask a parent, iOS camera, microphone, speech and local-network use, every optional service and what it receives (the PipePipe decoder is on by default, including in Kids profiles), the update check, Internet Pickup, all extension permissions including Google Search, and a clearer children's section.",
   },
   {
     title: "4 May 2026",
@@ -528,15 +528,20 @@ export default function PrivacyPage() {
             <PolicySection id="optional-services" title="5. Optional services">
               <p>
                 These community services add features to the apps. Each one is
-                off by default, set per profile, and can be turned off again at
-                any time. When one is on, your device contacts it directly; we
+                set per profile and can be turned off at any time. All are off
+                by default except the PipePipe decoder, which is on by default
+                because it receives no video ID and videos can be slow to start
+                without it. When one is on, your device contacts it directly; we
                 never see the request. Each service handles what it receives
                 under its own policy.
               </p>
               <CardGrid items={optionalServices} />
               <p>
-                Nothing is sent to any of these services while it is off. For
-                child profiles, we suggest leaving them all off.
+                Nothing is sent to any of these services while it is off.
+                SponsorBlock, DeArrow, Return YouTube Dislike and LRCLIB never
+                run in child profiles, because they receive video IDs or song
+                details. The PipePipe decoder follows the parent profile&apos;s
+                setting in child profiles.
               </p>
             </PolicySection>
 
@@ -624,14 +629,18 @@ export default function PrivacyPage() {
               </p>
               <p>
                 When a child watches in the app, the video service receives
-                those requests as described in section 3. Optional services
-                stay off unless a parent turns them on.
+                those requests as described in section 3. SponsorBlock, DeArrow,
+                Return YouTube Dislike and LRCLIB never run in child profiles.
+                The PipePipe decoder follows the parent profile&apos;s setting;
+                it receives only the player version and scrambled stream codes,
+                never a video ID, account or cookies.
               </p>
               <p>
                 We built FilterTube with the aims of the US COPPA rule, the UK
                 Age Appropriate Design Code and India&apos;s Digital Personal
-                Data Protection Act in mind: collect nothing, keep everything
-                off by default, and leave the parent in charge. We have not had
+                Data Protection Act in mind: collect nothing, keep every service
+                that receives video IDs off by default, and leave the parent in
+                charge. We have not had
                 this reviewed by a regulator. Parents with questions or
                 concerns can write to the contact below.
               </p>
