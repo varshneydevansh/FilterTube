@@ -2004,6 +2004,8 @@ function sendSettingsToMainWorld(settings) {
     retainVerifiedVideoMetadata(settings);
     latestSettings = settings;
     currentSettings = settings;
+    // The page's own views (narrowed_view.js, allowlist_feed_view.js) redraw on this, without polling.
+    try { document.dispatchEvent(new Event('filtertube-settings-applied')); } catch (_) {}
 
     if (applyManagedViewingRouteGate(settings)) {
         releaseManagedTimeLimitRuntime();

@@ -9,6 +9,12 @@
  * (data-filtertube-feed-exhausted), or the page's cards are all hidden after three loads, Kriti says
  * that most of this page matched the filters, with Subscriptions, Search and Review filters.
  * The panel swaps in and out live: rules or a study session changing re-decide it at once.
+ * In a narrowed mode (Allowed only, Study) the decision is the narrowed layer's (narrowed_mode.js,
+ * narrowed_view.js): Home is always the built feed, and it owns the page body. The site's grid, its chip
+ * bar, shelves and loader are hidden in place by the layer's stylesheet, so the site never draws a second
+ * chip bar under the feed, empty "Shorts" headers, or a chip that loads into a blank feed. Search belongs
+ * to the channel search shelf. Redraws are per element: cards already shown stay, with their thumbnails.
+ * It runs on events (settings applied, the layer's decision, navigation); nothing polls.
  * Copy comes from data/ui_locales through admission_overlay.js; no string names the video site.
  */
 (function () {
@@ -30,10 +36,12 @@
     const DOM_EMPTY_LOADS = 3;
     const COMPANION_KEY = 'ftCompanionMode';
     const SETTLE_MS = 2500;
+    const PAGE_SIZE = 48;
+    const STUDY_BATCH = 24;
 
     let companion = 'quiet';
-    let studyLabel = '';
     let built = null;          // {key, items, nextOffset}
+    let shownCount = PAGE_SIZE; // cards drawn; "Show more" adds a page
     let building = null;       // Promise while a build runs
     let shownFor = '';         // route + decision the panel was drawn for
     let domWatch = { route: '', loads: 0, lastCount: 0 };
@@ -105,8 +113,14 @@ html[dark] #${PANEL_ID}{--ftf-paper:#151c24;--ftf-ink:#eef2f6;--ftf-muted:#b8c3c
 #${PANEL_ID} .ftf-title{margin:0;font-family:"Delius","Outfit",system-ui,sans-serif;font-size:20px;font-weight:400;line-height:1.3}
 #${PANEL_ID} .ftf-title::after{content:"";display:block;width:44px;height:3px;margin-top:6px;border-radius:3px;background:var(--ftf-sage)}
 #${PANEL_ID}[data-kind="block"] .ftf-title::after{background:var(--ftf-brick)}
-#${PANEL_ID} .ftf-line{margin:8px 0 0;color:var(--ftf-muted);font-size:14px;line-height:1.5;max-width:64ch}
-#${PANEL_ID} .ftf-chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px}
+#${PANEL_ID} .ftf-line{margin:6px 0 0;color:var(--ftf-muted);font-size:14px;line-height:1.5;max-width:64ch}
+#${PANEL_ID} .ftf-line:empty{display:none}
+#${PANEL_ID} .ftf-chips{display:flex;gap:8px;margin-top:14px;overflow-x:auto;scrollbar-width:none;padding-bottom:2px;
+  -webkit-mask-image:linear-gradient(to right,#000 calc(100% - 40px),transparent);mask-image:linear-gradient(to right,#000 calc(100% - 40px),transparent)}
+#${PANEL_ID} .ftf-chips::-webkit-scrollbar{display:none}
+#${PANEL_ID} .ftf-chips:empty{display:none}
+#${PANEL_ID} .ftf-chip{flex:0 0 auto;white-space:nowrap}
+#${PANEL_ID} .ftf-chip[aria-current="page"]{background:var(--ftf-ink);border-color:var(--ftf-ink);color:var(--ftf-paper)}
 #${PANEL_ID} .ftf-chip,#${PANEL_ID} .ftf-btn{appearance:none;display:inline-flex;align-items:center;gap:6px;min-height:34px;padding:6px 14px;border-radius:999px;
   border:1.5px solid var(--ftf-line);background:transparent;color:var(--ftf-ink);font:500 14px/1.2 "Outfit","Roboto",system-ui,sans-serif;text-decoration:none;cursor:pointer;
   transition:background-color .15s ease,border-color .15s ease,transform .1s ease}
@@ -132,7 +146,9 @@ html[dark] #${PANEL_ID}{--ftf-paper:#151c24;--ftf-ink:#eef2f6;--ftf-muted:#b8c3c
 #${PANEL_ID} .ftf-more{margin-top:18px}
 @media (prefers-reduced-motion:reduce){#${PANEL_ID} *{transition:none!important}}
 html[${BUILT_ATTR}] ytd-browse[page-subtype="home"] ytd-rich-grid-renderer ytd-continuation-item-renderer,
-html[${BUILT_ATTR}] ytd-browse[page-subtype="home"] ytd-rich-grid-renderer #ghost-cards{display:none!important}`;
+html[${BUILT_ATTR}] ytd-browse[page-subtype="home"] ytd-rich-grid-renderer #ghost-cards{display:none!important}
+#${PANEL_ID} .ftf-bar:empty{display:none}
+#${PANEL_ID} .ftf-bar .filtertube-mode-bar{margin:0 0 14px}`;
         (doc.head || doc.documentElement).appendChild(style);
     }
 
@@ -197,16 +213,66 @@ html[${BUILT_ATTR}] ytd-browse[page-subtype="home"] ytd-rich-grid-renderer #ghos
         }
     }
 
+    function setText(node, value) {
+        const next = value || '';
+        if (node.textContent !== next) node.textContent = next;
+    }
+
+    /** The panel's three parts, made once: the header, the chips row and the body. Later draws change them in place. */
+    function parts(panel) {
+        let bar = panel.querySelector(':scope > .ftf-bar');
+        if (!bar) { bar = el('div', 'ftf-bar'); panel.prepend(bar); }
+        let head = panel.querySelector(':scope > .ftf-head');
+        if (!head) {
+            head = el('div', 'ftf-head');
+            const textBox = el('div', 'ftf-head-text');
+            textBox.append(el('h2', 'ftf-title'), el('p', 'ftf-line'));
+            head.append(textBox);
+            bar.after(head);
+        }
+        let chipRow = panel.querySelector(':scope > .ftf-chips');
+        if (!chipRow) { chipRow = el('nav', 'ftf-chips'); head.after(chipRow); }
+        let body = panel.querySelector(':scope > .ftf-body');
+        if (!body) { body = el('div', 'ftf-body'); chipRow.after(body); }
+        return { bar, head, chipRow, body };
+    }
+
+    function narrowedView() { return root.FilterTubeNarrowedView || null; }
+    function studyInfo() { return narrowedView()?.studyInfo?.() || { label: '', chips: [] }; }
+
+    /** The mode bar heads the built feed (round, minutes left, End), the same bar as on Watch. */
+    function refreshModeBar() {
+        const panel = doc.getElementById(PANEL_ID);
+        const barHost = panel?.querySelector(':scope > .ftf-bar');
+        if (!barHost) return;
+        // Only during study: there it carries the round, the time left and End. In allowed-only mode the
+        // feed's title already says it.
+        const studying = narrowedView()?.current?.()?.mode?.kind === 'study';
+        if (panel.dataset.kind !== 'allow' || !studying) { barHost.textContent = ''; return; }
+        narrowedView().renderModeBar(barHost);
+    }
+
+    function studyTitle(sources) {
+        const label = studyInfo().label;
+        return label ? t('feed.built.studyingTitle', 'Studying {label}', { label }) : t('feed.built.studyTitle', 'Study feed');
+    }
+
     function header(panel, kind, title, line) {
-        panel.dataset.kind = kind;
-        const head = el('div', 'ftf-head');
-        const textBox = el('div', 'ftf-head-text');
-        const heading = el('h2', 'ftf-title', title);
-        textBox.append(heading);
-        if (line) textBox.append(el('p', 'ftf-line', line));
-        head.append(textBox);
-        panel.append(head);
+        if (panel.dataset.kind !== kind) panel.dataset.kind = kind;
+        const { head } = parts(panel);
+        setText(head.querySelector('.ftf-title'), title);
+        setText(head.querySelector('.ftf-line'), line);
         return head;
+    }
+
+    /** Swaps the body's content only when its kind changes ("grid", "empty", "loading", "calm"). */
+    function body(panel, kind) {
+        const node = parts(panel).body;
+        if (node.dataset.kind !== kind) {
+            node.textContent = '';
+            node.dataset.kind = kind;
+        }
+        return node;
     }
 
     function mascot(name, alt) {
@@ -225,14 +291,29 @@ html[${BUILT_ATTR}] ytd-browse[page-subtype="home"] ytd-rich-grid-renderer #ghos
         return node;
     }
 
-    function chips(sources) {
-        const box = el('div', 'ftf-chips');
-        for (const topic of sources.topics.slice(0, 8)) {
-            const chip = el('a', 'ftf-chip', topic);
-            chip.href = `/results?search_query=${encodeURIComponent(topic)}`;
-            box.append(chip);
+    /**
+     * The chips row: during study "All" and the plan's subjects (Android StudyHomeFeed chips, each a search
+     * "<subject> <exam>"); in allowed-only mode the allowed words. Redrawn only when the list changes.
+     */
+    function chips(panel, sources, show) {
+        const row = parts(panel).chipRow;
+        const studyChips = sources?.study ? studyInfo().chips : [];
+        const list = !show ? [] : (sources.study
+            ? (studyChips.length
+                ? [{ label: t('feed.built.chipAll', 'All'), href: '/', current: true }, ...studyChips.map(chip => ({ label: chip.label, href: `/results?search_query=${encodeURIComponent(chip.query)}` }))]
+                : [])
+            : sources.topics.slice(0, 8).map(topic => ({ label: topic, href: `/results?search_query=${encodeURIComponent(topic)}` })));
+        const signature = JSON.stringify(list);
+        if (row.dataset.signature === signature) return;
+        row.dataset.signature = signature;
+        row.textContent = '';
+        row.setAttribute('aria-label', t('feed.built.chipsLabel', 'Subjects'));
+        for (const entry of list) {
+            const chip = el('a', 'ftf-chip', entry.label);
+            chip.href = entry.href;
+            if (entry.current) chip.setAttribute('aria-current', 'page');
+            row.append(chip);
         }
-        return box.childElementCount ? box : null;
     }
 
     function panelShell() {
@@ -247,21 +328,30 @@ html[${BUILT_ATTR}] ytd-browse[page-subtype="home"] ytd-rich-grid-renderer #ghos
             panel.setAttribute('aria-live', 'polite');
             mount.prepend(panel);
         }
-        panel.textContent = '';
+        parts(panel);
         return panel;
     }
 
-    function drawAllowEmpty(panel, sources, { unreachable }) {
-        header(panel, 'allow', unreachable
+    function drawAllowEmpty(panel, sources, { unreachable, page = 'home' }) {
+        const label = studyInfo().label;
+        // Home: nothing came from the channels. Another page (Subscriptions, History): it all waits.
+        const title = unreachable
             ? t('feed.built.offlineTitle', 'Couldn’t reach your channels')
-            : t('feed.built.emptyTitle', 'Nothing from your allowed channels yet'),
-        unreachable
+            : (sources.study
+                ? (page === 'home' ? t('feed.built.studyEmptyTitle', 'No study videos right now') : t('feed.built.studyPageEmptyTitle', 'Nothing from your study plan here'))
+                : t('feed.built.emptyTitle', 'Nothing from your allowed channels yet'));
+        const line = unreachable
             ? t('feed.built.offlineBody', 'Check the connection and try again. Search still works.')
             : (sources.study
-                ? t('feed.built.emptyBodyStudy', 'Try a subject search, or open the plan to add channels.')
-                : t('feed.built.emptyBody', 'Search for something on your list, or add channels to it.')));
+                ? (page === 'home'
+                    ? (label ? t('feed.built.studyEmptyBody', 'Study videos come from your {label} channels. Try a subject search.', { label }) : t('feed.built.emptyBodyStudy', 'Try a subject search, or open the plan to add channels.'))
+                    : t('feed.built.studyPageEmptyBody', 'It’ll be here after study ends.'))
+                : t('feed.built.emptyBody', 'Search for something on your list, or add channels to it.'));
+        header(panel, 'allow', title, line);
         const row = el('div', 'ftf-empty');
         const kriti = mascot(unreachable ? 'uljhan_pose_02.webp' : 'kriti_pose_08.webp', '');
+        const box = body(panel, unreachable ? 'offline' : 'empty');
+        box.textContent = '';
         if (kriti) row.append(kriti);
         const actions = el('div', 'ftf-actions');
         if (unreachable) actions.append(button(t('feed.built.retry', 'Try again'), () => { built = null; decide(true); }, true));
@@ -269,57 +359,73 @@ html[${BUILT_ATTR}] ytd-browse[page-subtype="home"] ytd-rich-grid-renderer #ghos
         actions.append(button(sources.study ? t('feed.built.openStudy', 'Open study plan') : t('feed.built.reviewAllowed', 'Review allowed channels'),
             () => openDashboard(sources.study ? 'study' : 'filters')));
         row.append(actions);
-        panel.append(row);
-        const chipRow = chips(sources);
-        if (chipRow) panel.append(chipRow);
+        box.append(row);
+        chips(panel, sources, true);
     }
 
     function drawFeed(panel, sources, items, more) {
         header(panel, 'allow',
+            sources.study ? studyTitle(sources) : t('feed.built.title', 'From your allowed channels'),
             sources.study
-                ? (studyLabel ? t('feed.built.studyTitleLabel', 'Study feed · {label}', { label: studyLabel }) : t('feed.built.studyTitle', 'Study feed'))
-                : t('feed.built.title', 'From your allowed channels'),
-            sources.study
-                ? t('feed.built.studyLine', 'Latest lessons from your plan’s channels and topics.')
+                ? t('feed.built.studyLessonsLine', 'Lessons from your plan’s channels, the ones on your topics first.')
                 : t('feed.built.line', 'Latest videos from the channels and words you allow.'));
-        const chipRow = chips(sources);
-        if (chipRow) panel.append(chipRow);
-        const grid = el('div', 'ftf-grid');
+        chips(panel, sources, true);
+        const box = body(panel, 'grid');
+        let grid = box.querySelector(':scope > .ftf-grid');
+        if (!grid) { grid = el('div', 'ftf-grid'); box.prepend(grid); }
+        // Per element: cards already shown stay as they are; new ones are added, gone ones removed.
+        const existing = new Map(Array.from(grid.children).map(node => [node.dataset.videoId, node]));
+        let cursor = grid.firstElementChild;
         for (const item of items) {
-            const card = el('a', 'ftf-card');
-            card.href = `/watch?v=${encodeURIComponent(item.videoId)}`;
-            const img = el('img', 'ftf-thumb');
-            img.src = item.thumbnail || `https://i.ytimg.com/vi/${item.videoId}/mqdefault.jpg`;
-            img.alt = '';
-            img.loading = 'lazy';
-            img.decoding = 'async';
-            card.append(img, el('p', 'ftf-card-title', item.title || ''));
-            const meta = [item.channelName, age(item)].filter(Boolean).join(' · ');
-            if (meta) card.append(el('p', 'ftf-card-meta', meta));
-            grid.append(card);
+            let card = existing.get(item.videoId);
+            existing.delete(item.videoId);
+            if (!card) card = feedCard(item);
+            if (card !== cursor) grid.insertBefore(card, cursor);
+            else cursor = cursor.nextElementSibling;
         }
-        panel.append(grid);
-        if (more) {
-            const moreRow = el('div', 'ftf-more');
+        for (const node of existing.values()) node.remove();
+        let moreRow = box.querySelector(':scope > .ftf-more');
+        if (more && !moreRow) {
+            moreRow = el('div', 'ftf-more');
             moreRow.append(button(t('feed.built.more', 'Show more'), () => loadMore(), false));
-            panel.append(moreRow);
-        }
+            box.append(moreRow);
+        } else if (!more && moreRow) moreRow.remove();
+    }
+
+    function feedCard(item) {
+        const card = el('a', 'ftf-card');
+        card.dataset.videoId = item.videoId;
+        card.href = `/watch?v=${encodeURIComponent(item.videoId)}`;
+        const img = el('img', 'ftf-thumb');
+        img.src = item.thumbnail || `https://i.ytimg.com/vi/${item.videoId}/mqdefault.jpg`;
+        img.alt = '';
+        img.loading = 'lazy';
+        img.decoding = 'async';
+        card.append(img, el('p', 'ftf-card-title', item.title || ''));
+        const meta = [item.channelName, age(item)].filter(Boolean).join(' · ');
+        if (meta) card.append(el('p', 'ftf-card-meta', meta));
+        return card;
     }
 
     function drawLoading(panel, sources) {
         header(panel, 'allow',
-            sources.study ? (studyLabel ? t('feed.built.studyTitleLabel', 'Study feed · {label}', { label: studyLabel }) : t('feed.built.studyTitle', 'Study feed'))
-                : t('feed.built.title', 'From your allowed channels'), null);
+            sources.study ? studyTitle(sources) : t('feed.built.title', 'From your allowed channels'), null);
+        chips(panel, sources, true);
+        const box = body(panel, 'loading');
+        if (box.childElementCount) return;
         const row = el('div', 'ftf-loading');
         const uljhan = mascot('uljhan_fetch_01.webp', '');
         if (uljhan) row.append(uljhan);
         row.append(el('span', '', t('feed.built.loading', 'Gathering the latest from your list…')));
-        panel.append(row);
+        box.append(row);
     }
 
     function drawBlockCalm(panel) {
         header(panel, 'block', t('feed.calm.title', 'Most of this page matched your filters'),
             t('feed.calm.body', 'FilterTube stopped loading more of it. Your subscriptions and search still work.'));
+        chips(panel, null, false);
+        const box = body(panel, 'calm');
+        if (box.childElementCount) return;
         const row = el('div', 'ftf-empty');
         const kriti = mascot('kriti_peek.webp', '');
         if (kriti) row.append(kriti);
@@ -328,7 +434,7 @@ html[${BUILT_ATTR}] ytd-browse[page-subtype="home"] ytd-rich-grid-renderer #ghos
         actions.append(button(t('feed.built.search', 'Search'), focusSearch));
         actions.append(button(t('feed.calm.review', 'Review filters'), () => openDashboard('filters')));
         row.append(actions);
-        panel.append(row);
+        box.append(row);
     }
 
     function visibleItems(items, current) {
@@ -339,7 +445,12 @@ html[${BUILT_ATTR}] ytd-browse[page-subtype="home"] ytd-rich-grid-renderer #ghos
         const key = `${sources.channels.map(ch => ch.id).join(',')}|${sources.topics.slice(0, 20).join(',')}`;
         if (built && built.key === key) return built;
         if (building && building.key === key) return building.promise;
-        const promise = builder.build(sources).then(result => {
+        // Study ranks by plan topic, which only means something over the whole plan: every plan channel
+        // is read at once (at most 24, cached for an hour, three requests at a time). Allowed only starts
+        // with the first few channels and "Show more" reads the rest.
+        const batch = sources.study ? Math.min(Math.max(sources.channels.length, Feed.FIRST_BATCH), STUDY_BATCH) : Feed.FIRST_BATCH;
+        const promise = builder.build(sources, { batch }).then(result => {
+            shownCount = PAGE_SIZE;
             built = { key, items: result.items, nextOffset: result.nextOffset, unreachable: result.unreachable };
             return built;
         }).finally(() => { if (building?.promise === promise) building = null; });
@@ -349,27 +460,18 @@ html[${BUILT_ATTR}] ytd-browse[page-subtype="home"] ytd-rich-grid-renderer #ghos
 
     async function loadMore() {
         const current = settings();
-        if (!built || built.nextOffset === null || !current) return;
-        const sources = Feed.feedSources(current);
-        const result = await builder.build(sources, { offset: built.nextOffset, searches: 0 });
-        const seen = new Set(built.items.map(item => item.videoId));
-        built = { ...built, items: built.items.concat(result.items.filter(item => !seen.has(item.videoId))), nextOffset: result.nextOffset };
+        if (!built || !current) return;
+        const visible = visibleItems(built.items, current).length;
+        // Cards already fetched come first; the next channels are asked only when those run out.
+        if (visible <= shownCount + PAGE_SIZE / 2 && built.nextOffset !== null) {
+            const sources = Feed.feedSources(current);
+            const result = await builder.build(sources, { offset: built.nextOffset, searches: 0 });
+            const seen = new Set(built.items.map(item => item.videoId));
+            built = { ...built, items: built.items.concat(result.items.filter(item => !seen.has(item.videoId))), nextOffset: result.nextOffset };
+        }
+        shownCount += PAGE_SIZE / 2;
         shownFor = '';
         decide(true);
-    }
-
-    function loadStudyLabel(current) {
-        if (!current?.study || current.study.phase !== 'study') { studyLabel = ''; return; }
-        try {
-            Promise.resolve(runtime.sendMessage({ action: 'FilterTube_StudyGetState' })).then(state => {
-                const packs = Array.isArray(state?.packs) ? state.packs : [];
-                const first = packs[0];
-                if (!first) return;
-                const name = first.shortName || first.names?.[lang()] || first.names?.en || '';
-                const next = packs.length > 1 ? `${name} + ${packs.length - 1}` : name;
-                if (next && next !== studyLabel) { studyLabel = next; shownFor = ''; decide(); }
-            }).catch(() => { });
-        } catch (e) { }
     }
 
     function visibleCardCount() {
@@ -397,6 +499,38 @@ html[${BUILT_ATTR}] ytd-browse[page-subtype="home"] ytd-rich-grid-renderer #ghos
         return false;
     }
 
+    function feedKey(sources) {
+        return `${sources.channels.map(ch => ch.id).join(',')}|${sources.topics.slice(0, 20).join(',')}`;
+    }
+
+    /**
+     * What this page shows: 'feed' (the built feed), 'allow-empty', 'block-calm' or 'none'. In a narrowed
+     * mode the narrowed layer's page plan decides (Home is always the built feed; Search, Watch and channel
+     * pages have their own owners); otherwise the block list's empty-feed guard does.
+     */
+    function decision(current, sources, kind, route) {
+        const html = doc.documentElement;
+        const exhausted = String(html.getAttribute('data-filtertube-feed-exhausted') || '').endsWith(`:${route}`);
+        const emptyHere = String(html.getAttribute('data-filtertube-feed-empty') || '').endsWith(`:${route}`);
+        const layer = narrowedView()?.current?.();
+        if (layer && layer.plan?.narrowed) {
+            if (layer.plan.builtFeed) return 'feed';
+            const page = layer.plan.page;
+            if (page === 'search' || page === 'watch' || page === 'channel' || page === 'shorts') return 'none';
+            return exhausted ? 'allow-empty' : 'none';
+        }
+        if (sources.allow) {
+            // A Home with no cards of its own at all (signed out, or history off) has nothing to hide
+            // either: once it has settled, the allowed sources fill it.
+            const bareHome = kind === 'home' && Date.now() - navigatedAt > SETTLE_MS && visibleCardCount() === 0;
+            if (kind === 'home' && (sources.study || emptyHere || exhausted || bareHome)) return 'feed';
+            if (exhausted && kind !== 'search') return 'allow-empty';
+            return 'none';
+        }
+        if (exhausted || ((kind === 'home' || kind === 'feed' || kind === 'search') && domLooksExhausted())) return 'block-calm';
+        return 'none';
+    }
+
     async function decide(force = false) {
         const current = settings();
         const kind = Feed.routeKind(root.location.pathname);
@@ -407,62 +541,55 @@ html[${BUILT_ATTR}] ytd-browse[page-subtype="home"] ytd-rich-grid-renderer #ghos
             return;
         }
         const route = routeKey();
-        const exhaustedAttr = String(html.getAttribute('data-filtertube-feed-exhausted') || '');
-        const emptyAttr = String(html.getAttribute('data-filtertube-feed-empty') || '');
-        const exhausted = exhaustedAttr.endsWith(`:${route}`);
-        const emptyHere = emptyAttr.endsWith(`:${route}`);
         const sources = Feed.feedSources(current);
         const studying = sources.study;
-
-        let decision = 'none';
-        if (sources.allow) {
-            // A Home with no cards of its own at all (signed out, or history off) has nothing to hide
-            // either: once it has settled, the allowed sources fill it.
-            const bareHome = kind === 'home' && Date.now() - navigatedAt > SETTLE_MS && visibleCardCount() === 0;
-            if (kind === 'home' && (studying || emptyHere || exhausted || bareHome)) decision = 'feed';
-            else if (exhausted) decision = 'allow-empty';
-        } else if (exhausted || ((kind === 'home' || kind === 'feed' || kind === 'search') && domLooksExhausted())) {
-            decision = 'block-calm';
-        }
+        const chosen = decision(current, sources, kind, route);
         // A plain word for diagnostics (and the capture scripts): what this page decided.
-        html.setAttribute('data-filtertube-feed-decision', `${decision}${sources.allow ? ':allow' : ':block'}${studying ? ':study' : ''}`);
-        const stamp = `${route}|${decision}|${built?.key || ''}|${built?.items?.length || 0}|${studyLabel}|${companion}`;
-        if (decision === 'none') { if (doc.getElementById(PANEL_ID)) removePanel(); return; }
+        html.setAttribute('data-filtertube-feed-decision', `${chosen}${sources.allow ? ':allow' : ':block'}${studying ? ':study' : ''}`);
+        const info = studyInfo();
+        const stamp = `${route}|${chosen}|${built?.key || ''}|${built?.items?.length || 0}|${info.label}|${info.chips.length}|${companion}`;
+        if (chosen === 'none') { if (doc.getElementById(PANEL_ID)) removePanel(); return; }
         if (!force && stamp === shownFor && doc.getElementById(PANEL_ID)?.isConnected) return;
 
         const my = ++token;
-        if (decision === 'block-calm') {
+        if (chosen === 'block-calm') {
             const panel = panelShell();
             if (!panel) return;
             drawBlockCalm(panel);
+            refreshModeBar();
             shownFor = stamp;
             return;
         }
-        if (decision === 'allow-empty') {
+        if (chosen === 'allow-empty') {
             const panel = panelShell();
             if (!panel) return;
-            drawAllowEmpty(panel, sources, { unreachable: false });
+            drawAllowEmpty(panel, sources, { unreachable: false, page: kind });
+            refreshModeBar();
             shownFor = stamp;
             return;
         }
-        // decision === 'feed'
+        // chosen === 'feed'
         html.setAttribute(BUILT_ATTR, '');
         let panel = panelShell();
         if (!panel) return;
         if (!sources.channels.length && !sources.topics.length) {
             drawAllowEmpty(panel, sources, { unreachable: false });
+            refreshModeBar();
             shownFor = stamp;
             return;
         }
-        if (!built || built.key !== `${sources.channels.map(ch => ch.id).join(',')}|${sources.topics.slice(0, 20).join(',')}`) drawLoading(panel, sources);
+        if (!built || built.key !== feedKey(sources)) drawLoading(panel, sources);
+        refreshModeBar();
         const result = await ensureBuilt(sources, current).catch(() => null);
         if (my !== token) return;
         panel = panelShell();
         if (!panel) return;
         const items = result ? visibleItems(result.items, settings() || current) : [];
         if (!items.length) drawAllowEmpty(panel, sources, { unreachable: !result || result.unreachable });
-        else drawFeed(panel, sources, items.slice(0, 48), result.nextOffset !== null);
-        shownFor = `${route}|${decision}|${built?.key || ''}|${built?.items?.length || 0}|${studyLabel}|${companion}`;
+        else drawFeed(panel, sources, items.slice(0, shownCount), result.nextOffset !== null || items.length > shownCount);
+        refreshModeBar();
+        const after = studyInfo();
+        shownFor = `${route}|${chosen}|${built?.key || ''}|${built?.items?.length || 0}|${after.label}|${after.chips.length}|${companion}`;
     }
 
     let scheduled = 0;
@@ -478,10 +605,7 @@ html[${BUILT_ATTR}] ytd-browse[page-subtype="home"] ytd-rich-grid-renderer #ghos
         lastSettingsRef = current;
         const prevAllow = previous?.listMode === 'whitelist';
         const prevStudy = previous?.study?.phase === 'study';
-        if (!current || prevAllow !== (current.listMode === 'whitelist') || prevStudy !== (current.study?.phase === 'study')) {
-            built = null;
-            loadStudyLabel(current);
-        }
+        if (!current || prevAllow !== (current.listMode === 'whitelist') || prevStudy !== (current.study?.phase === 'study')) built = null;
         schedule(true);
     }
 
@@ -495,6 +619,10 @@ html[${BUILT_ATTR}] ytd-browse[page-subtype="home"] ytd-rich-grid-renderer #ghos
     new MutationObserver(() => schedule(false)).observe(doc.documentElement, {
         attributes: true, attributeFilter: ['data-filtertube-feed-empty', 'data-filtertube-feed-exhausted']
     });
+    // Events only: settings applied in this tab, the narrowed layer's decision, navigation. A block-list
+    // Home that turns out bare is looked at once more after it has settled.
+    doc.addEventListener('filtertube-settings-applied', watchSettings);
+    doc.addEventListener('filtertube-narrowed-change', () => schedule(false));
     doc.addEventListener('yt-navigate-finish', () => { navigatedAt = Date.now(); shownFor = ''; schedule(true); root.setTimeout(() => schedule(false), SETTLE_MS + 200); }, true);
     doc.addEventListener('yt-page-data-updated', () => schedule(false), true);
     try {
@@ -502,11 +630,9 @@ html[${BUILT_ATTR}] ytd-browse[page-subtype="home"] ytd-rich-grid-renderer #ghos
             if (message?.action === 'FilterTube_ApplySettings' || message?.action === 'FilterTube_StudyState') root.setTimeout(watchSettings, 50);
         });
     } catch (e) { }
-    // Settings also change from storage (bridge_settings refreshes currentSettings): look every 2 s.
-    root.setInterval(() => { watchSettings(); if (!shownFor && Feed.routeKind(root.location.pathname) !== 'watch') schedule(false); }, 2000);
-    root.setTimeout(() => schedule(false), SETTLE_MS + 200);
+    root.setTimeout(() => { watchSettings(); schedule(false); }, SETTLE_MS + 200);
     if (doc.readyState === 'loading') doc.addEventListener('DOMContentLoaded', () => schedule(true), { once: true });
     else schedule(true);
 
-    root.FilterTubeAllowFeedView = { decide, removePanel, _state: () => ({ built, shownFor, studyLabel }) };
+    root.FilterTubeAllowFeedView = { decide, removePanel, refreshModeBar, _state: () => ({ built, shownFor }) };
 }());

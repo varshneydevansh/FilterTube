@@ -644,6 +644,7 @@ export const LANES = Object.freeze({
       'tests/runtime/channel-search.test.mjs',
       'tests/runtime/manifest-world-split.test.mjs',
       'tests/runtime/allowlist-feed.test.mjs',
+      'tests/runtime/narrowed-mode.test.mjs',
       'tests/runtime/get-watch-streaming-interception.test.mjs',
       'tests/runtime/ad-void-duration-seek-current-behavior.test.mjs',
       'tests/runtime/popup-intrinsic-sizing.test.mjs',
