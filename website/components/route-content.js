@@ -981,7 +981,7 @@ export const detailPages = {
         summary: "Coming in the next update: a rebuilt Study planner around Your study day.",
         points: [
           "Your study day plans rounds and breaks, and while a round runs only the channels in your plan show up. Search during study looks only in those channels.",
-          "Setup starts with your country, then offers ready-made packs for exams and school classes in 29 countries, or lets you add your own channels.",
+          "Setup starts with your country, then offers ready-made packs for exams and school classes in 56 countries, or lets you add your own channels.",
           "Study and focus sits in FilterTube Controls. Kids learning by age fills the Kids space with age-picked lessons during study.",
         ],
       },
