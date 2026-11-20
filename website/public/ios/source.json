@@ -14,6 +14,16 @@
       "iconURL": "https://filtertube.in/brand/logo.png",
       "versions": [
         {
+          "version": "3.6.3",
+          "buildVersion": "30608.2611201730",
+          "date": "2026-11-20",
+          "localizedDescription": "Backups and sync keep every profile and setting, Kids profiles keep optional services off, the HD decoder is on by default, and fixes from the 3.6.3 extension engine.",
+          "downloadURL": "https://github.com/varshneydevansh/FilterTube/releases/download/v3.6.3/FilterTube-Direct-3.6.3.ipa",
+          "size": 117176104,
+          "sha256": "74fce7375d6f5c5a330b7c9753b503f41fc2587bea3974be607a8c16cdc77a21",
+          "minOSVersion": "17.0"
+        },
+        {
           "version": "3.6.2",
           "buildVersion": "30605.2611181751",
           "date": "2026-11-18",
