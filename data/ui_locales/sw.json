@@ -3456,5 +3456,16 @@
   "community.body": "Uliza maswali, shiriki mawazo ya vichujio na upate habari za matoleo mapya.",
   "community.discord": "FilterTube kwenye Discord, hufunguka kwenye kichupo kipya",
   "community.reddit": "FilterTube kwenye Reddit, hufunguka kwenye kichupo kipya",
-  "community.instagram": "FilterTube kwenye Instagram, hufunguka kwenye kichupo kipya"
+  "community.instagram": "FilterTube kwenye Instagram, hufunguka kwenye kichupo kipya",
+  "content.managedUpdate.title": "Mzazi ametuma sasisho",
+  "content.managedUpdate.otherProfile": "Sheria za {profile} zimesasishwa",
+  "content.managedUpdate.body": "Vichujio vyako viko sasa.",
+  "dashboard.sync.outbox.waiting": "Inasubiri {device} ifungue FilterTube",
+  "dashboard.sync.outbox.delivered": "Imefika",
+  "dashboard.sync.outbox.applied": "Imetumika",
+  "dashboard.sync.outbox.notApplied": "Haijatumika ({reason})",
+  "dashboard.sync.outbox.expired": "Muda umeisha",
+  "dashboard.sync.label.delivery": "Uwasilishaji",
+  "dashboard.sync.toast.noWayToReachDevice": "Bado hakuna njia ya kufikia kifaa hiki. Ruhusu usawazishaji kupitia intaneti, au weka Internet Pickup.",
+  "dashboard.sync.toast.parentUpdateApplied": "Mzazi ametuma sasisho"
 }

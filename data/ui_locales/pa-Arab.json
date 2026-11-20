@@ -3456,5 +3456,16 @@
   "community.body": "سوال پُچھو، فلٹر دے خیال سانجھے کرو تے نویاں ریلیزاں دی خبر لوو۔",
   "community.discord": "Discord اُتے FilterTube، نویں ٹیب وچ کھلدا اے",
   "community.reddit": "Reddit اُتے FilterTube، نویں ٹیب وچ کھلدا اے",
-  "community.instagram": "Instagram اُتے FilterTube، نویں ٹیب وچ کھلدا اے"
+  "community.instagram": "Instagram اُتے FilterTube، نویں ٹیب وچ کھلدا اے",
+  "content.managedUpdate.title": "ماپیاں نے اپڈیٹ گھلی",
+  "content.managedUpdate.otherProfile": "{profile} دے اصول اپڈیٹ ہو گئے",
+  "content.managedUpdate.body": "تہاڈے فلٹر تازہ نیں۔",
+  "dashboard.sync.outbox.waiting": "{device} تے FilterTube کھلن دی اڈیک",
+  "dashboard.sync.outbox.delivered": "پہنچ گیا",
+  "dashboard.sync.outbox.applied": "لاگو ہو گیا",
+  "dashboard.sync.outbox.notApplied": "لاگو نئیں ہویا ({reason})",
+  "dashboard.sync.outbox.expired": "مدت مک گئی",
+  "dashboard.sync.label.delivery": "پہنچ",
+  "dashboard.sync.toast.noWayToReachDevice": "حالے ایس ڈیوائس تیکر اپڑن دا کوئی رستہ نئیں۔ انٹرنیٹ سنک دی اجازت دیو، یا Internet Pickup سیٹ کرو۔",
+  "dashboard.sync.toast.parentUpdateApplied": "ماپیاں نے اپڈیٹ گھلی"
 }

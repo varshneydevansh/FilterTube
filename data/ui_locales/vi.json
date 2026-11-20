@@ -3454,5 +3454,16 @@
   "community.body": "Đặt câu hỏi, chia sẻ ý tưởng bộ lọc và nhận tin về các bản phát hành mới.",
   "community.discord": "FilterTube trên Discord, mở trong thẻ mới",
   "community.reddit": "FilterTube trên Reddit, mở trong thẻ mới",
-  "community.instagram": "FilterTube trên Instagram, mở trong thẻ mới"
+  "community.instagram": "FilterTube trên Instagram, mở trong thẻ mới",
+  "content.managedUpdate.title": "Phụ huynh đã gửi bản cập nhật",
+  "content.managedUpdate.otherProfile": "Đã cập nhật quy tắc cho {profile}",
+  "content.managedUpdate.body": "Bộ lọc của bạn đã được cập nhật.",
+  "dashboard.sync.outbox.waiting": "Đang chờ {device} mở FilterTube",
+  "dashboard.sync.outbox.delivered": "Đã gửi đến",
+  "dashboard.sync.outbox.applied": "Đã áp dụng",
+  "dashboard.sync.outbox.notApplied": "Chưa áp dụng ({reason})",
+  "dashboard.sync.outbox.expired": "Đã hết hạn",
+  "dashboard.sync.label.delivery": "Gửi",
+  "dashboard.sync.toast.noWayToReachDevice": "Chưa có cách nào để kết nối thiết bị này. Hãy cho phép đồng bộ qua internet hoặc thiết lập Internet Pickup.",
+  "dashboard.sync.toast.parentUpdateApplied": "Phụ huynh đã gửi bản cập nhật"
 }

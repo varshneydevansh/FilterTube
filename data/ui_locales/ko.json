@@ -3454,5 +3454,16 @@
   "community.body": "질문하고, 필터 아이디어를 나누고, 새 릴리스 소식을 받아 보세요.",
   "community.discord": "Discord의 FilterTube, 새 탭에서 열림",
   "community.reddit": "Reddit의 FilterTube, 새 탭에서 열림",
-  "community.instagram": "Instagram의 FilterTube, 새 탭에서 열림"
+  "community.instagram": "Instagram의 FilterTube, 새 탭에서 열림",
+  "content.managedUpdate.title": "보호자가 업데이트를 보냈어요",
+  "content.managedUpdate.otherProfile": "{profile}의 규칙이 업데이트됐어요",
+  "content.managedUpdate.body": "필터가 최신 상태예요.",
+  "dashboard.sync.outbox.waiting": "{device}에서 FilterTube가 열리기를 기다리는 중",
+  "dashboard.sync.outbox.delivered": "전달됨",
+  "dashboard.sync.outbox.applied": "적용됨",
+  "dashboard.sync.outbox.notApplied": "적용 안 됨({reason})",
+  "dashboard.sync.outbox.expired": "만료됨",
+  "dashboard.sync.label.delivery": "전달",
+  "dashboard.sync.toast.noWayToReachDevice": "아직 이 기기에 연결할 방법이 없어요. 인터넷 동기화를 허용하거나 Internet Pickup을 설정하세요.",
+  "dashboard.sync.toast.parentUpdateApplied": "보호자가 업데이트를 보냈어요"
 }

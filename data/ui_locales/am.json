@@ -3456,5 +3456,16 @@
   "community.body": "ጥያቄ ይጠይቁ፣ የማጣሪያ ሐሳቦችን ያጋሩ፣ ስለ አዳዲስ ልቀቶችም ይስሙ።",
   "community.discord": "FilterTube በDiscord፣ በአዲስ ትር ይከፈታል",
   "community.reddit": "FilterTube በReddit፣ በአዲስ ትር ይከፈታል",
-  "community.instagram": "FilterTube በInstagram፣ በአዲስ ትር ይከፈታል"
+  "community.instagram": "FilterTube በInstagram፣ በአዲስ ትር ይከፈታል",
+  "content.managedUpdate.title": "ወላጅ ዝማኔ ልከዋል",
+  "content.managedUpdate.otherProfile": "የ{profile} ደንቦች ተዘምነዋል",
+  "content.managedUpdate.body": "ማጣሪያዎችዎ ወቅታዊ ናቸው።",
+  "dashboard.sync.outbox.waiting": "{device} FilterTube እስኪከፍት በመጠበቅ ላይ",
+  "dashboard.sync.outbox.delivered": "ደርሷል",
+  "dashboard.sync.outbox.applied": "ተተግብሯል",
+  "dashboard.sync.outbox.notApplied": "አልተተገበረም ({reason})",
+  "dashboard.sync.outbox.expired": "ጊዜው አልፏል",
+  "dashboard.sync.label.delivery": "ማድረስ",
+  "dashboard.sync.toast.noWayToReachDevice": "ወደዚህ መሣሪያ የሚደርስበት መንገድ ገና የለም። የበይነመረብ ማመሳሰልን ይፍቀዱ፣ ወይም Internet Pickup ያዋቅሩ።",
+  "dashboard.sync.toast.parentUpdateApplied": "ወላጅ ዝማኔ ልከዋል"
 }

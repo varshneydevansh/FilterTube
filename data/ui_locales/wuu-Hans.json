@@ -3454,5 +3454,16 @@
   "community.body": "问问题、分享过滤想法，还好晓得新版本个消息。",
   "community.discord": "Discord 上个 FilterTube，勒新标签页里打开",
   "community.reddit": "Reddit 上个 FilterTube，勒新标签页里打开",
-  "community.instagram": "Instagram 上个 FilterTube，勒新标签页里打开"
+  "community.instagram": "Instagram 上个 FilterTube，勒新标签页里打开",
+  "content.managedUpdate.title": "家长发来一只更新",
+  "content.managedUpdate.otherProfile": "{profile} 个规则更新好了",
+  "content.managedUpdate.body": "侬个过滤已经是最新个了。",
+  "dashboard.sync.outbox.waiting": "等 {device} 打开 FilterTube",
+  "dashboard.sync.outbox.delivered": "送到了",
+  "dashboard.sync.outbox.applied": "用上了",
+  "dashboard.sync.outbox.notApplied": "呒没用上（{reason}）",
+  "dashboard.sync.outbox.expired": "过期了",
+  "dashboard.sync.label.delivery": "送达",
+  "dashboard.sync.toast.noWayToReachDevice": "暂时还呒没办法连到搿只设备。请允许通过互联网同步，或者设置 Internet Pickup。",
+  "dashboard.sync.toast.parentUpdateApplied": "家长发来一只更新"
 }

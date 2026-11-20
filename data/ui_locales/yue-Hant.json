@@ -3454,5 +3454,16 @@
   "community.body": "問問題、分享過濾諗法，同埋知道新版本消息。",
   "community.discord": "Discord 上嘅 FilterTube，會喺新分頁開啟",
   "community.reddit": "Reddit 上嘅 FilterTube，會喺新分頁開啟",
-  "community.instagram": "Instagram 上嘅 FilterTube，會喺新分頁開啟"
+  "community.instagram": "Instagram 上嘅 FilterTube，會喺新分頁開啟",
+  "content.managedUpdate.title": "家長傳咗更新",
+  "content.managedUpdate.otherProfile": "{profile} 嘅規則已經更新",
+  "content.managedUpdate.body": "你嘅過濾已經係最新。",
+  "dashboard.sync.outbox.waiting": "等緊 {device} 開 FilterTube",
+  "dashboard.sync.outbox.delivered": "已送到",
+  "dashboard.sync.outbox.applied": "已套用",
+  "dashboard.sync.outbox.notApplied": "未套用（{reason}）",
+  "dashboard.sync.outbox.expired": "已過期",
+  "dashboard.sync.label.delivery": "送遞",
+  "dashboard.sync.toast.noWayToReachDevice": "暫時未有方法聯絡呢部裝置。請允許經互聯網同步，或者設定 Internet Pickup。",
+  "dashboard.sync.toast.parentUpdateApplied": "家長傳咗更新"
 }

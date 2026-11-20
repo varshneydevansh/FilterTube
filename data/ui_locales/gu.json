@@ -3456,5 +3456,16 @@
   "community.body": "પ્રશ્નો પૂછો, ફિલ્ટરના વિચારો શેર કરો અને નવી રિલીઝની જાણ મેળવો.",
   "community.discord": "Discord પર FilterTube, નવા ટૅબમાં ખૂલે છે",
   "community.reddit": "Reddit પર FilterTube, નવા ટૅબમાં ખૂલે છે",
-  "community.instagram": "Instagram પર FilterTube, નવા ટૅબમાં ખૂલે છે"
+  "community.instagram": "Instagram પર FilterTube, નવા ટૅબમાં ખૂલે છે",
+  "content.managedUpdate.title": "વાલીએ અપડેટ મોકલ્યું",
+  "content.managedUpdate.otherProfile": "{profile} માટે નિયમો અપડેટ થયા",
+  "content.managedUpdate.body": "તમારા ફિલ્ટર અપ-ટુ-ડેટ છે.",
+  "dashboard.sync.outbox.waiting": "{device} પર FilterTube ખૂલવાની રાહ",
+  "dashboard.sync.outbox.delivered": "પહોંચ્યું",
+  "dashboard.sync.outbox.applied": "લાગુ થયું",
+  "dashboard.sync.outbox.notApplied": "લાગુ થયું નથી ({reason})",
+  "dashboard.sync.outbox.expired": "સમય સમાપ્ત",
+  "dashboard.sync.label.delivery": "ડિલિવરી",
+  "dashboard.sync.toast.noWayToReachDevice": "આ ડિવાઇસ સુધી પહોંચવાનો હજી કોઈ રસ્તો નથી. ઇન્ટરનેટ સિંકની મંજૂરી આપો, અથવા Internet Pickup સેટ કરો.",
+  "dashboard.sync.toast.parentUpdateApplied": "વાલીએ અપડેટ મોકલ્યું"
 }

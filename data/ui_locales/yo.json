@@ -3454,5 +3454,16 @@
   "community.body": "Béèrè ìbéèrè, pín èrò àlẹ̀mọ́, kí o sì gbọ́ nípa àwọn ìtújáde tuntun.",
   "community.discord": "FilterTube lórí Discord, ó ń ṣí ní táàbù tuntun",
   "community.reddit": "FilterTube lórí Reddit, ó ń ṣí ní táàbù tuntun",
-  "community.instagram": "FilterTube lórí Instagram, ó ń ṣí ní táàbù tuntun"
+  "community.instagram": "FilterTube lórí Instagram, ó ń ṣí ní táàbù tuntun",
+  "content.managedUpdate.title": "Òbí fi àtúnṣe ránṣẹ́",
+  "content.managedUpdate.otherProfile": "Àwọn òfin {profile} ti di tuntun",
+  "content.managedUpdate.body": "Àwọn àlẹ̀mọ́ rẹ ti wà ní òde-òní.",
+  "dashboard.sync.outbox.waiting": "Ń dúró kí {device} ṣí FilterTube",
+  "dashboard.sync.outbox.delivered": "Ó ti dé",
+  "dashboard.sync.outbox.applied": "Ó ti ṣiṣẹ́",
+  "dashboard.sync.outbox.notApplied": "Kò ṣiṣẹ́ ({reason})",
+  "dashboard.sync.outbox.expired": "Ó ti parí",
+  "dashboard.sync.label.delivery": "Ìfijíṣẹ́",
+  "dashboard.sync.toast.noWayToReachDevice": "Kò sí ọ̀nà láti dé ẹ̀rọ yìí síbẹ̀. Fààyè gba ìmúṣiṣẹ́pọ̀ orí íntánẹ́ẹ̀tì, tàbí ṣètò Internet Pickup.",
+  "dashboard.sync.toast.parentUpdateApplied": "Òbí fi àtúnṣe ránṣẹ́"
 }

@@ -3454,5 +3454,16 @@
   "community.body": "Ajukan pertanyaan, bagikan ide filter, dan dapatkan kabar rilis baru.",
   "community.discord": "FilterTube di Discord, terbuka di tab baru",
   "community.reddit": "FilterTube di Reddit, terbuka di tab baru",
-  "community.instagram": "FilterTube di Instagram, terbuka di tab baru"
+  "community.instagram": "FilterTube di Instagram, terbuka di tab baru",
+  "content.managedUpdate.title": "Orang tua mengirim pembaruan",
+  "content.managedUpdate.otherProfile": "Aturan diperbarui untuk {profile}",
+  "content.managedUpdate.body": "Filter kamu sudah terbaru.",
+  "dashboard.sync.outbox.waiting": "Menunggu {device} membuka FilterTube",
+  "dashboard.sync.outbox.delivered": "Terkirim",
+  "dashboard.sync.outbox.applied": "Diterapkan",
+  "dashboard.sync.outbox.notApplied": "Tidak diterapkan ({reason})",
+  "dashboard.sync.outbox.expired": "Kedaluwarsa",
+  "dashboard.sync.label.delivery": "Pengiriman",
+  "dashboard.sync.toast.noWayToReachDevice": "Belum ada cara untuk menjangkau perangkat ini. Izinkan sinkronisasi internet, atau siapkan Internet Pickup.",
+  "dashboard.sync.toast.parentUpdateApplied": "Orang tua mengirim pembaruan"
 }

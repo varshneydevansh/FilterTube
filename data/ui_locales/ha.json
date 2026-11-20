@@ -3456,5 +3456,16 @@
   "community.body": "Yi tambayoyi, raba ra’ayoyin tacewa, kuma ji labarin sababbin fitowa.",
   "community.discord": "FilterTube a Discord, yana buɗewa a sabon shafi",
   "community.reddit": "FilterTube a Reddit, yana buɗewa a sabon shafi",
-  "community.instagram": "FilterTube a Instagram, yana buɗewa a sabon shafi"
+  "community.instagram": "FilterTube a Instagram, yana buɗewa a sabon shafi",
+  "content.managedUpdate.title": "Iyaye sun aiko da sabuntawa",
+  "content.managedUpdate.otherProfile": "An sabunta dokokin {profile}",
+  "content.managedUpdate.body": "Matatun ka sabbi ne.",
+  "dashboard.sync.outbox.waiting": "Ana jiran {device} ya buɗe FilterTube",
+  "dashboard.sync.outbox.delivered": "An isar",
+  "dashboard.sync.outbox.applied": "An aiwatar",
+  "dashboard.sync.outbox.notApplied": "Ba a aiwatar ba ({reason})",
+  "dashboard.sync.outbox.expired": "Ya ƙare",
+  "dashboard.sync.label.delivery": "Isarwa",
+  "dashboard.sync.toast.noWayToReachDevice": "Babu hanyar isa wannan na'ura tukuna. Ka ba da izinin daidaitawa ta intanet, ko ka saita Internet Pickup.",
+  "dashboard.sync.toast.parentUpdateApplied": "Iyaye sun aiko da sabuntawa"
 }

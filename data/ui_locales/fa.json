@@ -3456,5 +3456,16 @@
   "community.body": "سؤال بپرسید، ایده‌های فیلتر را به اشتراک بگذارید و از نسخه‌های جدید باخبر شوید.",
   "community.discord": "FilterTube در Discord، در زبانهٔ جدید باز می‌شود",
   "community.reddit": "FilterTube در Reddit، در زبانهٔ جدید باز می‌شود",
-  "community.instagram": "FilterTube در Instagram، در زبانهٔ جدید باز می‌شود"
+  "community.instagram": "FilterTube در Instagram، در زبانهٔ جدید باز می‌شود",
+  "content.managedUpdate.title": "والد یک به‌روزرسانی فرستاد",
+  "content.managedUpdate.otherProfile": "قوانین {profile} به‌روز شد",
+  "content.managedUpdate.body": "فیلترهای شما به‌روز هستند.",
+  "dashboard.sync.outbox.waiting": "در انتظار باز شدن FilterTube در {device}",
+  "dashboard.sync.outbox.delivered": "تحویل شد",
+  "dashboard.sync.outbox.applied": "اعمال شد",
+  "dashboard.sync.outbox.notApplied": "اعمال نشد ({reason})",
+  "dashboard.sync.outbox.expired": "منقضی شد",
+  "dashboard.sync.label.delivery": "تحویل",
+  "dashboard.sync.toast.noWayToReachDevice": "هنوز راهی برای رسیدن به این دستگاه نیست. همگام‌سازی اینترنتی را مجاز کنید یا Internet Pickup را راه‌اندازی کنید.",
+  "dashboard.sync.toast.parentUpdateApplied": "والد یک به‌روزرسانی فرستاد"
 }

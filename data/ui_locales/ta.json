@@ -3456,5 +3456,16 @@
   "community.body": "கேள்விகள் கேளுங்கள், வடிகட்டி யோசனைகளைப் பகிருங்கள், புதிய வெளியீடுகளைப் பற்றி அறியுங்கள்.",
   "community.discord": "Discord இல் FilterTube, புதிய தாவலில் திறக்கும்",
   "community.reddit": "Reddit இல் FilterTube, புதிய தாவலில் திறக்கும்",
-  "community.instagram": "Instagram இல் FilterTube, புதிய தாவலில் திறக்கும்"
+  "community.instagram": "Instagram இல் FilterTube, புதிய தாவலில் திறக்கும்",
+  "content.managedUpdate.title": "பெற்றோர் புதுப்பிப்பை அனுப்பினார்",
+  "content.managedUpdate.otherProfile": "{profile} க்கான விதிகள் புதுப்பிக்கப்பட்டன",
+  "content.managedUpdate.body": "உங்கள் வடிப்பான்கள் புதுப்பித்த நிலையில் உள்ளன.",
+  "dashboard.sync.outbox.waiting": "{device} இல் FilterTube திறக்கப்படும் வரை காத்திருக்கிறது",
+  "dashboard.sync.outbox.delivered": "சென்றடைந்தது",
+  "dashboard.sync.outbox.applied": "பயன்படுத்தப்பட்டது",
+  "dashboard.sync.outbox.notApplied": "பயன்படுத்தப்படவில்லை ({reason})",
+  "dashboard.sync.outbox.expired": "காலாவதியானது",
+  "dashboard.sync.label.delivery": "வழங்கல்",
+  "dashboard.sync.toast.noWayToReachDevice": "இந்தச் சாதனத்தை அடைய இன்னும் வழி இல்லை. இணைய ஒத்திசைவை அனுமதிக்கவும், அல்லது Internet Pickup ஐ அமைக்கவும்.",
+  "dashboard.sync.toast.parentUpdateApplied": "பெற்றோர் புதுப்பிப்பை அனுப்பினார்"
 }

@@ -3456,5 +3456,16 @@
   "community.body": "Stell Fragen, teile Filterideen und erfahre von neuen Versionen.",
   "community.discord": "FilterTube auf Discord, öffnet sich in einem neuen Tab",
   "community.reddit": "FilterTube auf Reddit, öffnet sich in einem neuen Tab",
-  "community.instagram": "FilterTube auf Instagram, öffnet sich in einem neuen Tab"
+  "community.instagram": "FilterTube auf Instagram, öffnet sich in einem neuen Tab",
+  "content.managedUpdate.title": "Eltern-Update erhalten",
+  "content.managedUpdate.otherProfile": "Regeln für {profile} aktualisiert",
+  "content.managedUpdate.body": "Deine Filter sind aktuell.",
+  "dashboard.sync.outbox.waiting": "Warten, bis {device} FilterTube öffnet",
+  "dashboard.sync.outbox.delivered": "Zugestellt",
+  "dashboard.sync.outbox.applied": "Angewendet",
+  "dashboard.sync.outbox.notApplied": "Nicht angewendet ({reason})",
+  "dashboard.sync.outbox.expired": "Abgelaufen",
+  "dashboard.sync.label.delivery": "Zustellung",
+  "dashboard.sync.toast.noWayToReachDevice": "Dieses Gerät ist noch nicht erreichbar. Erlaube die Synchronisierung über das Internet oder richte Internet Pickup ein.",
+  "dashboard.sync.toast.parentUpdateApplied": "Eltern-Update erhalten"
 }

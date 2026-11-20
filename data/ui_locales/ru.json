@@ -3468,5 +3468,16 @@
   "community.body": "Задавайте вопросы, делитесь идеями фильтров и узнавайте о новых версиях.",
   "community.discord": "FilterTube в Discord, откроется в новой вкладке",
   "community.reddit": "FilterTube в Reddit, откроется в новой вкладке",
-  "community.instagram": "FilterTube в Instagram, откроется в новой вкладке"
+  "community.instagram": "FilterTube в Instagram, откроется в новой вкладке",
+  "content.managedUpdate.title": "Родитель отправил обновление",
+  "content.managedUpdate.otherProfile": "Правила обновлены для {profile}",
+  "content.managedUpdate.body": "Ваши фильтры актуальны.",
+  "dashboard.sync.outbox.waiting": "Ожидание, пока {device} откроет FilterTube",
+  "dashboard.sync.outbox.delivered": "Доставлено",
+  "dashboard.sync.outbox.applied": "Применено",
+  "dashboard.sync.outbox.notApplied": "Не применено ({reason})",
+  "dashboard.sync.outbox.expired": "Истекло",
+  "dashboard.sync.label.delivery": "Доставка",
+  "dashboard.sync.toast.noWayToReachDevice": "Пока нет способа связаться с этим устройством. Разрешите синхронизацию через интернет или настройте Internet Pickup.",
+  "dashboard.sync.toast.parentUpdateApplied": "Родитель отправил обновление"
 }

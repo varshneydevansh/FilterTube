@@ -3456,5 +3456,16 @@
   "community.body": "प्रश्न विचारा, फिल्टरच्या कल्पना शेअर करा आणि नव्या रिलीजची माहिती मिळवा.",
   "community.discord": "Discord वर FilterTube, नवीन टॅबमध्ये उघडते",
   "community.reddit": "Reddit वर FilterTube, नवीन टॅबमध्ये उघडते",
-  "community.instagram": "Instagram वर FilterTube, नवीन टॅबमध्ये उघडते"
+  "community.instagram": "Instagram वर FilterTube, नवीन टॅबमध्ये उघडते",
+  "content.managedUpdate.title": "पालकांनी अपडेट पाठवले",
+  "content.managedUpdate.otherProfile": "{profile} साठी नियम अपडेट झाले",
+  "content.managedUpdate.body": "तुमचे फिल्टर अद्ययावत आहेत.",
+  "dashboard.sync.outbox.waiting": "{device} वर FilterTube उघडण्याची प्रतीक्षा",
+  "dashboard.sync.outbox.delivered": "पोहोचले",
+  "dashboard.sync.outbox.applied": "लागू झाले",
+  "dashboard.sync.outbox.notApplied": "लागू झाले नाही ({reason})",
+  "dashboard.sync.outbox.expired": "मुदत संपली",
+  "dashboard.sync.label.delivery": "वितरण",
+  "dashboard.sync.toast.noWayToReachDevice": "या डिव्हाइसपर्यंत पोहोचण्याचा अजून कोणताही मार्ग नाही. इंटरनेट सिंकला परवानगी द्या, किंवा Internet Pickup सेट अप करा.",
+  "dashboard.sync.toast.parentUpdateApplied": "पालकांनी अपडेट पाठवले"
 }

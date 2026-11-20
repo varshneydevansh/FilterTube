@@ -3456,5 +3456,16 @@
   "community.body": "Ask question, share filter idea, and hear about new release.",
   "community.discord": "FilterTube for Discord, e go open for new tab",
   "community.reddit": "FilterTube for Reddit, e go open for new tab",
-  "community.instagram": "FilterTube for Instagram, e go open for new tab"
+  "community.instagram": "FilterTube for Instagram, e go open for new tab",
+  "content.managedUpdate.title": "Your parent don send update",
+  "content.managedUpdate.otherProfile": "Dem don update rules for {profile}",
+  "content.managedUpdate.body": "Your filters dey up to date.",
+  "dashboard.sync.outbox.waiting": "Dey wait make {device} open FilterTube",
+  "dashboard.sync.outbox.delivered": "E don reach",
+  "dashboard.sync.outbox.applied": "E don apply",
+  "dashboard.sync.outbox.notApplied": "E no apply ({reason})",
+  "dashboard.sync.outbox.expired": "E don expire",
+  "dashboard.sync.label.delivery": "Delivery status",
+  "dashboard.sync.toast.noWayToReachDevice": "No way to reach dis device yet. Allow internet sync, or set up Internet Pickup.",
+  "dashboard.sync.toast.parentUpdateApplied": "Your parent don send update"
 }

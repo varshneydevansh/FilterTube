@@ -3456,5 +3456,16 @@
   "community.body": "Soru sor, filtre fikirlerini paylaş ve yeni sürümlerden haberdar ol.",
   "community.discord": "Discord üzerinde FilterTube, yeni sekmede açılır",
   "community.reddit": "Reddit üzerinde FilterTube, yeni sekmede açılır",
-  "community.instagram": "Instagram üzerinde FilterTube, yeni sekmede açılır"
+  "community.instagram": "Instagram üzerinde FilterTube, yeni sekmede açılır",
+  "content.managedUpdate.title": "Ebeveynin bir güncelleme gönderdi",
+  "content.managedUpdate.otherProfile": "{profile} için kurallar güncellendi",
+  "content.managedUpdate.body": "Filtrelerin güncel.",
+  "dashboard.sync.outbox.waiting": "{device} cihazının FilterTube'u açması bekleniyor",
+  "dashboard.sync.outbox.delivered": "Teslim edildi",
+  "dashboard.sync.outbox.applied": "Uygulandı",
+  "dashboard.sync.outbox.notApplied": "Uygulanmadı ({reason})",
+  "dashboard.sync.outbox.expired": "Süresi doldu",
+  "dashboard.sync.label.delivery": "Teslimat",
+  "dashboard.sync.toast.noWayToReachDevice": "Bu cihaza henüz ulaşmanın bir yolu yok. İnternet üzerinden eşitlemeye izin ver veya Internet Pickup'ı kur.",
+  "dashboard.sync.toast.parentUpdateApplied": "Ebeveynin bir güncelleme gönderdi"
 }

@@ -3456,5 +3456,16 @@
   "community.body": "ప్రశ్నలు అడగండి, ఫిల్టర్ ఆలోచనలు పంచుకోండి, కొత్త విడుదలల గురించి తెలుసుకోండి.",
   "community.discord": "Discordలో FilterTube, కొత్త ట్యాబ్‌లో తెరుచుకుంటుంది",
   "community.reddit": "Redditలో FilterTube, కొత్త ట్యాబ్‌లో తెరుచుకుంటుంది",
-  "community.instagram": "Instagramలో FilterTube, కొత్త ట్యాబ్‌లో తెరుచుకుంటుంది"
+  "community.instagram": "Instagramలో FilterTube, కొత్త ట్యాబ్‌లో తెరుచుకుంటుంది",
+  "content.managedUpdate.title": "తల్లిదండ్రులు అప్‌డేట్ పంపారు",
+  "content.managedUpdate.otherProfile": "{profile} నియమాలు అప్‌డేట్ అయ్యాయి",
+  "content.managedUpdate.body": "మీ ఫిల్టర్లు తాజాగా ఉన్నాయి.",
+  "dashboard.sync.outbox.waiting": "{device}లో FilterTube తెరవబడే వరకు వేచి ఉంది",
+  "dashboard.sync.outbox.delivered": "చేరింది",
+  "dashboard.sync.outbox.applied": "వర్తింపజేయబడింది",
+  "dashboard.sync.outbox.notApplied": "వర్తించలేదు ({reason})",
+  "dashboard.sync.outbox.expired": "గడువు ముగిసింది",
+  "dashboard.sync.label.delivery": "డెలివరీ",
+  "dashboard.sync.toast.noWayToReachDevice": "ఈ పరికరాన్ని చేరుకోవడానికి ఇంకా మార్గం లేదు. ఇంటర్నెట్ సింక్‌ను అనుమతించండి, లేదా Internet Pickup సెటప్ చేయండి.",
+  "dashboard.sync.toast.parentUpdateApplied": "తల్లిదండ్రులు అప్‌డేట్ పంపారు"
 }

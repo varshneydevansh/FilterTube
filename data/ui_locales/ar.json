@@ -3480,5 +3480,16 @@
   "community.body": "اطرح الأسئلة، وشارك أفكار التصفية، وتابع الإصدارات الجديدة.",
   "community.discord": "FilterTube على Discord، يفتح في علامة تبويب جديدة",
   "community.reddit": "FilterTube على Reddit، يفتح في علامة تبويب جديدة",
-  "community.instagram": "FilterTube على Instagram، يفتح في علامة تبويب جديدة"
+  "community.instagram": "FilterTube على Instagram، يفتح في علامة تبويب جديدة",
+  "content.managedUpdate.title": "أرسل ولي الأمر تحديثًا",
+  "content.managedUpdate.otherProfile": "تم تحديث قواعد {profile}",
+  "content.managedUpdate.body": "عوامل التصفية لديك محدّثة.",
+  "dashboard.sync.outbox.waiting": "بانتظار أن يفتح {device} تطبيق FilterTube",
+  "dashboard.sync.outbox.delivered": "تم التسليم",
+  "dashboard.sync.outbox.applied": "تم التطبيق",
+  "dashboard.sync.outbox.notApplied": "لم يُطبَّق ({reason})",
+  "dashboard.sync.outbox.expired": "انتهت الصلاحية",
+  "dashboard.sync.label.delivery": "التسليم",
+  "dashboard.sync.toast.noWayToReachDevice": "لا توجد طريقة للوصول إلى هذا الجهاز بعد. اسمح بالمزامنة عبر الإنترنت، أو أعدّ Internet Pickup.",
+  "dashboard.sync.toast.parentUpdateApplied": "أرسل ولي الأمر تحديثًا"
 }

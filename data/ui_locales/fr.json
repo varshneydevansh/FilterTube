@@ -3456,5 +3456,16 @@
   "community.body": "Posez vos questions, partagez vos idées de filtres et suivez les nouvelles versions.",
   "community.discord": "FilterTube sur Discord, s’ouvre dans un nouvel onglet",
   "community.reddit": "FilterTube sur Reddit, s’ouvre dans un nouvel onglet",
-  "community.instagram": "FilterTube sur Instagram, s’ouvre dans un nouvel onglet"
+  "community.instagram": "FilterTube sur Instagram, s’ouvre dans un nouvel onglet",
+  "content.managedUpdate.title": "Mise à jour parentale reçue",
+  "content.managedUpdate.otherProfile": "Règles mises à jour pour {profile}",
+  "content.managedUpdate.body": "Tes filtres sont à jour.",
+  "dashboard.sync.outbox.waiting": "En attente de l’ouverture de FilterTube sur {device}",
+  "dashboard.sync.outbox.delivered": "Livrée",
+  "dashboard.sync.outbox.applied": "Appliquée",
+  "dashboard.sync.outbox.notApplied": "Non appliquée ({reason})",
+  "dashboard.sync.outbox.expired": "Expirée",
+  "dashboard.sync.label.delivery": "Livraison",
+  "dashboard.sync.toast.noWayToReachDevice": "Impossible de joindre cet appareil pour l’instant. Autorise la synchronisation par Internet ou configure Internet Pickup.",
+  "dashboard.sync.toast.parentUpdateApplied": "Mise à jour parentale reçue"
 }

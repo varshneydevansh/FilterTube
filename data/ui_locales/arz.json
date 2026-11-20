@@ -3480,5 +3480,16 @@
   "community.body": "اسأل، وشارك أفكار الفلترة، واعرف أول بأول عن الإصدارات الجديدة.",
   "community.discord": "FilterTube على Discord، بيفتح في تاب جديدة",
   "community.reddit": "FilterTube على Reddit، بيفتح في تاب جديدة",
-  "community.instagram": "FilterTube على Instagram، بيفتح في تاب جديدة"
+  "community.instagram": "FilterTube على Instagram، بيفتح في تاب جديدة",
+  "content.managedUpdate.title": "ولي الأمر بعت تحديث",
+  "content.managedUpdate.otherProfile": "قواعد {profile} اتحدّثت",
+  "content.managedUpdate.body": "الفلاتر بتاعتك محدّثة.",
+  "dashboard.sync.outbox.waiting": "مستنيين {device} يفتح FilterTube",
+  "dashboard.sync.outbox.delivered": "وصل",
+  "dashboard.sync.outbox.applied": "اتطبّق",
+  "dashboard.sync.outbox.notApplied": "ما اتطبّقش ({reason})",
+  "dashboard.sync.outbox.expired": "انتهت صلاحيته",
+  "dashboard.sync.label.delivery": "التوصيل",
+  "dashboard.sync.toast.noWayToReachDevice": "مفيش طريقة توصل للجهاز ده لسه. اسمح بالمزامنة عبر الإنترنت، أو جهّز Internet Pickup.",
+  "dashboard.sync.toast.parentUpdateApplied": "ولي الأمر بعت تحديث"
 }

@@ -3456,5 +3456,16 @@
   "community.body": "سوال پوچھیں، فلٹر کے خیالات شیئر کریں اور نئی ریلیز کی خبر پائیں۔",
   "community.discord": "Discord پر FilterTube، نئے ٹیب میں کھلتا ہے",
   "community.reddit": "Reddit پر FilterTube، نئے ٹیب میں کھلتا ہے",
-  "community.instagram": "Instagram پر FilterTube، نئے ٹیب میں کھلتا ہے"
+  "community.instagram": "Instagram پر FilterTube، نئے ٹیب میں کھلتا ہے",
+  "content.managedUpdate.title": "والدین نے اپ ڈیٹ بھیجی",
+  "content.managedUpdate.otherProfile": "{profile} کے اصول اپ ڈیٹ ہو گئے",
+  "content.managedUpdate.body": "آپ کے فلٹر تازہ ترین ہیں۔",
+  "dashboard.sync.outbox.waiting": "{device} پر FilterTube کھلنے کا انتظار",
+  "dashboard.sync.outbox.delivered": "پہنچ گیا",
+  "dashboard.sync.outbox.applied": "لاگو ہو گیا",
+  "dashboard.sync.outbox.notApplied": "لاگو نہیں ہوا ({reason})",
+  "dashboard.sync.outbox.expired": "میعاد ختم",
+  "dashboard.sync.label.delivery": "ترسیل",
+  "dashboard.sync.toast.noWayToReachDevice": "ابھی اس ڈیوائس تک پہنچنے کا کوئی راستہ نہیں۔ انٹرنیٹ سنک کی اجازت دیں، یا Internet Pickup سیٹ اپ کریں۔",
+  "dashboard.sync.toast.parentUpdateApplied": "والدین نے اپ ڈیٹ بھیجی"
 }

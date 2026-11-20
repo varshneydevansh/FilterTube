@@ -3454,5 +3454,16 @@
   "community.body": "ถามคำถาม แบ่งปันไอเดียตัวกรอง และรับข่าวรุ่นใหม่",
   "community.discord": "FilterTube บน Discord เปิดในแท็บใหม่",
   "community.reddit": "FilterTube บน Reddit เปิดในแท็บใหม่",
-  "community.instagram": "FilterTube บน Instagram เปิดในแท็บใหม่"
+  "community.instagram": "FilterTube บน Instagram เปิดในแท็บใหม่",
+  "content.managedUpdate.title": "ผู้ปกครองส่งอัปเดตมาแล้ว",
+  "content.managedUpdate.otherProfile": "อัปเดตกฎสำหรับ {profile} แล้ว",
+  "content.managedUpdate.body": "ตัวกรองของคุณเป็นปัจจุบันแล้ว",
+  "dashboard.sync.outbox.waiting": "กำลังรอให้ {device} เปิด FilterTube",
+  "dashboard.sync.outbox.delivered": "ส่งถึงแล้ว",
+  "dashboard.sync.outbox.applied": "ใช้แล้ว",
+  "dashboard.sync.outbox.notApplied": "ยังไม่ได้ใช้ ({reason})",
+  "dashboard.sync.outbox.expired": "หมดอายุ",
+  "dashboard.sync.label.delivery": "การส่ง",
+  "dashboard.sync.toast.noWayToReachDevice": "ยังไม่มีวิธีเข้าถึงอุปกรณ์นี้ อนุญาตการซิงค์ผ่านอินเทอร์เน็ต หรือตั้งค่า Internet Pickup",
+  "dashboard.sync.toast.parentUpdateApplied": "ผู้ปกครองส่งอัปเดตมาแล้ว"
 }

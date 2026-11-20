@@ -3454,5 +3454,16 @@
   "community.body": "質問したり、フィルターのアイデアを共有したり、新しいリリースを知ったりできます。",
   "community.discord": "Discord の FilterTube（新しいタブで開きます）",
   "community.reddit": "Reddit の FilterTube（新しいタブで開きます）",
-  "community.instagram": "Instagram の FilterTube（新しいタブで開きます）"
+  "community.instagram": "Instagram の FilterTube（新しいタブで開きます）",
+  "content.managedUpdate.title": "保護者が更新を送りました",
+  "content.managedUpdate.otherProfile": "{profile} のルールが更新されました",
+  "content.managedUpdate.body": "フィルターは最新です。",
+  "dashboard.sync.outbox.waiting": "{device} で FilterTube が開かれるのを待っています",
+  "dashboard.sync.outbox.delivered": "配信済み",
+  "dashboard.sync.outbox.applied": "適用済み",
+  "dashboard.sync.outbox.notApplied": "未適用（{reason}）",
+  "dashboard.sync.outbox.expired": "期限切れ",
+  "dashboard.sync.label.delivery": "配信",
+  "dashboard.sync.toast.noWayToReachDevice": "このデバイスにはまだ届けられません。インターネット同期を許可するか、Internet Pickup を設定してください。",
+  "dashboard.sync.toast.parentUpdateApplied": "保護者が更新を送りました"
 }

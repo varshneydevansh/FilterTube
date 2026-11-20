@@ -3456,5 +3456,16 @@
   "community.body": "ಪ್ರಶ್ನೆ ಕೇಳಿ, ಫಿಲ್ಟರ್ ಆಲೋಚನೆಗಳನ್ನು ಹಂಚಿಕೊಳ್ಳಿ ಮತ್ತು ಹೊಸ ಬಿಡುಗಡೆಗಳ ಬಗ್ಗೆ ತಿಳಿಯಿರಿ.",
   "community.discord": "Discord ನಲ್ಲಿ FilterTube, ಹೊಸ ಟ್ಯಾಬ್‌ನಲ್ಲಿ ತೆರೆಯುತ್ತದೆ",
   "community.reddit": "Reddit ನಲ್ಲಿ FilterTube, ಹೊಸ ಟ್ಯಾಬ್‌ನಲ್ಲಿ ತೆರೆಯುತ್ತದೆ",
-  "community.instagram": "Instagram ನಲ್ಲಿ FilterTube, ಹೊಸ ಟ್ಯಾಬ್‌ನಲ್ಲಿ ತೆರೆಯುತ್ತದೆ"
+  "community.instagram": "Instagram ನಲ್ಲಿ FilterTube, ಹೊಸ ಟ್ಯಾಬ್‌ನಲ್ಲಿ ತೆರೆಯುತ್ತದೆ",
+  "content.managedUpdate.title": "ಪೋಷಕರು ಅಪ್‌ಡೇಟ್ ಕಳುಹಿಸಿದ್ದಾರೆ",
+  "content.managedUpdate.otherProfile": "{profile} ನಿಯಮಗಳು ಅಪ್‌ಡೇಟ್ ಆಗಿವೆ",
+  "content.managedUpdate.body": "ನಿಮ್ಮ ಫಿಲ್ಟರ್‌ಗಳು ಅಪ್-ಟು-ಡೇಟ್ ಆಗಿವೆ.",
+  "dashboard.sync.outbox.waiting": "{device} ನಲ್ಲಿ FilterTube ತೆರೆಯುವವರೆಗೆ ಕಾಯಲಾಗುತ್ತಿದೆ",
+  "dashboard.sync.outbox.delivered": "ತಲುಪಿದೆ",
+  "dashboard.sync.outbox.applied": "ಅನ್ವಯಿಸಲಾಗಿದೆ",
+  "dashboard.sync.outbox.notApplied": "ಅನ್ವಯಿಸಲಾಗಿಲ್ಲ ({reason})",
+  "dashboard.sync.outbox.expired": "ಅವಧಿ ಮುಗಿದಿದೆ",
+  "dashboard.sync.label.delivery": "ವಿತರಣೆ",
+  "dashboard.sync.toast.noWayToReachDevice": "ಈ ಸಾಧನವನ್ನು ತಲುಪಲು ಇನ್ನೂ ದಾರಿಯಿಲ್ಲ. ಇಂಟರ್ನೆಟ್ ಸಿಂಕ್ ಅನುಮತಿಸಿ, ಅಥವಾ Internet Pickup ಹೊಂದಿಸಿ.",
+  "dashboard.sync.toast.parentUpdateApplied": "ಪೋಷಕರು ಅಪ್‌ಡೇಟ್ ಕಳುಹಿಸಿದ್ದಾರೆ"
 }

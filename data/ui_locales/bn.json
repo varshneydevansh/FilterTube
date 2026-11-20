@@ -3456,5 +3456,16 @@
   "community.body": "প্রশ্ন করুন, ফিল্টারের আইডিয়া শেয়ার করুন আর নতুন রিলিজের খবর পান।",
   "community.discord": "Discord-এ FilterTube, নতুন ট্যাবে খোলে",
   "community.reddit": "Reddit-এ FilterTube, নতুন ট্যাবে খোলে",
-  "community.instagram": "Instagram-এ FilterTube, নতুন ট্যাবে খোলে"
+  "community.instagram": "Instagram-এ FilterTube, নতুন ট্যাবে খোলে",
+  "content.managedUpdate.title": "অভিভাবক একটি আপডেট পাঠিয়েছেন",
+  "content.managedUpdate.otherProfile": "{profile}-এর নিয়ম আপডেট হয়েছে",
+  "content.managedUpdate.body": "আপনার ফিল্টার হালনাগাদ আছে।",
+  "dashboard.sync.outbox.waiting": "{device}-এ FilterTube খোলার অপেক্ষায়",
+  "dashboard.sync.outbox.delivered": "পৌঁছেছে",
+  "dashboard.sync.outbox.applied": "প্রয়োগ হয়েছে",
+  "dashboard.sync.outbox.notApplied": "প্রয়োগ হয়নি ({reason})",
+  "dashboard.sync.outbox.expired": "মেয়াদ শেষ",
+  "dashboard.sync.label.delivery": "ডেলিভারি",
+  "dashboard.sync.toast.noWayToReachDevice": "এই ডিভাইসে পৌঁছানোর কোনো উপায় এখনও নেই। ইন্টারনেট সিঙ্কের অনুমতি দিন, অথবা Internet Pickup সেট আপ করুন।",
+  "dashboard.sync.toast.parentUpdateApplied": "অভিভাবক একটি আপডেট পাঠিয়েছেন"
 }

@@ -3456,5 +3456,16 @@
   "community.body": "Magtanong, magbahagi ng mga ideya sa filter, at alamin ang mga bagong release.",
   "community.discord": "FilterTube sa Discord, bubukas sa bagong tab",
   "community.reddit": "FilterTube sa Reddit, bubukas sa bagong tab",
-  "community.instagram": "FilterTube sa Instagram, bubukas sa bagong tab"
+  "community.instagram": "FilterTube sa Instagram, bubukas sa bagong tab",
+  "content.managedUpdate.title": "Nagpadala ng update ang magulang",
+  "content.managedUpdate.otherProfile": "Na-update ang mga patakaran para kay {profile}",
+  "content.managedUpdate.body": "Napapanahon ang iyong mga filter.",
+  "dashboard.sync.outbox.waiting": "Hinihintay na buksan ng {device} ang FilterTube",
+  "dashboard.sync.outbox.delivered": "Naihatid",
+  "dashboard.sync.outbox.applied": "Nailapat",
+  "dashboard.sync.outbox.notApplied": "Hindi nailapat ({reason})",
+  "dashboard.sync.outbox.expired": "Nag-expire",
+  "dashboard.sync.label.delivery": "Paghahatid",
+  "dashboard.sync.toast.noWayToReachDevice": "Wala pang paraan para maabot ang device na ito. Payagan ang pag-sync sa internet, o i-set up ang Internet Pickup.",
+  "dashboard.sync.toast.parentUpdateApplied": "Nagpadala ng update ang magulang"
 }

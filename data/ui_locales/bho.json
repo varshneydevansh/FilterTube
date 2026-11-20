@@ -3456,5 +3456,16 @@
   "community.body": "सवाल पूछीं, फ़िल्टर के आइडिया साझा करीं आ नया रिलीज़ के खबर पाईं।",
   "community.discord": "Discord पर FilterTube, नया टैब में खुलेला",
   "community.reddit": "Reddit पर FilterTube, नया टैब में खुलेला",
-  "community.instagram": "Instagram पर FilterTube, नया टैब में खुलेला"
+  "community.instagram": "Instagram पर FilterTube, नया टैब में खुलेला",
+  "content.managedUpdate.title": "अभिभावक अपडेट भेजले बाड़ें",
+  "content.managedUpdate.otherProfile": "{profile} के नियम अपडेट हो गइल",
+  "content.managedUpdate.body": "राउर फ़िल्टर अप-टू-डेट बा।",
+  "dashboard.sync.outbox.waiting": "{device} पर FilterTube खुले के इंतजार",
+  "dashboard.sync.outbox.delivered": "पहुँच गइल",
+  "dashboard.sync.outbox.applied": "लागू हो गइल",
+  "dashboard.sync.outbox.notApplied": "लागू ना भइल ({reason})",
+  "dashboard.sync.outbox.expired": "समय खतम",
+  "dashboard.sync.label.delivery": "डिलीवरी",
+  "dashboard.sync.toast.noWayToReachDevice": "एह डिवाइस तक पहुँचे के अबहीं कवनो रास्ता नइखे। इंटरनेट सिंक के अनुमति दीं, भा Internet Pickup सेट करीं।",
+  "dashboard.sync.toast.parentUpdateApplied": "अभिभावक अपडेट भेजले बाड़ें"
 }
