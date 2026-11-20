@@ -18594,7 +18594,22 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
     }
 
+    // The background worker runs pickups now (SEAMLESS_SYNC_SPEC.md §5) and cannot read this page's
+    // localStorage, so the same config is mirrored into extension storage under the same key.
+    function mirrorNanahManagedMailboxConfigToWorker(config) {
+        try {
+            const root = safeObject(config);
+            if (normalizeString(root.endpointUrl || root.url || root.baseUrl)) {
+                void writeNanahStorage(NANAH_MANAGED_MAILBOX_CONFIG_KEY, root);
+            } else if (runtimeAPI?.storage?.local?.remove) {
+                runtimeAPI.storage.local.remove(NANAH_MANAGED_MAILBOX_CONFIG_KEY);
+            }
+        } catch (_) {
+        }
+    }
+
     function writeNanahManagedMailboxServerConfig(config) {
+        mirrorNanahManagedMailboxConfigToWorker(config);
         try {
             const root = safeObject(config);
             if (!normalizeString(root.endpointUrl || root.url || root.baseUrl)) {
@@ -23090,6 +23105,10 @@ document.addEventListener('DOMContentLoaded', async () => {
         const localNetworkProvider = getNanahManagedLocalNetworkProvider();
         const mailboxReady = hasNanahManagedMailboxUploadWriter(mailboxProvider);
         const localReady = hasNanahManagedLocalNetworkDeliveryWriter(localNetworkProvider);
+        // The parent's outbox (SEAMLESS_SYNC_SPEC.md §4): the background worker keeps each sealed
+        // item and hands it over when the child's browser or app is open. Needs internet sync.
+        let outboxReady = null;
+        let outboxConsentAsked = false;
         const profiles = safeObject(authorizedRoot.profiles);
         const allowedTargets = targetIds.filter((targetId) => {
             const profile = safeObject(profiles[targetId]);
@@ -23108,6 +23127,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             liveSentCount: 0,
             mailboxUploadedCount: 0,
             localNetworkDeliveredCount: 0,
+            outboxQueuedCount: 0,
             providerMissingCount: 0,
             noLinkCount: 0
         };
@@ -23153,7 +23173,16 @@ document.addEventListener('DOMContentLoaded', async () => {
                 : normalizedDeliveryMode === 'later'
                     ? mailboxCanDeliver
                     : normalizedDeliveryMode === 'auto' && !sendLive && !sendLocal && mailboxCanDeliver;
-            if (!sendLive && !sendLocal && !sendMailbox) {
+            const outboxMode = normalizedDeliveryMode === 'all' || normalizedDeliveryMode === 'later'
+                || (normalizedDeliveryMode === 'auto' && !sendLive && !sendLocal);
+            if (outboxMode && outboxReady === null && savedUpdateLinks.length > 0) outboxReady = await isInternetSyncConsentAccepted();
+            if (outboxMode && outboxReady !== true && !outboxConsentAsked && savedUpdateLinks.length > 0 && !sendLocal && !sendMailbox) {
+                // Nothing else can reach the device: ask once whether internet sync may be used.
+                outboxConsentAsked = true;
+                outboxReady = await ensureInternetSyncConsent();
+            }
+            const sendOutbox = outboxMode && outboxReady === true && savedUpdateLinks.length > 0;
+            if (!sendLive && !sendLocal && !sendMailbox && !sendOutbox) {
                 summary.providerMissingCount += 1;
                 await recordManagedParentPolicyPushHistory(targetId, {
                     scope: normalizedScope,
@@ -23182,6 +23211,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             let liveSent = 0;
             let mailboxUploaded = 0;
             let localNetworkDelivered = 0;
+            let outboxQueued = 0;
             let failureReason = '';
             nanahManagedPolicySourceOverride = {
                 profileId: targetId,
@@ -23248,6 +23278,25 @@ document.addEventListener('DOMContentLoaded', async () => {
                     targetFailed += normalizeNonNegativeInteger(mailboxResult?.failedMailboxItemCount) || 0;
                     failureReason = failureReason || normalizeString(mailboxResult?.reason);
                 }
+                if (sendOutbox && typeof sendOperation.uploadMailboxPolicyBatch === 'function') {
+                    const createdAtMs = Date.now();
+                    const outboxResult = await sendOperation.uploadMailboxPolicyBatch(
+                        policy,
+                        savedUpdateLinks,
+                        createNanahManagedOutboxProvider(targetProfile),
+                        {
+                            reason: 'command_center_parent_push',
+                            requestedAt: createdAtMs,
+                            createdAtMs,
+                            expiresAtMs: createdAtMs + NANAH_MANAGED_OUTBOX_TTL_MS
+                        }
+                    );
+                    outboxQueued = normalizeNonNegativeInteger(outboxResult?.uploadedMailboxItemCount) || 0;
+                    if (outboxQueued > 0) transports.push('outbox_courier');
+                    targetDelivered += outboxQueued;
+                    targetFailed += normalizeNonNegativeInteger(outboxResult?.failedMailboxItemCount) || 0;
+                    failureReason = failureReason || normalizeString(outboxResult?.reason);
+                }
             } catch (error) {
                 targetFailed += links.length;
                 failureReason = normalizeString(error?.message) || 'managed_policy_delivery_failed';
@@ -23259,6 +23308,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             summary.liveSentCount += liveSent;
             summary.mailboxUploadedCount += mailboxUploaded;
             summary.localNetworkDeliveredCount += localNetworkDelivered;
+            summary.outboxQueuedCount += outboxQueued;
             await recordManagedParentPolicyPushHistory(targetId, {
                 scope: normalizedScope,
                 linkCount: links.length,
@@ -23301,6 +23351,9 @@ document.addEventListener('DOMContentLoaded', async () => {
             ), 'success');
         } else if (summary.noLinkCount > 0) {
             UIComponents.showToast(tabViewUiText('dashboard.sync.toast.noSelectedProtectedLink', 'No selected protected profile has a verified device link yet'), 'error');
+        } else if (summary.providerMissingCount > 0 && outboxConsentAsked && outboxReady !== true) {
+            // §8: say why instead of failing quietly.
+            UIComponents.showToast(tabViewUiText('dashboard.sync.toast.noWayToReachDevice', "There's no way to reach this device yet. Allow internet sync, or set up Internet Pickup."), 'error');
         } else {
             UIComponents.showToast(tabViewUiText('dashboard.sync.toast.noVerifiedDeviceSendPath', 'No send path is available for verified-device updates yet'), 'error');
         }
@@ -23979,7 +24032,90 @@ document.addEventListener('DOMContentLoaded', async () => {
         deviceAutoSync.schedule();
     }
 
+    function askNanahBackgroundWorker(message) {
+        return new Promise(resolve => {
+            try {
+                if (typeof browser !== 'undefined' && browser.runtime?.sendMessage) {
+                    browser.runtime.sendMessage(message).then(resolve, () => resolve(null));
+                    return;
+                }
+                chrome.runtime.sendMessage(message, result => resolve(chrome.runtime.lastError ? null : result));
+            } catch (_) { resolve(null); }
+        });
+    }
+
+    // The pickup itself runs in the background worker (managed_sync_background.js), so it also
+    // happens with no dashboard open; this page only asks for one and shows the result. The
+    // in-page run stays as the fallback when the worker cannot answer.
     async function runNanahManagedOpenSync({ reason = 'dashboard_open' } = {}) {
+        const response = await askNanahBackgroundWorker({ action: 'FilterTube_ManagedPickupNow', reason });
+        if (!response || response.ok !== true) return runNanahManagedOpenSyncInPage({ reason });
+        await loadNanahManagedOpenSyncState();
+        if ((normalizeNonNegativeInteger(response.pulledItemCount) || 0) > 0) {
+            await checkNanahManagedMailboxServerHealth({ reason: 'post_receive', silent: true });
+        }
+        if (safeArray(response.appliedProfileIds).length > 0) {
+            await refreshFilterTubeUiAfterNanahImport();
+            UIComponents.showToast(tabViewUiText('dashboard.sync.toast.parentUpdateApplied', 'Parent sent an update'), 'success');
+        }
+        renderNanahTrustedLinks();
+        return nanahManagedOpenSyncState;
+    }
+
+    // ---- Parent outbox (SEAMLESS_SYNC_SPEC.md §4, §8). The worker owns the entries; this page
+    // hands sealed items over and shows the latest state per child link.
+    const NANAH_MANAGED_OUTBOX_KEY = 'ftManagedOutboxV1';
+    const NANAH_MANAGED_OUTBOX_TTL_MS = 7 * 24 * 60 * 60 * 1000;
+    let nanahManagedOutboxState = { version: 1, entries: [] };
+
+    function createNanahManagedOutboxProvider(targetProfile) {
+        const targetProfileName = normalizeString(safeObject(targetProfile).name);
+        return {
+            configured: true,
+            transport: 'outbox_courier',
+            requiresSealedMailboxItems: true,
+            uploadManagedMailboxItems: async (request) => {
+                const items = safeArray(safeObject(request).items).map(item => ({ item, targetProfileName }));
+                const response = await askNanahBackgroundWorker({ action: 'FilterTube_ManagedOutboxEnqueue', items });
+                if (!response || response.ok !== true) return { ok: false, reason: 'outbox_unavailable' };
+                return { ok: true, uploadedMailboxItemIds: safeArray(response.uploadedMailboxItemIds) };
+            }
+        };
+    }
+
+    async function loadNanahManagedOutboxState() {
+        const raw = safeObject(await readNanahStorage(NANAH_MANAGED_OUTBOX_KEY));
+        nanahManagedOutboxState = { version: 1, entries: safeArray(raw.entries) };
+    }
+
+    /** §8 status line for a parent→child link: the newest outbox entry for it, or nothing. */
+    function formatNanahManagedOutboxStatus(entry) {
+        const linkId = normalizeString(entry?.linkId);
+        const latest = safeArray(nanahManagedOutboxState.entries)
+            .filter(row => normalizeString(row?.linkId) === linkId)
+            .sort((a, b) => (Number(b?.createdAt) || 0) - (Number(a?.createdAt) || 0))[0];
+        if (!latest) return '';
+        const device = normalizeString(latest.remoteLabel) || normalizeString(entry?.deviceLabel)
+            || tabViewUiText('dashboard.sync.copy.trustedDevice', 'Trusted device');
+        switch (normalizeString(latest.state)) {
+            case 'queued':
+                return tabViewUiText('dashboard.sync.outbox.waiting', 'Waiting for {device} to open FilterTube', { device });
+            case 'delivered':
+                return tabViewUiText('dashboard.sync.outbox.delivered', 'Delivered');
+            case 'applied':
+                return tabViewUiText('dashboard.sync.outbox.applied', 'Applied');
+            case 'rejected':
+                return tabViewUiText('dashboard.sync.outbox.notApplied', 'Not applied ({reason})', {
+                    reason: formatManagedNanahBlockedReason(latest.reason, normalizeString(latest.reason) || 'rejected')
+                });
+            case 'expired':
+                return tabViewUiText('dashboard.sync.outbox.expired', 'Expired');
+            default:
+                return '';
+        }
+    }
+
+    async function runNanahManagedOpenSyncInPage({ reason = 'dashboard_open' } = {}) {
         const helper = createNanahManagedOpenSyncHelper();
         if (!helper) return null;
         const io = window.FilterTubeIO || {};
@@ -25425,7 +25561,11 @@ document.addEventListener('DOMContentLoaded', async () => {
                             ? tabViewUiText('dashboard.sync.value.matchingParentUpdatesAllowed', 'Matching parent updates allowed')
                             : tabViewUiText('dashboard.sync.value.askBeforeApplying', 'Ask before applying')
                     }
-                ].forEach((item) => {
+                ].concat((() => {
+                    if (!managedSourceSender) return [];
+                    const outboxStatus = formatNanahManagedOutboxStatus(entry);
+                    return outboxStatus ? [{ labelKey: 'dashboard.sync.label.delivery', label: 'Delivery', value: outboxStatus }] : [];
+                })()).forEach((item) => {
                     const detail = document.createElement('span');
                     const label = document.createElement('small');
                     setTabViewLocalizedCopy(label, 'textContent', item.labelKey, item.label);
@@ -27631,6 +27771,14 @@ document.addEventListener('DOMContentLoaded', async () => {
     // Internet sync goes through the developer's signaling relay and a STUN server (Android
     // InternetSyncRelayConsent): the first use asks once, device-wide, with Continue / Not now.
     const INTERNET_SYNC_CONSENT_KEY = 'ftInternetSyncConsentV1';
+    async function isInternetSyncConsentAccepted() {
+        try {
+            return safeObject(await readNanahStorage(INTERNET_SYNC_CONSENT_KEY)).accepted === true;
+        } catch (_) {
+            return false;
+        }
+    }
+
     async function ensureInternetSyncConsent() {
         try {
             const items = await new Promise(resolve => chrome.storage.local.get([INTERNET_SYNC_CONSENT_KEY], resolve));
@@ -31375,6 +31523,13 @@ document.addEventListener('DOMContentLoaded', async () => {
     void initializeDeviceAutoSync().catch(() => {
         const node = document.getElementById('ftDeviceAutoSync');
         if (node) node.textContent = 'Auto-sync is unavailable. Existing manual sync is still available.';
+    });
+    mirrorNanahManagedMailboxConfigToWorker(readNanahManagedMailboxServerConfig());
+    await loadNanahManagedOutboxState();
+    renderNanahTrustedLinks();
+    runtimeAPI?.storage?.onChanged?.addListener((changes, area) => {
+        if (area !== 'local' || !changes[NANAH_MANAGED_OUTBOX_KEY]) return;
+        void loadNanahManagedOutboxState().then(() => renderNanahTrustedLinks());
     });
     void runNanahManagedBackgroundSync({ reason: 'dashboard_open' });
     document.addEventListener('visibilitychange', () => {
