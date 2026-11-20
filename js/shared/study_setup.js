@@ -23,6 +23,8 @@
     const KIND_CLASS = 'class';
     /** Job-interview prep (Android StudyPackCatalog.KIND_INTERVIEW): global packs, their own setup tile. */
     const KIND_INTERVIEW = 'interview';
+    /** University lectures for one specialization track (Android KIND_DEGREE, 8a7671cc3). */
+    const KIND_DEGREE = 'degree';
     const EXAM_KINDS = Object.freeze(['study', 'exam']);
     /** Android StudySetupActivity.MIN_CHANNELS: a pack shows in setup with at least this many channels. */
     const MIN_CHANNELS = 3;
@@ -122,13 +124,14 @@
 
     // ---- Steps (Android StudySetupPath) ----------------------------------------------------------
 
-    const MODES = Object.freeze({ EXAM: 'exam', SCHOOL: 'school', SKILL: 'skill', INTERVIEW: 'interview' });
+    /** Three tiles (Android 8a7671cc3): interviews and degrees live under Skills and careers. */
+    const MODES = Object.freeze({ EXAM: 'exam', SCHOOL: 'school', SKILL: 'skill' });
 
     /** The tile a chosen pack lives under (Android StudySetupMode.of), so changing a plan reopens on its list. */
     function modeOf(pack) {
         // Kids learning by age lives under School (Android 420df66be: parents look there).
         if (pack?.kind === 'kids_age' || pack?.kind === 'kids_classic') return MODES.SCHOOL;
-        if (pack?.kind === KIND_INTERVIEW) return MODES.INTERVIEW;
+        if (pack?.kind === KIND_INTERVIEW || pack?.kind === KIND_DEGREE) return MODES.SKILL;
         if (isGlobal(pack) && (pack?.kind === KIND_CLASS || StudyExamFields.of(pack) === 'skills')) return MODES.SKILL;
         if (pack?.kind === KIND_CLASS) return MODES.SCHOOL;
         return MODES.EXAM;
@@ -491,6 +494,76 @@
         }
     });
 
+    /**
+     * "Skills and careers" (Android StudyCareers, 8a7671cc3; docs/study/SETUP_SIMPLICITY.md): interview
+     * tracks, degree tracks and the lessons for anyone, filed under one row per field. A field opens on
+     * its tracks: interviews first, then degree tracks under their specializations.
+     */
+    const CAREER_FIELDS = Object.freeze(['software', 'engineering', 'science', 'health', 'management', 'law', 'design', 'public', 'other', 'lessons']);
+    /** Data groups that fold into the list's fields. */
+    const CAREER_FOLDS = Object.freeze({ commerce: 'management', arts: 'design', education: 'other' });
+
+    function specializationName(pack, language) {
+        const labels = object(pack?.specialization);
+        const lang = text(language).toLowerCase().split(/[-_]/)[0];
+        return (lang && labels[lang]) || labels.en || Object.values(labels)[0] || null;
+    }
+
+    const StudyCareers = Object.freeze({
+        FIELDS: CAREER_FIELDS,
+        /** The field a pack lives under, or null for packs outside Skills and careers. */
+        fieldOf(pack) {
+            if (pack?.kind === KIND_CLASS && isGlobal(pack)) return 'lessons';
+            if (pack?.kind === KIND_INTERVIEW || pack?.kind === KIND_DEGREE) {
+                const group = text(pack.group);
+                if (CAREER_FOLDS[group]) return CAREER_FOLDS[group];
+                return CAREER_FIELDS.includes(group) ? group : 'other';
+            }
+            if (EXAM_KINDS.includes(pack?.kind) && isGlobal(pack) && StudyExamFields.of(pack) === 'skills') return 'software';
+            return null;
+        },
+        packs(catalog, minChannels = 0) {
+            return array(catalog?.packs).filter(pack => array(pack.channels).length >= minChannels && StudyCareers.fieldOf(pack) !== null);
+        },
+        /** The fields that have packs, in FIELDS order, as [field, packs] pairs. */
+        fields(catalog, minChannels = 0) {
+            const groups = new Map();
+            for (const pack of StudyCareers.packs(catalog, minChannels)) {
+                const field = StudyCareers.fieldOf(pack);
+                if (!groups.has(field)) groups.set(field, []);
+                groups.get(field).push(pack);
+            }
+            return CAREER_FIELDS.filter(field => groups.has(field)).map(field => [field, groups.get(field)]);
+        },
+        /**
+         * One field's tracks in sections: interview tracks first (key "interviews"), then degree tracks by
+         * specialization (key = its English name), then anything else (key "").
+         */
+        sections(packs) {
+            const list = array(packs);
+            const interviews = list.filter(pack => pack.kind === KIND_INTERVIEW);
+            const degrees = new Map();
+            for (const pack of list.filter(item => item.kind === KIND_DEGREE)) {
+                const key = specializationName(pack, 'en') || '';
+                if (!degrees.has(key)) degrees.set(key, []);
+                degrees.get(key).push(pack);
+            }
+            const rest = list.filter(pack => pack.kind !== KIND_INTERVIEW && pack.kind !== KIND_DEGREE);
+            return [
+                ...(interviews.length ? [['interviews', interviews]] : []),
+                ...degrees.entries(),
+                ...(rest.length ? [['', rest]] : [])
+            ];
+        },
+        /** Search across every field: name, short name, specialization, keywords and subjects. */
+        search(catalog, query, minChannels = 0) {
+            const words = text(query).toLowerCase();
+            if (!words) return [];
+            return StudyCareers.packs(catalog, minChannels).filter(pack => matches(pack, words)
+                || Object.values(object(pack.specialization)).some(label => text(label).toLowerCase().includes(words)));
+        }
+    });
+
     const StudySkills = Object.freeze({
         /** Lessons for anyone: the global class packs, then global skill packs such as coding interviews. */
         of(catalog, minChannels = 0) {
@@ -758,10 +831,10 @@
     }
 
     return Object.freeze({
-        MIN_CHANNELS, ROWS_FOLDED, TOPICS_FOLDED, MAX_TOPICS, MODES, STEPS, KIND_INTERVIEW, modeOf,
+        MIN_CHANNELS, ROWS_FOLDED, TOPICS_FOLDED, MAX_TOPICS, MODES, STEPS, KIND_INTERVIEW, KIND_DEGREE, modeOf,
         StudySetupPath, StudyExamFields, StudyExamList, StudySchool, StudySkills, StudyInterviews, StudyReviewGroups, StudyChannelInput,
         channelsFor, topicsFor, normalizeKey, refKey, topicKey, isGlobal, packName, variant, variantName,
         savedEdits, planLabel, reopenAt, countries,
-        StudyExamCategory, StudyExamFilter, isRegional, areaName
+        StudyExamCategory, StudyExamFilter, isRegional, areaName, StudyCareers, specializationName
     });
 }));

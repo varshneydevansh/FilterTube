@@ -67,14 +67,15 @@ test('interview packs stay out of the exam list and the skill list', () => {
 });
 
 test('a chosen pack reopens setup on its own tile', () => {
-    assert.equal(Setup.MODES.INTERVIEW, 'interview');
-    assert.equal(Setup.modeOf(parsed('interview_hr', 'interview')), Setup.MODES.INTERVIEW);
-    assert.equal(Setup.modeOf(Packs.packById(catalog, 'global_coding_interview')), Setup.MODES.INTERVIEW);
+    // Three tiles (Android 8a7671cc3): interviews reopen under Skills and careers.
+    assert.equal(Setup.MODES.INTERVIEW, undefined);
+    assert.equal(Setup.modeOf(parsed('interview_hr', 'interview')), Setup.MODES.SKILL);
+    assert.equal(Setup.modeOf(Packs.packById(catalog, 'global_coding_interview')), Setup.MODES.SKILL);
     assert.equal(Setup.modeOf(Packs.packById(catalog, 'in_gate')), Setup.MODES.EXAM);
     assert.equal(Setup.modeOf(Packs.packById(catalog, 'cls_in_cbse_9_10')), Setup.MODES.SCHOOL);
     assert.equal(Setup.modeOf(Packs.packById(catalog, 'global_cls_khan_academy')), Setup.MODES.SKILL);
     assert.equal(Setup.modeOf(parsed('kids_age_5_7', 'kids_age')), Setup.MODES.SCHOOL);
-    assert.deepEqual(Setup.reopenAt(['interview_hr'], withInterview, 'IN'), { step: 'list', mode: 'interview', country: 'IN' });
+    assert.deepEqual(Setup.reopenAt(['interview_hr'], withInterview, 'IN'), { step: 'list', mode: 'skill', country: 'IN' });
 });
 
 test('interview packs are study kinds, so the plan model and family scopes keep them', () => {
@@ -162,4 +163,26 @@ test('each pack lists the device country\'s channels first, then global ones, th
     assert.deepEqual(order('IN'), ['3', '5', '2', '4', '1']);
     assert.deepEqual(order('US'), ['1', '2', '4', '3', '5']);
     assert.deepEqual(order(null), ['2', '4', '1', '3', '5']);
+});
+
+test('skills and careers files every track under one field row, interviews before degree tracks', () => {
+    const { StudyCareers } = Setup;
+    const fields = StudyCareers.fields(catalog, 3).map(([field]) => field);
+    assert.deepEqual(fields, [...fields].sort((a, b) => StudyCareers.FIELDS.indexOf(a) - StudyCareers.FIELDS.indexOf(b)));
+    assert.ok(fields.includes('software') && fields.includes('management') && fields.includes('lessons'));
+    assert.equal(StudyCareers.fieldOf(Packs.packById(catalog, 'global_coding_interview')), 'software');
+    assert.equal(StudyCareers.fieldOf(Packs.packById(catalog, 'global_cls_khan_academy')), 'lessons');
+    assert.equal(StudyCareers.fieldOf(Packs.packById(catalog, 'in_gate')), null);
+    const two = Packs.parseCatalog({ ...raw, packs: [
+        rawPack('deg_mech_thermal', 'degree', { group: 'engineering', specialization: { en: 'Mechanical engineering' }, shortName: 'Thermal' }),
+        rawPack('deg_finance', 'degree', { group: 'commerce', specialization: { en: 'Commerce' } }),
+        rawPack('interview_x', 'interview')
+    ] });
+    const [degree, commerce, interview] = two.packs;
+    assert.equal(StudyCareers.fieldOf(degree), 'engineering');
+    assert.equal(StudyCareers.fieldOf(commerce), 'management');
+    assert.deepEqual(StudyCareers.sections([degree, interview]).map(([key]) => key), ['interviews', 'Mechanical engineering']);
+    assert.ok(StudyCareers.search(catalog, 'system design', 3).some(pack => pack.id === 'interview_system_design'));
+    assert.equal(Setup.modeOf(degree), Setup.MODES.SKILL);
+    assert.ok(Packs.STUDY_KINDS.includes('degree'));
 });

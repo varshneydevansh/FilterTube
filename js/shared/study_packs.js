@@ -16,7 +16,7 @@
      * Study-picker kinds; "exam" and "class" are the v2 names, "interview" is job-interview prep (global
      * packs with their own setup tile). Kids packs are "kids_age" and "kids_classic".
      */
-    const STUDY_KINDS = Object.freeze(['study', 'exam', 'class', 'interview']);
+    const STUDY_KINDS = Object.freeze(['study', 'exam', 'class', 'interview', 'degree']);
     const KIDS_KINDS = Object.freeze(['kids_age', 'kids_classic']);
     const PACK_ID = /^[A-Za-z0-9_.-]{1,64}$/;
     let cached = null;
@@ -112,6 +112,8 @@
                 level: text(json.level) || null,
                 area: parseLabels(json.area),
                 category: text(json.category) || null,
+                // Degree packs: the specialization their track sits under ({"en": "Mechanical engineering"}).
+                specialization: parseLabels(json.specialization),
                 chips: strings(json.chips),
                 variants: parseVariants(json.variants),
                 // True when the variants are levels of one syllabus (JEE Main and Advanced), not branches.

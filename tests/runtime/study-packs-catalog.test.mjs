@@ -158,7 +158,7 @@ test('packs for a country: own first, then nearby, then global; kids packs are s
   assert.equal(new Set(nepal).size, nepal.length, 'no pack repeats');
   assert.equal(nepal.includes('us_bar'), false, 'unrelated countries are not listed');
   assert.ok(nepal.every(id => !id.startsWith('kids_') && !id.startsWith('classic_')));
-  assert.deepEqual(Packs.forCountry(catalog, '').map(pack => pack.id), catalog.packs.filter(Packs.isGlobal).filter(p => p.kind === 'study' || p.kind === 'class' || p.kind === 'interview').map(p => p.id));
+  assert.deepEqual(Packs.forCountry(catalog, '').map(pack => pack.id), catalog.packs.filter(Packs.isGlobal).filter(p => p.kind === 'study' || p.kind === 'class' || p.kind === 'interview' || p.kind === 'degree').map(p => p.id));
   assert.deepEqual(Packs.kidsPacks(catalog).map(pack => pack.kind).filter((kind, i, all) => all.indexOf(kind) === i).sort(), ['kids_age', 'kids_classic']);
 });
 

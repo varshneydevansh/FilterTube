@@ -728,7 +728,8 @@
             step: start.step, mode: start.mode, country: start.country, query: '', filtersOpen: false, examFilter: null, board: null,
             selected: array(study.activePackIds).filter(id => Packs.packById(catalog, id)),
             edits: clone(object(study.packEdits)) || {},
-            opened: {}, showAll: new Set(), keptOwn: {}, grade: {}, lockMode: 'gentle', direction: 0, addFor: null
+            opened: {}, showAll: new Set(), keptOwn: {}, grade: {}, lockMode: 'gentle', direction: 0, addFor: null,
+            careerField: null, careerFieldLoaded: false
         };
         // The card's own styles set display, so the hidden attribute alone wouldn't hide it.
         const hidden = Array.from(holder.children).map(node => [node, node.style.display]);
@@ -754,7 +755,16 @@
             render();
             try { panel.scrollIntoView({ block: 'start', behavior: 'smooth' }); } catch (e) { }
         };
-        const back = () => go(Setup.StudySetupPath.back(s.step, needsStream()), false);
+        const back = () => {
+            // Skills and careers: Back from a field's tracks returns to the field list (SETUP_SIMPLICITY.md).
+            if (s.step === 'list' && s.mode === 'skill' && s.careerField && !text(s.query)) {
+                s.careerField = null;
+                s.direction = -1;
+                render();
+                return;
+            }
+            go(Setup.StudySetupPath.back(s.step, needsStream()), false);
+        };
         const goNext = () => go(Setup.StudySetupPath.next(s.step, needsStream()));
         /** Saves the plan (the default branch for any pack without one) and, when asked, starts a round. */
         const savePlan = async startNowToo => {
@@ -774,7 +784,7 @@
             if (s.step === 'list') {
                 if (s.mode === 'exam') return s.country ? t('study.setup.examsIn', 'Exams in {country}', { country: countryName(s.country) }) : t('study.setup.examsTitle', 'Exams');
                 if (s.mode === 'school') return t('study.setup.kindSchool', 'School');
-                return s.mode === 'interview' ? t('study.setup.kindInterview', 'A job interview') : t('study.setup.kindSkill', 'Learn a skill');
+                return s.careerField ? careerFieldName(s.careerField) : t('study.setup.kindSkill', 'Skills and careers');
             }
             if (s.step === 'stream') {
                 const list = packs().filter(pack => array(pack.variants).length && pack.kind !== 'class');
@@ -836,7 +846,7 @@
             panel.dataset.step = s.step;
             const country = s.country;
             if (Packs.countryAccent) panel.dataset.country = country || '';
-            const parts = { kind: renderKind, list: s.mode === 'exam' ? renderExams : s.mode === 'school' ? renderSchool : s.mode === 'interview' ? renderInterviews : renderSkills,
+            const parts = { kind: renderKind, list: s.mode === 'exam' ? renderExams : s.mode === 'school' ? renderSchool : renderSkills,
                 stream: renderStream, review: renderReview, ready: renderReady }[s.step];
             const tail = parts(body);
             panel.replaceChildren(header(), body);
@@ -934,16 +944,13 @@
             const boards = Setup.StudySchool.boards(catalog, s.country, Setup.MIN_CHANNELS);
             const schoolLine = !boards.length ? t('study.setup.kindSchoolNone', 'Lessons that fit any curriculum')
                 : t('study.setup.kindExamples', '{names} and more', { names: boards.map(board => board.label).filter(label => label.length <= 16).slice(0, 3).join(', ') || boards[0].label });
-            // The Interview tile shows only when the catalog has interview packs (Android StudySetupActivity).
-            const hasInterviews = Setup.StudyInterviews.of(catalog, Setup.MIN_CHANNELS).length > 0;
+            // Three tiles (Android 8a7671cc3): interviews and degrees live under Skills and careers.
             const tiles = el('div', 'ft-setup-tiles');
             for (const [mode, name, line, doodle] of [
                 ['exam', t('study.setup.kindExam', 'An exam'), examLine, 'seal'],
                 ['school', t('study.setup.kindSchool', 'School'), schoolLine, 'note'],
-                ['skill', t('study.setup.kindSkill', 'Learn a skill'), t('study.setup.kindSkillBody', 'Maths, science and open lectures. Add your own channels too.'), 'crayon'],
-                ['interview', t('study.setup.kindInterview', 'A job interview'),
-                    t('study.setup.kindInterviewBody', 'Coding, system design, finance, HR and more. Add your own channels too.'), 'clip']
-            ].filter(([mode]) => mode !== 'interview' || hasInterviews)) {
+                ['skill', t('study.setup.kindSkill', 'Skills and careers'), t('study.setup.kindSkillBody', 'Degrees, job interviews and lessons for anyone'), 'crayon']
+            ]) {
                 const tile = button('', `ft-setup-tile is-${mode}`, () => {
                     if (s.mode !== mode) { s.query = ''; s.filtersOpen = false; s.examFilter = null; }
                     s.mode = mode;
@@ -1199,39 +1206,89 @@
             return row;
         }
 
+        /** Where Skills and careers remembers the field picked last, per profile. */
+        const careerPrefKey = () => `careerField:${options.profileId || 'self'}`;
+
+        /**
+         * Skills and careers (Android 8a7671cc3): one row per field, with search across every track. A
+         * field pushes, inside this step, to its tracks: job interviews first, then degree tracks under
+         * their specializations. A chosen pack opens its own field; else the field picked last time.
+         */
         function renderSkills(body) {
-            body.append(el('h3', 'ft-setup-h1', t('study.setup.skillQuestion', 'What do you want to learn?')),
-                el('p', 'ft-study-muted', t('study.setup.skillBody', 'Pick one or more. You can add your own channels next.')));
-            const list = el('div', 'ft-setup-picks');
-            Setup.StudySkills.of(catalog, Setup.MIN_CHANNELS).forEach(pack => list.appendChild(pickRow(pack)));
-            body.appendChild(list);
-            return listBar();
-        }
-
-        // ---- Step 2d: a job interview
-        function renderInterviews(body) {
-            body.append(el('h3', 'ft-setup-h1', t('study.setup.interviewQuestion', 'Which interview are you preparing for?')),
-                el('p', 'ft-study-muted', t('study.setup.skillBody', 'Pick one or more. You can add your own channels next.')));
-            const list = el('div', 'ft-setup-picks');
-            const groups = Setup.StudyInterviews.grouped(catalog, Setup.MIN_CHANNELS);
-            for (const [group, items] of groups) {
-                // One career group per heading; a single group needs none.
-                if (groups.length > 1) list.appendChild(el('p', 'ft-setup-h2', interviewGroupName(group)));
-                items.forEach(pack => list.appendChild(pickRow(pack)));
+            if (!s.careerFieldLoaded) {
+                s.careerFieldLoaded = true;
+                const fields = Setup.StudyCareers.fields(catalog, Setup.MIN_CHANNELS).map(([field]) => field);
+                const saved = homePrefs()[careerPrefKey()];
+                s.careerField = packs().map(Setup.StudyCareers.fieldOf).find(Boolean) || (fields.includes(saved) ? saved : null);
             }
-            body.appendChild(list);
+            const example = Setup.StudyCareers.packs(catalog, Setup.MIN_CHANNELS).find(pack => pack.kind === Setup.KIND_DEGREE && pack.shortName)?.shortName
+                || Setup.StudyInterviews.examples(catalog, Setup.MIN_CHANNELS, 1)[0] || 'DSA';
+            const search = el('input', 'text-input ft-setup-search');
+            search.type = 'search';
+            search.value = s.query;
+            search.placeholder = t('study.setup.careerSearch', 'Search, like {example}', { example });
+            search.setAttribute('aria-label', search.placeholder);
+            const host = el('div', 'ft-setup-picks');
+            search.addEventListener('input', () => { s.query = search.value; drawCareerList(host); });
+            body.append(search, host);
+            drawCareerList(host);
             return listBar();
         }
 
-        function interviewGroupName(group) {
+        function drawCareerList(host) {
+            host.replaceChildren();
+            if (text(s.query)) {
+                const hits = Setup.StudyCareers.search(catalog, s.query, Setup.MIN_CHANNELS);
+                if (!hits.length) host.appendChild(el('p', 'ft-study-muted ft-setup-center', t('study.setup.empty', 'Nothing matches. Try another country or word.')));
+                hits.forEach(pack => host.appendChild(pickRow(pack)));
+                return;
+            }
+            const fields = Setup.StudyCareers.fields(catalog, Setup.MIN_CHANNELS);
+            const open = s.careerField ? fields.find(([field]) => field === s.careerField) : null;
+            if (!open) {
+                // One row per field, never chips.
+                fields.forEach(([field, list]) => host.appendChild(fieldRow(field, list)));
+                return;
+            }
+            setHomePref(careerPrefKey(), open[0]);
+            const sections = Setup.StudyCareers.sections(open[1]);
+            for (const [key, list] of sections) {
+                const heading = key === 'interviews' ? t('study.setup.careerInterviews', 'Job interviews')
+                    : key === '' ? null : Setup.specializationName(list[0], language()) || key;
+                if (heading && sections.length > 1) host.appendChild(el('p', 'ft-setup-h2', heading));
+                list.forEach(pack => host.appendChild(pickRow(pack)));
+            }
+        }
+
+        /** A field on paper: its name and a few of its tracks; a click opens the field's tracks. */
+        function fieldRow(field, list) {
+            const picked = list.some(pack => s.selected.includes(pack.id));
+            const name = careerFieldName(field);
+            const names = [...new Set(list.map(pack => pack.shortName || chipLabel(pack)).filter(Boolean))].slice(0, 3).join(', ');
+            const line = t('study.setup.kindExamples', '{names} and more', { names });
+            const row = button('', `ft-setup-field${picked ? ' is-on' : ''}`, () => { s.careerField = field; s.direction = 1; render(); });
+            const words = el('span', 'ft-setup-field__words');
+            words.append(el('strong', 'ft-setup-field__name', name), el('span', 'ft-study-muted ft-setup-field__line', line));
+            const chevron = icon('chevron');
+            chevron.classList.add('ft-setup-field__chevron');
+            row.append(words, chevron);
+            row.setAttribute('aria-label', `${name}. ${line}`);
+            return row;
+        }
+
+        function careerFieldName(field) {
             const names = {
                 software: ['study.setup.interviewGroup.software', 'Computer science and software'],
+                engineering: ['study.setup.careerField.engineering', 'Engineering'],
+                science: ['study.setup.careerField.science', 'Science'],
+                health: ['study.setup.interviewGroup.health', 'Healthcare'],
                 management: ['study.setup.interviewGroup.management', 'MBA and management'],
                 law: ['study.setup.interviewGroup.law', 'Law'],
+                design: ['study.setup.careerField.design', 'Design and arts'],
                 public: ['study.setup.interviewGroup.public', 'Government and defence'],
-                health: ['study.setup.interviewGroup.health', 'Healthcare']
+                lessons: ['study.setup.careerLessons', 'Lessons for anyone']
             };
-            const [key, fallback] = names[group] || ['study.setup.interviewGroup.other', 'Other careers'];
+            const [key, fallback] = names[field] || ['study.setup.interviewGroup.other', 'Other careers'];
             return t(key, fallback);
         }
 

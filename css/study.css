@@ -300,6 +300,13 @@
 .ft-setup-pick.is-on .ft-setup-pick__name { color: var(--pk-brick, #a93e31); }
 .ft-setup-pick__check { display: grid; place-items: center; width: 28px; height: 28px; border: 2px solid var(--pk-line, #dcd1c2); border-radius: 50%; font-weight: 700; }
 .ft-setup-pick.is-on .ft-setup-pick__check { border-color: var(--pk-brick, #a93e31); background: var(--pk-brick, #a93e31); color: var(--pk-on-brick, #fffcf6); }
+/* Skills and careers (Android 8a7671cc3): one row per field; a click opens its tracks. */
+.ft-setup-field { display: flex; align-items: center; gap: 12px; width: 100%; min-height: 68px; padding: 12px 14px 14px 16px; border: 1.5px solid var(--pk-line, #dcd1c2); border-radius: 20px; background: var(--pk-paper, #fffcf6); box-shadow: 3px 3px 0 var(--pk-ledge, rgba(27, 26, 24, 0.14)); color: inherit; font: inherit; text-align: start; cursor: pointer; }
+.ft-setup-field.is-on { border-color: var(--pk-brick, #a93e31); background: var(--pk-rose, #fae8e6); }
+.ft-setup-field__words { display: flex; flex-direction: column; flex: 1; min-width: 0; gap: 3px; }
+.ft-setup-field__name { font-size: 1.06rem; }
+.ft-setup-field__line { overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+.ft-setup-field__chevron { flex: 0 0 auto; width: 20px; height: 20px; }
 .ft-setup-streams { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; margin-top: 8px; }
 .ft-setup-stream { display: flex; flex-direction: column; gap: 2px; padding: 12px 16px 16px 14px; border: 1.5px solid var(--pk-line, #dcd1c2); border-radius: 20px; background: var(--pk-paper, #fffcf6); box-shadow: 3px 3px 0 var(--pk-ledge, rgba(27, 26, 24, 0.14)); color: inherit; font: inherit; text-align: start; cursor: pointer; }
 .ft-setup-stream strong { font-family: var(--pk-font-display, inherit); font-size: 1.25rem; font-weight: 600; }
