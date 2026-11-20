@@ -24128,6 +24128,14 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (!latest) return '';
         const device = normalizeString(latest.remoteLabel) || normalizeString(entry?.deviceLabel)
             || tabViewUiText('dashboard.sync.copy.trustedDevice', 'Trusted device');
+        const status = formatNanahManagedOutboxState(latest, device);
+        // §10.3: an ack from an older child has no MAC; its state is shown but marked.
+        return status && latest.unverified === true
+            ? tabViewUiText('dashboard.sync.outbox.unverified', '{status} (unverified)', { status })
+            : status;
+    }
+
+    function formatNanahManagedOutboxState(latest, device) {
         switch (normalizeString(latest.state)) {
             case 'queued':
                 return tabViewUiText('dashboard.sync.outbox.waiting', 'Waiting for {device} to open FilterTube', { device });

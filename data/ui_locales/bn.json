@@ -3468,5 +3468,6 @@
   "dashboard.sync.label.delivery": "ডেলিভারি",
   "dashboard.sync.toast.noWayToReachDevice": "এই ডিভাইসে পৌঁছানোর কোনো উপায় এখনও নেই। ইন্টারনেট সিঙ্কের অনুমতি দিন, অথবা Internet Pickup সেট আপ করুন।",
   "dashboard.sync.toast.parentUpdateApplied": "অভিভাবক একটি আপডেট পাঠিয়েছেন",
-  "dashboard.sync.outbox.appliedExceptPacks": "{device}-এ প্রয়োগ হয়েছে, তবে যে স্টাডি প্যাকগুলো ওই ডিভাইসে এখনও নেই সেগুলো বাদে: {packs}। সেখানে FilterTube আপডেট করুন।"
+  "dashboard.sync.outbox.appliedExceptPacks": "{device}-এ প্রয়োগ হয়েছে, তবে যে স্টাডি প্যাকগুলো ওই ডিভাইসে এখনও নেই সেগুলো বাদে: {packs}। সেখানে FilterTube আপডেট করুন।",
+  "dashboard.sync.outbox.unverified": "{status} (যাচাই করা হয়নি)"
 }

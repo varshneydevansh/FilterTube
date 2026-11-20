@@ -3468,5 +3468,6 @@
   "dashboard.sync.label.delivery": "Teslimat",
   "dashboard.sync.toast.noWayToReachDevice": "Bu cihaza henüz ulaşmanın bir yolu yok. İnternet üzerinden eşitlemeye izin ver veya Internet Pickup'ı kur.",
   "dashboard.sync.toast.parentUpdateApplied": "Ebeveynin bir güncelleme gönderdi",
-  "dashboard.sync.outbox.appliedExceptPacks": "{device} cihazında uygulandı; o cihazda henüz olmayan çalışma paketleri hariç: {packs}. Orada FilterTube'u güncelle."
+  "dashboard.sync.outbox.appliedExceptPacks": "{device} cihazında uygulandı; o cihazda henüz olmayan çalışma paketleri hariç: {packs}. Orada FilterTube'u güncelle.",
+  "dashboard.sync.outbox.unverified": "{status} (doğrulanmadı)"
 }

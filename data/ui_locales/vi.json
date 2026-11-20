@@ -3466,5 +3466,6 @@
   "dashboard.sync.label.delivery": "Gửi",
   "dashboard.sync.toast.noWayToReachDevice": "Chưa có cách nào để kết nối thiết bị này. Hãy cho phép đồng bộ qua internet hoặc thiết lập Internet Pickup.",
   "dashboard.sync.toast.parentUpdateApplied": "Phụ huynh đã gửi bản cập nhật",
-  "dashboard.sync.outbox.appliedExceptPacks": "Đã áp dụng trên {device}, trừ các gói học mà thiết bị đó chưa có: {packs}. Hãy cập nhật FilterTube trên thiết bị đó."
+  "dashboard.sync.outbox.appliedExceptPacks": "Đã áp dụng trên {device}, trừ các gói học mà thiết bị đó chưa có: {packs}. Hãy cập nhật FilterTube trên thiết bị đó.",
+  "dashboard.sync.outbox.unverified": "{status} (chưa xác minh)"
 }

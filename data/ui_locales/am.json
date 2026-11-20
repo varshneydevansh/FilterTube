@@ -3468,5 +3468,6 @@
   "dashboard.sync.label.delivery": "ማድረስ",
   "dashboard.sync.toast.noWayToReachDevice": "ወደዚህ መሣሪያ የሚደርስበት መንገድ ገና የለም። የበይነመረብ ማመሳሰልን ይፍቀዱ፣ ወይም Internet Pickup ያዋቅሩ።",
   "dashboard.sync.toast.parentUpdateApplied": "ወላጅ ዝማኔ ልከዋል",
-  "dashboard.sync.outbox.appliedExceptPacks": "በ{device} ላይ ተተግብሯል፣ ያ መሣሪያ ገና የሌሉትን የጥናት ጥቅሎች ሳይጨምር፦ {packs}። እዚያ FilterTubeን ያዘምኑ።"
+  "dashboard.sync.outbox.appliedExceptPacks": "በ{device} ላይ ተተግብሯል፣ ያ መሣሪያ ገና የሌሉትን የጥናት ጥቅሎች ሳይጨምር፦ {packs}። እዚያ FilterTubeን ያዘምኑ።",
+  "dashboard.sync.outbox.unverified": "{status} (ያልተረጋገጠ)"
 }

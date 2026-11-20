@@ -8,6 +8,7 @@ const Receiver = require('../../js/managed_update_receiver.js');
 const Sync = require('../../js/managed_sync_background.js');
 const Doorbell = require('../../js/managed_doorbell.js');
 const Courier = require('../../js/managed_courier.js');
+const Auth = require('../../js/managed_seamless_auth.js');
 
 function fakeApi(store, tabs = [{ id: 1, url: 'https://www.youtube.com/watch?v=abc', active: true }], session = null) {
     const changed = [];
@@ -74,10 +75,11 @@ test('Send → ring → announce → courier → applied on the child and "appli
             ftNanahDeviceId: 'parent-device',
             ftInternetSyncConsentV1: { accepted: true },
             ftNanahTrustedLinks: [{ linkId: child.link.linkId, remoteDeviceId: 'child-device', deviceLabel: 'Kid tablet', linkType: 'managed_link',
-                localRole: 'source', remoteRole: 'replica', policy: { targetProfileBehavior: 'fixed_profile', targetProfileId: 'Child' } }]
+                localRole: 'source', remoteRole: 'replica', mailboxWrappingKeyBase64Url: child.link.mailboxWrappingKeyBase64Url,
+                policy: { targetProfileBehavior: 'fixed_profile', targetProfileId: 'Child' } }]
         };
         const childReceiver = { ...Receiver, create: options => Receiver.create({ ...options, adapter: child.adapter, openSync: child.box.FilterTubeNanahManagedOpenSync }) };
-        const common = { isTrustedUiSender: () => true, Doorbell, Courier };
+        const common = { isTrustedUiSender: () => true, Doorbell, Courier, Auth };
         const childSync = Sync.install({ api: fakeApi(child.store), Receiver: childReceiver, ...common, getSelfControlSession: async () => null });
         const parentSync = Sync.install({ api: fakeApi(parentStore), Receiver, ...common });
         await Promise.all([childSync.ready, parentSync.ready]);
@@ -91,6 +93,10 @@ test('Send → ring → announce → courier → applied on the child and "appli
 
         await until(() => parentStore.ftManagedOutboxV1.entries[0].state !== 'queued');
         assert.equal(parentStore.ftManagedOutboxV1.entries[0].state, 'applied');
+        assert.equal(parentStore.ftManagedOutboxV1.entries[0].unverified, false, 'the ack carried a valid link MAC (§10)');
+        const announce = relay.frames.find(frame => frame.payload?.type === 'ft_update_announce').payload;
+        assert.equal(announce.auth.v, 1);
+        assert.ok(announce.auth.macs[child.link.linkId]);
         assert.deepEqual(child.store.ftProfilesV4.profiles.Child.main.keywords.map(entry => entry.word), ['creepy doll']);
         assert.equal(child.store.ftManagedUpdateNotice.activeChanged, true);
         const kinds = relay.frames.filter(frame => frame.type === 'signal').map(frame => frame.payload?.type);
@@ -171,4 +177,27 @@ test('the Internet Pickup token is read from session storage, never left in stor
     assert.equal((await fromSession.handleMessage({ action: 'FilterTube_ManagedPickupNow' }, trusted)).ok, true);
     assert.equal(JSON.stringify(child.store).includes('secret-token'), false);
     fromLocal.dispose(); fromSession.dispose();
+});
+
+test('§10: a forged announce for a real link gets no courier; a forged ack never marks Applied', async () => {
+    const relay = fakeRelay();
+    globalThis.WebSocket = relay.WebSocketImpl;
+    try {
+        const parentStore = { ftNanahDeviceId: 'parent-device', ftInternetSyncConsentV1: { accepted: true },
+            ftNanahTrustedLinks: [{ linkId: 'L1', remoteDeviceId: 'child-device', linkType: 'managed_link', localRole: 'source', remoteRole: 'replica',
+                mailboxWrappingKeyBase64Url: Buffer.alloc(32, 3).toString('base64url'), policy: {} }],
+            ftManagedOutboxV1: { version: 1, entries: [{ entryId: 'm1', linkId: 'L1', remoteDeviceId: 'child-device', scope: 'keywords', state: 'queued',
+                createdAt: Date.now(), expiresAt: Date.now() + 1e9, stateAt: Date.now(), item: { schema: 'filtertube_managed_mailbox_item', mailboxItemId: 'm1', ciphertext: 'x' } }] } };
+        const parentSync = Sync.install({ api: fakeApi(parentStore), Receiver, Doorbell, Courier, Auth, isTrustedUiSender: () => true });
+        await parentSync.ready;
+        await until(() => relay.byCode.size === 1);
+        const forged = { ...Doorbell.announceMessage('child-device', ['L1']), auth: { v: 1, ts: Date.now(), macs: { L1: 'AAAA' } } };
+        const result = await Doorbell.call({ remoteDeviceId: 'parent-device', fromDeviceId: 'child-device', WebSocketImpl: relay.WebSocketImpl, timeoutMs: 800,
+            converse: async ({ send, next }) => { send(forged); return { ok: true, answer: await Promise.race([next(), new Promise(r => setTimeout(() => r(null), 400))]) }; } });
+        assert.notEqual(result.answer?.type, 'ft_update_announce_answer', 'no courier code for a bad MAC');
+        assert.equal(parentStore.ftManagedOutboxV1.entries[0].state, 'queued');
+        parentSync.dispose();
+    } finally {
+        delete globalThis.WebSocket;
+    }
 });

@@ -3466,5 +3466,6 @@
   "dashboard.sync.label.delivery": "送遞",
   "dashboard.sync.toast.noWayToReachDevice": "暫時未有方法聯絡呢部裝置。請允許經互聯網同步，或者設定 Internet Pickup。",
   "dashboard.sync.toast.parentUpdateApplied": "家長傳咗更新",
-  "dashboard.sync.outbox.appliedExceptPacks": "已經喺 {device} 套用，但嗰部裝置仲未有呢啲溫習包：{packs}。請喺嗰度更新 FilterTube。"
+  "dashboard.sync.outbox.appliedExceptPacks": "已經喺 {device} 套用，但嗰部裝置仲未有呢啲溫習包：{packs}。請喺嗰度更新 FilterTube。",
+  "dashboard.sync.outbox.unverified": "{status}（未核實）"
 }

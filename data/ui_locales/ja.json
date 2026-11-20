@@ -3466,5 +3466,6 @@
   "dashboard.sync.label.delivery": "配信",
   "dashboard.sync.toast.noWayToReachDevice": "このデバイスにはまだ届けられません。インターネット同期を許可するか、Internet Pickup を設定してください。",
   "dashboard.sync.toast.parentUpdateApplied": "保護者が更新を送りました",
-  "dashboard.sync.outbox.appliedExceptPacks": "{device} に適用しました。ただし、そのデバイスにまだない学習パックを除きます：{packs}。そちらの FilterTube を更新してください。"
+  "dashboard.sync.outbox.appliedExceptPacks": "{device} に適用しました。ただし、そのデバイスにまだない学習パックを除きます：{packs}。そちらの FilterTube を更新してください。",
+  "dashboard.sync.outbox.unverified": "{status}（未確認）"
 }

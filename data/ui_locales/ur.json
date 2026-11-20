@@ -3468,5 +3468,6 @@
   "dashboard.sync.label.delivery": "ترسیل",
   "dashboard.sync.toast.noWayToReachDevice": "ابھی اس ڈیوائس تک پہنچنے کا کوئی راستہ نہیں۔ انٹرنیٹ سنک کی اجازت دیں، یا Internet Pickup سیٹ اپ کریں۔",
   "dashboard.sync.toast.parentUpdateApplied": "والدین نے اپ ڈیٹ بھیجی",
-  "dashboard.sync.outbox.appliedExceptPacks": "{device} پر لاگو ہو گیا، سوائے ان اسٹڈی پیکس کے جو اس ڈیوائس پر ابھی نہیں ہیں: {packs}۔ وہاں FilterTube اپ ڈیٹ کریں۔"
+  "dashboard.sync.outbox.appliedExceptPacks": "{device} پر لاگو ہو گیا، سوائے ان اسٹڈی پیکس کے جو اس ڈیوائس پر ابھی نہیں ہیں: {packs}۔ وہاں FilterTube اپ ڈیٹ کریں۔",
+  "dashboard.sync.outbox.unverified": "{status} (غیر تصدیق شدہ)"
 }

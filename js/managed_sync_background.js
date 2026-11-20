@@ -92,20 +92,25 @@
         return '';
     }
 
-    /** Applies acks that came from `fromDeviceId`; an ack for another device's entry is ignored. */
-    function applyAcks(outbox, acks, fromDeviceId, linkDevice, nowMs) {
+    /**
+     * Applies acks that came from `fromDeviceId`; an ack for another device's entry is ignored, and so
+     * is one for an entry already past `delivered` (a replay can't move it twice, spec §10.3).
+     * `unverified` holds the mailboxItemIds whose ack had no MAC (an older child).
+     */
+    function applyAcks(outbox, acks, fromDeviceId, linkDevice, nowMs, unverified = new Set()) {
         const byId = new Map(arr(acks).map(obj).filter(row => str(row.mailboxItemId)).map(row => [str(row.mailboxItemId), row]));
         let changed = 0;
         const entries = readOutbox(outbox).entries.map(entry => {
             const ack = byId.get(entry.entryId);
-            if (!ack || entry.state !== 'queued' || str(ack.linkId) !== entry.linkId) return entry;
+            if (!ack || !['queued', 'delivered'].includes(entry.state) || str(ack.linkId) !== entry.linkId) return entry;
             if (linkDevice(entry.linkId) !== str(fromDeviceId)) return entry;
             const state = stateFromAck(ack);
-            if (!state) return entry;
+            if (!state || state === entry.state) return entry;
             changed += 1;
             const unresolved = arr(ack.unresolvedPackIds).map(str).filter(id => /^[A-Za-z0-9_.-]{1,64}$/.test(id)).slice(0, 64);
             return { ...entry, state, stateAt: nowMs, reason: state === 'rejected' || state === 'expired' ? (str(ack.reason).slice(0, 80) || state) : null,
-                ...(unresolved.length && (state === 'applied' || state === 'delivered') ? { unresolvedPackIds: unresolved } : {}) };
+                ...(unresolved.length && (state === 'applied' || state === 'delivered') ? { unresolvedPackIds: unresolved } : {}),
+                unverified: unverified.has(entry.entryId) };
         });
         return { outbox: { version: 1, entries }, changed };
     }
@@ -152,7 +157,8 @@
 
     function install({ api, promiseApi = false, isTrustedUiSender, getSelfControlSession = null, now = () => Date.now(),
         Receiver = root.FilterTubeManagedUpdateReceiver, Doorbell = root.FilterTubeManagedDoorbell,
-        Courier = root.FilterTubeManagedCourier, MailboxClient = root.FilterTubeManagedMailboxClient } = {}) {
+        Courier = root.FilterTubeManagedCourier, MailboxClient = root.FilterTubeManagedMailboxClient,
+        Auth = root.FilterTubeManagedSeamlessAuth } = {}) {
         if (!api?.storage?.local || !Receiver || !Doorbell) return null;
         const call = (target, method, ...args) => (promiseApi
             ? Promise.resolve().then(() => target[method](...args))
@@ -256,9 +262,17 @@
             return typeof root.RTCPeerConnection === 'function' && !!Courier && !!root.FilterTubeNanah;
         }
 
+        function rawLinkFor(ctx, linkId) {
+            return ctx.rawLinks.find(raw => Receiver.projectTrustedLink(raw)?.linkId === str(linkId)) || null;
+        }
+
         async function applyCourierItems(items) {
             const result = await serialApply(() => receiver.runPickup({ reason: 'courier', courierItems: arr(items), selfControlActive }));
-            return arr(result?.acks);
+            const acks = arr(result?.acks);
+            if (!Auth) return acks;
+            // §10.2: each ack is MACed with its own link's key, so a stranger can't forge "Applied".
+            const ctx = await context();
+            return Promise.all(acks.map(ack => Auth.signAck(ack, rawLinkFor(ctx, ack.linkId)).catch(() => ack)));
         }
 
         /** Runs a courier job here (Firefox) or in an extension page; resolves with its result. */
@@ -317,7 +331,8 @@
                 fromDeviceId: ctx.deviceId,
                 timeoutMs: ANSWER_WAIT_MS + 5000,
                 converse: async ({ send, next }) => {
-                    send(Doorbell.announceMessage(ctx.deviceId, linkIds));
+                    const message = Doorbell.announceMessage(ctx.deviceId, linkIds);
+                    send(Auth ? await Auth.signAnnounce(message, id => rawLinkFor(ctx, id), now()).catch(() => message) : message);
                     const timeout = new Promise(resolve => setTimeout(() => resolve(null), ANSWER_WAIT_MS));
                     for (;;) {
                         const payload = await Promise.race([next(), timeout]);
@@ -396,9 +411,16 @@
             const announce = Doorbell.parseUpdateCall(payload, Doorbell.ANNOUNCE);
             if (!announce) return;
             // §2.2: usable source links to that same child device.
-            const kept = announce.linkIds.filter(id => ctx.parentLinks
+            let kept = announce.linkIds.filter(id => ctx.parentLinks
                 .some(link => link.linkId === id && str(link.remoteDeviceId) === announce.fromDeviceId));
             if (!kept.length) return;
+            // §10.3: an announce with a MAC must verify for a link to count; none verifying means no
+            // answer. One without `auth` (an older child) is still accepted in this version.
+            if (Auth) {
+                const check = await Auth.verifyAnnounce({ ...payload, linkIds: kept }, id => rawLinkFor(ctx, id), now());
+                if (check.status === 'bad') return;
+                if (check.status === 'ok') kept = check.linkIds;
+            }
             const outbox = pruneOutbox((await get([OUTBOX_KEY]))[OUTBOX_KEY], now());
             const queued = outbox.entries.filter(entry => entry.state === 'queued' && kept.includes(entry.linkId)).slice(0, 16);
             if (!queued.length) { reply(Doorbell.announceAnswer('', 0)); return; }
@@ -414,7 +436,16 @@
             if (!answered) answer();
             if (result?.ok) {
                 const linkDevice = id => str(ctx.parentLinks.find(link => link.linkId === id)?.remoteDeviceId);
-                await mutateOutbox(box => applyAcks(box, result.acks, announce.fromDeviceId, linkDevice, now()));
+                // §10.3: a wrong MAC is ignored; no MAC (an older child) applies but stays "unverified".
+                const accepted = [];
+                const unverified = new Set();
+                for (const ack of arr(result.acks)) {
+                    const verdict = Auth ? await Auth.verifyAck(ack, rawLinkFor(ctx, ack.linkId), now()).catch(() => 'bad') : 'unverified';
+                    if (verdict === 'bad') continue;
+                    if (verdict === 'unverified') unverified.add(str(ack.mailboxItemId));
+                    accepted.push(ack);
+                }
+                await mutateOutbox(box => applyAcks(box, accepted, announce.fromDeviceId, linkDevice, now(), unverified));
             }
         }
 

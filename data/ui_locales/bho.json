@@ -3468,5 +3468,6 @@
   "dashboard.sync.label.delivery": "डिलीवरी",
   "dashboard.sync.toast.noWayToReachDevice": "एह डिवाइस तक पहुँचे के अबहीं कवनो रास्ता नइखे। इंटरनेट सिंक के अनुमति दीं, भा Internet Pickup सेट करीं।",
   "dashboard.sync.toast.parentUpdateApplied": "अभिभावक अपडेट भेजले बाड़ें",
-  "dashboard.sync.outbox.appliedExceptPacks": "{device} पर लागू हो गइल, ओह डिवाइस पर अबहीं ना होखे वाला स्टडी पैक छोड़ के: {packs}। उहाँ FilterTube अपडेट करीं।"
+  "dashboard.sync.outbox.appliedExceptPacks": "{device} पर लागू हो गइल, ओह डिवाइस पर अबहीं ना होखे वाला स्टडी पैक छोड़ के: {packs}। उहाँ FilterTube अपडेट करीं।",
+  "dashboard.sync.outbox.unverified": "{status} (पुष्टि ना भइल)"
 }

@@ -3468,5 +3468,6 @@
   "dashboard.sync.label.delivery": "Uwasilishaji",
   "dashboard.sync.toast.noWayToReachDevice": "Bado hakuna njia ya kufikia kifaa hiki. Ruhusu usawazishaji kupitia intaneti, au weka Internet Pickup.",
   "dashboard.sync.toast.parentUpdateApplied": "Mzazi ametuma sasisho",
-  "dashboard.sync.outbox.appliedExceptPacks": "Imetumika kwenye {device}, isipokuwa vifurushi vya masomo ambavyo kifaa hicho bado hakina: {packs}. Sasisha FilterTube huko."
+  "dashboard.sync.outbox.appliedExceptPacks": "Imetumika kwenye {device}, isipokuwa vifurushi vya masomo ambavyo kifaa hicho bado hakina: {packs}. Sasisha FilterTube huko.",
+  "dashboard.sync.outbox.unverified": "{status} (haijathibitishwa)"
 }

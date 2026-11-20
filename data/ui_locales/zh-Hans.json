@@ -3466,5 +3466,6 @@
   "dashboard.sync.label.delivery": "送达",
   "dashboard.sync.toast.noWayToReachDevice": "暂时无法连接到这台设备。请允许通过互联网同步，或设置 Internet Pickup。",
   "dashboard.sync.toast.parentUpdateApplied": "家长发送了更新",
-  "dashboard.sync.outbox.appliedExceptPacks": "已在 {device} 上应用，但该设备还没有这些学习包：{packs}。请在该设备上更新 FilterTube。"
+  "dashboard.sync.outbox.appliedExceptPacks": "已在 {device} 上应用，但该设备还没有这些学习包：{packs}。请在该设备上更新 FilterTube。",
+  "dashboard.sync.outbox.unverified": "{status}（未验证）"
 }

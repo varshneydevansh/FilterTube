@@ -1359,7 +1359,7 @@ catch (_) { /* Wakeup failure cannot interfere with filtering. */ }
 try {
     if (typeof importScripts === 'function' && !globalThis.FilterTubeManagedSyncBackground) {
         importScripts('io_manager.js', 'nanah_sync_adapter.js', 'nanah_managed_open_sync.js', 'nanah_managed_mailbox_client.js',
-            'managed_action_history.js', 'managed_update_receiver.js', 'managed_doorbell.js', 'managed_courier.js', 'managed_sync_background.js');
+            'managed_action_history.js', 'managed_seamless_auth.js', 'managed_update_receiver.js', 'managed_doorbell.js', 'managed_courier.js', 'managed_sync_background.js');
     }
     globalThis.FilterTubeManagedSyncBackground?.install({
         api: browserAPI,
