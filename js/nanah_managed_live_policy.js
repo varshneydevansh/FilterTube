@@ -74,16 +74,48 @@
             'breakMode', 'progress', 'weekView', 'packCopies', 'packChannelsOnly'];
         const STUDY_RESERVED_EXTRA_KEYS = { timetable: 'schedule' };
 
+        // §9.4: the sender keeps within the receiver's limits, so an item is never refused for them.
+        const STUDY_PACK_ID = /^[A-Za-z0-9_.-]{1,64}$/;
+        const STUDY_MAX_PACKS = 64;
+        const STUDY_MAX_EXTRA_KEYS = 32;
+        const STUDY_FORBIDDEN_KEYS = ['__proto__', 'prototype', 'constructor'];
+
+        function studyPlainObject(value) {
+            return !!value && typeof value === 'object' && !Array.isArray(value);
+        }
+
+        function sendableStudyFields(study) {
+            const dropped = [];
+            const activePackIds = [];
+            for (const id of safeArray(study.activePackIds)) {
+                const value = typeof id === 'string' ? id.trim() : '';
+                if (STUDY_PACK_ID.test(value) && !activePackIds.includes(value) && activePackIds.length < STUDY_MAX_PACKS) activePackIds.push(value);
+                else dropped.push('activePackIds');
+            }
+            const packCopies = {};
+            for (const [id, copy] of Object.entries(safeObject(study.packCopies))) {
+                if (STUDY_PACK_ID.test(id) && studyPlainObject(copy) && Object.keys(packCopies).length < STUDY_MAX_PACKS) packCopies[id] = copy;
+                else dropped.push('packCopies.' + id);
+            }
+            const extra = {};
+            for (const key of Object.keys(study).sort()) {
+                if (STUDY_KNOWN_KEYS.includes(key) || Object.prototype.hasOwnProperty.call(STUDY_RESERVED_EXTRA_KEYS, key)) continue;
+                if (STUDY_FORBIDDEN_KEYS.includes(key) || Object.keys(extra).length >= STUDY_MAX_EXTRA_KEYS) { dropped.push(key); continue; }
+                extra[key] = study[key];
+            }
+            if (dropped.length && typeof console !== 'undefined') {
+                console.warn('FilterTube study payload left out (names only): ' + Array.from(new Set(dropped)).join(','));
+            }
+            return { activePackIds, packCopies, extra };
+        }
+
         function buildStudyPayload(scope, profile) {
             const study = safeObject(safeObject(profile).study);
             if (scope === 'study') {
-                const extra = {};
-                for (const [key, value] of Object.entries(study)) {
-                    if (!STUDY_KNOWN_KEYS.includes(key) && !Object.prototype.hasOwnProperty.call(STUDY_RESERVED_EXTRA_KEYS, key)) extra[key] = value;
-                }
-                return { scope, replace: true, activePackIds: safeArray(study.activePackIds), packEdits: safeObject(study.packEdits),
+                const { activePackIds, packCopies, extra } = sendableStudyFields(study);
+                return { scope, replace: true, activePackIds, packEdits: safeObject(study.packEdits),
                     focus: safeObject(study.focus), weekView: typeof study.weekView === 'boolean' ? study.weekView : null,
-                    packCopies: safeObject(study.packCopies),
+                    packCopies,
                     packChannelsOnly: typeof study.packChannelsOnly === 'boolean' ? study.packChannelsOnly : null,
                     extra };
             }

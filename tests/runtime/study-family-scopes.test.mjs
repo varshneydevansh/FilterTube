@@ -291,3 +291,14 @@ test('a parent\'s lock during a Self-Control session waits unwritten and unackno
   assert.equal(r.study().lock.sessionId, 'exam-week');
   assert.equal(r.study().lock.setByParentId, 'parent-profile-1');
 });
+
+test('§9.4: the sender stays within the receiver\'s limits (pack ids, copies, 32 sorted extra keys)', async () => {
+  const many = Object.fromEntries(Array.from({ length: 40 }, (_, i) => [`k${String(i).padStart(2, '0')}`, i]));
+  const study = { ...parentStudy(), ...many, activePackIds: ['in_upsc_cse', 'in_upsc_cse', 'bad id!'],
+    packCopies: { ok_pack: { channels: [] }, 'bad id': {}, listy: [] } };
+  const envelopes = plain(await sender({ live: ['sync.receive', 'filtertube.study.v1'], study }).helper.buildEnvelopeBatchForLiveSend({ scope: 'active' }));
+  const payload = envelopes.find(e => e.scope === 'study').payload;
+  assert.deepEqual(payload.activePackIds, ['in_upsc_cse']);
+  assert.deepEqual(Object.keys(payload.packCopies), ['ok_pack']);
+  assert.deepEqual(Object.keys(payload.extra), Object.keys(many).sort().slice(0, 32));
+});
