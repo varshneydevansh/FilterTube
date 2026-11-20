@@ -31259,6 +31259,8074 @@
    ]
   },
   {
+   "id": "deg_physics",
+   "kind": "degree",
+   "name": {
+    "en": "Physics degree (BSc/MSc)"
+   },
+   "shortName": "Physics",
+   "group": "science",
+   "specialization": {
+    "en": "Physics"
+   },
+   "languages": [
+    "en",
+    "hi",
+    "bn",
+    "id",
+    "ar"
+   ],
+   "subjects": [
+    "Classical mechanics",
+    "Electromagnetism",
+    "Quantum mechanics",
+    "Thermal & statistical physics",
+    "Mathematical physics",
+    "Condensed matter",
+    "Nuclear & particle physics"
+   ],
+   "keywords": [
+    "BSc physics",
+    "MSc physics",
+    "university physics",
+    "classical mechanics",
+    "Lagrangian",
+    "electromagnetism",
+    "Maxwell equations",
+    "quantum mechanics",
+    "perturbation theory",
+    "statistical mechanics",
+    "thermodynamics",
+    "mathematical physics",
+    "Green's function",
+    "solid state physics",
+    "nuclear physics",
+    "special relativity",
+    "optics",
+    "IIT JAM physics",
+    "CSIR NET physical science",
+    "GATE physics",
+    "fisika dasar",
+    "física universitaria",
+    "পদার্থবিজ্ঞান",
+    "فيزياء جامعية"
+   ],
+   "blockedWords": [
+    "vlog",
+    "reaction",
+    "result live",
+    "admit card",
+    "exam date out",
+    "job alert",
+    "salary",
+    "motivation shorts"
+   ],
+   "chips": [
+    "Classical mechanics",
+    "Electromagnetism",
+    "Quantum mechanics",
+    "Thermodynamics",
+    "Statistical mechanics",
+    "Optics & waves",
+    "Mathematical physics",
+    "Solid state",
+    "Nuclear & particle",
+    "Electronics"
+   ],
+   "channels": [
+    {
+     "channelId": "UCEBb1b_L6zDS3xTUrIALZOw",
+     "handle": "@mitocw",
+     "name": "MIT OpenCourseWare",
+     "language": "en",
+     "country": "global"
+    },
+    {
+     "channelId": "UCiEHVhv0SBMpP75JbzJShqw",
+     "handle": "@lecturesbywalterlewin.they9259",
+     "name": "Lectures by Walter Lewin. They will make you ♥ Physics.",
+     "language": "en",
+     "country": "global"
+    },
+    {
+     "channelId": "UC4a-Gbdw7vOaccHmFo40b9g",
+     "handle": "@khanacademy",
+     "name": "Khan Academy",
+     "language": "en",
+     "country": "global"
+    },
+    {
+     "channelId": "UC640y4UvDAlya_WOj5U4pfA",
+     "handle": "@iit",
+     "name": "nptelhrd",
+     "language": "en",
+     "country": "IN"
+    },
+    {
+     "channelId": "UCOfLm6gZGt3vwTMKRg-irhg",
+     "handle": "@FortheLoveofPhysics",
+     "name": "For the Love of Physics",
+     "language": "en",
+     "country": "IN"
+    },
+    {
+     "channelId": "UCYqACVYl0c0BhlVN6X2HIMg",
+     "handle": "@FlippingPhysics",
+     "name": "Flipping Physics",
+     "language": "en",
+     "country": "US"
+    },
+    {
+     "channelId": "UCuj28Zll58sztDqLiDhzgtQ",
+     "handle": "@pwiit-jam",
+     "name": "PW IIT JAM & CUET PG",
+     "language": "hi",
+     "country": "IN"
+    },
+    {
+     "channelId": "UCenCWn-cADj_vEhWTh-HhAQ",
+     "handle": "@potentialg",
+     "name": "PotentialG - CSIR NET | GATE | TIFR PHYSICS",
+     "language": "hi",
+     "country": "IN"
+    },
+    {
+     "channelId": "UCFci2ISqqo_r5iE5DpmcymA",
+     "handle": "@PravegaaEducation",
+     "name": "Pravegaa Education",
+     "language": "hi",
+     "country": "IN"
+    },
+    {
+     "channelId": "UCV7fnu0vgU9qlGA_tJOtSYQ",
+     "handle": "@D_PHYSICS",
+     "name": "D PHYSICS - CSIR NET, GATE & JEST",
+     "language": "hi",
+     "country": "IN"
+    },
+    {
+     "channelId": "UCz8-QUn4Uyjn08wUtQ8YbVw",
+     "handle": "@physicsstudybd4243",
+     "name": "Physics Study BD",
+     "language": "bn",
+     "country": "BD"
+    },
+    {
+     "channelId": "UCvtQnUgLelzZ2Roo97Uk2LA",
+     "handle": "@Berfisikacom",
+     "name": "Berfisika. com",
+     "language": "id",
+     "country": "ID"
+    },
+    {
+     "channelId": "UC5LgWBptLy5Y2vhYIWmLz0g",
+     "handle": "@Alkhaldi.physicstube",
+     "name": "فيزياء تيوب Physics Tube",
+     "language": "ar",
+     "country": "SA"
+    }
+   ]
+  },
+  {
+   "id": "deg_chemistry",
+   "kind": "degree",
+   "name": {
+    "en": "Chemistry degree (BSc/MSc)"
+   },
+   "shortName": "Chemistry",
+   "group": "science",
+   "specialization": {
+    "en": "Chemistry"
+   },
+   "languages": [
+    "en",
+    "hi",
+    "es",
+    "pt",
+    "id"
+   ],
+   "subjects": [
+    "Organic chemistry",
+    "Inorganic chemistry",
+    "Physical chemistry",
+    "Analytical chemistry",
+    "Spectroscopy"
+   ],
+   "keywords": [
+    "BSc chemistry",
+    "MSc chemistry",
+    "organic chemistry",
+    "reaction mechanism",
+    "stereochemistry",
+    "chirality",
+    "inorganic chemistry",
+    "coordination compounds",
+    "physical chemistry",
+    "chemical kinetics",
+    "spectroscopy",
+    "NMR",
+    "chromatography",
+    "HPLC",
+    "quantum chemistry",
+    "CSIR NET chemical science",
+    "IIT JAM chemistry",
+    "GATE chemistry",
+    "química orgánica",
+    "química graduação",
+    "kimia organik",
+    "aromaticity"
+   ],
+   "blockedWords": [
+    "vlog",
+    "reaction",
+    "result live",
+    "admit card",
+    "exam date out",
+    "job alert",
+    "salary",
+    "motivation shorts"
+   ],
+   "chips": [
+    "Organic chemistry",
+    "Inorganic chemistry",
+    "Physical chemistry",
+    "Analytical chemistry",
+    "Spectroscopy",
+    "Reaction mechanisms",
+    "Quantum chemistry",
+    "Biochemistry",
+    "Thermodynamics",
+    "Lab techniques"
+   ],
+   "channels": [
+    {
+     "channelId": "UCEWpbFLzoYGPfuWUMFPSaoA",
+     "handle": "@TheOrganicChemistryTutor",
+     "name": "The Organic Chemistry Tutor",
+     "language": "en",
+     "country": "global"
+    },
+    {
+     "channelId": "UCEBb1b_L6zDS3xTUrIALZOw",
+     "handle": "@mitocw",
+     "name": "MIT OpenCourseWare",
+     "language": "en",
+     "country": "global"
+    },
+    {
+     "channelId": "UC4a-Gbdw7vOaccHmFo40b9g",
+     "handle": "@khanacademy",
+     "name": "Khan Academy",
+     "language": "en",
+     "country": "global"
+    },
+    {
+     "channelId": "UCAkdabTbEpxD7pr7TJlRZIw",
+     "handle": "@MasterOrganicChem",
+     "name": "Master Organic Chemistry",
+     "language": "en",
+     "country": "US"
+    },
+    {
+     "channelId": "UCpUkAZfpeUBMmA_zAAERyZw",
+     "handle": "@chemistryunleashed4348",
+     "name": "Chemistry Unleashed",
+     "language": "en",
+     "country": "US"
+    },
+    {
+     "channelId": "UCrMG-MUxA3Ku3U8UymxyBeQ",
+     "handle": "@csirnet_gate_set_chemistry",
+     "name": "Chemistry - CSIR NET, GATE \\u0026 SET: IFAS",
+     "language": "hi",
+     "country": "IN"
+    },
+    {
+     "channelId": "UClRPR4RDy-go2SbfZ8odFGA",
+     "handle": "@JChemistry",
+     "name": "J Chemistry",
+     "language": "hi",
+     "country": "IN"
+    },
+    {
+     "channelId": "UCZ7bxZhScgUDWBElCK0NmUQ",
+     "handle": "@MadChemClasses",
+     "name": "MadChem Classes",
+     "language": "hi",
+     "country": "IN"
+    },
+    {
+     "channelId": "UCYULiGF81EDY2let8qY-tRQ",
+     "handle": "@Dr_Deependra_Kumar_Sharma",
+     "name": "CHEMISTRY By D SHARMA",
+     "language": "hi",
+     "country": "IN"
+    },
+    {
+     "channelId": "UCLmQNvIUQ-sWRwjiF5pjgxQ",
+     "handle": "@kifayatchemistrylectures",
+     "name": "Kifayat Chemistry Lectures",
+     "language": "ur",
+     "country": "PK"
+    },
+    {
+     "channelId": "UC_RiUaA2326jO9XozAA4q2g",
+     "handle": "@quimica-organica",
+     "name": "QUÍMICA ORGÁNICA",
+     "language": "es",
+     "country": "ES"
+    },
+    {
+     "channelId": "UCHyeOQ0-Td0Dv3xfI0dwu3g",
+     "handle": "@UniversidadedaQuímica",
+     "name": "Universidade da Química",
+     "language": "pt",
+     "country": "BR"
+    },
+    {
+     "channelId": "UCx5Pce-pXPOXPh8h2g4Muuw",
+     "handle": "@KimiaOrganikIPB",
+     "name": "Kimia Organik IPB",
+     "language": "id",
+     "country": "ID"
+    }
+   ]
+  },
+  {
+   "id": "deg_biology",
+   "kind": "degree",
+   "name": {
+    "en": "Biology & life sciences degree"
+   },
+   "shortName": "Biology",
+   "group": "science",
+   "specialization": {
+    "en": "Biology"
+   },
+   "languages": [
+    "en",
+    "hi",
+    "es",
+    "pt"
+   ],
+   "subjects": [
+    "Cell & molecular biology",
+    "Genetics",
+    "Biochemistry",
+    "Microbiology",
+    "Botany & zoology"
+   ],
+   "keywords": [
+    "BSc biology",
+    "life sciences",
+    "cell biology",
+    "molecular biology",
+    "genetics",
+    "biochemistry",
+    "DNA replication",
+    "gene expression",
+    "microbiology",
+    "immunology",
+    "developmental biology",
+    "ecology",
+    "evolution",
+    "botany",
+    "zoology",
+    "bioinformatics",
+    "CSIR NET life science",
+    "biología celular",
+    "biología molecular",
+    "histología",
+    "microbiologia",
+    "antigens antibodies"
+   ],
+   "blockedWords": [
+    "vlog",
+    "reaction",
+    "result live",
+    "admit card",
+    "exam date out",
+    "job alert",
+    "salary",
+    "motivation shorts"
+   ],
+   "chips": [
+    "Cell biology",
+    "Molecular biology",
+    "Genetics",
+    "Biochemistry",
+    "Microbiology",
+    "Immunology",
+    "Ecology",
+    "Developmental biology",
+    "Botany",
+    "Zoology"
+   ],
+   "channels": [
+    {
+     "channelId": "UCEBb1b_L6zDS3xTUrIALZOw",
+     "handle": "@mitocw",
+     "name": "MIT OpenCourseWare",
+     "language": "en",
+     "country": "global"
+    },
+    {
+     "channelId": "UC4a-Gbdw7vOaccHmFo40b9g",
+     "handle": "@khanacademy",
+     "name": "Khan Academy",
+     "language": "en",
+     "country": "global"
+    },
+    {
+     "channelId": "UCEPMCywJ6FPZpQ_aPEZt5JA",
+     "handle": "@shomusbiologyofficial",
+     "name": "Shomu's Biology",
+     "language": "en",
+     "country": "global"
+    },
+    {
+     "channelId": "UCTN-fCATY79l4QiJQ7rT0wA",
+     "handle": "@csirnet_gate_set_lifescience",
+     "name": "IFAS LIFE SCIENCES \\u0026 BIO-TECHNOLOGY - CSIR DBT NET",
+     "language": "hi",
+     "country": "IN"
+    },
+    {
+     "channelId": "UCZx2_rdVeWypKs14GmQsL0w",
+     "handle": "@SRBScCLASSES",
+     "name": "SUMIT RANA B.Sc. CLASSES",
+     "language": "hi",
+     "country": "IN"
+    },
+    {
+     "channelId": "UCkX4NsL6tNJvNTTpfkHmMxA",
+     "handle": "@biologiaygenetica1ua701",
+     "name": "Biología Molecular y Genética FMED - UBA",
+     "language": "es",
+     "country": "AR"
+    },
+    {
+     "channelId": "UCzvy0n6utM4fTVakdTT9adg",
+     "handle": "@departamentodebiologiacelu9190",
+     "name": "DEPARTAMENTO DE BIOLOGIA CELULAR Y TISULAR",
+     "language": "es",
+     "country": "MX"
+    },
+    {
+     "channelId": "UCquyhzSquGEayfmyxi03_1w",
+     "handle": "@microrganismos",
+     "name": "ALEXANDRE LOURENÇO",
+     "language": "pt",
+     "country": "BR"
+    }
+   ]
+  },
+  {
+   "id": "deg_maths",
+   "kind": "degree",
+   "name": {
+    "en": "Mathematics degree (BSc/MSc)"
+   },
+   "shortName": "Maths",
+   "group": "science",
+   "specialization": {
+    "en": "Mathematics"
+   },
+   "languages": [
+    "en",
+    "hi",
+    "es",
+    "pt",
+    "id",
+    "fil"
+   ],
+   "subjects": [
+    "Calculus",
+    "Linear algebra",
+    "Analysis",
+    "Algebra",
+    "Differential equations"
+   ],
+   "keywords": [
+    "BSc mathematics",
+    "MSc mathematics",
+    "calculus",
+    "limits",
+    "derivatives",
+    "integrals",
+    "linear algebra",
+    "real analysis",
+    "metric space",
+    "group theory",
+    "ring theory",
+    "complex analysis",
+    "differential equations",
+    "PDE",
+    "topology",
+    "IIT JAM mathematics",
+    "CSIR NET mathematics",
+    "cálculo",
+    "cálculo 1",
+    "kalkulus",
+    "Euler's method",
+    "proof"
+   ],
+   "blockedWords": [
+    "vlog",
+    "reaction",
+    "result live",
+    "admit card",
+    "exam date out",
+    "job alert",
+    "salary",
+    "motivation shorts"
+   ],
+   "chips": [
+    "Calculus",
+    "Linear algebra",
+    "Real analysis",
+    "Abstract algebra",
+    "Complex analysis",
+    "Differential equations",
+    "Topology",
+    "Metric spaces",
+    "Number theory",
+    "Numerical methods"
+   ],
+   "channels": [
+    {
+     "channelId": "UCEBb1b_L6zDS3xTUrIALZOw",
+     "handle": "@mitocw",
+     "name": "MIT OpenCourseWare",
+     "language": "en",
+     "country": "global"
+    },
+    {
+     "channelId": "UCYO_jab_esuFRV4b17AJtAw",
+     "handle": "@3blue1brown",
+     "name": "3Blue1Brown",
+     "language": "en",
+     "country": "global"
+    },
+    {
+     "channelId": "UCoHhuummRZaIVX7bD4t2czg",
+     "handle": "@ProfessorLeonard",
+     "name": "Professor Leonard",
+     "language": "en",
+     "country": "global"
+    },
+    {
+     "channelId": "UCLnGGRG__uGSPLBLzyhg8dQ",
+     "handle": "@OxfordMathematics",
+     "name": "Oxford Mathematics",
+     "language": "en",
+     "country": "GB"
+    },
+    {
+     "channelId": "UC640y4UvDAlya_WOj5U4pfA",
+     "handle": "@iit",
+     "name": "nptelhrd",
+     "language": "en",
+     "country": "IN"
+    },
+    {
+     "channelId": "UCrOmFbHgf_k4pk-jYRmyhjw",
+     "handle": "@gajendrapurohit-GATE-NET-JAM",
+     "name": "Dr.Gajendra Purohit - GATE / IIT JAM / CSIR NET",
+     "language": "hi",
+     "country": "IN"
+    },
+    {
+     "channelId": "UChOw8Rcbhycy_v3nWQxnT4Q",
+     "handle": "@DipsAcademyOfficial",
+     "name": "Dips Academy -  IIT JAM / CSIR NET / GATE Maths",
+     "language": "hi",
+     "country": "IN"
+    },
+    {
+     "channelId": "UC4Aq8vADhmO32aRdhxOGL7A",
+     "handle": "@csirnet_gate_set_mathematics",
+     "name": "Mathematics - CSIR NET, GATE, SET & NBHM: IFAS",
+     "language": "hi",
+     "country": "IN"
+    },
+    {
+     "channelId": "UC88rUhfKSa5uLYXjRn7H3QQ",
+     "handle": "@DrHarishGarg",
+     "name": "Dr. Harish Garg",
+     "language": "hi",
+     "country": "IN"
+    },
+    {
+     "channelId": "UCrOUMqLiv6yR1RbLmOvzJ2A",
+     "handle": "@DreamMaths",
+     "name": "Dream Maths",
+     "language": "hi",
+     "country": "IN"
+    },
+    {
+     "channelId": "UCIkCzk3ezlAxX5r2OFlHLaQ",
+     "handle": "@julioprofe",
+     "name": "julioprofe",
+     "language": "es",
+     "country": "CO"
+    },
+    {
+     "channelId": "UCUsDa4Eo6ow-2fJfXReXfLQ",
+     "handle": "@HelpEngenharia",
+     "name": "Help Engenharia com Prof. Dênis Rodrigues",
+     "language": "pt",
+     "country": "BR"
+    },
+    {
+     "channelId": "UCSPxImRkhgcpbtYZaoYU2hg",
+     "handle": "@MATHCAOfficial",
+     "name": "MATHCA Official",
+     "language": "id",
+     "country": "ID"
+    },
+    {
+     "channelId": "UC_ABJRhYn_W-atwn8o4OKjQ",
+     "handle": "@numberbender",
+     "name": "Numberbender",
+     "language": "fil",
+     "country": "PH"
+    }
+   ]
+  },
+  {
+   "id": "deg_statistics",
+   "kind": "degree",
+   "name": {
+    "en": "Statistics degree"
+   },
+   "shortName": "Statistics",
+   "group": "science",
+   "specialization": {
+    "en": "Statistics"
+   },
+   "languages": [
+    "en",
+    "hi",
+    "es"
+   ],
+   "subjects": [
+    "Probability",
+    "Statistical inference",
+    "Regression",
+    "Applied statistics with R"
+   ],
+   "keywords": [
+    "statistics",
+    "probability",
+    "probability distributions",
+    "hypothesis testing",
+    "p-value",
+    "confidence interval",
+    "linear regression",
+    "ANOVA",
+    "chi-square test",
+    "Bayesian statistics",
+    "sampling",
+    "statistical inference",
+    "R programming",
+    "IIT JAM mathematical statistics",
+    "ISS statistics",
+    "estadística",
+    "estadística inferencial",
+    "outliers",
+    "residuals"
+   ],
+   "blockedWords": [
+    "vlog",
+    "reaction",
+    "result live",
+    "admit card",
+    "exam date out",
+    "job alert",
+    "salary",
+    "motivation shorts"
+   ],
+   "chips": [
+    "Probability",
+    "Distributions",
+    "Hypothesis testing",
+    "Confidence intervals",
+    "Regression",
+    "ANOVA",
+    "Bayesian statistics",
+    "Sampling",
+    "R programming",
+    "Inference"
+   ],
+   "channels": [
+    {
+     "channelId": "UCtYLUTtgS3k1Fg4y5tAhLbw",
+     "handle": "@statquest",
+     "name": "StatQuest with Josh Starmer",
+     "language": "en",
+     "country": "global"
+    },
+    {
+     "channelId": "UC4a-Gbdw7vOaccHmFo40b9g",
+     "handle": "@khanacademy",
+     "name": "Khan Academy",
+     "language": "en",
+     "country": "global"
+    },
+    {
+     "channelId": "UCiHi6xXLzi9FMr9B0zgoHqA",
+     "handle": "@jbstatistics",
+     "name": "jbstatistics",
+     "language": "en",
+     "country": "CA"
+    },
+    {
+     "channelId": "UCaNIxVagLhqupvUiDK01Mgg",
+     "handle": "@marinstatlectures",
+     "name": "MarinStatsLectures-R Programming & Statistics",
+     "language": "en",
+     "country": "CA"
+    },
+    {
+     "channelId": "UCoHhuummRZaIVX7bD4t2czg",
+     "handle": "@ProfessorLeonard",
+     "name": "Professor Leonard",
+     "language": "en",
+     "country": "global"
+    },
+    {
+     "channelId": "UC7cs8q-gJRlGwj4A8OmCmXg",
+     "handle": "@AlexTheAnalyst",
+     "name": "Alex The Analyst",
+     "language": "en",
+     "country": "global"
+    },
+    {
+     "channelId": "UCplD1ufko398Ql4ZEB4dF7g",
+     "handle": "@MathstatsClasses",
+     "name": "MathStats:JAM, GATE, NET, ISS, RBI, CUET, ISI, CMI",
+     "language": "hi",
+     "country": "IN"
+    },
+    {
+     "channelId": "UCanMxWvOoiwtjLYm08Bo8QQ",
+     "handle": "@MatematicasprofeAlex",
+     "name": "Matemáticas profe Alex",
+     "language": "es",
+     "country": "CO"
+    }
+   ]
+  },
+  {
+   "id": "deg_data_science",
+   "kind": "degree",
+   "name": {
+    "en": "Data science degree"
+   },
+   "shortName": "Data science",
+   "group": "science",
+   "specialization": {
+    "en": "Data science"
+   },
+   "languages": [
+    "en",
+    "hi",
+    "ur",
+    "bn",
+    "es",
+    "ar"
+   ],
+   "subjects": [
+    "Programming for data",
+    "Statistics & probability",
+    "Machine learning",
+    "Data engineering basics",
+    "Interview preparation"
+   ],
+   "keywords": [
+    "data science",
+    "machine learning",
+    "deep learning",
+    "Python",
+    "pandas",
+    "NumPy",
+    "SQL",
+    "data analysis",
+    "data visualization",
+    "Power BI",
+    "statistics for data science",
+    "regression",
+    "classification",
+    "neural networks",
+    "feature engineering",
+    "MLOps",
+    "data science interview",
+    "ML interview questions",
+    "ciencia de datos",
+    "علم البيانات",
+    "Kaggle",
+    "data science projects"
+   ],
+   "blockedWords": [
+    "vlog",
+    "reaction",
+    "result live",
+    "admit card",
+    "exam date out",
+    "job alert",
+    "salary",
+    "motivation shorts"
+   ],
+   "chips": [
+    "Python for data",
+    "SQL",
+    "Statistics for DS",
+    "Machine learning",
+    "Deep learning",
+    "Data visualization",
+    "Pandas",
+    "Data analysis projects",
+    "MLOps",
+    "Interview prep"
+   ],
+   "channels": [
+    {
+     "channelId": "UC8butISFwT-Wl7EV0hUK0BQ",
+     "handle": "@freecodecamp",
+     "name": "freeCodeCamp.org",
+     "language": "en",
+     "country": "global"
+    },
+    {
+     "channelId": "UCtYLUTtgS3k1Fg4y5tAhLbw",
+     "handle": "@statquest",
+     "name": "StatQuest with Josh Starmer",
+     "language": "en",
+     "country": "global"
+    },
+    {
+     "channelId": "UC7cs8q-gJRlGwj4A8OmCmXg",
+     "handle": "@AlexTheAnalyst",
+     "name": "Alex The Analyst",
+     "language": "en",
+     "country": "global"
+    },
+    {
+     "channelId": "UCLLw7jmFsvfIVaUFsLs8mlQ",
+     "handle": "@LukeBarousse",
+     "name": "Luke Barousse",
+     "language": "en",
+     "country": "US"
+    },
+    {
+     "channelId": "UCQSMCVUX1HgrwxJhO_7VrJQ",
+     "handle": "@DataInterview",
+     "name": "DataInterview",
+     "language": "en",
+     "country": "US"
+    },
+    {
+     "channelId": "UCNU_lfiiWBdtULKOw6X0Dig",
+     "handle": "@krishnaik06",
+     "name": "Krish Naik",
+     "language": "en",
+     "country": "IN"
+    },
+    {
+     "channelId": "UCjWY5hREA6FFYrthD0rZNIw",
+     "handle": "@krishnaikhindi",
+     "name": "Krish Naik Hindi",
+     "language": "hi",
+     "country": "IN"
+    },
+    {
+     "channelId": "UCh9nVJoWXmFb7sLApWGcLPQ",
+     "handle": "@codebasics",
+     "name": "codebasics",
+     "language": "en",
+     "country": "IN"
+    },
+    {
+     "channelId": "UCCWi3hpnq_Pe03nGxuS7isg",
+     "handle": "@campusx-official",
+     "name": "CampusX",
+     "language": "hi",
+     "country": "IN"
+    },
+    {
+     "channelId": "UCmNXJXWONLNF6bdftGY0Otw",
+     "handle": "@Codanics",
+     "name": "Codanics",
+     "language": "ur",
+     "country": "PK"
+    },
+    {
+     "channelId": "UCH6wiF1uC7PhuV_UIR_28AA",
+     "handle": "@StudyMart",
+     "name": "STUDY MART",
+     "language": "bn",
+     "country": "BD"
+    },
+    {
+     "channelId": "UC_IzDG4Zc3rJCPXvqeDcPQw",
+     "handle": "@RocioChavezCienciadeDatos",
+     "name": "Rocio Chavez Ciencia de Datos",
+     "language": "es",
+     "country": "MX"
+    },
+    {
+     "channelId": "UCT-lzgOtHWsc0y_Y4V_BWlw",
+     "handle": "@ahmedaboghaly2010",
+     "name": "داتا ساينس بالعربي .. Data Science",
+     "language": "ar",
+     "country": "EG"
+    },
+    {
+     "channelId": "UC4LKOPkDtPYE188DwMwhHtw",
+     "handle": "@Elgouhary-AI",
+     "name": "Elgouhary AI",
+     "language": "ar",
+     "country": "EG"
+    }
+   ]
+  },
+  {
+   "id": "deg_finance",
+   "kind": "degree",
+   "name": {
+    "en": "Finance"
+   },
+   "shortName": "Finance",
+   "group": "commerce",
+   "specialization": {
+    "en": "Commerce and management (B.Com, BBA, MBA)"
+   },
+   "languages": [
+    "en",
+    "hi",
+    "ur",
+    "es",
+    "id"
+   ],
+   "subjects": [
+    "Corporate finance",
+    "Financial management",
+    "Valuation",
+    "Investments",
+    "Financial modelling",
+    "Financial markets"
+   ],
+   "keywords": [
+    "corporate finance",
+    "financial management",
+    "time value of money",
+    "NPV",
+    "IRR",
+    "capital budgeting",
+    "WACC",
+    "cost of capital",
+    "capital structure",
+    "dividend policy",
+    "working capital management",
+    "ratio analysis",
+    "valuation",
+    "DCF",
+    "financial modelling",
+    "portfolio theory",
+    "CAPM",
+    "bonds",
+    "derivatives",
+    "options",
+    "financial markets",
+    "MBA finance",
+    "B.Com financial management",
+    "manajemen keuangan",
+    "finanzas corporativas",
+    "finance interview"
+   ],
+   "blockedWords": [
+    "vlog",
+    "reaction",
+    "meme",
+    "salary reveal",
+    "stock tips",
+    "trading signals",
+    "crypto pump",
+    "prank",
+    "shorts compilation"
+   ],
+   "chips": [
+    "Time value of money",
+    "Capital budgeting",
+    "Cost of capital",
+    "Capital structure",
+    "Working capital",
+    "Ratio analysis",
+    "Valuation",
+    "DCF",
+    "Financial modelling",
+    "Portfolio theory",
+    "Derivatives"
+   ],
+   "channels": [
+    {
+     "channelId": "UCLvnJL8htRR1T9cbSccaoVw",
+     "handle": "@AswathDamodaranonValuation",
+     "name": "Aswath Damodaran",
+     "language": "en",
+     "country": "global"
+    },
+    {
+     "channelId": "UCGtbVv_ACgV7difdVZ92NMw",
+     "handle": "@CFI_Official",
+     "name": "Corporate Finance Institute",
+     "language": "en",
+     "country": "global"
+    },
+    {
+     "channelId": "UCEBb1b_L6zDS3xTUrIALZOw",
+     "handle": "@mitocw",
+     "name": "MIT OpenCourseWare",
+     "language": "en",
+     "country": "global"
+    },
+    {
+     "channelId": "UCkHdBeQ4DuvBXTahMYZVlMA",
+     "handle": "@KenjiExplains",
+     "name": "Kenji Explains",
+     "language": "en",
+     "country": "global"
+    },
+    {
+     "channelId": "UCJTY6z_SrU39MIcJxEtmduA",
+     "handle": "@thevaluationschool",
+     "name": "The Valuation School",
+     "language": "en",
+     "country": "IN"
+    },
+    {
+     "channelId": "UCyt8himITSzS0U9ktWIxc8g",
+     "handle": "@aswinibajaj",
+     "name": "Aswini Bajaj",
+     "language": "en",
+     "country": "IN"
+    },
+    {
+     "channelId": "UCnxrcb5Hu1GP5gcnrnOX3dA",
+     "handle": "@chhamzatariq",
+     "name": "Ch Hamza Tariq",
+     "language": "ur",
+     "country": "PK"
+    },
+    {
+     "channelId": "UC1doJRo_s8FmjQMd8maEcTg",
+     "handle": "@TusClasesdeFinanzas",
+     "name": "Tus Clases de Finanzas",
+     "language": "es",
+     "country": "global"
+    },
+    {
+     "channelId": "UCteCtbwcfQGizh4QQ2l13dw",
+     "handle": "@kuwatslamet",
+     "name": "Kuwat Slamet",
+     "language": "id",
+     "country": "ID"
+    },
+    {
+     "channelId": "UC4LeewYWZ3ruS3Bc64ldXuw",
+     "handle": "@financialmodeling",
+     "name": "Mergers & Inquisitions / Breaking Into Wall Street",
+     "language": "en",
+     "country": "global"
+    }
+   ]
+  },
+  {
+   "id": "deg_accounting",
+   "kind": "degree",
+   "name": {
+    "en": "Accounting"
+   },
+   "shortName": "Accounting",
+   "group": "commerce",
+   "specialization": {
+    "en": "Commerce and management (B.Com, BBA, MBA)"
+   },
+   "languages": [
+    "en",
+    "hi",
+    "fil",
+    "bn",
+    "ar",
+    "pt"
+   ],
+   "subjects": [
+    "Financial accounting",
+    "Intermediate accounting",
+    "Cost accounting",
+    "Management accounting",
+    "Auditing",
+    "IFRS / Ind AS"
+   ],
+   "keywords": [
+    "financial accounting",
+    "accounting lecture",
+    "journal entries",
+    "ledger",
+    "trial balance",
+    "final accounts",
+    "balance sheet",
+    "income statement",
+    "cash flow statement",
+    "depreciation",
+    "inventory valuation",
+    "intermediate accounting",
+    "cost accounting",
+    "management accounting",
+    "standard costing",
+    "marginal costing",
+    "auditing",
+    "IFRS",
+    "IAS",
+    "Ind AS",
+    "consolidation",
+    "B.Com accounting",
+    "BBA accounting",
+    "contabilidade",
+    "محاسبة مالية",
+    "accounting interview questions"
+   ],
+   "blockedWords": [
+    "vlog",
+    "reaction",
+    "meme",
+    "salary reveal",
+    "stock tips",
+    "trading signals",
+    "crypto pump",
+    "prank",
+    "shorts compilation"
+   ],
+   "chips": [
+    "Journal entries",
+    "Ledger",
+    "Trial balance",
+    "Final accounts",
+    "Cash flow statement",
+    "Depreciation",
+    "Inventory",
+    "Cost accounting",
+    "Management accounting",
+    "IFRS",
+    "Auditing",
+    "Consolidation"
+   ],
+   "channels": [
+    {
+     "channelId": "UCYJLdSmyKoXCbnd-pklMn5Q",
+     "handle": "@AccountingStuff",
+     "name": "Accounting Stuff",
+     "language": "en",
+     "country": "global"
+    },
+    {
+     "channelId": "UCzRF-OFuv8os-bGzANpQGqg",
+     "handle": "@Edspira",
+     "name": "Edspira",
+     "language": "en",
+     "country": "global"
+    },
+    {
+     "channelId": "UCNFClg6mzfZ5ixpuH9c7f1A",
+     "handle": "@Tony-Bell",
+     "name": "Tony Bell",
+     "language": "en",
+     "country": "global"
+    },
+    {
+     "channelId": "UCOYjmNfEFcUPDgihxwSSReA",
+     "handle": "@Farhatlectures",
+     "name": "Farhat Lectures | CPA, CMA, EA & Accounting",
+     "language": "en",
+     "country": "US"
+    },
+    {
+     "channelId": "UCQuIb5zbUkHjtj_cyCO3b4w",
+     "handle": "@accountingmasterclass",
+     "name": "Accounting MasterClass",
+     "language": "hi",
+     "country": "IN"
+    },
+    {
+     "channelId": "UC9lWAUya12IeVsgyOuaVQfw",
+     "handle": "@caparveensharmaofficial",
+     "name": "CA Parveen Sharma",
+     "language": "hi",
+     "country": "IN"
+    },
+    {
+     "channelId": "UCQTpd_zYizpCpYX6uqn_Z5w",
+     "handle": "@SirWinAccountingLectures",
+     "name": "Sir Win - Accounting Lectures",
+     "language": "fil",
+     "country": "PH"
+    },
+    {
+     "channelId": "UC5doWoqVq9jULiYP1EncJWw",
+     "handle": "@easyaccountingbangla",
+     "name": "Easy Accounting- Bangla",
+     "language": "bn",
+     "country": "BD"
+    },
+    {
+     "channelId": "UCSc0OLaM8shvqmeq5Qa2wpQ",
+     "handle": "@FOGAccountancyTutorials",
+     "name": "FOG Accountancy Tutorials",
+     "language": "en",
+     "country": "GH"
+    },
+    {
+     "channelId": "UCGHBcFkf73PwhjjVm14qofw",
+     "handle": "@Ezikan",
+     "name": "EZIKAN ACADEMY",
+     "language": "en",
+     "country": "NG"
+    },
+    {
+     "channelId": "UCc0c3FUW5gstkELcCMK5Bnw",
+     "handle": "@mahmoudkamaleid",
+     "name": "Mahmoud Kamal Eid",
+     "language": "ar",
+     "country": "EG"
+    },
+    {
+     "channelId": "UCsYMOCOvTQeNsiRivtGgmxQ",
+     "handle": "@EmadKhalifa",
+     "name": "Emad Khalifa",
+     "language": "ar",
+     "country": "EG"
+    },
+    {
+     "channelId": "UCdxWVuRlsJq6RHmKvo5-G3w",
+     "handle": "@contabilidadefacilitada",
+     "name": "Contabilidade Facilitada",
+     "language": "pt",
+     "country": "BR"
+    },
+    {
+     "channelId": "UCRXmKgO_wpxHzcTf6_KUVbQ",
+     "handle": "@CorporateWala",
+     "name": "Corporate Wala",
+     "language": "en",
+     "country": "IN"
+    }
+   ]
+  },
+  {
+   "id": "deg_marketing",
+   "kind": "degree",
+   "name": {
+    "en": "Marketing"
+   },
+   "shortName": "Marketing",
+   "group": "commerce",
+   "specialization": {
+    "en": "Commerce and management (B.Com, BBA, MBA)"
+   },
+   "languages": [
+    "en",
+    "hi",
+    "ur",
+    "ar"
+   ],
+   "subjects": [
+    "Marketing management",
+    "Consumer behaviour",
+    "Digital marketing",
+    "Brand management",
+    "Sales management",
+    "Marketing research"
+   ],
+   "keywords": [
+    "marketing management",
+    "principles of marketing",
+    "Kotler",
+    "marketing mix",
+    "4Ps",
+    "segmentation targeting positioning",
+    "STP",
+    "consumer behaviour",
+    "brand management",
+    "pricing strategy",
+    "distribution channels",
+    "integrated marketing communication",
+    "promotion mix",
+    "digital marketing",
+    "SEO",
+    "SEM",
+    "Google Ads",
+    "Meta ads",
+    "social media marketing",
+    "content marketing",
+    "marketing research",
+    "sales management",
+    "services marketing",
+    "MBA marketing",
+    "BBA marketing",
+    "التسويق"
+   ],
+   "blockedWords": [
+    "vlog",
+    "reaction",
+    "meme",
+    "salary reveal",
+    "stock tips",
+    "trading signals",
+    "crypto pump",
+    "prank",
+    "shorts compilation",
+    "make money online",
+    "earn money"
+   ],
+   "chips": [
+    "4Ps",
+    "STP",
+    "Consumer behaviour",
+    "Branding",
+    "Pricing",
+    "Distribution",
+    "Promotion mix",
+    "Digital marketing",
+    "SEO",
+    "Google Ads",
+    "Sales",
+    "Marketing research"
+   ],
+   "channels": [
+    {
+     "channelId": "UCywtvR0JMHHAeHfK8RBx0dw",
+     "handle": "@HBSOnline",
+     "name": "HBS Online",
+     "language": "en",
+     "country": "global"
+    },
+    {
+     "channelId": "UCZT_Vg3DwREDlz11aeWe8FQ",
+     "handle": "@ProfessorWolters",
+     "name": "Professor Wolters",
+     "language": "en",
+     "country": "global"
+    },
+    {
+     "channelId": "UCSqxdu-i09olM3V0p9Yx2Eg",
+     "handle": "@DeeshaClasses",
+     "name": "Deesha Classes",
+     "language": "hi",
+     "country": "IN"
+    },
+    {
+     "channelId": "UCE9MJ4t9WOFHqR4zCVF-fqQ",
+     "handle": "@managementelearningshivanj3145",
+     "name": "Management e Learning",
+     "language": "hi",
+     "country": "IN"
+    },
+    {
+     "channelId": "UC64h7xNOjx7n7EKwq9AzGRg",
+     "handle": "@DigitalMarketing_Wallah",
+     "name": "Digital Marketing Wallah",
+     "language": "hi",
+     "country": "IN"
+    },
+    {
+     "channelId": "UCnqtMFtOv3AKCAhyEYtSXiA",
+     "handle": "@UmarTazkeer",
+     "name": "Umar Tazkeer",
+     "language": "ur",
+     "country": "PK"
+    },
+    {
+     "channelId": "UCgn3S2_G_pjfkO7QMJFdy8g",
+     "handle": "@amr.shobaki",
+     "name": "عمرو الشوبكي - Amr Elshobaky",
+     "language": "ar",
+     "country": "EG"
+    }
+   ]
+  },
+  {
+   "id": "deg_operations",
+   "kind": "degree",
+   "name": {
+    "en": "Operations and supply chain"
+   },
+   "shortName": "Operations",
+   "group": "commerce",
+   "specialization": {
+    "en": "Commerce and management (B.Com, BBA, MBA)"
+   },
+   "languages": [
+    "en"
+   ],
+   "subjects": [
+    "Operations management",
+    "Supply chain management",
+    "Logistics",
+    "Quality management",
+    "Forecasting",
+    "Production planning"
+   ],
+   "keywords": [
+    "operations management",
+    "production and operations management",
+    "supply chain management",
+    "logistics",
+    "inventory management",
+    "EOQ",
+    "safety stock",
+    "forecasting",
+    "MRP",
+    "ERP",
+    "capacity planning",
+    "scheduling",
+    "lean manufacturing",
+    "six sigma",
+    "total quality management",
+    "5S",
+    "kaizen",
+    "sales and operations planning",
+    "S&OP",
+    "procurement",
+    "warehouse",
+    "transportation",
+    "operations research",
+    "linear programming",
+    "supply chain interview"
+   ],
+   "blockedWords": [
+    "vlog",
+    "reaction",
+    "meme",
+    "salary reveal",
+    "stock tips",
+    "trading signals",
+    "crypto pump",
+    "prank",
+    "shorts compilation"
+   ],
+   "chips": [
+    "Forecasting",
+    "Inventory",
+    "EOQ",
+    "MRP / ERP",
+    "Lean",
+    "Six Sigma",
+    "Quality",
+    "Scheduling",
+    "Logistics",
+    "Supply chain design",
+    "S&OP"
+   ],
+   "channels": [
+    {
+     "channelId": "UCQXTVdVrvWDdHfd3FUHhBbQ",
+     "handle": "@MITCTL",
+     "name": "MIT Center for Transportation & Logistics",
+     "language": "en",
+     "country": "global"
+    },
+    {
+     "channelId": "UC3rV9m8Pgvqu1s9F4nOQ_Vw",
+     "handle": "@OperationsAndSupplyChain",
+     "name": "Operations & Supply Chain Management University",
+     "language": "en",
+     "country": "global"
+    },
+    {
+     "channelId": "UC_1zTI-jifjliD0fMFPb8EQ",
+     "handle": "@time4pi",
+     "name": "Eddy Witzel",
+     "language": "en",
+     "country": "global"
+    },
+    {
+     "channelId": "UCP9j0k-u0Stlm3x-aV-NdVQ",
+     "handle": "@OperationsManagement101",
+     "name": "Operations Management 101",
+     "language": "en",
+     "country": "global"
+    },
+    {
+     "channelId": "UCJx_EjxDb0155qnUNCB9DlQ",
+     "handle": "@ascm_hq",
+     "name": "Association for Supply Chain Management",
+     "language": "en",
+     "country": "global"
+    },
+    {
+     "channelId": "UCYQMvu3YszW1dgKi97Fmzow",
+     "handle": "@LeanSixSigmaGlobal",
+     "name": "Lean Six Sigma Training",
+     "language": "en",
+     "country": "global"
+    },
+    {
+     "channelId": "UCYa1WtI-vb_bx-anHdmpNfA",
+     "handle": "@nptel-nociitm9240",
+     "name": "NPTEL-NOC IITM",
+     "language": "en",
+     "country": "IN"
+    },
+    {
+     "channelId": "UC79jXm9nGKKcT7qIrrNHAcw",
+     "handle": "@jameelhye",
+     "name": "Jameel Hye - Supply Chain Career Coach",
+     "language": "en",
+     "country": "global"
+    }
+   ]
+  },
+  {
+   "id": "deg_hr",
+   "kind": "degree",
+   "name": {
+    "en": "Human resource management"
+   },
+   "shortName": "HR",
+   "group": "commerce",
+   "specialization": {
+    "en": "Commerce and management (B.Com, BBA, MBA)"
+   },
+   "languages": [
+    "en",
+    "hi",
+    "es"
+   ],
+   "subjects": [
+    "Human resource management",
+    "Organisational behaviour",
+    "Industrial relations",
+    "Performance management",
+    "Compensation",
+    "Talent acquisition"
+   ],
+   "keywords": [
+    "human resource management",
+    "HRM",
+    "HR planning",
+    "recruitment and selection",
+    "training and development",
+    "performance management",
+    "performance appraisal",
+    "compensation management",
+    "reward management",
+    "industrial relations",
+    "industrial disputes",
+    "labour laws",
+    "organisational behaviour",
+    "motivation theories",
+    "leadership",
+    "organisational culture",
+    "HR analytics",
+    "talent management",
+    "employee engagement",
+    "UGC NET HRM",
+    "MBA HR",
+    "gestión de recursos humanos",
+    "HR interview questions"
+   ],
+   "blockedWords": [
+    "vlog",
+    "reaction",
+    "meme",
+    "salary reveal",
+    "stock tips",
+    "trading signals",
+    "crypto pump",
+    "prank",
+    "shorts compilation"
+   ],
+   "chips": [
+    "HR planning",
+    "Recruitment",
+    "Selection",
+    "Training",
+    "Performance appraisal",
+    "Compensation",
+    "Industrial relations",
+    "Labour laws",
+    "Organisational behaviour",
+    "HR analytics"
+   ],
+   "channels": [
+    {
+     "channelId": "UCkGTJyIqAzQ5QIAkzLUW-Tg",
+     "handle": "@AIHRAcademytoInnovateHR",
+     "name": "AIHR - Academy to Innovate HR",
+     "language": "en",
+     "country": "global"
+    },
+    {
+     "channelId": "UC39qahXncjbze9FXF5MQluQ",
+     "handle": "@hrtrends813",
+     "name": "HR Trends",
+     "language": "en",
+     "country": "global"
+    },
+    {
+     "channelId": "UC_jne3ZLcgBW4gcn3VGzjpw",
+     "handle": "@perminuswainaina",
+     "name": "Perminus Wainaina",
+     "language": "en",
+     "country": "KE"
+    },
+    {
+     "channelId": "UC2OvqK2co75JxtU83XKqB6Q",
+     "handle": "@STUDYHRMbyDishaChaturvedi",
+     "name": "STUDY HRM by Disha Chaturvedi",
+     "language": "hi",
+     "country": "IN"
+    },
+    {
+     "channelId": "UChTZIRq8K3FBEtV_SCucd_A",
+     "handle": "@HRPreparation",
+     "name": "HRpreparation. com",
+     "language": "en",
+     "country": "IN"
+    },
+    {
+     "channelId": "UC556QJVm0HsEPmmS-zd3vvg",
+     "handle": "@devikascommercemanagement",
+     "name": "Devika's Commerce & Management Academy",
+     "language": "hi",
+     "country": "IN"
+    },
+    {
+     "channelId": "UCE9MJ4t9WOFHqR4zCVF-fqQ",
+     "handle": "@managementelearningshivanj3145",
+     "name": "Management e Learning",
+     "language": "hi",
+     "country": "IN"
+    },
+    {
+     "channelId": "UC15VMcNxIJhTzTBKN57C0vw",
+     "handle": "@soyfranviale",
+     "name": "Fran Viale: Recursos Humanos y Coaching Vocacional",
+     "language": "es",
+     "country": "AR"
+    }
+   ]
+  },
+  {
+   "id": "deg_law_corporate",
+   "kind": "degree",
+   "name": {
+    "en": "Corporate and commercial law"
+   },
+   "shortName": "Corporate law",
+   "group": "law",
+   "specialization": {
+    "en": "Law (LLB, LLM)"
+   },
+   "languages": [
+    "en",
+    "hi",
+    "pt",
+    "es",
+    "ar"
+   ],
+   "subjects": [
+    "Company law",
+    "Contract law",
+    "Securities law",
+    "Mergers and acquisitions",
+    "Insolvency",
+    "Commercial transactions"
+   ],
+   "keywords": [
+    "company law",
+    "corporate law",
+    "Companies Act",
+    "incorporation",
+    "memorandum and articles",
+    "directors duties",
+    "shares and debentures",
+    "corporate governance",
+    "mergers and acquisitions",
+    "securities law",
+    "SEBI",
+    "insolvency",
+    "IBC",
+    "contract law",
+    "contract drafting",
+    "commercial law",
+    "business associations",
+    "direito empresarial",
+    "recuperação judicial",
+    "derecho corporativo",
+    "derecho mercantil",
+    "قانون الشركات",
+    "corporate practice",
+    "law firm interview"
+   ],
+   "blockedWords": [
+    "vlog",
+    "reaction",
+    "meme",
+    "salary reveal",
+    "stock tips",
+    "trading signals",
+    "crypto pump",
+    "prank",
+    "shorts compilation"
+   ],
+   "chips": [
+    "Company law",
+    "Incorporation",
+    "Directors",
+    "Shares",
+    "Contracts",
+    "M&A",
+    "Securities",
+    "Insolvency",
+    "Corporate governance",
+    "Drafting"
+   ],
+   "channels": [
+    {
+     "channelId": "UCwvaQ_T2IyOvNeMBchvhFlw",
+     "handle": "@LawSikho",
+     "name": "LawSikho",
+     "language": "en",
+     "country": "IN"
+    },
+    {
+     "channelId": "UCumvunP0q_kO4qdnJYuR-yQ",
+     "handle": "@HGVirtuals",
+     "name": "CA Harsh Gupta",
+     "language": "hi",
+     "country": "IN"
+    },
+    {
+     "channelId": "UCVTrDBjyx2YUs-IyqTn2AVg",
+     "handle": "@QuimbeeDotCom",
+     "name": "Quimbee",
+     "language": "en",
+     "country": "US"
+    },
+    {
+     "channelId": "UCp0fZHbMhngjllew6LlMNcw",
+     "handle": "@AprendaEmpresarial",
+     "name": "Direito Empresarial - Professor José Humberto",
+     "language": "pt",
+     "country": "BR"
+    },
+    {
+     "channelId": "UCGOaGMRfDlnXurIAXGbzWAQ",
+     "handle": "@prof.andresantacruz",
+     "name": "Prof. André Santa Cruz",
+     "language": "pt",
+     "country": "BR"
+    },
+    {
+     "channelId": "UCLeME9ZU-M39Hd0jMnwBGuA",
+     "handle": "@Derecho_Corporativo",
+     "name": "Derecho Corporativo",
+     "language": "es",
+     "country": "global"
+    },
+    {
+     "channelId": "UC8dYRbG7JR79OMiLv_eh0sg",
+     "handle": "@dr.ehababdelrahman3867",
+     "name": "Dr. Ehab Abdelrahman",
+     "language": "ar",
+     "country": "EG"
+    },
+    {
+     "channelId": "UCjPsoAMHf6fvNye2LrtTYxQ",
+     "handle": "@تأصيل",
+     "name": "تأصيل المحامي",
+     "language": "ar",
+     "country": "SA"
+    },
+    {
+     "channelId": "UCucRQzOIlrUnP-y3xZEpo8g",
+     "handle": "@diekodaniels",
+     "name": "Dieko Daniels",
+     "language": "en",
+     "country": "NG"
+    },
+    {
+     "channelId": "UCJ2SfFsh-hAdF5AK6xxlu0Q",
+     "handle": "@NigerianLawSchoolLectures",
+     "name": "Nigerian Law School Lectures",
+     "language": "en",
+     "country": "NG"
+    }
+   ]
+  },
+  {
+   "id": "deg_law_litigation",
+   "kind": "degree",
+   "name": {
+    "en": "Litigation and procedure"
+   },
+   "shortName": "Litigation",
+   "group": "law",
+   "specialization": {
+    "en": "Law (LLB, LLM)"
+   },
+   "languages": [
+    "hi",
+    "en",
+    "ur",
+    "pt",
+    "es",
+    "ar"
+   ],
+   "subjects": [
+    "Civil procedure",
+    "Criminal procedure",
+    "Evidence",
+    "Pleadings and drafting",
+    "Advocacy",
+    "Execution and appeals"
+   ],
+   "keywords": [
+    "civil procedure",
+    "CPC",
+    "code of civil procedure",
+    "criminal procedure",
+    "CrPC",
+    "BNSS",
+    "evidence act",
+    "BSA",
+    "pleadings",
+    "plaint",
+    "written statement",
+    "injunction",
+    "execution of decree",
+    "appeal",
+    "revision",
+    "legal drafting",
+    "advocacy skills",
+    "trial advocacy",
+    "processo civil",
+    "petição inicial",
+    "derecho procesal civil",
+    "قانون المرافعات",
+    "civil litigation",
+    "moot court"
+   ],
+   "blockedWords": [
+    "vlog",
+    "reaction",
+    "meme",
+    "salary reveal",
+    "stock tips",
+    "trading signals",
+    "crypto pump",
+    "prank",
+    "shorts compilation",
+    "court news",
+    "viral case"
+   ],
+   "chips": [
+    "CPC",
+    "CrPC / BNSS",
+    "Evidence",
+    "Pleadings",
+    "Plaint and written statement",
+    "Injunctions",
+    "Execution",
+    "Appeals",
+    "Drafting",
+    "Advocacy skills"
+   ],
+   "channels": [
+    {
+     "channelId": "UCrxgfv-YahtUNq5TBZQZ3QA",
+     "handle": "@pawanreley650",
+     "name": "Pawan Reley (Advocate-on-Record, SC of India)",
+     "language": "en",
+     "country": "IN"
+    },
+    {
+     "channelId": "UC344tiP7qX4kQdZNdRrKKag",
+     "handle": "@SanyogVyasLawClasses",
+     "name": "Sanyog Vyas Law Classes",
+     "language": "hi",
+     "country": "IN"
+    },
+    {
+     "channelId": "UCwjf3JxsziftRXFtNgRtt_A",
+     "handle": "@LawGuruClasses",
+     "name": "LAW GURU Ashu Gupta (LawGuru_Classes)",
+     "language": "hi",
+     "country": "IN"
+    },
+    {
+     "channelId": "UCNtd5EFPHp3WW0w4gJqW6sg",
+     "handle": "@LAWSCHOOL2021",
+     "name": "Xpert Law School",
+     "language": "hi",
+     "country": "IN"
+    },
+    {
+     "channelId": "UC4tub9in35DlV73JSRuIZUA",
+     "handle": "@THENATIONALACADEMYBYSIRUMAR",
+     "name": "NATIONAL ACADEMY & LEGENDS LAW COLLEGE BY SIR UMAR",
+     "language": "ur",
+     "country": "PK"
+    },
+    {
+     "channelId": "UCUn9iL91zJL-SLEeLittAMA",
+     "handle": "@theoryoflaw1752",
+     "name": "Theory Of Law",
+     "language": "ur",
+     "country": "PK"
+    },
+    {
+     "channelId": "UC_sx5gDmlczT-Nn7r1FET_Q",
+     "handle": "@RenêHellman",
+     "name": "Professor Renê Hellman",
+     "language": "pt",
+     "country": "BR"
+    },
+    {
+     "channelId": "UC4zLmk-T-w7CrFHTJD-zXww",
+     "handle": "@ProfessorGuilhermeCorrea",
+     "name": "Professor Guilherme Corrêa",
+     "language": "pt",
+     "country": "BR"
+    },
+    {
+     "channelId": "UCpkHFTPI5G9BIHa7O6PjL0w",
+     "handle": "@derechoprocesalcivilycomer4778",
+     "name": "Derecho Procesal Civil y Comercial. Cátedra Rojas.",
+     "language": "es",
+     "country": "AR"
+    },
+    {
+     "channelId": "UC9JeZ9SyB9lvZ5PKoNPrM_g",
+     "handle": "@DrMahmoudOmar",
+     "name": "د. محمود عمر محمود",
+     "language": "ar",
+     "country": "EG"
+    },
+    {
+     "channelId": "UCYCeangJz_Ow_bTjVhCl5gw",
+     "handle": "@LAWSCHOOLMADEEASY256",
+     "name": "LAW SCHOOL MADE EASY",
+     "language": "en",
+     "country": "UG"
+    },
+    {
+     "channelId": "UCoXgwk9ZX2msxujoL7ptzrg",
+     "handle": "@theadvocacytutor",
+     "name": "The Advocacy Tutor",
+     "language": "en",
+     "country": "global"
+    }
+   ]
+  },
+  {
+   "id": "deg_law_ip",
+   "kind": "degree",
+   "name": {
+    "en": "Intellectual property law"
+   },
+   "shortName": "IP law",
+   "group": "law",
+   "specialization": {
+    "en": "Law (LLB, LLM)"
+   },
+   "languages": [
+    "en"
+   ],
+   "subjects": [
+    "Patents",
+    "Trademarks",
+    "Copyright",
+    "Designs",
+    "Trade secrets",
+    "IP enforcement"
+   ],
+   "keywords": [
+    "intellectual property",
+    "IPR",
+    "patent law",
+    "patent drafting",
+    "patent claims",
+    "prior art",
+    "trademark law",
+    "trademark registration",
+    "trademark infringement",
+    "copyright law",
+    "fair use",
+    "industrial designs",
+    "geographical indications",
+    "trade secrets",
+    "IP licensing",
+    "IP enforcement",
+    "TRIPS",
+    "WIPO",
+    "Patents Act",
+    "Trade Marks Act",
+    "IP and AI",
+    "propriedade intelectual",
+    "propiedad intelectual"
+   ],
+   "blockedWords": [
+    "vlog",
+    "reaction",
+    "meme",
+    "salary reveal",
+    "stock tips",
+    "trading signals",
+    "crypto pump",
+    "prank",
+    "shorts compilation"
+   ],
+   "chips": [
+    "Patents",
+    "Patent drafting",
+    "Trademarks",
+    "Copyright",
+    "Designs",
+    "Geographical indications",
+    "Trade secrets",
+    "Infringement",
+    "IP and AI"
+   ],
+   "channels": [
+    {
+     "channelId": "UC6CbAK73ohEL5XeRi0wbN9w",
+     "handle": "@wipo",
+     "name": "World Intellectual Property Organization – WIPO",
+     "language": "en",
+     "country": "global"
+    },
+    {
+     "channelId": "UC_EdazBt99xQQIuxj_ECE0Q",
+     "handle": "@EUIPO",
+     "name": "EUIPO",
+     "language": "en",
+     "country": "global"
+    },
+    {
+     "channelId": "UCLM6hNNbujxKB3QPII1X6Ng",
+     "handle": "@IntellectualPropertyOfficeUK",
+     "name": "Intellectual Property Office UK",
+     "language": "en",
+     "country": "GB"
+    },
+    {
+     "channelId": "UCPQF-_EINRWoPUv4yAJYIZQ",
+     "handle": "@TheIPOPHL",
+     "name": "Intellectual Property Office of the Philippines",
+     "language": "en",
+     "country": "PH"
+    },
+    {
+     "channelId": "UCwvaQ_T2IyOvNeMBchvhFlw",
+     "handle": "@LawSikho",
+     "name": "LawSikho",
+     "language": "en",
+     "country": "IN"
+    },
+    {
+     "channelId": "UCvQzfeZIvO6KpNJfs7UbstA",
+     "handle": "@Sonisvision_Legal",
+     "name": "Sonisvision Legal",
+     "language": "en",
+     "country": "IN"
+    }
+   ]
+  },
+  {
+   "id": "deg_law_international",
+   "kind": "degree",
+   "name": {
+    "en": "International law"
+   },
+   "shortName": "Intl law",
+   "group": "law",
+   "specialization": {
+    "en": "Law (LLB, LLM)"
+   },
+   "languages": [
+    "en",
+    "pt"
+   ],
+   "subjects": [
+    "Public international law",
+    "International organisations",
+    "Human rights law",
+    "International criminal law",
+    "Law of the sea",
+    "Investment law"
+   ],
+   "keywords": [
+    "public international law",
+    "international law lecture",
+    "sources of international law",
+    "treaties",
+    "Vienna Convention",
+    "state responsibility",
+    "statehood and recognition",
+    "jurisdiction",
+    "immunity",
+    "United Nations",
+    "ICJ",
+    "international criminal law",
+    "ICC",
+    "human rights law",
+    "international humanitarian law",
+    "law of the sea",
+    "international investment law",
+    "WTO law",
+    "direito internacional público",
+    "derecho internacional público",
+    "القانون الدولي العام"
+   ],
+   "blockedWords": [
+    "vlog",
+    "reaction",
+    "meme",
+    "salary reveal",
+    "stock tips",
+    "trading signals",
+    "crypto pump",
+    "prank",
+    "shorts compilation"
+   ],
+   "chips": [
+    "Sources of international law",
+    "Treaties",
+    "State responsibility",
+    "UN system",
+    "ICJ",
+    "Human rights",
+    "Humanitarian law",
+    "Law of the sea",
+    "Investment law"
+   ],
+   "channels": [
+    {
+     "channelId": "UCFmqZV9RKOoYAQYn11R4W-g",
+     "handle": "@HagueAcademyofInternationalLaw",
+     "name": "The Hague Academy of International Law | Académie de droit international de La Haye",
+     "language": "en",
+     "country": "global"
+    },
+    {
+     "channelId": "UCoeOFaWeSlay3llELm8bMqA",
+     "handle": "@ESILchannel",
+     "name": "ESIL Lectures, Events, and Webinars",
+     "language": "en",
+     "country": "global"
+    },
+    {
+     "channelId": "UCAKBr6X6PalbyDKh7PMH4pg",
+     "handle": "@LauterpachtCentre",
+     "name": "Lauterpacht Centre",
+     "language": "en",
+     "country": "global"
+    },
+    {
+     "channelId": "UCgqQMh4FtF0MMUXmZc1rXfA",
+     "handle": "@manchesterinternationallaw2809",
+     "name": "Manchester International Law Centre",
+     "language": "en",
+     "country": "GB"
+    },
+    {
+     "channelId": "UCmDg2sM9hZpiEMTSu8EriOg",
+     "handle": "@CEDIN-Direito",
+     "name": "CEDIN - Centro de Direito Internacional",
+     "language": "pt",
+     "country": "BR"
+    },
+    {
+     "channelId": "UCHCpdCgUp1sCPhgug8iTw6A",
+     "handle": "@ilawproject",
+     "name": "International Law Project",
+     "language": "en",
+     "country": "global"
+    }
+   ]
+  },
+  {
+   "id": "deg_aero_aerodynamics",
+   "kind": "degree",
+   "name": {
+    "en": "Aerodynamics"
+   },
+   "shortName": "Aerodynamics",
+   "group": "engineering",
+   "specialization": {
+    "en": "Aerospace engineering"
+   },
+   "languages": [
+    "en",
+    "hi",
+    "pt"
+   ],
+   "subjects": [
+    "Aerodynamics",
+    "Fluid mechanics",
+    "Compressible flow",
+    "Flight mechanics",
+    "Aircraft performance"
+   ],
+   "keywords": [
+    "aerodynamics",
+    "airfoil",
+    "lift",
+    "drag",
+    "thin airfoil theory",
+    "boundary layer",
+    "potential flow",
+    "compressible flow",
+    "supersonic flow",
+    "shock wave",
+    "Prandtl",
+    "Bernoulli",
+    "wind tunnel",
+    "CFD",
+    "flight mechanics",
+    "aircraft performance",
+    "stability and control",
+    "GATE aerospace",
+    "GATE AE",
+    "aerospace engineering lecture",
+    "NPTEL aerodynamics",
+    "aerodinâmica",
+    "aerodinámica",
+    "teoria de voo",
+    "aircraft design"
+   ],
+   "blockedWords": [
+    "vlog",
+    "reaction",
+    "salary reveal",
+    "job alert",
+    "result live",
+    "prank",
+    "motivation shorts",
+    "meme",
+    "unboxing"
+   ],
+   "chips": [
+    "Airfoils",
+    "Lift & drag",
+    "Boundary layer",
+    "Compressible flow",
+    "Shock waves",
+    "Wind tunnels",
+    "CFD basics",
+    "Flight mechanics",
+    "Stability",
+    "GATE AE"
+   ],
+   "channels": [
+    {
+     "channelId": "UCiY8ERfD4qvD_-d-VUWh_GA",
+     "handle": "@aerospaceengineering1031",
+     "name": "Aerospace Engineering",
+     "language": "en",
+     "country": "IN"
+    },
+    {
+     "channelId": "UCEBb1b_L6zDS3xTUrIALZOw",
+     "handle": "@mitocw",
+     "name": "MIT OpenCourseWare",
+     "language": "en",
+     "country": "global"
+    },
+    {
+     "channelId": "UCPUuVY7w8brL0r__P8UBgyQ",
+     "handle": "@ChristopherLum",
+     "name": "Christopher Lum",
+     "language": "en",
+     "country": "US"
+    },
+    {
+     "channelId": "UCXAS_Ekkq0iFJ9dSUIkcAkw",
+     "handle": "@TheEfficientEngineer",
+     "name": "The Efficient Engineer",
+     "language": "en",
+     "country": "global"
+    },
+    {
+     "channelId": "UCR1IuLEqb6UEA_zQ81kwXfg",
+     "handle": "@RealEngineering",
+     "name": "Real Engineering",
+     "language": "en",
+     "country": "global"
+    },
+    {
+     "channelId": "UC7KARY_u-pnVlWUtESJA4DQ",
+     "handle": "@snubberai",
+     "name": "Snubber | Engineering Interview Prep",
+     "language": "en",
+     "country": "global"
+    },
+    {
+     "channelId": "UCGNOEBp7AZaY4XPNoagpv8w",
+     "handle": "@ZCOCW",
+     "name": "Zewail City OpenCourseWare",
+     "language": "en",
+     "country": "EG"
+    },
+    {
+     "channelId": "UC-Xm2AjuiY9Izk4hVBUBbtQ",
+     "handle": "@conceptlibrary",
+     "name": "GATE Aerospace Engineering Coaching ConceptLibrary",
+     "language": "hi",
+     "country": "IN"
+    },
+    {
+     "channelId": "UCYdzEhcAnSxbbeJSNlItxtA",
+     "handle": "@gateaerospaceengineering",
+     "name": "GATE Aerospace Engineering - GOODWILL GATE2IIT",
+     "language": "en",
+     "country": "IN"
+    },
+    {
+     "channelId": "UCGUAxLGd1bqZkGgHYm7QZzA",
+     "handle": "@gateaerospaceengineering-igc",
+     "name": "GATE Aerospace -IGC",
+     "language": "en",
+     "country": "IN"
+    },
+    {
+     "channelId": "UCwrJT4eaK6rvkGGovO80GQw",
+     "handle": "@aviadoreseaeronautas",
+     "name": "Aviadores e Aeronautas",
+     "language": "pt",
+     "country": "BR"
+    }
+   ]
+  },
+  {
+   "id": "deg_aero_propulsion",
+   "kind": "degree",
+   "name": {
+    "en": "Propulsion (jet and rocket)"
+   },
+   "shortName": "Propulsion",
+   "group": "engineering",
+   "specialization": {
+    "en": "Aerospace engineering"
+   },
+   "languages": [
+    "en",
+    "pt"
+   ],
+   "subjects": [
+    "Aircraft propulsion",
+    "Gas turbines",
+    "Rocket propulsion",
+    "Thermodynamics of propulsion",
+    "Space flight mechanics"
+   ],
+   "keywords": [
+    "aircraft propulsion",
+    "jet propulsion",
+    "gas turbine",
+    "turbofan",
+    "turbojet",
+    "Brayton cycle",
+    "compressor",
+    "turbine",
+    "combustor",
+    "nozzle",
+    "rocket propulsion",
+    "rocket engine",
+    "specific impulse",
+    "thrust equation",
+    "rocket equation",
+    "liquid rocket",
+    "solid rocket",
+    "turbomachinery",
+    "orbital mechanics",
+    "space flight mechanics",
+    "GATE aerospace propulsion",
+    "NPTEL jet and rocket propulsion",
+    "propulsão",
+    "propulsión"
+   ],
+   "blockedWords": [
+    "vlog",
+    "reaction",
+    "salary reveal",
+    "job alert",
+    "result live",
+    "prank",
+    "motivation shorts",
+    "meme",
+    "unboxing"
+   ],
+   "chips": [
+    "Jet engines",
+    "Gas turbine cycles",
+    "Compressors & turbines",
+    "Combustors",
+    "Nozzles",
+    "Rocket engines",
+    "Specific impulse",
+    "Orbital mechanics",
+    "Turbomachinery",
+    "GATE AE"
+   ],
+   "channels": [
+    {
+     "channelId": "UCiY8ERfD4qvD_-d-VUWh_GA",
+     "handle": "@aerospaceengineering1031",
+     "name": "Aerospace Engineering",
+     "language": "en",
+     "country": "IN"
+    },
+    {
+     "channelId": "UCEBb1b_L6zDS3xTUrIALZOw",
+     "handle": "@mitocw",
+     "name": "MIT OpenCourseWare",
+     "language": "en",
+     "country": "global"
+    },
+    {
+     "channelId": "UCh57rwk3ySElDpzgCDLh9KA",
+     "handle": "@AgentJayZ",
+     "name": "AgentJayZ",
+     "language": "en",
+     "country": "global"
+    },
+    {
+     "channelId": "UC6uKrU_WqJ1R2HMTY3LIx5Q",
+     "handle": "@EverydayAstronaut",
+     "name": "Everyday Astronaut",
+     "language": "en",
+     "country": "global"
+    },
+    {
+     "channelId": "UCn46-_J-tZOormY24CqhqDQ",
+     "handle": "@ProfSeleghim",
+     "name": "Prof. P. Seleghim",
+     "language": "pt",
+     "country": "BR"
+    },
+    {
+     "channelId": "UC9ZvnHwvAR4XkjKzKxhYDDg",
+     "handle": "@ProfessorRoss",
+     "name": "Dr. Shane Ross",
+     "language": "en",
+     "country": "US"
+    },
+    {
+     "channelId": "UCeyvXAFv04k8MWxDo3Ravdw",
+     "handle": "@Kwiationengineering",
+     "name": "Kwiation Engineering",
+     "language": "en",
+     "country": "global"
+    },
+    {
+     "channelId": "UCGocLJBoQgLZJKRu0yRQ0xA",
+     "handle": "@gateaerospaceacademy",
+     "name": "Gate Aerospace Academy",
+     "language": "en",
+     "country": "IN"
+    },
+    {
+     "channelId": "UCaeoHcufuy7BGQ7Wq_ohTtw",
+     "handle": "@iitiansgateclasses",
+     "name": "IITians GATE CLASSES- IGC",
+     "language": "en",
+     "country": "IN"
+    },
+    {
+     "channelId": "UC7KARY_u-pnVlWUtESJA4DQ",
+     "handle": "@snubberai",
+     "name": "Snubber | Engineering Interview Prep",
+     "language": "en",
+     "country": "global"
+    }
+   ]
+  },
+  {
+   "id": "deg_aero_avionics",
+   "kind": "degree",
+   "name": {
+    "en": "Avionics and flight control"
+   },
+   "shortName": "Avionics",
+   "group": "engineering",
+   "specialization": {
+    "en": "Aerospace engineering"
+   },
+   "languages": [
+    "en",
+    "hi"
+   ],
+   "subjects": [
+    "Avionics systems",
+    "Flight dynamics and control",
+    "Navigation and sensors",
+    "Control systems",
+    "Aircraft systems"
+   ],
+   "keywords": [
+    "avionics",
+    "flight control system",
+    "autopilot",
+    "flight dynamics",
+    "aircraft stability",
+    "control systems",
+    "PID controller",
+    "state space",
+    "Kalman filter",
+    "sensor fusion",
+    "IMU",
+    "inertial navigation",
+    "GPS navigation",
+    "fly by wire",
+    "Simulink",
+    "model-based design",
+    "UAV",
+    "drone control",
+    "aircraft systems",
+    "ATA chapters",
+    "GATE aerospace flight mechanics",
+    "aviônica",
+    "aviónica"
+   ],
+   "blockedWords": [
+    "vlog",
+    "reaction",
+    "salary reveal",
+    "job alert",
+    "result live",
+    "prank",
+    "motivation shorts",
+    "meme",
+    "unboxing"
+   ],
+   "chips": [
+    "Flight control",
+    "Autopilot",
+    "Sensors & IMU",
+    "Kalman filter",
+    "Navigation",
+    "Control systems",
+    "PID",
+    "UAV/drones",
+    "Aircraft systems",
+    "Model-based design"
+   ],
+   "channels": [
+    {
+     "channelId": "UCPUuVY7w8brL0r__P8UBgyQ",
+     "handle": "@ChristopherLum",
+     "name": "Christopher Lum",
+     "language": "en",
+     "country": "US"
+    },
+    {
+     "channelId": "UCgdHSFcXvkN6O3NXvif0-pA",
+     "handle": "@MATLAB",
+     "name": "MATLAB",
+     "language": "en",
+     "country": "global"
+    },
+    {
+     "channelId": "UCDeOZ2v5NhlIioMGux4_h-A",
+     "handle": "@AeroAstroMIT",
+     "name": "MIT AeroAstro",
+     "language": "en",
+     "country": "US"
+    },
+    {
+     "channelId": "UCm5mt-A4w61lknZ9lCsZtBw",
+     "handle": "@Eigensteve",
+     "name": "Steve Brunton",
+     "language": "en",
+     "country": "global"
+    },
+    {
+     "channelId": "UCEBb1b_L6zDS3xTUrIALZOw",
+     "handle": "@mitocw",
+     "name": "MIT OpenCourseWare",
+     "language": "en",
+     "country": "global"
+    },
+    {
+     "channelId": "UCeyvXAFv04k8MWxDo3Ravdw",
+     "handle": "@Kwiationengineering",
+     "name": "Kwiation Engineering",
+     "language": "en",
+     "country": "global"
+    },
+    {
+     "channelId": "UC7KARY_u-pnVlWUtESJA4DQ",
+     "handle": "@snubberai",
+     "name": "Snubber | Engineering Interview Prep",
+     "language": "en",
+     "country": "global"
+    },
+    {
+     "channelId": "UCGUAxLGd1bqZkGgHYm7QZzA",
+     "handle": "@gateaerospaceengineering-igc",
+     "name": "GATE Aerospace -IGC",
+     "language": "en",
+     "country": "IN"
+    },
+    {
+     "channelId": "UCgp23vdLNaUitOkCxxVnRrg",
+     "handle": "@IITKharagpurJuly-is9ie",
+     "name": "NPTEL IIT Kharagpur",
+     "language": "en",
+     "country": "IN"
+    },
+    {
+     "channelId": "UCg4k338hz9U8jnD5SXPO5jQ",
+     "handle": "@EngineeringMindsetHindi",
+     "name": "Engineering Mindset in Hindi",
+     "language": "hi",
+     "country": "IN"
+    }
+   ]
+  },
+  {
+   "id": "deg_aero_structures",
+   "kind": "degree",
+   "name": {
+    "en": "Aerospace structures"
+   },
+   "shortName": "Structures",
+   "group": "engineering",
+   "specialization": {
+    "en": "Aerospace engineering"
+   },
+   "languages": [
+    "en",
+    "hi",
+    "es"
+   ],
+   "subjects": [
+    "Mechanics of materials",
+    "Aircraft structures",
+    "Structural analysis",
+    "Finite element method",
+    "Aeroelasticity"
+   ],
+   "keywords": [
+    "aircraft structures",
+    "aerospace structures",
+    "mechanics of materials",
+    "strength of materials",
+    "stress and strain",
+    "bending stress",
+    "shear flow",
+    "thin walled structures",
+    "torsion",
+    "buckling",
+    "column",
+    "finite element method",
+    "FEM",
+    "composites",
+    "fatigue",
+    "aeroelasticity",
+    "wing structure",
+    "statics",
+    "Hibbeler",
+    "resistencia de materiales",
+    "GATE aerospace structures",
+    "NPTEL aircraft structures"
+   ],
+   "blockedWords": [
+    "vlog",
+    "reaction",
+    "salary reveal",
+    "job alert",
+    "result live",
+    "prank",
+    "motivation shorts",
+    "meme",
+    "unboxing"
+   ],
+   "chips": [
+    "Stress & strain",
+    "Bending",
+    "Torsion",
+    "Thin-walled sections",
+    "Shear flow",
+    "Buckling",
+    "FEM",
+    "Composites",
+    "Fatigue",
+    "GATE AE"
+   ],
+   "channels": [
+    {
+     "channelId": "UCXAS_Ekkq0iFJ9dSUIkcAkw",
+     "handle": "@TheEfficientEngineer",
+     "name": "The Efficient Engineer",
+     "language": "en",
+     "country": "global"
+    },
+    {
+     "channelId": "UCEBb1b_L6zDS3xTUrIALZOw",
+     "handle": "@mitocw",
+     "name": "MIT OpenCourseWare",
+     "language": "en",
+     "country": "global"
+    },
+    {
+     "channelId": "UC7KARY_u-pnVlWUtESJA4DQ",
+     "handle": "@snubberai",
+     "name": "Snubber | Engineering Interview Prep",
+     "language": "en",
+     "country": "global"
+    },
+    {
+     "channelId": "UCXKW_dKcpFh358S1rV5qBDw",
+     "handle": "@1234jhanson",
+     "name": "Jeff Hanson",
+     "language": "en",
+     "country": "US"
+    },
+    {
+     "channelId": "UCiY8ERfD4qvD_-d-VUWh_GA",
+     "handle": "@aerospaceengineering1031",
+     "name": "Aerospace Engineering",
+     "language": "en",
+     "country": "IN"
+    },
+    {
+     "channelId": "UCgp23vdLNaUitOkCxxVnRrg",
+     "handle": "@IITKharagpurJuly-is9ie",
+     "name": "NPTEL IIT Kharagpur",
+     "language": "en",
+     "country": "IN"
+    },
+    {
+     "channelId": "UCGocLJBoQgLZJKRu0yRQ0xA",
+     "handle": "@gateaerospaceacademy",
+     "name": "Gate Aerospace Academy",
+     "language": "en",
+     "country": "IN"
+    },
+    {
+     "channelId": "UCYdzEhcAnSxbbeJSNlItxtA",
+     "handle": "@gateaerospaceengineering",
+     "name": "GATE Aerospace Engineering - GOODWILL GATE2IIT",
+     "language": "en",
+     "country": "IN"
+    },
+    {
+     "channelId": "UCRp71rRBhfyFu0gDWgj26xg",
+     "handle": "@gatemechanical",
+     "name": "Ex-IES, IITian, Manish Jindal",
+     "language": "hi",
+     "country": "IN"
+    },
+    {
+     "channelId": "UC6XXX85MsqeQos_T9nnh_wQ",
+     "handle": "@engradnanrasheedmechanical",
+     "name": "Engr. Adnan Rasheed Mechanical",
+     "language": "en",
+     "country": "PK"
+    },
+    {
+     "channelId": "UCn_0UH6BABKL1E6rliBmFeA",
+     "handle": "@ClasesDeIngenieria",
+     "name": "Clases de Ingeniería",
+     "language": "es",
+     "country": "CO"
+    }
+   ]
+  },
+  {
+   "id": "deg_mech_thermal",
+   "kind": "degree",
+   "name": {
+    "en": "Thermal engineering"
+   },
+   "shortName": "Thermal",
+   "group": "engineering",
+   "specialization": {
+    "en": "Mechanical engineering"
+   },
+   "languages": [
+    "en",
+    "hi",
+    "pt",
+    "es",
+    "ar",
+    "id",
+    "bn"
+   ],
+   "subjects": [
+    "Thermodynamics",
+    "Heat transfer",
+    "Fluid mechanics",
+    "Power plant engineering",
+    "Refrigeration and air conditioning",
+    "IC engines"
+   ],
+   "keywords": [
+    "thermodynamics",
+    "first law",
+    "second law",
+    "entropy",
+    "Rankine cycle",
+    "Brayton cycle",
+    "Otto cycle",
+    "heat transfer",
+    "conduction",
+    "convection",
+    "radiation",
+    "heat exchanger",
+    "fluid mechanics",
+    "refrigeration",
+    "air conditioning",
+    "psychrometry",
+    "HVAC",
+    "power plant",
+    "boiler",
+    "steam turbine",
+    "IC engines",
+    "Cengel",
+    "GATE mechanical thermodynamics",
+    "termodinâmica",
+    "termodinámica",
+    "ديناميكا حرارية",
+    "termodinamika",
+    "তাপগতিবিদ্যা"
+   ],
+   "blockedWords": [
+    "vlog",
+    "reaction",
+    "salary reveal",
+    "job alert",
+    "result live",
+    "prank",
+    "motivation shorts",
+    "meme",
+    "unboxing"
+   ],
+   "chips": [
+    "Laws of thermodynamics",
+    "Entropy",
+    "Power cycles",
+    "Heat transfer",
+    "Heat exchangers",
+    "Fluid mechanics",
+    "Refrigeration",
+    "HVAC",
+    "Power plants",
+    "GATE ME"
+   ],
+   "channels": [
+    {
+     "channelId": "UCrRKDc1uHcif575CQexIA5Q",
+     "handle": "@ronhugo6225",
+     "name": "Ron Hugo",
+     "language": "en",
+     "country": "CA"
+    },
+    {
+     "channelId": "UCEBb1b_L6zDS3xTUrIALZOw",
+     "handle": "@mitocw",
+     "name": "MIT OpenCourseWare",
+     "language": "en",
+     "country": "global"
+    },
+    {
+     "channelId": "UCXAS_Ekkq0iFJ9dSUIkcAkw",
+     "handle": "@TheEfficientEngineer",
+     "name": "The Efficient Engineer",
+     "language": "en",
+     "country": "global"
+    },
+    {
+     "channelId": "UCk0fGHsCEzGig-rSzkfCjMw",
+     "handle": "@EngineeringMindset",
+     "name": "The Engineering Mindset",
+     "language": "en",
+     "country": "global"
+    },
+    {
+     "channelId": "UC7KARY_u-pnVlWUtESJA4DQ",
+     "handle": "@snubberai",
+     "name": "Snubber | Engineering Interview Prep",
+     "language": "en",
+     "country": "global"
+    },
+    {
+     "channelId": "UC640y4UvDAlya_WOj5U4pfA",
+     "handle": "@iit",
+     "name": "nptelhrd",
+     "language": "en",
+     "country": "IN"
+    },
+    {
+     "channelId": "UCrpELe0mluSZ8-2saJH5a0A",
+     "handle": "@UnacademyGATEMEPIXE",
+     "name": "Unacademy GATE - ME, PI, XE",
+     "language": "hi",
+     "country": "IN"
+    },
+    {
+     "channelId": "UCtiuYQs7NKvzMZq63VStmWA",
+     "handle": "@ExergicGATE",
+     "name": "Exergic - GATE ME, XE",
+     "language": "hi",
+     "country": "IN"
+    },
+    {
+     "channelId": "UCn46-_J-tZOormY24CqhqDQ",
+     "handle": "@ProfSeleghim",
+     "name": "Prof. P. Seleghim",
+     "language": "pt",
+     "country": "BR"
+    },
+    {
+     "channelId": "UCmIEFPpVOYyneAuP1qWNNvQ",
+     "handle": "@CiênciasTérmicas",
+     "name": "Ciências Térmicas",
+     "language": "pt",
+     "country": "BR"
+    },
+    {
+     "channelId": "UCBgDLK5n0SHj-dfWeUCA-tA",
+     "handle": "@gabrielfernandogarciasanchez",
+     "name": "Gabriel Fernando García Sánchez",
+     "language": "es",
+     "country": "CO"
+    },
+    {
+     "channelId": "UCu9Puth4dyEiUC6tsIG4P1w",
+     "handle": "@mushtaq.alebrahimy",
+     "name": "Prof.Dr.Mushtaq Al-Ebrahimy",
+     "language": "ar",
+     "country": "IQ"
+    },
+    {
+     "channelId": "UCXqSyNyLuUFrFFcAaoxgZNw",
+     "handle": "@dr.agungpambudi41",
+     "name": "Dr. Agung Pambudi",
+     "language": "id",
+     "country": "ID"
+    },
+    {
+     "channelId": "UCJAfqksp7MimZmoegFtPqIg",
+     "handle": "@EngineersCafe",
+     "name": "Engineers Cafe",
+     "language": "bn",
+     "country": "BD"
+    }
+   ]
+  },
+  {
+   "id": "deg_mech_automotive",
+   "kind": "degree",
+   "name": {
+    "en": "Automotive engineering"
+   },
+   "shortName": "Automotive",
+   "group": "engineering",
+   "specialization": {
+    "en": "Mechanical engineering"
+   },
+   "languages": [
+    "en",
+    "hi",
+    "es",
+    "bn"
+   ],
+   "subjects": [
+    "Automobile engineering",
+    "IC engines",
+    "Vehicle dynamics",
+    "Automotive electronics",
+    "Transmission and drivetrain"
+   ],
+   "keywords": [
+    "automobile engineering",
+    "automotive engineering",
+    "IC engine",
+    "engine working",
+    "bore and stroke",
+    "compression ratio",
+    "fuel injection",
+    "turbocharger",
+    "transmission",
+    "gearbox",
+    "clutch",
+    "differential",
+    "brakes",
+    "suspension",
+    "steering",
+    "vehicle dynamics",
+    "automotive sensors",
+    "ECU",
+    "ADAS",
+    "hybrid vehicle",
+    "OBD diagnostics",
+    "ASE",
+    "engenharia automotiva",
+    "ingeniería automotriz",
+    "automobile engineering hindi"
+   ],
+   "blockedWords": [
+    "vlog",
+    "reaction",
+    "salary reveal",
+    "job alert",
+    "result live",
+    "prank",
+    "motivation shorts",
+    "meme",
+    "unboxing",
+    "car review",
+    "price launch",
+    "modified car"
+   ],
+   "chips": [
+    "Engine basics",
+    "Fuel injection",
+    "Transmission",
+    "Brakes",
+    "Suspension & steering",
+    "Vehicle dynamics",
+    "Automotive sensors",
+    "ADAS",
+    "Hybrids",
+    "Diagnostics"
+   ],
+   "channels": [
+    {
+     "channelId": "UClqhvGmHcvWL9w3R48t9QXQ",
+     "handle": "@EngineeringExplained",
+     "name": "Engineering Explained",
+     "language": "en",
+     "country": "global"
+    },
+    {
+     "channelId": "UCr9n57XbMVwDb-eLfgGB3IQ",
+     "handle": "@AutomotiveEngineeringschool",
+     "name": "Automotive Engineering",
+     "language": "en",
+     "country": "global"
+    },
+    {
+     "channelId": "UC7KARY_u-pnVlWUtESJA4DQ",
+     "handle": "@snubberai",
+     "name": "Snubber | Engineering Interview Prep",
+     "language": "en",
+     "country": "global"
+    },
+    {
+     "channelId": "UC4XfTSrHuqJgRQWQJm_4HBQ",
+     "handle": "@CollegeAutomotiveClasses",
+     "name": "CollegeAutomotiveClasses",
+     "language": "en",
+     "country": "US"
+    },
+    {
+     "channelId": "UC640y4UvDAlya_WOj5U4pfA",
+     "handle": "@iit",
+     "name": "nptelhrd",
+     "language": "en",
+     "country": "IN"
+    },
+    {
+     "channelId": "UCGSyg2h9LWU16eTNND0J26w",
+     "handle": "@AutomotiveEngineHindi",
+     "name": "Automotive Engine Hindi",
+     "language": "hi",
+     "country": "IN"
+    },
+    {
+     "channelId": "UCBgDLK5n0SHj-dfWeUCA-tA",
+     "handle": "@gabrielfernandogarciasanchez",
+     "name": "Gabriel Fernando García Sánchez",
+     "language": "es",
+     "country": "CO"
+    },
+    {
+     "channelId": "UCuScExjP7KhaS3icEI6xz4g",
+     "handle": "@AutomobileEngineering",
+     "name": "Automobile Engineering",
+     "language": "bn",
+     "country": "BD"
+    }
+   ]
+  },
+  {
+   "id": "deg_mech_ev_fuel_cells",
+   "kind": "degree",
+   "name": {
+    "en": "Electric vehicles and fuel cells"
+   },
+   "shortName": "EV & fuel cells",
+   "group": "engineering",
+   "specialization": {
+    "en": "Mechanical engineering"
+   },
+   "languages": [
+    "en",
+    "hi",
+    "es",
+    "pt",
+    "ar",
+    "id"
+   ],
+   "subjects": [
+    "Electric vehicle technology",
+    "Batteries and BMS",
+    "Electric motors and drives",
+    "Hybrid vehicles",
+    "Fuel cells and hydrogen",
+    "Renewable energy"
+   ],
+   "keywords": [
+    "electric vehicle",
+    "EV technology",
+    "lithium ion battery",
+    "battery management system",
+    "BMS",
+    "state of charge",
+    "electric motor",
+    "BLDC motor",
+    "PMSM",
+    "induction motor",
+    "motor drive",
+    "power electronics",
+    "inverter",
+    "EV charging",
+    "regenerative braking",
+    "hybrid electric vehicle",
+    "fuel cell",
+    "PEM fuel cell",
+    "hydrogen",
+    "energy storage",
+    "renewable energy",
+    "NPTEL electric vehicles",
+    "vehículos eléctricos",
+    "veículos elétricos",
+    "السيارات الكهربائية"
+   ],
+   "blockedWords": [
+    "vlog",
+    "reaction",
+    "salary reveal",
+    "job alert",
+    "result live",
+    "prank",
+    "motivation shorts",
+    "meme",
+    "unboxing",
+    "car review",
+    "price launch",
+    "stock news"
+   ],
+   "chips": [
+    "EV architecture",
+    "Li-ion batteries",
+    "BMS",
+    "Motors & drives",
+    "Power electronics",
+    "Charging",
+    "Hybrids",
+    "Fuel cells",
+    "Hydrogen",
+    "Energy conversion"
+   ],
+   "channels": [
+    {
+     "channelId": "UClqhvGmHcvWL9w3R48t9QXQ",
+     "handle": "@EngineeringExplained",
+     "name": "Engineering Explained",
+     "language": "en",
+     "country": "global"
+    },
+    {
+     "channelId": "UCk0fGHsCEzGig-rSzkfCjMw",
+     "handle": "@EngineeringMindset",
+     "name": "The Engineering Mindset",
+     "language": "en",
+     "country": "global"
+    },
+    {
+     "channelId": "UCgdHSFcXvkN6O3NXvif0-pA",
+     "handle": "@MATLAB",
+     "name": "MATLAB",
+     "language": "en",
+     "country": "global"
+    },
+    {
+     "channelId": "UCEBb1b_L6zDS3xTUrIALZOw",
+     "handle": "@mitocw",
+     "name": "MIT OpenCourseWare",
+     "language": "en",
+     "country": "global"
+    },
+    {
+     "channelId": "UC7KARY_u-pnVlWUtESJA4DQ",
+     "handle": "@snubberai",
+     "name": "Snubber | Engineering Interview Prep",
+     "language": "en",
+     "country": "global"
+    },
+    {
+     "channelId": "UC4XfTSrHuqJgRQWQJm_4HBQ",
+     "handle": "@CollegeAutomotiveClasses",
+     "name": "CollegeAutomotiveClasses",
+     "language": "en",
+     "country": "US"
+    },
+    {
+     "channelId": "UC2f8Yv7uTOwRqecRZbgsAuA",
+     "handle": "@npteliitd",
+     "name": "NPTEL IIT Delhi",
+     "language": "en",
+     "country": "IN"
+    },
+    {
+     "channelId": "UCg4k338hz9U8jnD5SXPO5jQ",
+     "handle": "@EngineeringMindsetHindi",
+     "name": "Engineering Mindset in Hindi",
+     "language": "hi",
+     "country": "IN"
+    },
+    {
+     "channelId": "UCBgDLK5n0SHj-dfWeUCA-tA",
+     "handle": "@gabrielfernandogarciasanchez",
+     "name": "Gabriel Fernando García Sánchez",
+     "language": "es",
+     "country": "CO"
+    },
+    {
+     "channelId": "UCn46-_J-tZOormY24CqhqDQ",
+     "handle": "@ProfSeleghim",
+     "name": "Prof. P. Seleghim",
+     "language": "pt",
+     "country": "BR"
+    },
+    {
+     "channelId": "UCu9Puth4dyEiUC6tsIG4P1w",
+     "handle": "@mushtaq.alebrahimy",
+     "name": "Prof.Dr.Mushtaq Al-Ebrahimy",
+     "language": "ar",
+     "country": "IQ"
+    },
+    {
+     "channelId": "UCXqSyNyLuUFrFFcAaoxgZNw",
+     "handle": "@dr.agungpambudi41",
+     "name": "Dr. Agung Pambudi",
+     "language": "id",
+     "country": "ID"
+    }
+   ]
+  },
+  {
+   "id": "deg_mech_manufacturing",
+   "kind": "degree",
+   "name": {
+    "en": "Manufacturing and production engineering"
+   },
+   "shortName": "Manufacturing",
+   "group": "engineering",
+   "specialization": {
+    "en": "Mechanical engineering"
+   },
+   "languages": [
+    "en",
+    "hi",
+    "es",
+    "pt",
+    "id"
+   ],
+   "subjects": [
+    "Manufacturing processes",
+    "Machining and machine tools",
+    "Casting, forming and welding",
+    "Metrology and GD&T",
+    "CNC and CAD/CAM",
+    "Industrial machinery"
+   ],
+   "keywords": [
+    "manufacturing processes",
+    "production engineering",
+    "casting",
+    "welding",
+    "metal forming",
+    "sheet metal",
+    "metal cutting",
+    "machining",
+    "lathe",
+    "milling",
+    "machine tools",
+    "CNC",
+    "CAM",
+    "G-code",
+    "GD&T",
+    "metrology",
+    "surface finish",
+    "tolerances",
+    "mold design",
+    "tool design",
+    "pumps",
+    "mechanical seals",
+    "GATE manufacturing",
+    "procesos de manufactura",
+    "processos de fabricação"
+   ],
+   "blockedWords": [
+    "vlog",
+    "reaction",
+    "salary reveal",
+    "job alert",
+    "result live",
+    "prank",
+    "motivation shorts",
+    "meme",
+    "unboxing"
+   ],
+   "chips": [
+    "Casting",
+    "Welding",
+    "Forming",
+    "Metal cutting",
+    "Machine tools",
+    "CNC & CAM",
+    "GD&T",
+    "Metrology",
+    "Mold design",
+    "GATE ME"
+   ],
+   "channels": [
+    {
+     "channelId": "UCe0IyK4ntgdPTTjsxjvyHPg",
+     "handle": "@nyccnc",
+     "name": "NYC CNC",
+     "language": "en",
+     "country": "global"
+    },
+    {
+     "channelId": "UCc2lUKVOTXKlQR7Fm7h1JfQ",
+     "handle": "@TITANSofCNC",
+     "name": "TITANS of CNC MACHINING",
+     "language": "en",
+     "country": "global"
+    },
+    {
+     "channelId": "UC7KARY_u-pnVlWUtESJA4DQ",
+     "handle": "@snubberai",
+     "name": "Snubber | Engineering Interview Prep",
+     "language": "en",
+     "country": "global"
+    },
+    {
+     "channelId": "UCEBb1b_L6zDS3xTUrIALZOw",
+     "handle": "@mitocw",
+     "name": "MIT OpenCourseWare",
+     "language": "en",
+     "country": "global"
+    },
+    {
+     "channelId": "UC640y4UvDAlya_WOj5U4pfA",
+     "handle": "@iit",
+     "name": "nptelhrd",
+     "language": "en",
+     "country": "IN"
+    },
+    {
+     "channelId": "UCrpELe0mluSZ8-2saJH5a0A",
+     "handle": "@UnacademyGATEMEPIXE",
+     "name": "Unacademy GATE - ME, PI, XE",
+     "language": "hi",
+     "country": "IN"
+    },
+    {
+     "channelId": "UCGrrw9x3_B_fItUIBMvqAUw",
+     "handle": "@gatewallah_me_ce_xe_ch",
+     "name": "GATE Wallah - ME, CE, XE, CH, PI & ES",
+     "language": "hi",
+     "country": "IN"
+    },
+    {
+     "channelId": "UCtiuYQs7NKvzMZq63VStmWA",
+     "handle": "@ExergicGATE",
+     "name": "Exergic - GATE ME, XE",
+     "language": "hi",
+     "country": "IN"
+    },
+    {
+     "channelId": "UCr_KAKlfAStAojEwQm4QHMQ",
+     "handle": "@praveenkulkarnimechanical",
+     "name": "kulkarni's Academy of Mechanical Engineering",
+     "language": "en",
+     "country": "IN"
+    },
+    {
+     "channelId": "UCeY6L9SsqRt6JrNIfH22fzw",
+     "handle": "@educationwood-Mechanical",
+     "name": "EducationWood - Mechanical Engineering",
+     "language": "en",
+     "country": "IN"
+    },
+    {
+     "channelId": "UCTo8USxK5DGtTpfNZMCp9sQ",
+     "handle": "@AnkuEducationCentre1990",
+     "name": "Anku Education Centre",
+     "language": "hi",
+     "country": "IN"
+    },
+    {
+     "channelId": "UC8tIkk4LuQY5OiEx-WTlPdA",
+     "handle": "@JavierCarpintero",
+     "name": "Javier Carpintero",
+     "language": "es",
+     "country": "CO"
+    },
+    {
+     "channelId": "UCr_IrlOjdgsvCm8-fmd9WtA",
+     "handle": "@LesicsPOR",
+     "name": "JAES Company Português",
+     "language": "pt",
+     "country": "BR"
+    },
+    {
+     "channelId": "UC-lJ0kIvHNRs0r0yqm48FOw",
+     "handle": "@LesicsIndo",
+     "name": "JAES Company Indonesian",
+     "language": "id",
+     "country": "ID"
+    }
+   ]
+  },
+  {
+   "id": "deg_mech_robotics",
+   "kind": "degree",
+   "name": {
+    "en": "Robotics and mechatronics"
+   },
+   "shortName": "Robotics",
+   "group": "engineering",
+   "specialization": {
+    "en": "Mechanical engineering"
+   },
+   "languages": [
+    "en",
+    "es"
+   ],
+   "subjects": [
+    "Robot kinematics and dynamics",
+    "Control systems",
+    "Robot perception and SLAM",
+    "ROS and robot programming",
+    "Industrial robotics"
+   ],
+   "keywords": [
+    "robotics",
+    "robot kinematics",
+    "forward kinematics",
+    "inverse kinematics",
+    "Jacobian",
+    "robot dynamics",
+    "trajectory planning",
+    "motion planning",
+    "control systems",
+    "PID",
+    "SLAM",
+    "localization",
+    "computer vision",
+    "ROS",
+    "ROS 2",
+    "Gazebo",
+    "manipulator",
+    "end effector",
+    "mobile robots",
+    "industrial robot",
+    "mechatronics",
+    "Modern Robotics",
+    "rigid body dynamics",
+    "mecánica racional",
+    "robótica"
+   ],
+   "blockedWords": [
+    "vlog",
+    "reaction",
+    "salary reveal",
+    "job alert",
+    "result live",
+    "prank",
+    "motivation shorts",
+    "meme",
+    "unboxing",
+    "robot toy"
+   ],
+   "chips": [
+    "Kinematics",
+    "Dynamics",
+    "Jacobians",
+    "Trajectory planning",
+    "Control",
+    "SLAM",
+    "Perception",
+    "ROS 2",
+    "Manipulators",
+    "Industrial robots"
+   ],
+   "channels": [
+    {
+     "channelId": "UCi1TC2fLRvgBQNe-T4dp8Eg",
+     "handle": "@CyrillStachniss",
+     "name": "Cyrill Stachniss",
+     "language": "en",
+     "country": "global"
+    },
+    {
+     "channelId": "UCiK0J5wtnyX2jP-AiGbdhjg",
+     "handle": "@NorthwesternRobotics",
+     "name": "Northwestern Robotics",
+     "language": "en",
+     "country": "global"
+    },
+    {
+     "channelId": "UCm5mt-A4w61lknZ9lCsZtBw",
+     "handle": "@Eigensteve",
+     "name": "Steve Brunton",
+     "language": "en",
+     "country": "global"
+    },
+    {
+     "channelId": "UCgdHSFcXvkN6O3NXvif0-pA",
+     "handle": "@MATLAB",
+     "name": "MATLAB",
+     "language": "en",
+     "country": "global"
+    },
+    {
+     "channelId": "UCEBb1b_L6zDS3xTUrIALZOw",
+     "handle": "@mitocw",
+     "name": "MIT OpenCourseWare",
+     "language": "en",
+     "country": "global"
+    },
+    {
+     "channelId": "UCx9vSJTSZGFrErfPtut5GNQ",
+     "handle": "@ArticulatedRobotics",
+     "name": "Articulated Robotics",
+     "language": "en",
+     "country": "global"
+    },
+    {
+     "channelId": "UCHHv_UYPcZGGibNiPhJRpmw",
+     "handle": "@learn-robotics-with-ros",
+     "name": "Learn robotics with ROS",
+     "language": "en",
+     "country": "global"
+    },
+    {
+     "channelId": "UCt6Lag-vv25fTX3e11mVY1Q",
+     "handle": "@TheConstruct",
+     "name": "The Construct Robotics Institute",
+     "language": "en",
+     "country": "global"
+    },
+    {
+     "channelId": "UC7KARY_u-pnVlWUtESJA4DQ",
+     "handle": "@snubberai",
+     "name": "Snubber | Engineering Interview Prep",
+     "language": "en",
+     "country": "global"
+    },
+    {
+     "channelId": "UC_t5aCuly693PgqLzFM97Sw",
+     "handle": "@intro-to-robotics",
+     "name": "Introduction to Robotics @ Princeton",
+     "language": "en",
+     "country": "US"
+    },
+    {
+     "channelId": "UCY-ANi3wxkUSGhAel7T0TGw",
+     "handle": "@IITRoorkeeJuly",
+     "name": "IIT Roorkee July 2018",
+     "language": "en",
+     "country": "IN"
+    },
+    {
+     "channelId": "UCgPrsct5ZJgMQMAW147Rk8A",
+     "handle": "@ArunUdai",
+     "name": "Arun Dayal Udai",
+     "language": "en",
+     "country": "IN"
+    },
+    {
+     "channelId": "UCG8NH3EwFXecRJvb9773q5A",
+     "handle": "@jorgealejandrovitaliti",
+     "name": "Jorge Alejandro Vitaliti",
+     "language": "es",
+     "country": "AR"
+    }
+   ]
+  },
+  {
+   "id": "deg_civil_structural",
+   "kind": "degree",
+   "name": {
+    "en": "Structural engineering"
+   },
+   "shortName": "Structural",
+   "group": "engineering",
+   "specialization": {
+    "en": "Civil engineering"
+   },
+   "languages": [
+    "en",
+    "hi",
+    "ar",
+    "es",
+    "pt",
+    "id",
+    "ur"
+   ],
+   "subjects": [
+    "Structural analysis",
+    "Reinforced concrete design",
+    "Steel design",
+    "Structural dynamics and earthquake engineering",
+    "Interview questions"
+   ],
+   "keywords": [
+    "structural engineering",
+    "structural analysis",
+    "reinforced concrete design",
+    "RCC design",
+    "steel design",
+    "beam design",
+    "column design",
+    "slab design",
+    "truss analysis",
+    "matrix stiffness method",
+    "moment distribution",
+    "influence lines",
+    "earthquake engineering",
+    "seismic design",
+    "prestressed concrete",
+    "ETABS",
+    "STAAD Pro",
+    "IS 456",
+    "ACI 318",
+    "Eurocode 2",
+    "CE board exam structural",
+    "GATE civil structural analysis",
+    "structural engineer interview questions",
+    "análisis estructural",
+    "concreto armado",
+    "análise estrutural",
+    "تحليل انشائي",
+    "analisis struktur"
+   ],
+   "blockedWords": [
+    "vlog",
+    "day in the life",
+    "salary reveal",
+    "job alert",
+    "result live",
+    "reaction",
+    "prank",
+    "motivation shorts"
+   ],
+   "chips": [
+    "Structural analysis",
+    "RCC design",
+    "Steel design",
+    "Beams & columns",
+    "Trusses & frames",
+    "Stiffness method",
+    "Earthquake design",
+    "Prestressed concrete",
+    "Codes (IS 456, ACI, Eurocode)",
+    "Interview questions"
+   ],
+   "channels": [
+    {
+     "channelId": "UCvSpLnUTU6MamZwD2a9zySg",
+     "handle": "@DrStructure",
+     "name": "Dr. Structure",
+     "language": "en",
+     "country": "global"
+    },
+    {
+     "channelId": "UCGv3KG_qIWQuIZEH-YGpBUw",
+     "handle": "@gregorymichaelson",
+     "name": "Gregory Michaelson",
+     "language": "en",
+     "country": "global"
+    },
+    {
+     "channelId": "UCpYp_lkXxZvBUV6QrQYGs6w",
+     "handle": "@DrJQureshi",
+     "name": "Dr Jawed Qureshi",
+     "language": "en",
+     "country": "global"
+    },
+    {
+     "channelId": "UC3j0swS3gQHbs4eiZEJfj5A",
+     "handle": "@UnderstandingStructures",
+     "name": "Understanding Structures with Fawad Najam",
+     "language": "en",
+     "country": "global"
+    },
+    {
+     "channelId": "UCNHiPdtZhwVKUSeCyAhF5zQ",
+     "handle": "@kestava_engineering",
+     "name": "Kestävä",
+     "language": "en",
+     "country": "US"
+    },
+    {
+     "channelId": "UCBZru6uj_M66HfYhTh6ELOA",
+     "handle": "@civilbrainshindi",
+     "name": "Civil Brains हिन्दी - Civil Engineers Empire",
+     "language": "hi",
+     "country": "IN"
+    },
+    {
+     "channelId": "UC1xLsrOa2kSwVaro1sKuh_g",
+     "handle": "@EngrDeLaCruz",
+     "name": "Engr. Jobert S. De La Cruz",
+     "language": "en",
+     "country": "PH"
+    },
+    {
+     "channelId": "UC_9Yxgd-hgvzIR6kGxMvoMQ",
+     "handle": "@GillesaniaEngineeringVideos",
+     "name": "Gillesania Engineering Videos",
+     "language": "en",
+     "country": "PH"
+    },
+    {
+     "channelId": "UClYS6cDC2GSX0phXTQMxOKg",
+     "handle": "@engrsami1",
+     "name": "Engr Sami",
+     "language": "ur",
+     "country": "PK"
+    },
+    {
+     "channelId": "UCjjYaOuix0GOFtWiY49L27w",
+     "handle": "@IbrahemOkkeh",
+     "name": "Ibrahem Okkeh",
+     "language": "ar",
+     "country": "JO"
+    },
+    {
+     "channelId": "UCSGi9sgZVeQdbbl8z_R-w0g",
+     "handle": "@FerNANCivil",
+     "name": "FerNAN Civil",
+     "language": "es",
+     "country": "PE"
+    },
+    {
+     "channelId": "UCk_2PZmNbFyfyhYsH_sHzVw",
+     "handle": "@EngEstrutGilberto",
+     "name": "Eng estrutural Gilberto - novo canal",
+     "language": "pt",
+     "country": "BR"
+    },
+    {
+     "channelId": "UCK8XU66V4JujVJ1Yl0HYRLw",
+     "handle": "@BelajarStrukturdiUBL",
+     "name": "Belajar Struktur di UBL",
+     "language": "id",
+     "country": "ID"
+    }
+   ]
+  },
+  {
+   "id": "deg_civil_geotechnical",
+   "kind": "degree",
+   "name": {
+    "en": "Geotechnical engineering"
+   },
+   "shortName": "Geotechnical",
+   "group": "engineering",
+   "specialization": {
+    "en": "Civil engineering"
+   },
+   "languages": [
+    "en",
+    "hi",
+    "bn",
+    "pt"
+   ],
+   "subjects": [
+    "Soil mechanics",
+    "Foundation engineering",
+    "Slope stability",
+    "Earth retaining structures",
+    "Geotechnical software"
+   ],
+   "keywords": [
+    "geotechnical engineering",
+    "soil mechanics",
+    "foundation engineering",
+    "bearing capacity",
+    "Terzaghi",
+    "consolidation",
+    "compaction",
+    "shear strength",
+    "effective stress",
+    "permeability",
+    "seepage",
+    "slope stability",
+    "retaining wall",
+    "pile foundation",
+    "shallow foundation",
+    "soil classification",
+    "PLAXIS",
+    "GATE geotechnical",
+    "soil mechanics GATE",
+    "core cutter test",
+    "mecánica de suelos",
+    "mecânica dos solos",
+    "geotecnia",
+    "ميكانيكا التربة",
+    "mekanika tanah"
+   ],
+   "blockedWords": [
+    "vlog",
+    "day in the life",
+    "salary reveal",
+    "job alert",
+    "result live",
+    "reaction",
+    "prank",
+    "motivation shorts"
+   ],
+   "chips": [
+    "Soil classification",
+    "Compaction",
+    "Consolidation",
+    "Shear strength",
+    "Bearing capacity",
+    "Shallow foundations",
+    "Pile foundations",
+    "Slope stability",
+    "Retaining walls",
+    "PLAXIS",
+    "Lab tests"
+   ],
+   "channels": [
+    {
+     "channelId": "UCaRDHxjYO8nGiYHv22QgZfg",
+     "handle": "@GeoStructAcademy",
+     "name": "GeoStruct Academy",
+     "language": "en",
+     "country": "global"
+    },
+    {
+     "channelId": "UCJSwhjgMIMiS5Cmp8RqAYcg",
+     "handle": "@Dr.Fahmi.GEOtExcel",
+     "name": "Bearing Capacity & Soil Mechanics: Geotech Excel",
+     "language": "en",
+     "country": "global"
+    },
+    {
+     "channelId": "UC4AKuOwN1AHlhh41rEVWLrA",
+     "handle": "@ProfessorKlingerSenra",
+     "name": "Professor Klinger Senra | Geotecnia",
+     "language": "pt",
+     "country": "BR"
+    },
+    {
+     "channelId": "UCac_5guiBqzDPqiwvUIHcpA",
+     "handle": "@Civilengineeringinbengali",
+     "name": "Civil engineering in bengali",
+     "language": "bn",
+     "country": "IN"
+    },
+    {
+     "channelId": "UCnFE7w57zVCFOdkmele9aDw",
+     "handle": "@simplifiedcivilandgeotechn4036",
+     "name": "SIMPLIFIED CIVIL AND GEOTECHNICAL ENGINEERING",
+     "language": "en",
+     "country": "IN"
+    },
+    {
+     "channelId": "UCwh_qd5g7I88OVr8FM1PnjQ",
+     "handle": "@GATEACADEMYCEME",
+     "name": "GATE ACADEMY - CE | ME | CH by Umesh Dhande",
+     "language": "hi",
+     "country": "IN"
+    },
+    {
+     "channelId": "UCj3uro8sUcAMj5gEEw9u-FA",
+     "handle": "@OnlineEngineering",
+     "name": "Online Engineering - GATE & ESE",
+     "language": "en",
+     "country": "IN"
+    }
+   ]
+  },
+  {
+   "id": "deg_civil_transportation",
+   "kind": "degree",
+   "name": {
+    "en": "Transportation engineering"
+   },
+   "shortName": "Transportation",
+   "group": "engineering",
+   "specialization": {
+    "en": "Civil engineering"
+   },
+   "languages": [
+    "en",
+    "hi",
+    "bn",
+    "ar"
+   ],
+   "subjects": [
+    "Highway engineering",
+    "Pavement design",
+    "Traffic engineering",
+    "Transportation planning",
+    "Railway and airport engineering"
+   ],
+   "keywords": [
+    "transportation engineering",
+    "highway engineering",
+    "pavement design",
+    "flexible pavement",
+    "rigid pavement",
+    "IRC",
+    "AASHTO",
+    "traffic engineering",
+    "traffic flow",
+    "signal design",
+    "sight distance",
+    "horizontal curve",
+    "superelevation",
+    "trip generation",
+    "four step model",
+    "origin destination study",
+    "airport engineering",
+    "railway engineering",
+    "Civil 3D road design",
+    "FE civil transportation",
+    "GATE highway engineering",
+    "ingeniería de tránsito",
+    "ingeniería vial",
+    "engenharia de transportes",
+    "هندسة الطرق"
+   ],
+   "blockedWords": [
+    "vlog",
+    "day in the life",
+    "salary reveal",
+    "job alert",
+    "result live",
+    "reaction",
+    "prank",
+    "motivation shorts"
+   ],
+   "chips": [
+    "Highway geometry",
+    "Sight distance",
+    "Horizontal curves",
+    "Pavement design",
+    "Flexible vs rigid",
+    "Traffic flow",
+    "Signal design",
+    "Trip generation",
+    "Airport engineering",
+    "Railway engineering",
+    "Road surveying"
+   ],
+   "channels": [
+    {
+     "channelId": "UCA4RSwxJq1EjQ8U4EnXCxXQ",
+     "handle": "@SatishIITR",
+     "name": "Transportation Engg Talks | Satish IITR",
+     "language": "en",
+     "country": "IN"
+    },
+    {
+     "channelId": "UCac_5guiBqzDPqiwvUIHcpA",
+     "handle": "@Civilengineeringinbengali",
+     "name": "Civil engineering in bengali",
+     "language": "bn",
+     "country": "IN"
+    },
+    {
+     "channelId": "UCwh_qd5g7I88OVr8FM1PnjQ",
+     "handle": "@GATEACADEMYCEME",
+     "name": "GATE ACADEMY - CE | ME | CH by Umesh Dhande",
+     "language": "hi",
+     "country": "IN"
+    },
+    {
+     "channelId": "UCj3uro8sUcAMj5gEEw9u-FA",
+     "handle": "@OnlineEngineering",
+     "name": "Online Engineering - GATE & ESE",
+     "language": "en",
+     "country": "IN"
+    },
+    {
+     "channelId": "UCR1wtr3PSI9G591G23J_Mlw",
+     "handle": "@directhubfeexam",
+     "name": "DIRECTHUB FE EXAM PREP",
+     "language": "en",
+     "country": "US"
+    },
+    {
+     "channelId": "UCIv8TEGNXiumxcgtVO1uzsg",
+     "handle": "@Engr.Khaled.AbdEl-Karim",
+     "name": "مهندس خالد عبدالكريم Eng.Khaled Abd El-Karim",
+     "language": "ar",
+     "country": "EG"
+    },
+    {
+     "channelId": "UCc8DzyyKuItDJ_Nd3_FKdhw",
+     "handle": "@CivilHintsOfficial",
+     "name": "Civil Hints by Eng. Mohamed Nabil",
+     "language": "ar",
+     "country": "EG"
+    }
+   ]
+  },
+  {
+   "id": "deg_civil_environmental",
+   "kind": "degree",
+   "name": {
+    "en": "Environmental engineering"
+   },
+   "shortName": "Environmental",
+   "group": "engineering",
+   "specialization": {
+    "en": "Civil engineering"
+   },
+   "languages": [
+    "en",
+    "pt",
+    "hi"
+   ],
+   "subjects": [
+    "Water treatment",
+    "Wastewater treatment",
+    "Water supply and sewerage",
+    "Water resources",
+    "Environmental engineering exams"
+   ],
+   "keywords": [
+    "environmental engineering",
+    "water treatment",
+    "wastewater treatment",
+    "sewage treatment",
+    "activated sludge",
+    "coagulation",
+    "flocculation",
+    "sedimentation",
+    "filtration",
+    "disinfection",
+    "anaerobic baffled reactor",
+    "sewer design",
+    "SewerGEMS",
+    "water supply engineering",
+    "water resources",
+    "hydraulics",
+    "BOD COD",
+    "FE environmental",
+    "GATE environmental science",
+    "tratamiento de aguas residuales",
+    "saneamento",
+    "tratamento de água",
+    "معالجة مياه الصرف"
+   ],
+   "blockedWords": [
+    "vlog",
+    "day in the life",
+    "salary reveal",
+    "job alert",
+    "result live",
+    "reaction",
+    "prank",
+    "motivation shorts"
+   ],
+   "chips": [
+    "Water treatment",
+    "Coagulation & flocculation",
+    "Filtration",
+    "Wastewater treatment",
+    "Activated sludge",
+    "Anaerobic reactors",
+    "Sewer design",
+    "Water supply",
+    "Water chemistry",
+    "FE environmental",
+    "GATE ES"
+   ],
+   "channels": [
+    {
+     "channelId": "UCTXhG1rT4lWWPBKGufjkxZw",
+     "handle": "@wateracademy5866",
+     "name": "Water Academy",
+     "language": "en",
+     "country": "global"
+    },
+    {
+     "channelId": "UCnr744D0uXV3uZWCw1gHu0Q",
+     "handle": "@Sanitaryengineering",
+     "name": "Ahmed Shaban (Sanitary&Environmental Engineering)",
+     "language": "en",
+     "country": "global"
+    },
+    {
+     "channelId": "UCR1wtr3PSI9G591G23J_Mlw",
+     "handle": "@directhubfeexam",
+     "name": "DIRECTHUB FE EXAM PREP",
+     "language": "en",
+     "country": "US"
+    },
+    {
+     "channelId": "UCeq7PGMxIiI-fD9jaOUoaqA",
+     "handle": "@SidneySecklerFerreiraFilho",
+     "name": "Sidney Seckler Ferreira Filho",
+     "language": "pt",
+     "country": "BR"
+    },
+    {
+     "channelId": "UCj3uro8sUcAMj5gEEw9u-FA",
+     "handle": "@OnlineEngineering",
+     "name": "Online Engineering - GATE & ESE",
+     "language": "en",
+     "country": "IN"
+    },
+    {
+     "channelId": "UCGrrw9x3_B_fItUIBMvqAUw",
+     "handle": "@gatewallah_me_ce_xe_ch",
+     "name": "GATE Wallah - ME, CE, XE, CH, PI & ES",
+     "language": "hi",
+     "country": "IN"
+    }
+   ]
+  },
+  {
+   "id": "deg_ee_power",
+   "kind": "degree",
+   "name": {
+    "en": "Power systems"
+   },
+   "shortName": "Power",
+   "group": "engineering",
+   "specialization": {
+    "en": "Electrical engineering"
+   },
+   "languages": [
+    "en",
+    "hi",
+    "ur",
+    "ar",
+    "pt"
+   ],
+   "subjects": [
+    "Power system analysis",
+    "Electrical machines",
+    "Power electronics",
+    "Protection and switchgear",
+    "Interview questions"
+   ],
+   "keywords": [
+    "power systems",
+    "power system analysis",
+    "load flow",
+    "fault analysis",
+    "symmetrical components",
+    "transmission lines",
+    "per unit system",
+    "transformers",
+    "induction motor",
+    "synchronous generator",
+    "DC machines",
+    "power electronics",
+    "choppers",
+    "inverters",
+    "protection relay",
+    "switchgear",
+    "circuit breaker",
+    "substation",
+    "three phase power",
+    "GATE electrical",
+    "electrical engineer interview questions",
+    "sistemas de potencia",
+    "sistemas elétricos de potência",
+    "انظمة القوى الكهربائية"
+   ],
+   "blockedWords": [
+    "vlog",
+    "day in the life",
+    "salary reveal",
+    "job alert",
+    "result live",
+    "reaction",
+    "prank",
+    "motivation shorts"
+   ],
+   "chips": [
+    "Power system analysis",
+    "Load flow",
+    "Fault analysis",
+    "Transmission lines",
+    "Transformers",
+    "Electrical machines",
+    "Power electronics",
+    "Protection & relays",
+    "Switchgear",
+    "Interview questions"
+   ],
+   "channels": [
+    {
+     "channelId": "UCk0fGHsCEzGig-rSzkfCjMw",
+     "handle": "@EngineeringMindset",
+     "name": "The Engineering Mindset",
+     "language": "en",
+     "country": "global"
+    },
+    {
+     "channelId": "UCmbUJWHul7r2StLe5lvoUhQ",
+     "handle": "@electricallectures",
+     "name": "Electrical lectures",
+     "language": "en",
+     "country": "global"
+    },
+    {
+     "channelId": "UC7KARY_u-pnVlWUtESJA4DQ",
+     "handle": "@snubberai",
+     "name": "Snubber | Engineering Interview Prep",
+     "language": "en",
+     "country": "global"
+    },
+    {
+     "channelId": "UCm6-ln5lWmgpOVq_d2vVZcA",
+     "handle": "@examdostbyankitgoyal",
+     "name": "EXAM DOST - Ankit Goyal",
+     "language": "hi",
+     "country": "IN"
+    },
+    {
+     "channelId": "UC0SXu7VFJG5CmT4o2h87ocA",
+     "handle": "@electricalwithabhishekjoshi",
+     "name": "Electrical With Abhishek Joshi",
+     "language": "hi",
+     "country": "IN"
+    },
+    {
+     "channelId": "UCzpqlw7lmDQ-1IUvy7H6jfQ",
+     "handle": "@IBTechnicalClasses",
+     "name": "IB TECHNICAL CLASSES",
+     "language": "hi",
+     "country": "IN"
+    },
+    {
+     "channelId": "UCtgu8i2WD-WSZuOuI9ZJukQ",
+     "handle": "@ElectricalEngineeringAcademy",
+     "name": "Electrical Engineering Academy",
+     "language": "ur",
+     "country": "PK"
+    },
+    {
+     "channelId": "UCFGD9Qu0HM9mjJs-wS1JJow",
+     "handle": "@HanyShaltoot",
+     "name": "Hany Shaltoot هاني شلتوت",
+     "language": "ar",
+     "country": "EG"
+    },
+    {
+     "channelId": "UCl4au51kDW_CctYsZHjb_HQ",
+     "handle": "@Ahmed.Hassanin.Academy",
+     "name": "Ahmed Hassanin Academy",
+     "language": "ar",
+     "country": "EG"
+    },
+    {
+     "channelId": "UCe9KOSGORXh_hDBIcxMU2Nw",
+     "handle": "@gesep_br",
+     "name": "Gesep - Sistemas Elétricos de Potência",
+     "language": "pt",
+     "country": "BR"
+    }
+   ]
+  },
+  {
+   "id": "deg_ee_vlsi",
+   "kind": "degree",
+   "name": {
+    "en": "VLSI design"
+   },
+   "shortName": "VLSI",
+   "group": "engineering",
+   "specialization": {
+    "en": "Electrical engineering"
+   },
+   "languages": [
+    "en"
+   ],
+   "subjects": [
+    "Digital design",
+    "Verilog and SystemVerilog",
+    "Functional verification (UVM)",
+    "Physical design and STA",
+    "Interview questions"
+   ],
+   "keywords": [
+    "VLSI",
+    "VLSI design",
+    "digital design",
+    "Verilog",
+    "SystemVerilog",
+    "UVM",
+    "RTL design",
+    "functional verification",
+    "CMOS",
+    "MOSFET",
+    "static timing analysis",
+    "setup and hold",
+    "clock tree synthesis",
+    "physical design",
+    "floorplanning",
+    "placement and routing",
+    "RTL to GDSII",
+    "low power design",
+    "IR drop",
+    "FPGA",
+    "RISC-V processor design",
+    "ASIC design flow",
+    "VLSI interview questions",
+    "VLSI mock interview"
+   ],
+   "blockedWords": [
+    "vlog",
+    "day in the life",
+    "salary reveal",
+    "job alert",
+    "result live",
+    "reaction",
+    "prank",
+    "motivation shorts"
+   ],
+   "chips": [
+    "Digital design",
+    "Verilog",
+    "SystemVerilog",
+    "UVM",
+    "CMOS",
+    "RTL design",
+    "Physical design",
+    "STA",
+    "Low power",
+    "RISC-V",
+    "Mock interviews"
+   ],
+   "channels": [
+    {
+     "channelId": "UCQYMhOMi_Cdj1CEAU-fv80A",
+     "handle": "@nesoacademy",
+     "name": "Neso Academy",
+     "language": "en",
+     "country": "global"
+    },
+    {
+     "channelId": "UCkZyWD6gVPsfJIM8h3Dy4Rw",
+     "handle": "@ChipDesignRashid",
+     "name": "Chip Design with Rashid",
+     "language": "en",
+     "country": "global"
+    },
+    {
+     "channelId": "UClXGbn7w_oVcGOS0I_Zf_xw",
+     "handle": "@SystemverilogAcademy",
+     "name": "Systemverilog Academy",
+     "language": "en",
+     "country": "global"
+    },
+    {
+     "channelId": "UCQ3r9xbgmQ2H5zfYHGPu9Qg",
+     "handle": "@vlsiforall",
+     "name": "VLSI FOR ALL",
+     "language": "en",
+     "country": "IN"
+    },
+    {
+     "channelId": "UCaqTP7nUtXzcA-OvO12TxCw",
+     "handle": "@Allaboutvlsii",
+     "name": "ALL ABOUT VLSI",
+     "language": "en",
+     "country": "IN"
+    },
+    {
+     "channelId": "UCYz9GoRkaDPr26S-XtUOsXQ",
+     "handle": "@VLSIAcademyhub",
+     "name": "VLSI Academy",
+     "language": "en",
+     "country": "IN"
+    },
+    {
+     "channelId": "UC8xyENEltc3DXGbARgbC38A",
+     "handle": "@VLSISystemDesign",
+     "name": "VLSI System Design",
+     "language": "en",
+     "country": "IN"
+    },
+    {
+     "channelId": "UCnnhD-6aZ6yo2vkrLyWWj9w",
+     "handle": "@Explore_VLSI",
+     "name": "Explore VLSI",
+     "language": "en",
+     "country": "IN"
+    },
+    {
+     "channelId": "UCB1DP9AnzMoNq1zctg6vg0Q",
+     "handle": "@ECAcademy",
+     "name": "EC Academy",
+     "language": "en",
+     "country": "IN"
+    },
+    {
+     "channelId": "UCpypuI1yXfnpwcyjzsSnEeg",
+     "handle": "@HimanshuAgarwal_",
+     "name": "Himanshu Agarwal",
+     "language": "en",
+     "country": "IN"
+    }
+   ]
+  },
+  {
+   "id": "deg_ee_embedded",
+   "kind": "degree",
+   "name": {
+    "en": "Embedded systems"
+   },
+   "shortName": "Embedded",
+   "group": "engineering",
+   "specialization": {
+    "en": "Electrical engineering"
+   },
+   "languages": [
+    "en",
+    "hi",
+    "pt",
+    "ar"
+   ],
+   "subjects": [
+    "Embedded C",
+    "Microcontrollers (8051, ARM, STM32)",
+    "RTOS",
+    "Communication protocols",
+    "Interview questions"
+   ],
+   "keywords": [
+    "embedded systems",
+    "embedded C",
+    "microcontroller",
+    "ARM Cortex-M",
+    "STM32",
+    "8051 microcontroller",
+    "8085 microprocessor",
+    "RTOS",
+    "FreeRTOS",
+    "Zephyr RTOS",
+    "interrupts",
+    "timers",
+    "UART",
+    "SPI",
+    "I2C",
+    "CAN bus",
+    "bare metal programming",
+    "device drivers",
+    "firmware",
+    "state machines",
+    "PCB design",
+    "embedded interview questions",
+    "sistemas embarcados",
+    "sistemas embebidos",
+    "شرح embedded systems"
+   ],
+   "blockedWords": [
+    "vlog",
+    "day in the life",
+    "salary reveal",
+    "job alert",
+    "result live",
+    "reaction",
+    "prank",
+    "motivation shorts"
+   ],
+   "chips": [
+    "Embedded C",
+    "Microcontrollers",
+    "ARM Cortex-M",
+    "STM32",
+    "8051",
+    "RTOS",
+    "Interrupts",
+    "UART/SPI/I2C",
+    "Bare-metal",
+    "PCB design",
+    "Interview questions"
+   ],
+   "channels": [
+    {
+     "channelId": "UCa1REBV9hyrzGp2mjJCagBg",
+     "handle": "@FastbitEmbeddedBrainAcademy",
+     "name": "Fastbit Embedded Brain Academy",
+     "language": "en",
+     "country": "global"
+    },
+    {
+     "channelId": "UCMGXFEew8I6gzjg3tWen4Gw",
+     "handle": "@StateMachineCOM",
+     "name": "Quantum Leaps, LLC",
+     "language": "en",
+     "country": "global"
+    },
+    {
+     "channelId": "UCVryWqJ4cSlbTSETBHpBUWw",
+     "handle": "@PhilsLab",
+     "name": "Phil’s Lab",
+     "language": "en",
+     "country": "global"
+    },
+    {
+     "channelId": "UCFJibhZ9FOjbsZIr6AxR0AQ",
+     "handle": "@LearnEmbeddedSystems",
+     "name": "Learn Embedded Systems",
+     "language": "en",
+     "country": "global"
+    },
+    {
+     "channelId": "UCMCJmZhlhf3JX-YsYU5GbWA",
+     "handle": "@prtechtalk416",
+     "name": "PR TechTalk",
+     "language": "en",
+     "country": "global"
+    },
+    {
+     "channelId": "UCKCf76QgpN_h9c0SgsvNnlA",
+     "handle": "@pyjamacafe",
+     "name": "Pyjama Cafe -- Embedded Systems!",
+     "language": "en",
+     "country": "IN"
+    },
+    {
+     "channelId": "UC-AyjLkoQSxTHN3zlThxg6w",
+     "handle": "@BharatAcharyaEducation",
+     "name": "Bharat Acharya Education",
+     "language": "en",
+     "country": "IN"
+    },
+    {
+     "channelId": "UC-QLoiuSx38Vp6gzM8MH2ow",
+     "handle": "@Embedded_07",
+     "name": "Embedded Hub",
+     "language": "hi",
+     "country": "IN"
+    },
+    {
+     "channelId": "UCf5BCi_FK6NYwmyeeeLkXrA",
+     "handle": "@microgenios",
+     "name": "Microgenios",
+     "language": "pt",
+     "country": "BR"
+    },
+    {
+     "channelId": "UC5Rg0IiTHhtd8qs-DNBZBDQ",
+     "handle": "@Khaled-Magdy-yt",
+     "name": "Khaled Magdy | خالد مجدي",
+     "language": "ar",
+     "country": "EG"
+    }
+   ]
+  },
+  {
+   "id": "deg_ee_communications",
+   "kind": "degree",
+   "name": {
+    "en": "Communication systems"
+   },
+   "shortName": "Communications",
+   "group": "engineering",
+   "specialization": {
+    "en": "Electrical engineering"
+   },
+   "languages": [
+    "en",
+    "hi"
+   ],
+   "subjects": [
+    "Signals and systems",
+    "Analog communication",
+    "Digital communication",
+    "Digital signal processing",
+    "Wireless communication"
+   ],
+   "keywords": [
+    "communication systems",
+    "signals and systems",
+    "Fourier transform",
+    "Laplace transform",
+    "analog communication",
+    "amplitude modulation",
+    "frequency modulation",
+    "sampling theorem",
+    "pulse code modulation",
+    "digital communication",
+    "QAM",
+    "PSK",
+    "OFDM",
+    "information theory",
+    "channel coding",
+    "digital signal processing",
+    "FIR IIR filters",
+    "bilinear transformation",
+    "wireless communication",
+    "MIMO",
+    "beamforming",
+    "5G",
+    "noise",
+    "GATE ECE communication",
+    "telecomunicaciones",
+    "اتصالات رقمية"
+   ],
+   "blockedWords": [
+    "vlog",
+    "day in the life",
+    "salary reveal",
+    "job alert",
+    "result live",
+    "reaction",
+    "prank",
+    "motivation shorts"
+   ],
+   "chips": [
+    "Signals & systems",
+    "Fourier transform",
+    "AM/FM",
+    "Sampling",
+    "Digital modulation",
+    "QAM/PSK",
+    "Information theory",
+    "DSP filters",
+    "Wireless & 5G",
+    "Noise",
+    "GATE ECE"
+   ],
+   "channels": [
+    {
+     "channelId": "UCrltzuSvRbL3rpsvLDnFkuQ",
+     "handle": "@iain_explains",
+     "name": "Iain Explains Signals, Systems, and Digital Comms",
+     "language": "en",
+     "country": "global"
+    },
+    {
+     "channelId": "UCQYMhOMi_Cdj1CEAU-fv80A",
+     "handle": "@nesoacademy",
+     "name": "Neso Academy",
+     "language": "en",
+     "country": "global"
+    },
+    {
+     "channelId": "UCBkOVp1Cqz4MR0LYR8vKpZg",
+     "handle": "@ALLABOUTELECTRONICS",
+     "name": "ALL ABOUT ELECTRONICS",
+     "language": "en",
+     "country": "global"
+    },
+    {
+     "channelId": "UCdlnqMpRrMcClK2fT6z8EEw",
+     "handle": "@EngineeringFunda",
+     "name": "Engineering Funda",
+     "language": "en",
+     "country": "IN"
+    },
+    {
+     "channelId": "UCnaOzPCUym-vNapCjV2p9Pg",
+     "handle": "@gate_academy",
+     "name": "GATE ACADEMY by Umesh Dhande",
+     "language": "hi",
+     "country": "IN"
+    },
+    {
+     "channelId": "UCB1DP9AnzMoNq1zctg6vg0Q",
+     "handle": "@ECAcademy",
+     "name": "EC Academy",
+     "language": "en",
+     "country": "IN"
+    },
+    {
+     "channelId": "UClsIj6jichbfM1ylWkh--Yg",
+     "handle": "@profbarapatestutorials",
+     "name": "Prof. Barapate's Tutorials",
+     "language": "en",
+     "country": "IN"
+    },
+    {
+     "channelId": "UCj86U7FT8O4JqXC-pfKFLIQ",
+     "handle": "@vaibhavjain3854",
+     "name": "Dr. Vaibhav Jain",
+     "language": "hi",
+     "country": "IN"
+    }
+   ]
+  },
+  {
+   "id": "deg_mbbs_clinical",
+   "kind": "degree",
+   "name": {
+    "en": "Clinical medicine",
+    "hi": "क्लिनिकल मेडिसिन"
+   },
+   "shortName": "Clinical medicine",
+   "group": "health",
+   "specialization": {
+    "en": "Medicine (MBBS / MD)"
+   },
+   "languages": [
+    "en",
+    "hi",
+    "bn",
+    "ar",
+    "pt",
+    "es",
+    "id"
+   ],
+   "subjects": [
+    "Internal medicine",
+    "Surgery",
+    "Pediatrics",
+    "Obstetrics and gynecology",
+    "Pathology",
+    "Pharmacology",
+    "Clinical skills"
+   ],
+   "keywords": [
+    "MBBS lectures",
+    "clinical medicine",
+    "internal medicine",
+    "Harrison",
+    "Davidson",
+    "OSCE",
+    "history taking",
+    "clinical examination",
+    "ECG interpretation",
+    "heart failure",
+    "diabetes mellitus",
+    "pneumonia",
+    "chronic kidney disease",
+    "sepsis",
+    "obstetrics and gynaecology",
+    "pathophysiology",
+    "pharmacology",
+    "case presentation",
+    "viva questions",
+    "final year MBBS",
+    "medicina interna",
+    "clínica médica",
+    "penyakit dalam",
+    "باطنة",
+    "मेडिसिन लेक्चर",
+    "মেডিসিন লেকচার"
+   ],
+   "blockedWords": [
+    "vlog",
+    "day in the life",
+    "salary",
+    "motivation shorts",
+    "prank",
+    "reaction",
+    "college fest",
+    "MBBS abroad admission"
+   ],
+   "chips": [
+    "Internal medicine",
+    "Cardiology",
+    "Respiratory",
+    "Nephrology",
+    "Endocrinology",
+    "Infectious diseases",
+    "ECG",
+    "OSCE",
+    "Obs and gynae",
+    "Pharmacology",
+    "Pathology",
+    "Case discussion"
+   ],
+   "channels": [
+    {
+     "channelId": "UC6QYFutt9cluQ3uSM963_KQ",
+     "handle": "@NinjaNerdOfficial",
+     "name": "Ninja Nerd",
+     "language": "en",
+     "country": "global"
+    },
+    {
+     "channelId": "UCNI0qOojpkhsUtaQ4_2NUhQ",
+     "handle": "@osmosis",
+     "name": "Osmosis from Elsevier",
+     "language": "en",
+     "country": "global"
+    },
+    {
+     "channelId": "UCPHpx55tgrbm8FrYYCflAHw",
+     "handle": "@DoctorNajeeb",
+     "name": "Dr. Najeeb Lectures",
+     "language": "en",
+     "country": "global"
+    },
+    {
+     "channelId": "UCl-J-ovSJhA3or73Q2uVpow",
+     "handle": "@MedicosisPerfectionalis",
+     "name": "Medicosis Perfectionalis",
+     "language": "en",
+     "country": "global"
+    },
+    {
+     "channelId": "UCkjnrEHQ8bQQmlfNdAQC_5w",
+     "handle": "@geekymedics",
+     "name": "Geeky Medics",
+     "language": "en",
+     "country": "GB"
+    },
+    {
+     "channelId": "UCFq5vPnNRNNNysLrktz4aSw",
+     "handle": "@StrongMed",
+     "name": "Strong Medicine",
+     "language": "en",
+     "country": "US"
+    },
+    {
+     "channelId": "UCk2VkCk0BwPDiPUgja41vkA",
+     "handle": "@JohariMBBS",
+     "name": "Johari MBBS",
+     "language": "hi",
+     "country": "IN"
+    },
+    {
+     "channelId": "UC49NkH1Dt8RrhXKwZoJJlYw",
+     "handle": "@MedicalStudyInBangla",
+     "name": "Medical Study in Bangla",
+     "language": "bn",
+     "country": "BD"
+    },
+    {
+     "channelId": "UCkXQbAZtZooJR-yL2rJ_3uw",
+     "handle": "@dr.dilrubazebasobsgynaelec7380",
+     "name": "Dr. Dilruba Zeba's Obs & Gynae lectures",
+     "language": "bn",
+     "country": "BD"
+    },
+    {
+     "channelId": "UCZlsht40qcUJzkIsrD_eHzg",
+     "handle": "@Medlearn.Academy",
+     "name": "Medlearn",
+     "language": "ar",
+     "country": "EG"
+    },
+    {
+     "channelId": "UC2i9nunoQCdliLwi-Wnl1ow",
+     "handle": "@MedicinaInternaHCFMUSP",
+     "name": "Medicina Interna",
+     "language": "pt",
+     "country": "BR"
+    },
+    {
+     "channelId": "UCXI3HeNrkqbAy1Bm7CrvEoQ",
+     "handle": "@MédiconaPrática",
+     "name": "Médico na Prática",
+     "language": "pt",
+     "country": "BR"
+    },
+    {
+     "channelId": "UCtrQDkwKBvKwfUxCQcyqlcg",
+     "handle": "@DrSalvadorContrerasInternista",
+     "name": "Dr. Salvador Contreras | Medicina Interna",
+     "language": "es",
+     "country": "MX"
+    },
+    {
+     "channelId": "UC70uqTg2KdR317bgSFMsf7Q",
+     "handle": "@KuliahPagiChannel",
+     "name": "Kuliah Pagi Channel",
+     "language": "id",
+     "country": "ID"
+    }
+   ]
+  },
+  {
+   "id": "deg_nursing",
+   "kind": "degree",
+   "name": {
+    "en": "Nursing (BSc / RN)",
+    "hi": "नर्सिंग"
+   },
+   "shortName": "Nursing",
+   "group": "health",
+   "specialization": {
+    "en": "Nursing"
+   },
+   "languages": [
+    "en",
+    "hi",
+    "fil",
+    "ur",
+    "pt",
+    "es",
+    "ar"
+   ],
+   "subjects": [
+    "Fundamentals of nursing",
+    "Medical-surgical nursing",
+    "Pharmacology",
+    "Maternal and child nursing",
+    "Pediatric nursing",
+    "Community health nursing",
+    "Anatomy and physiology"
+   ],
+   "keywords": [
+    "nursing lectures",
+    "BSc nursing",
+    "GNM",
+    "nursing fundamentals",
+    "medical surgical nursing",
+    "nursing pharmacology",
+    "dosage calculation",
+    "fluid and electrolytes",
+    "acid base",
+    "nursing care plan",
+    "nursing process",
+    "maternal nursing",
+    "pediatric nursing",
+    "community health nursing",
+    "NCLEX",
+    "PNLE",
+    "nursing review",
+    "enfermagem",
+    "enfermería",
+    "تمريض",
+    "नर्सिंग लेक्चर",
+    "vital signs"
+   ],
+   "blockedWords": [
+    "vlog",
+    "day in the life",
+    "salary",
+    "job alert",
+    "result",
+    "exam date out",
+    "motivation shorts",
+    "prank"
+   ],
+   "chips": [
+    "Fundamentals",
+    "Med-surg",
+    "Pharmacology",
+    "Maternity",
+    "Pediatrics",
+    "Mental health",
+    "Community health",
+    "Fluids and electrolytes",
+    "ECG",
+    "NCLEX / NLE",
+    "Nursing process",
+    "Care plans"
+   ],
+   "channels": [
+    {
+     "channelId": "UCPyMN8DzkFl2__xnTEiGZ1w",
+     "handle": "@RegisteredNurseRN",
+     "name": "RegisteredNurseRN",
+     "language": "en",
+     "country": "global"
+    },
+    {
+     "channelId": "UCUxQWmWk1_Hk9iDRKvhH29Q",
+     "handle": "@SimpleNursing",
+     "name": "SimpleNursing",
+     "language": "en",
+     "country": "global"
+    },
+    {
+     "channelId": "UCSlJ8BB17Ex9s4mrg7DEYCw",
+     "handle": "@LevelUpRN",
+     "name": "Level Up RN",
+     "language": "en",
+     "country": "global"
+    },
+    {
+     "channelId": "UC284Za0seKV8WGZJO4gltFg",
+     "handle": "@lecturionursing",
+     "name": "Lecturio Nursing",
+     "language": "en",
+     "country": "global"
+    },
+    {
+     "channelId": "UC1OT_rrZ-isdVcPqSODDSYw",
+     "handle": "@NurseCheung",
+     "name": "Nurse Cheung",
+     "language": "en",
+     "country": "US"
+    },
+    {
+     "channelId": "UC8KhMlJjx6CRb_BbaFbYn8w",
+     "handle": "@NursingLecture",
+     "name": "Nursing Lecture",
+     "language": "hi",
+     "country": "IN"
+    },
+    {
+     "channelId": "UCXyT8dwQiJEwoWsNydYynOA",
+     "handle": "@jhunlieescala",
+     "name": "Jhunlie Escala",
+     "language": "fil",
+     "country": "PH"
+    },
+    {
+     "channelId": "UCPTwnD3GvWDE6dDXgQ2piyg",
+     "handle": "@studywyannn",
+     "name": "Study with Yan",
+     "language": "fil",
+     "country": "PH"
+    },
+    {
+     "channelId": "UCI6VPEO3J7BOkjlpGCZLTiw",
+     "handle": "@nursingwithfarman",
+     "name": "Nursing With Farman",
+     "language": "ur",
+     "country": "PK"
+    },
+    {
+     "channelId": "UCcyzxxoiTwuwvBnEEGto-QA",
+     "handle": "@bsnpakistan",
+     "name": "BSN PAKISTAN",
+     "language": "ur",
+     "country": "PK"
+    },
+    {
+     "channelId": "UCikuMf3opbEbghLkDYo1CmA",
+     "handle": "@PráticaEnfermagem",
+     "name": "Prática Enfermagem",
+     "language": "pt",
+     "country": "BR"
+    },
+    {
+     "channelId": "UCkzU_dYjseNSDiOZtAKpmKg",
+     "handle": "@descomplicaenfermagem",
+     "name": "Descomplica Enfermagem",
+     "language": "pt",
+     "country": "BR"
+    },
+    {
+     "channelId": "UCfeY_8bXqqzMvDJ5pXtu_5A",
+     "handle": "@Enfermeria4.0",
+     "name": "🌟Enfermería 4.0🌟",
+     "language": "es",
+     "country": "global"
+    },
+    {
+     "channelId": "UCx0NH6XmYKTVbhe1_aO7Ucg",
+     "handle": "@بوابةمدرسةالتمريض",
+     "name": "مستر محمد ثروت بوابة شرح مواد التمريض والفنى الصحى",
+     "language": "ar",
+     "country": "EG"
+    }
+   ]
+  },
+  {
+   "id": "deg_pharmacy",
+   "kind": "degree",
+   "name": {
+    "en": "Pharmacy",
+    "hi": "फार्मेसी"
+   },
+   "shortName": "Pharmacy",
+   "group": "health",
+   "specialization": {
+    "en": "Pharmacy (B.Pharm / PharmD)"
+   },
+   "languages": [
+    "en",
+    "hi",
+    "pt",
+    "ar",
+    "id"
+   ],
+   "subjects": [
+    "Pharmacology",
+    "Pharmaceutics",
+    "Pharmaceutical chemistry",
+    "Pharmacognosy",
+    "Pharmaceutical analysis",
+    "Clinical pharmacy",
+    "Human anatomy and physiology"
+   ],
+   "keywords": [
+    "B Pharm lectures",
+    "D Pharm",
+    "PharmD",
+    "pharmacology",
+    "pharmaceutics",
+    "pharmacognosy",
+    "medicinal chemistry",
+    "pharmaceutical analysis",
+    "pharmacokinetics",
+    "pharmacodynamics",
+    "clinical pharmacy",
+    "drug interactions",
+    "GPAT",
+    "NIPER",
+    "pharmacist exam",
+    "drug inspector",
+    "chromatography",
+    "farmacologia",
+    "farmácia",
+    "صيدلة",
+    "farmasi",
+    "apoteker",
+    "UKAI",
+    "फार्मेसी"
+   ],
+   "blockedWords": [
+    "vlog",
+    "salary",
+    "job alert",
+    "result",
+    "admission open",
+    "motivation shorts",
+    "medical store business",
+    "prank"
+   ],
+   "chips": [
+    "Pharmacology",
+    "Pharmaceutics",
+    "Medicinal chemistry",
+    "Pharmacognosy",
+    "Pharmaceutical analysis",
+    "Clinical pharmacy",
+    "Pharmacokinetics",
+    "Antibiotics",
+    "GPAT",
+    "Pharmacist exam"
+   ],
+   "channels": [
+    {
+     "channelId": "UC-i2EBYXH6-GAglvuDIaufQ",
+     "handle": "@SpeedPharmacology",
+     "name": "Speed Pharmacology",
+     "language": "en",
+     "country": "global"
+    },
+    {
+     "channelId": "UCXEj-hdlOIENGk5nMMOhJow",
+     "handle": "@AM_Fouda",
+     "name": "Clinical Pharmacology Lectures",
+     "language": "en",
+     "country": "global"
+    },
+    {
+     "channelId": "UCNI0qOojpkhsUtaQ4_2NUhQ",
+     "handle": "@osmosis",
+     "name": "Osmosis from Elsevier",
+     "language": "en",
+     "country": "global"
+    },
+    {
+     "channelId": "UCKfxWbtJkL7HCWtfpcpBU-w",
+     "handle": "@pharmacologyconcepts",
+     "name": "Pharmacology Concepts By Rajesh Choudhary",
+     "language": "en",
+     "country": "IN"
+    },
+    {
+     "channelId": "UC3JuNksikKWeYaaN3mXH2kQ",
+     "handle": "@carewellpharma",
+     "name": "Carewell pharma",
+     "language": "hi",
+     "country": "IN"
+    },
+    {
+     "channelId": "UCL3IN4KsOFxUV4UzVs1f8Rg",
+     "handle": "@UditPharmacy",
+     "name": "Udit Pharmacy",
+     "language": "hi",
+     "country": "IN"
+    },
+    {
+     "channelId": "UCGQgcuZyggelP3XAcyieFdg",
+     "handle": "@pharmacywala",
+     "name": "Pharmacy wala",
+     "language": "hi",
+     "country": "IN"
+    },
+    {
+     "channelId": "UC1I2pFPrIeW1FndNUtzRAow",
+     "handle": "@PWBPharm",
+     "name": "PW B. Pharm",
+     "language": "hi",
+     "country": "IN"
+    },
+    {
+     "channelId": "UCJHtUUFE8lnVsf1o2FJODJQ",
+     "handle": "@LEARNINGPHARMACYIN",
+     "name": "LEARNINGPHARMACY.IN",
+     "language": "hi",
+     "country": "IN"
+    },
+    {
+     "channelId": "UCjV8SlXFtX9rG3QGtF_2YTA",
+     "handle": "@farmacologiafacil",
+     "name": "Farmacologia Fácil",
+     "language": "pt",
+     "country": "BR"
+    },
+    {
+     "channelId": "UChT315XMRj2MZ7xMOYhfWtQ",
+     "handle": "@farmacologianapratica",
+     "name": "Farmacologia na Prática",
+     "language": "pt",
+     "country": "BR"
+    },
+    {
+     "channelId": "UCT656ztBtvFtgc5LiBQMTtw",
+     "handle": "@hebamegidy-clinical",
+     "name": "official - كلينيكال خطوة بخطوة - هبه مجيدى",
+     "language": "ar",
+     "country": "EG"
+    },
+    {
+     "channelId": "UCFUhrwM2Os8N2Wj7K1cfVfw",
+     "handle": "@_CalonApoteker",
+     "name": "Calon Apoteker",
+     "language": "id",
+     "country": "ID"
+    }
+   ]
+  },
+  {
+   "id": "deg_dentistry",
+   "kind": "degree",
+   "name": {
+    "en": "Dentistry",
+    "hi": "दंत चिकित्सा"
+   },
+   "shortName": "Dentistry",
+   "group": "health",
+   "specialization": {
+    "en": "Dentistry (BDS / DDS)"
+   },
+   "languages": [
+    "en",
+    "hi",
+    "bn",
+    "ar",
+    "pt"
+   ],
+   "subjects": [
+    "Dental anatomy",
+    "Oral histology",
+    "Dental materials",
+    "Operative dentistry",
+    "Endodontics",
+    "Prosthodontics",
+    "Oral pathology",
+    "Oral surgery",
+    "Periodontics",
+    "Orthodontics"
+   ],
+   "keywords": [
+    "BDS lectures",
+    "dental anatomy",
+    "oral histology",
+    "dental materials",
+    "operative dentistry",
+    "endodontics",
+    "root canal",
+    "prosthodontics",
+    "complete denture",
+    "oral pathology",
+    "oral surgery",
+    "local anesthesia",
+    "periodontics",
+    "orthodontics",
+    "NEET MDS",
+    "INI-CET MDS",
+    "INBDE",
+    "dental boards",
+    "odontologia",
+    "طب الأسنان",
+    "डेंटल",
+    "dental pharmacology"
+   ],
+   "blockedWords": [
+    "vlog",
+    "teeth whitening at home",
+    "satisfying",
+    "asmr",
+    "salary",
+    "clinic setup",
+    "prank",
+    "reaction"
+   ],
+   "chips": [
+    "Dental anatomy",
+    "Oral histology",
+    "Dental materials",
+    "Operative",
+    "Endodontics",
+    "Prosthodontics",
+    "Oral pathology",
+    "Oral surgery",
+    "Periodontics",
+    "NEET MDS",
+    "INBDE"
+   ],
+   "channels": [
+    {
+     "channelId": "UCjtoIJxM5q88prynjOfJoSg",
+     "handle": "@mentaldental",
+     "name": "Mental Dental",
+     "language": "en",
+     "country": "global"
+    },
+    {
+     "channelId": "UCseHui0yyp3BCOzh_MvXxcQ",
+     "handle": "@DrTeethAcademy",
+     "name": "Dr Teeth",
+     "language": "en",
+     "country": "global"
+    },
+    {
+     "channelId": "UCPHpx55tgrbm8FrYYCflAHw",
+     "handle": "@DoctorNajeeb",
+     "name": "Dr. Najeeb Lectures",
+     "language": "en",
+     "country": "global"
+    },
+    {
+     "channelId": "UCEQaM3EFUA99_k9RUS8CcGQ",
+     "handle": "@5minDENTISTRY",
+     "name": "5 min DENTISTRY",
+     "language": "en",
+     "country": "IN"
+    },
+    {
+     "channelId": "UCqsjIaRhAxzMaCI51W5rvYA",
+     "handle": "@meriters_dental",
+     "name": "BDS - NEET MDS - INI-CET - NEXT - MERITERS MDSPrep",
+     "language": "en",
+     "country": "IN"
+    },
+    {
+     "channelId": "UCypqK0EgG28JcT4TxPzjllQ",
+     "handle": "@DBMCIMDSOFFICIAL",
+     "name": "DBMCI MDS",
+     "language": "en",
+     "country": "IN"
+    },
+    {
+     "channelId": "UCP2j7peMYYFgrRnN0yRL_rg",
+     "handle": "@PWMedEdBDS",
+     "name": "PW MedEd BDS",
+     "language": "en",
+     "country": "IN"
+    },
+    {
+     "channelId": "UC2k3_hrdIqnmvFe5_izARZA",
+     "handle": "@axisdentalschool129",
+     "name": "Axis Dental School",
+     "language": "bn",
+     "country": "BD"
+    },
+    {
+     "channelId": "UCkW5p5mFegA96rDxId9E2ag",
+     "handle": "@doctorsabbirbds",
+     "name": "DoctorSabbir BDS",
+     "language": "bn",
+     "country": "BD"
+    },
+    {
+     "channelId": "UC_C1kh0EGipIsTUXZIZZb2g",
+     "handle": "@Dentity",
+     "name": "Dentity دينتيتي",
+     "language": "ar",
+     "country": "IQ"
+    },
+    {
+     "channelId": "UCmOtF1awJAPHJhrxD0bjdFQ",
+     "handle": "@odontochannel",
+     "name": "OdontoChannel",
+     "language": "pt",
+     "country": "BR"
+    },
+    {
+     "channelId": "UCTscRTDw5nnar39fRU1ikeg",
+     "handle": "@DentistaConcursada",
+     "name": "Dentista Concursada - Amanda Caramel",
+     "language": "pt",
+     "country": "BR"
+    }
+   ]
+  },
+  {
+   "id": "deg_public_health",
+   "kind": "degree",
+   "name": {
+    "en": "Public health",
+    "hi": "सार्वजनिक स्वास्थ्य"
+   },
+   "shortName": "Public health",
+   "group": "health",
+   "specialization": {
+    "en": "Public health (MPH / community medicine)"
+   },
+   "languages": [
+    "en",
+    "hi",
+    "pt",
+    "es"
+   ],
+   "subjects": [
+    "Epidemiology",
+    "Biostatistics",
+    "Community medicine (PSM)",
+    "Health policy",
+    "Environmental health",
+    "National health programmes",
+    "Research methods"
+   ],
+   "keywords": [
+    "public health",
+    "epidemiology",
+    "biostatistics",
+    "community medicine",
+    "PSM",
+    "Park textbook",
+    "incidence and prevalence",
+    "randomised controlled trial",
+    "cohort study",
+    "case control",
+    "screening tests",
+    "sensitivity specificity",
+    "immunization schedule",
+    "national health programme",
+    "tuberculosis programme",
+    "health policy",
+    "MPH",
+    "saúde coletiva",
+    "SUS",
+    "salud pública",
+    "epidemiología",
+    "सामुदायिक चिकित्सा"
+   ],
+   "blockedWords": [
+    "vlog",
+    "news live",
+    "politics",
+    "salary",
+    "job alert",
+    "motivation shorts",
+    "prank",
+    "reaction"
+   ],
+   "chips": [
+    "Epidemiology",
+    "Biostatistics",
+    "Study designs",
+    "Screening",
+    "Vaccination",
+    "National health programmes",
+    "Nutrition",
+    "Health policy",
+    "Environmental health",
+    "Research ethics"
+   ],
+   "channels": [
+    {
+     "channelId": "UC6lsKOED7uB6JbqBQDRROJA",
+     "handle": "@LetsLearnPublicHealth",
+     "name": "Let's Learn Public Health",
+     "language": "en",
+     "country": "global"
+    },
+    {
+     "channelId": "UCbYmF43dpGHz8gi2ugiXr0Q",
+     "handle": "@lecturiomedical",
+     "name": "Lecturio Medical",
+     "language": "en",
+     "country": "global"
+    },
+    {
+     "channelId": "UC_AK324Za3GR5O55EhKGSMA",
+     "handle": "@JohnsHopkinsSPH",
+     "name": "Johns Hopkins Bloomberg School of Public Health",
+     "language": "en",
+     "country": "global"
+    },
+    {
+     "channelId": "UCCZ2pyS7sza4vWTgsFkkfSw",
+     "handle": "@harvardepi",
+     "name": "Harvard Chan School Department of Epidemiology",
+     "language": "en",
+     "country": "US"
+    },
+    {
+     "channelId": "UC6IXA8EMQWo5JIw6qxkrt8g",
+     "handle": "@arpitspsmmadeeasy9557",
+     "name": "Arpits PSM made easy",
+     "language": "hi",
+     "country": "IN"
+    },
+    {
+     "channelId": "UCZzho3IYVbAwvF4LmZ2F2og",
+     "handle": "@drnehataneja",
+     "name": "Dr Neha Taneja Community Medicine",
+     "language": "en",
+     "country": "IN"
+    },
+    {
+     "channelId": "UCwddOMy_3u1nlr_TntAx1kg",
+     "handle": "@mukhmohitsingh",
+     "name": "Dr.Mukhmohit singh's Community Medicine Simplified",
+     "language": "en",
+     "country": "IN"
+    },
+    {
+     "channelId": "UCpZOoJyALE5gnHOEM884K1A",
+     "handle": "@globalhealth123",
+     "name": "Community Medicine made VERY EASY",
+     "language": "en",
+     "country": "IN"
+    },
+    {
+     "channelId": "UCGwgJgO8FgXLGo1ElbQYbgQ",
+     "handle": "@ProfNataleSouza",
+     "name": "Profª Natale Souza",
+     "language": "pt",
+     "country": "BR"
+    },
+    {
+     "channelId": "UCiBLSaNoo1KA3R7J4DBvk_A",
+     "handle": "@escuelanacionaldesaludpublica",
+     "name": "Escuela Nacional de Salud Pública del Perú",
+     "language": "es",
+     "country": "PE"
+    },
+    {
+     "channelId": "UCBmpYwzd7UAeVRauVQZx6Uw",
+     "handle": "@seepidemiologia",
+     "name": "seepidemiologia",
+     "language": "es",
+     "country": "ES"
+    }
+   ]
+  },
+  {
+   "id": "deg_chemical",
+   "kind": "degree",
+   "name": {
+    "en": "Chemical engineering"
+   },
+   "shortName": "Chemical",
+   "group": "engineering",
+   "specialization": {
+    "en": "Chemical engineering"
+   },
+   "languages": [
+    "en",
+    "hi",
+    "ar",
+    "pt",
+    "es"
+   ],
+   "subjects": [
+    "Process calculations",
+    "Thermodynamics",
+    "Fluid mechanics",
+    "Heat transfer",
+    "Mass transfer",
+    "Reaction engineering",
+    "Process control",
+    "Plant design",
+    "Process simulation"
+   ],
+   "keywords": [
+    "chemical engineering",
+    "ChemE",
+    "process calculations",
+    "material balance",
+    "energy balance",
+    "chemical thermodynamics",
+    "fluid mechanics",
+    "heat exchanger",
+    "mass transfer",
+    "distillation",
+    "absorption",
+    "chemical reaction engineering",
+    "CSTR",
+    "PFR",
+    "process control",
+    "Aspen Plus",
+    "Aspen HYSYS",
+    "unit operations",
+    "GATE chemical",
+    "GATE CH",
+    "chemical plant interview questions",
+    "process engineer interview",
+    "ingeniería química",
+    "operações unitárias",
+    "الهندسة الكيميائية",
+    "chemical engineering in Hindi"
+   ],
+   "blockedWords": [
+    "vlog",
+    "salary reveal",
+    "day in the life",
+    "job alert",
+    "result live",
+    "reaction",
+    "prank",
+    "motivation shorts"
+   ],
+   "chips": [
+    "Mass & energy balance",
+    "Thermodynamics",
+    "Fluid mechanics",
+    "Heat transfer",
+    "Mass transfer",
+    "Reactors",
+    "Distillation",
+    "Process control",
+    "Aspen HYSYS",
+    "GATE CH",
+    "Plant interview"
+   ],
+   "channels": [
+    {
+     "channelId": "UCKVGxWqAcyGibKC2RKD19RQ",
+     "handle": "@LearnChemE",
+     "name": "LearnChemE",
+     "language": "en",
+     "country": "global"
+    },
+    {
+     "channelId": "UCEBb1b_L6zDS3xTUrIALZOw",
+     "handle": "@mitocw",
+     "name": "MIT OpenCourseWare",
+     "language": "en",
+     "country": "global"
+    },
+    {
+     "channelId": "UC640y4UvDAlya_WOj5U4pfA",
+     "handle": "@iit",
+     "name": "nptelhrd",
+     "language": "en",
+     "country": "IN"
+    },
+    {
+     "channelId": "UCJam6x5jrbVwDT9ql9KJ_Ig",
+     "handle": "@ChemicalEngineeringGuy",
+     "name": "Chemical Engineering Guy",
+     "language": "en",
+     "country": "global"
+    },
+    {
+     "channelId": "UCT8-SJRiI3kBeMovN0gCt6A",
+     "handle": "@TheChemEngStudent",
+     "name": "The ChemEngStudent",
+     "language": "en",
+     "country": "global"
+    },
+    {
+     "channelId": "UCNqjUT43Y2kt-OC71URYX-w",
+     "handle": "@UnacademyGATEChemical",
+     "name": "Unacademy GATE - Chemical",
+     "language": "hi",
+     "country": "IN"
+    },
+    {
+     "channelId": "UCVMIaShu0v-DkHkE3uBF-pg",
+     "handle": "@chemicalpedia47",
+     "name": "Chemical Pedia",
+     "language": "hi",
+     "country": "IN"
+    },
+    {
+     "channelId": "UC0ZOwMOD5bTUAMHSQWWt0Cg",
+     "handle": "@ChemicalMahi",
+     "name": "Chemical Mahi",
+     "language": "hi",
+     "country": "IN"
+    },
+    {
+     "channelId": "UCBY_CXDlnTdZAdW4Q_yuDaw",
+     "handle": "@ChemicalEngineeringLife",
+     "name": "Chemical Engineering Life (ChemEnggLife)",
+     "language": "en",
+     "country": "IN"
+    },
+    {
+     "channelId": "UCkoNHYAKV40ACzSxSMT2WsQ",
+     "handle": "@aspenchemchannel",
+     "name": "Chem Engg & Aspen Channel - Dr. M. Haris Hamayun",
+     "language": "en",
+     "country": "PK"
+    },
+    {
+     "channelId": "UCnu6tmQP3-_Rv62Cw8qLWcA",
+     "handle": "@ChemEngCorner",
+     "name": "ChemEng Corner",
+     "language": "ar",
+     "country": "IQ"
+    },
+    {
+     "channelId": "UCWqtONV3dRmJLi8_Ur7gHZw",
+     "handle": "@CanalEPD",
+     "name": "Unit Operations FURG-SAP",
+     "language": "pt",
+     "country": "BR"
+    },
+    {
+     "channelId": "UCW2r6A0NXXEcy9KazRDkB3A",
+     "handle": "@ingenieriaquimicautem",
+     "name": "Docencia Ingeniería Química UTEM",
+     "language": "es",
+     "country": "CL"
+    }
+   ]
+  },
+  {
+   "id": "deg_biomedical",
+   "kind": "degree",
+   "name": {
+    "en": "Biomedical engineering"
+   },
+   "shortName": "Biomedical",
+   "group": "engineering",
+   "specialization": {
+    "en": "Biomedical engineering"
+   },
+   "languages": [
+    "en",
+    "hi",
+    "pt"
+   ],
+   "subjects": [
+    "Biomedical instrumentation",
+    "Medical imaging",
+    "Biomechanics",
+    "Biomaterials",
+    "Physiological signals",
+    "Clinical engineering",
+    "Medical device regulation"
+   ],
+   "keywords": [
+    "biomedical engineering",
+    "BME",
+    "biomedical instrumentation",
+    "medical equipment",
+    "patient monitor",
+    "ventilator",
+    "defibrillator",
+    "ECG",
+    "EEG",
+    "biosignal processing",
+    "medical imaging",
+    "X-ray",
+    "MRI",
+    "CT scan",
+    "ultrasound",
+    "biomechanics",
+    "biomaterials",
+    "clinical engineering",
+    "medical device",
+    "510k",
+    "FDA regulation",
+    "biomedical engineer interview questions",
+    "equipment troubleshooting",
+    "engenharia clínica",
+    "ingeniería biomédica",
+    "biomedical in Hindi"
+   ],
+   "blockedWords": [
+    "vlog",
+    "salary reveal",
+    "day in the life",
+    "job alert",
+    "result live",
+    "reaction",
+    "prank",
+    "motivation shorts"
+   ],
+   "chips": [
+    "Instrumentation",
+    "Patient monitors",
+    "Ventilators",
+    "Medical imaging",
+    "ECG & signals",
+    "Biomechanics",
+    "Biomaterials",
+    "Clinical engineering",
+    "Device regulation",
+    "BME interview"
+   ],
+   "channels": [
+    {
+     "channelId": "UCEBb1b_L6zDS3xTUrIALZOw",
+     "handle": "@mitocw",
+     "name": "MIT OpenCourseWare",
+     "language": "en",
+     "country": "global"
+    },
+    {
+     "channelId": "UC640y4UvDAlya_WOj5U4pfA",
+     "handle": "@iit",
+     "name": "nptelhrd",
+     "language": "en",
+     "country": "IN"
+    },
+    {
+     "channelId": "UCzeGdBbgx90whIn-JI0Si5w",
+     "handle": "@TheBMELife",
+     "name": "The BME Life",
+     "language": "en",
+     "country": "US"
+    },
+    {
+     "channelId": "UC_yrZbStXvCTgmQmN4XpsQQ",
+     "handle": "@BiomedicalEngineersTV",
+     "name": "Biomedical Engineers TV",
+     "language": "en",
+     "country": "IN"
+    },
+    {
+     "channelId": "UCSmoWqZa-NB53L7lVtT8QFA",
+     "handle": "@Diagnotherapy",
+     "name": "Diagnotherapy | Biomedical Engineering",
+     "language": "hi",
+     "country": "IN"
+    },
+    {
+     "channelId": "UCMuZ2ScCaCts9dYbb-qlsJA",
+     "handle": "@BiomedicalWithGanesh",
+     "name": "GANESH  SBME  SPECIAL ADVISOR",
+     "language": "hi",
+     "country": "IN"
+    },
+    {
+     "channelId": "UCQhzdMzWXVQQOj8uGYeqOTQ",
+     "handle": "@edutstecnologia",
+     "name": "Mariana Brandão | EDUTS",
+     "language": "pt",
+     "country": "BR"
+    }
+   ]
+  },
+  {
+   "id": "deg_petroleum",
+   "kind": "degree",
+   "name": {
+    "en": "Petroleum engineering"
+   },
+   "shortName": "Petroleum",
+   "group": "engineering",
+   "specialization": {
+    "en": "Petroleum engineering"
+   },
+   "languages": [
+    "en",
+    "ar",
+    "es",
+    "hi"
+   ],
+   "subjects": [
+    "Drilling engineering",
+    "Reservoir engineering",
+    "Production engineering",
+    "Petroleum geology",
+    "Well completion",
+    "Enhanced oil recovery",
+    "Refining"
+   ],
+   "keywords": [
+    "petroleum engineering",
+    "oil and gas",
+    "drilling engineering",
+    "casing design",
+    "drilling fluids",
+    "mud engineering",
+    "well control",
+    "stuck pipe",
+    "reservoir engineering",
+    "PVT",
+    "material balance",
+    "IPR",
+    "nodal analysis",
+    "production engineering",
+    "artificial lift",
+    "well completion",
+    "enhanced oil recovery",
+    "petroleum geology",
+    "PIPESIM",
+    "PROSPER",
+    "GATE petroleum",
+    "oil and gas interview questions",
+    "refinery interview",
+    "ingeniería de petróleo",
+    "هندسة النفط"
+   ],
+   "blockedWords": [
+    "vlog",
+    "salary reveal",
+    "day in the life",
+    "job alert",
+    "result live",
+    "reaction",
+    "prank",
+    "motivation shorts"
+   ],
+   "chips": [
+    "Drilling",
+    "Well design",
+    "Reservoir",
+    "Production",
+    "IPR & nodal",
+    "Drilling fluids",
+    "Well control",
+    "EOR",
+    "Petroleum geology",
+    "Refinery interview"
+   ],
+   "channels": [
+    {
+     "channelId": "UC640y4UvDAlya_WOj5U4pfA",
+     "handle": "@iit",
+     "name": "nptelhrd",
+     "language": "en",
+     "country": "IN"
+    },
+    {
+     "channelId": "UCWMfsCe1NQMgx4UZWrVvFgA",
+     "handle": "@Milanslectures",
+     "name": "Milan's lectures",
+     "language": "en",
+     "country": "global"
+    },
+    {
+     "channelId": "UCBg16p_b4yQodvXWXlpV9Sw",
+     "handle": "@PetroleumEngineersAssociation",
+     "name": "Petroleum Engineers Association",
+     "language": "en",
+     "country": "global"
+    },
+    {
+     "channelId": "UCDRBgHUDNNwMygB3iBOblJQ",
+     "handle": "@XteemWellEngineering",
+     "name": "Petroleum (Drilling) Engineering Training",
+     "language": "en",
+     "country": "global"
+    },
+    {
+     "channelId": "UC-7eIZxdqRMupeurEVSJJvw",
+     "handle": "@drillingmanual",
+     "name": "Drilling Manual",
+     "language": "en",
+     "country": "global"
+    },
+    {
+     "channelId": "UCLUQHqb84lGoFlHuT8tZymg",
+     "handle": "@petronileacademy",
+     "name": "PetroNile Academy",
+     "language": "en",
+     "country": "EG"
+    },
+    {
+     "channelId": "UClOhfK2weYznhJy5CuGwQKQ",
+     "handle": "@waleedaqlan",
+     "name": "م/ وليد عقلان Waleed Aqlan",
+     "language": "ar",
+     "country": "YE"
+    },
+    {
+     "channelId": "UCuFnv3uXsWkHf27UoMbdVnQ",
+     "handle": "@hspetrocursos",
+     "name": "Hspetrocursos",
+     "language": "es",
+     "country": "VE"
+    },
+    {
+     "channelId": "UCcqzOx65loN1JR9YBHj7Bzw",
+     "handle": "@SoNuSiNgHRefinery",
+     "name": "SoNu SiNgH Refinery",
+     "language": "hi",
+     "country": "IN"
+    }
+   ]
+  },
+  {
+   "id": "deg_mining",
+   "kind": "degree",
+   "name": {
+    "en": "Mining engineering"
+   },
+   "shortName": "Mining",
+   "group": "engineering",
+   "specialization": {
+    "en": "Mining engineering"
+   },
+   "languages": [
+    "hi",
+    "en",
+    "pt",
+    "es"
+   ],
+   "subjects": [
+    "Mine development",
+    "Surface mining",
+    "Underground mining",
+    "Rock mechanics and ground control",
+    "Mine ventilation",
+    "Mine surveying",
+    "Mine legislation and safety",
+    "Mineral processing"
+   ],
+   "keywords": [
+    "mining engineering",
+    "surface mining",
+    "opencast mining",
+    "underground mining",
+    "mine development",
+    "rock mechanics",
+    "ground control",
+    "rock bolting",
+    "blasting",
+    "drilling and blasting",
+    "ground vibration PPV",
+    "mine ventilation",
+    "mine surveying",
+    "dragline",
+    "stripping ratio",
+    "CMR 2017",
+    "mines act",
+    "DGMS",
+    "first class manager",
+    "overman",
+    "mining sirdar",
+    "GATE mining",
+    "GATE MN",
+    "Coal India",
+    "ingeniería de minas",
+    "mineração"
+   ],
+   "blockedWords": [
+    "vlog",
+    "salary reveal",
+    "day in the life",
+    "job alert",
+    "result live",
+    "reaction",
+    "prank",
+    "motivation shorts"
+   ],
+   "chips": [
+    "Surface mining",
+    "Underground mining",
+    "Rock mechanics",
+    "Ground control",
+    "Blasting",
+    "Mine ventilation",
+    "Mine surveying",
+    "Mining laws",
+    "GATE MN",
+    "DGMS exams"
+   ],
+   "channels": [
+    {
+     "channelId": "UC640y4UvDAlya_WOj5U4pfA",
+     "handle": "@iit",
+     "name": "nptelhrd",
+     "language": "en",
+     "country": "IN"
+    },
+    {
+     "channelId": "UCBRQiH129YwCtRHesOMEHzA",
+     "handle": "@MININGGYAN",
+     "name": "MINING GYAN",
+     "language": "hi",
+     "country": "IN"
+    },
+    {
+     "channelId": "UCpxWuSleQiuMV-tL9JXOI6Q",
+     "handle": "@MiningTechnicalMT",
+     "name": "Mining Technical",
+     "language": "hi",
+     "country": "IN"
+    },
+    {
+     "channelId": "UCGdYiTomCyxyXrAPOe5iOmA",
+     "handle": "@MagicalMining",
+     "name": "Magical Mining",
+     "language": "hi",
+     "country": "IN"
+    },
+    {
+     "channelId": "UC6UMJCqJGJuLWKNaictCD0w",
+     "handle": "@miningengineering7786",
+     "name": "Mining Engineering",
+     "language": "en",
+     "country": "IN"
+    },
+    {
+     "channelId": "UCpBUgkzR3IaQ80mLELyRQnQ",
+     "handle": "@miningclassroomwithtulsida4052",
+     "name": "Mining Class Room With Tulsidas Vishwakarma",
+     "language": "hi",
+     "country": "IN"
+    },
+    {
+     "channelId": "UCSiYZ0UQMgQM-tGtygT6Gpw",
+     "handle": "@MiningClassesbyShankarSir",
+     "name": "Mining Classes by Shankar Sir",
+     "language": "hi",
+     "country": "IN"
+    },
+    {
+     "channelId": "UCvQKeP8vs1x9n40YAalb8aA",
+     "handle": "@GeoEngineeringandScience",
+     "name": "Soil Mechanics and Engineering Geology",
+     "language": "en",
+     "country": "global"
+    },
+    {
+     "channelId": "UCgNcUtOTz-i0-0ULmbIlvEA",
+     "handle": "@croenick",
+     "name": "CMR - Mineração de Cabo a Rabo",
+     "language": "pt",
+     "country": "BR"
+    },
+    {
+     "channelId": "UCDrM8BUW4CKDkzmD8ZylsgQ",
+     "handle": "@Paulamineria",
+     "name": "Paula Minería",
+     "language": "es",
+     "country": "CO"
+    }
+   ]
+  },
+  {
+   "id": "deg_metallurgy_materials",
+   "kind": "degree",
+   "name": {
+    "en": "Metallurgy and materials engineering"
+   },
+   "shortName": "Materials",
+   "group": "engineering",
+   "specialization": {
+    "en": "Metallurgical and materials engineering"
+   },
+   "languages": [
+    "en",
+    "hi"
+   ],
+   "subjects": [
+    "Physical metallurgy",
+    "Mechanical metallurgy",
+    "Extractive metallurgy",
+    "Phase diagrams",
+    "Heat treatment",
+    "Welding metallurgy",
+    "Materials characterisation",
+    "Ceramics, polymers and composites"
+   ],
+   "keywords": [
+    "materials science",
+    "metallurgy",
+    "metallurgical engineering",
+    "crystal structure",
+    "crystal defects",
+    "dislocations",
+    "grain boundaries",
+    "phase diagrams",
+    "iron carbon diagram",
+    "heat treatment",
+    "diffusion",
+    "mechanical properties",
+    "fracture",
+    "fatigue",
+    "creep",
+    "extractive metallurgy",
+    "ironmaking",
+    "steelmaking",
+    "welding metallurgy",
+    "NDT",
+    "ceramics",
+    "polymers",
+    "composites",
+    "glass",
+    "GATE metallurgy",
+    "GATE MT",
+    "metallurgy interview questions",
+    "materials science in Hindi"
+   ],
+   "blockedWords": [
+    "vlog",
+    "salary reveal",
+    "day in the life",
+    "job alert",
+    "result live",
+    "reaction",
+    "prank",
+    "motivation shorts"
+   ],
+   "chips": [
+    "Crystal structure",
+    "Defects",
+    "Phase diagrams",
+    "Heat treatment",
+    "Mechanical properties",
+    "Extractive metallurgy",
+    "Welding & NDT",
+    "Ceramics & glass",
+    "Materials informatics",
+    "GATE MT"
+   ],
+   "channels": [
+    {
+     "channelId": "UCkFj-5ptpNAk3JDN4_vwiVQ",
+     "handle": "@TaylorSparks",
+     "name": "Taylor Sparks",
+     "language": "en",
+     "country": "global"
+    },
+    {
+     "channelId": "UCEBb1b_L6zDS3xTUrIALZOw",
+     "handle": "@mitocw",
+     "name": "MIT OpenCourseWare",
+     "language": "en",
+     "country": "global"
+    },
+    {
+     "channelId": "UC640y4UvDAlya_WOj5U4pfA",
+     "handle": "@iit",
+     "name": "nptelhrd",
+     "language": "en",
+     "country": "IN"
+    },
+    {
+     "channelId": "UClRbecYR2E0oiXNuydO3WZA",
+     "handle": "@MaterialWelding",
+     "name": "Material Welding- Online Welding and NDT Training",
+     "language": "en",
+     "country": "global"
+    },
+    {
+     "channelId": "UCF97PIEXU1K4E6ri7xyEVTw",
+     "handle": "@janakkumar6771",
+     "name": "Metallurgy Education",
+     "language": "hi",
+     "country": "IN"
+    }
+   ]
+  },
+  {
+   "id": "deg_marine_naval",
+   "kind": "degree",
+   "name": {
+    "en": "Marine engineering and naval architecture"
+   },
+   "shortName": "Marine",
+   "group": "engineering",
+   "specialization": {
+    "en": "Marine engineering and naval architecture"
+   },
+   "languages": [
+    "en",
+    "hi"
+   ],
+   "subjects": [
+    "Marine diesel engines",
+    "Auxiliary machinery",
+    "Marine electrical and refrigeration",
+    "Ship stability",
+    "Naval architecture",
+    "Ship construction",
+    "Safety and regulations",
+    "MEO competency exams"
+   ],
+   "keywords": [
+    "marine engineering",
+    "naval architecture",
+    "ship engine room",
+    "two-stroke main engine",
+    "crosshead",
+    "fuel injection",
+    "turbocharger",
+    "purifier",
+    "marine boiler",
+    "air compressor",
+    "steering gear",
+    "oily water separator",
+    "marine refrigeration",
+    "marine electrical",
+    "ship stability",
+    "hydrostatics",
+    "ship construction",
+    "MEO class 4",
+    "MEO class 2",
+    "MEO oral questions",
+    "GME",
+    "engine cadet",
+    "fourth engineer",
+    "marine engineer interview",
+    "merchant navy"
+   ],
+   "blockedWords": [
+    "vlog",
+    "salary reveal",
+    "day in the life",
+    "job alert",
+    "result live",
+    "reaction",
+    "prank",
+    "motivation shorts"
+   ],
+   "chips": [
+    "Main engine",
+    "Auxiliary engines",
+    "Purifiers",
+    "Boilers",
+    "Air compressors",
+    "Refrigeration",
+    "Marine electrical",
+    "Ship stability",
+    "Naval architecture",
+    "MEO orals"
+   ],
+   "channels": [
+    {
+     "channelId": "UC8rdjg90PsJMlXiyydEUbow",
+     "handle": "@sailordecoded",
+     "name": "Sailor DECODED",
+     "language": "en",
+     "country": "IN"
+    },
+    {
+     "channelId": "UCICz1Bddl-kj8ld8fR1UkfA",
+     "handle": "@BasicMarineEngineering",
+     "name": "Basic Marine Engineering",
+     "language": "en",
+     "country": "IN"
+    },
+    {
+     "channelId": "UCfDhHuS6fVXFKtm1DVxCv3Q",
+     "handle": "@MarineEngineeringHub",
+     "name": "Marine Engineering Hub",
+     "language": "en",
+     "country": "IN"
+    },
+    {
+     "channelId": "UCv3KTSX52kwAtHW8NhM4A9w",
+     "handle": "@rmetcvideos",
+     "name": "Chief Engineers TeaTimeTalk | Marine Engineering",
+     "language": "en",
+     "country": "IN"
+    },
+    {
+     "channelId": "UCBKU9zdoKhXPJMk2z-IRXWg",
+     "handle": "@searainly",
+     "name": "Searainly",
+     "language": "en",
+     "country": "IN"
+    },
+    {
+     "channelId": "UC0UlJrKMYIQ5q9ksCMcf4dA",
+     "handle": "@marine-knowledge-basha",
+     "name": "Marine engineering basics by sailor basha",
+     "language": "hi",
+     "country": "IN"
+    },
+    {
+     "channelId": "UCLwq9Bk8497PKooGDxdkSRA",
+     "handle": "@marine_engineer_club",
+     "name": "MARINE ENGINEERING CLUB",
+     "language": "en",
+     "country": "IN"
+    },
+    {
+     "channelId": "UCUFpSwlPB3Ojf5Wvg4ISK6Q",
+     "handle": "@EngineRoomExplained",
+     "name": "Engine Room Explained",
+     "language": "en",
+     "country": "global"
+    },
+    {
+     "channelId": "UCDKNZSz2eKx-Z-r75ugvZnw",
+     "handle": "@navalarchitecturechannel",
+     "name": "Naval Architecture",
+     "language": "en",
+     "country": "global"
+    },
+    {
+     "channelId": "UCCKFExNsNAEpgFN5wyIKGeA",
+     "handle": "@marineelectroandrefrigeration",
+     "name": "MARINE ELECTRO AND REFRIGERATION TV",
+     "language": "en",
+     "country": "global"
+    }
+   ]
+  },
+  {
+   "id": "deg_agricultural",
+   "kind": "degree",
+   "name": {
+    "en": "Agricultural engineering"
+   },
+   "shortName": "Agricultural",
+   "group": "engineering",
+   "specialization": {
+    "en": "Agricultural engineering"
+   },
+   "languages": [
+    "hi",
+    "en",
+    "pt"
+   ],
+   "subjects": [
+    "Farm machinery and power",
+    "Soil and water conservation",
+    "Irrigation and drainage",
+    "Processing and food engineering",
+    "Agricultural structures",
+    "Renewable energy"
+   ],
+   "keywords": [
+    "agricultural engineering",
+    "farm machinery",
+    "farm power",
+    "tractor",
+    "traction",
+    "clutch",
+    "tillage",
+    "soil and water conservation",
+    "irrigation engineering",
+    "drainage",
+    "hydrology",
+    "agricultural hydraulics",
+    "post-harvest engineering",
+    "food processing engineering",
+    "agricultural structures",
+    "renewable energy",
+    "GATE AG",
+    "GATE agricultural engineering",
+    "ICAR JRF",
+    "ASRB NET",
+    "agriculture engineer exam",
+    "PYQ",
+    "hidráulica agrícola",
+    "engenharia agrícola"
+   ],
+   "blockedWords": [
+    "vlog",
+    "salary reveal",
+    "day in the life",
+    "job alert",
+    "result live",
+    "reaction",
+    "prank",
+    "motivation shorts"
+   ],
+   "chips": [
+    "Farm machinery",
+    "Tractors",
+    "Soil & water",
+    "Irrigation",
+    "Drainage",
+    "Hydraulics",
+    "Post-harvest",
+    "Food engineering",
+    "GATE AG",
+    "ICAR exams"
+   ],
+   "channels": [
+    {
+     "channelId": "UC640y4UvDAlya_WOj5U4pfA",
+     "handle": "@iit",
+     "name": "nptelhrd",
+     "language": "en",
+     "country": "IN"
+    },
+    {
+     "channelId": "UC80MHic1a0jRm-_uGzH_OIA",
+     "handle": "@gateagricultureengineering",
+     "name": "AGRIYUG - GATE AGRICULTURE ENGINEERING",
+     "language": "hi",
+     "country": "IN"
+    },
+    {
+     "channelId": "UCBtfemTH5mSPonasVixAWPQ",
+     "handle": "@gateforall-gateagriculture8778",
+     "name": "GATEFORALL GATE AG",
+     "language": "en",
+     "country": "IN"
+    },
+    {
+     "channelId": "UC3ELwe79TpMuY32xgTVJRJg",
+     "handle": "@agriculturalengineeringcra7258",
+     "name": "Agricultural Engineering Crack GATE Online",
+     "language": "en",
+     "country": "IN"
+    },
+    {
+     "channelId": "UCjEWdqeAe8XO8xvaqvf9oqg",
+     "handle": "@hidraulicaagricola-esalqus2984",
+     "name": "Hidráulica Agrícola - ESALQ/USP",
+     "language": "pt",
+     "country": "BR"
+    }
+   ]
+  },
+  {
+   "id": "deg_architecture",
+   "kind": "degree",
+   "name": {
+    "en": "Architecture"
+   },
+   "shortName": "Architecture",
+   "group": "design",
+   "specialization": {
+    "en": "Architecture"
+   },
+   "languages": [
+    "en",
+    "hi",
+    "pt",
+    "ar",
+    "id"
+   ],
+   "subjects": [
+    "Architectural design studio",
+    "Building construction and materials",
+    "History of architecture",
+    "Architectural drawing and representation",
+    "Building services and climate design",
+    "Urban planning",
+    "BIM and CAD (Revit, Archicad)",
+    "Professional practice and portfolio"
+   ],
+   "keywords": [
+    "architecture lecture",
+    "architectural design",
+    "design studio",
+    "architecture student",
+    "site analysis",
+    "architectural drawing",
+    "plan section elevation",
+    "architectural sketching",
+    "building construction",
+    "building materials",
+    "history of architecture",
+    "climate responsive design",
+    "sustainable architecture",
+    "urban design",
+    "town planning",
+    "Revit tutorial",
+    "Archicad",
+    "BIM",
+    "architecture portfolio",
+    "architecture thesis",
+    "GATE Architecture and Planning",
+    "B.Arch",
+    "NATA",
+    "arquitetura aula",
+    "arquitectura clase",
+    "desain arsitektur",
+    "تصميم معماري"
+   ],
+   "blockedWords": [
+    "vlog",
+    "prank",
+    "reaction",
+    "shorts compilation",
+    "house tour",
+    "giveaway",
+    "motivation status",
+    "salary reveal",
+    "luxury home tour",
+    "real estate listing"
+   ],
+   "chips": [
+    "Design studio",
+    "Sketching",
+    "Site analysis",
+    "Plans and sections",
+    "Construction",
+    "History of architecture",
+    "Revit and BIM",
+    "Urban design",
+    "Portfolio",
+    "GATE Architecture"
+   ],
+   "channels": [
+    {
+     "channelId": "UCoc2ZM2cYas4DijNdaEJXUA",
+     "handle": "@30by40",
+     "name": "30X40 Design Workshop",
+     "language": "en",
+     "country": "global"
+    },
+    {
+     "channelId": "UCYAm24PkejQR2xMgJgn7xwg",
+     "handle": "@stewarthicks",
+     "name": "Stewart Hicks",
+     "language": "en",
+     "country": "global"
+    },
+    {
+     "channelId": "UC_eRv_Rzr671BaKFtpYSi4A",
+     "handle": "@ShowItBetter",
+     "name": "Show It Better",
+     "language": "en",
+     "country": "global"
+    },
+    {
+     "channelId": "UC8kmK7NIn7MY5xZFxDA5oGw",
+     "handle": "@SurvivingArchitecture",
+     "name": "Surviving Architecture",
+     "language": "en",
+     "country": "global"
+    },
+    {
+     "channelId": "UCF0b_PC-cvPzv6Us56S6rtA",
+     "handle": "@MITArchitectureDept",
+     "name": "MIT Architecture",
+     "language": "en",
+     "country": "US"
+    },
+    {
+     "channelId": "UCbEKfCSIU12cEQVaJcwIhMg",
+     "handle": "@howtoarchitect",
+     "name": "How to Architect",
+     "language": "en",
+     "country": "US"
+    },
+    {
+     "channelId": "UCwagRWo6LeTv_0ob-SSSwOQ",
+     "handle": "@KPgateclasses",
+     "name": "KP Classes for GATE NET & IIT JAM",
+     "language": "en",
+     "country": "IN"
+    },
+    {
+     "channelId": "UCNxT9vCRqFKeYVuwUWImY8w",
+     "handle": "@PWDesignAndArch",
+     "name": "PW Design & Arch",
+     "language": "hi",
+     "country": "IN"
+    },
+    {
+     "channelId": "UChJ-YB-1jKYAOeIkaIwZfuA",
+     "handle": "@Architecture_Opinion",
+     "name": "Architecture Opinion",
+     "language": "hi",
+     "country": "IN"
+    },
+    {
+     "channelId": "UC8iAZDoPigcWXeARV3l4uRQ",
+     "handle": "@robertavendramini",
+     "name": "Roberta Vendramini - Cursos Construir",
+     "language": "pt",
+     "country": "BR"
+    },
+    {
+     "channelId": "UCYg7422fSZ6OaMW65gaIAVg",
+     "handle": "@ProjetoJovemArquiteto",
+     "name": "Projeto Jovem Arquiteto",
+     "language": "pt",
+     "country": "BR"
+    },
+    {
+     "channelId": "UCUFBuNdtYl3xclxAlR7x2ew",
+     "handle": "@arch-khaledgad",
+     "name": "الهندسة مع خالد",
+     "language": "ar",
+     "country": "EG"
+    },
+    {
+     "channelId": "UCCyrbd205yX0PlQcvvhsRgA",
+     "handle": "@ProboHindarto",
+     "name": "Probo Hindarto",
+     "language": "id",
+     "country": "ID"
+    }
+   ]
+  },
+  {
+   "id": "deg_design",
+   "kind": "degree",
+   "name": {
+    "en": "Design (UX, graphic and product)"
+   },
+   "shortName": "Design",
+   "group": "design",
+   "specialization": {
+    "en": "Design"
+   },
+   "languages": [
+    "en",
+    "hi",
+    "ur",
+    "ar",
+    "es"
+   ],
+   "subjects": [
+    "User experience (UX) research",
+    "User interface (UI) design",
+    "Interaction design",
+    "Graphic design and typography",
+    "Branding and visual identity",
+    "Product and industrial design (CAD)",
+    "Design tools (Figma, Adobe)",
+    "Portfolio and design interviews"
+   ],
+   "keywords": [
+    "UX design",
+    "UI design",
+    "user research",
+    "usability",
+    "usability testing",
+    "information architecture",
+    "wireframe",
+    "prototype",
+    "Figma",
+    "design system",
+    "interaction design",
+    "graphic design",
+    "typography",
+    "color theory",
+    "layout grid",
+    "branding",
+    "logo design",
+    "Adobe Illustrator",
+    "Photoshop",
+    "product design",
+    "industrial design",
+    "Fusion 360",
+    "UX portfolio",
+    "UX case study",
+    "UX interview questions",
+    "design critique",
+    "diseño gráfico",
+    "تصميم جرافيك"
+   ],
+   "blockedWords": [
+    "vlog",
+    "prank",
+    "reaction",
+    "shorts compilation",
+    "house tour",
+    "giveaway",
+    "motivation status",
+    "salary reveal",
+    "free download",
+    "crack",
+    "template pack"
+   ],
+   "chips": [
+    "UX research",
+    "UI design",
+    "Figma",
+    "Typography",
+    "Color theory",
+    "Branding",
+    "Logo design",
+    "Layout",
+    "Product design CAD",
+    "Portfolio",
+    "Case study",
+    "Design interview"
+   ],
+   "channels": [
+    {
+     "channelId": "UC2oCugzU6W8-h95W7eBTUEg",
+     "handle": "@NNgroup",
+     "name": "NNgroup",
+     "language": "en",
+     "country": "global"
+    },
+    {
+     "channelId": "UCQsVmhSa4X-G3lHlUtejzLA",
+     "handle": "@Figma",
+     "name": "Figma",
+     "language": "en",
+     "country": "global"
+    },
+    {
+     "channelId": "UCoeJKtPJLoIBqWq4o8TDLpA",
+     "handle": "@SatoriGraphics",
+     "name": "Satori Graphics",
+     "language": "en",
+     "country": "global"
+    },
+    {
+     "channelId": "UC-b3c7kxa5vU-bnmaROgvog",
+     "handle": "@thefutur",
+     "name": "The Futur",
+     "language": "en",
+     "country": "global"
+    },
+    {
+     "channelId": "UCooViVfi0DaWk_eqxIXXiOQ",
+     "handle": "@ProductDesignOnline",
+     "name": "Product Design Online",
+     "language": "en",
+     "country": "global"
+    },
+    {
+     "channelId": "UCtAoItAnNOJYf8XqnERy50w",
+     "handle": "@saptarshipr",
+     "name": "Saptarshi Prakash",
+     "language": "en",
+     "country": "IN"
+    },
+    {
+     "channelId": "UCVN2KSAUFL55plxpATCxBOw",
+     "handle": "@UXAnudeep",
+     "name": "UX Anudeep",
+     "language": "en",
+     "country": "IN"
+    },
+    {
+     "channelId": "UCVQXfLKRF2l6iSqWt_XDhNQ",
+     "handle": "@aspiradesign",
+     "name": "aspira design",
+     "language": "en",
+     "country": "IN"
+    },
+    {
+     "channelId": "UCxM6G42vmI752f60od3Gypw",
+     "handle": "@SarahDoody",
+     "name": "Sarah Doody",
+     "language": "en",
+     "country": "US"
+    },
+    {
+     "channelId": "UCWJE3xgMkuekX376g3SiwrQ",
+     "handle": "@zerotoux",
+     "name": "Kevin Liang | Zero to UX",
+     "language": "en",
+     "country": "US"
+    },
+    {
+     "channelId": "UCP3AIk974-PeB9bg1Mc7wug",
+     "handle": "@GFXMentor",
+     "name": "GFXMentor",
+     "language": "ur",
+     "country": "PK"
+    },
+    {
+     "channelId": "UCaGI-UP6IsjmK80Vlfn6btg",
+     "handle": "@NourDesign",
+     "name": "Nour Design",
+     "language": "ar",
+     "country": "EG"
+    },
+    {
+     "channelId": "UCWK_RY_ojQ1ff-BozUyk1lg",
+     "handle": "@AHMEDMOSTAFA77",
+     "name": "AHMED MOSTAFA",
+     "language": "ar",
+     "country": "EG"
+    },
+    {
+     "channelId": "UCrSY6jiH4sRBKyX22r2cMcA",
+     "handle": "@Danimozdesign",
+     "name": "Danimoz Diseño Gráfico",
+     "language": "es",
+     "country": "global"
+    }
+   ]
+  },
+  {
+   "id": "deg_economics",
+   "kind": "degree",
+   "name": {
+    "en": "Economics"
+   },
+   "shortName": "Economics",
+   "group": "arts",
+   "specialization": {
+    "en": "Economics"
+   },
+   "languages": [
+    "en",
+    "hi",
+    "ur",
+    "bn",
+    "es",
+    "pt",
+    "id"
+   ],
+   "subjects": [
+    "Microeconomics",
+    "Macroeconomics",
+    "Econometrics and statistics",
+    "Mathematical economics",
+    "Development economics",
+    "International economics",
+    "Public finance",
+    "Money and banking",
+    "History of economic thought"
+   ],
+   "keywords": [
+    "economics lecture",
+    "microeconomics",
+    "macroeconomics",
+    "demand and supply",
+    "elasticity",
+    "consumer theory",
+    "production and cost",
+    "perfect competition",
+    "monopoly",
+    "game theory",
+    "GDP",
+    "inflation",
+    "unemployment",
+    "monetary policy",
+    "fiscal policy",
+    "balance of payments",
+    "econometrics",
+    "regression",
+    "development economics",
+    "public finance",
+    "international trade",
+    "economic growth models",
+    "BA economics",
+    "MA economics",
+    "UGC NET Economics",
+    "IES",
+    "अर्थशास्त्र",
+    "অর্থনীতি",
+    "economía",
+    "economia",
+    "ekonomi"
+   ],
+   "blockedWords": [
+    "vlog",
+    "prank",
+    "reaction",
+    "shorts compilation",
+    "house tour",
+    "giveaway",
+    "motivation status",
+    "salary reveal",
+    "stock tips",
+    "crypto signals",
+    "trading live",
+    "get rich"
+   ],
+   "chips": [
+    "Microeconomics",
+    "Macroeconomics",
+    "Demand and supply",
+    "Elasticity",
+    "Market structures",
+    "Game theory",
+    "Inflation",
+    "Monetary policy",
+    "Fiscal policy",
+    "Econometrics",
+    "Development economics",
+    "UGC NET Economics"
+   ],
+   "channels": [
+    {
+     "channelId": "UCnkEhPBMZcEO0QGu51fDFDg",
+     "handle": "@MarginalRevolutionUniversity",
+     "name": "Marginal Revolution University",
+     "language": "en",
+     "country": "global"
+    },
+    {
+     "channelId": "UCCQEbqDL8i40d83Au55lYMQ",
+     "handle": "@JacobAClifford",
+     "name": "Jacob Clifford",
+     "language": "en",
+     "country": "global"
+    },
+    {
+     "channelId": "UCQbBh9Jn2IjcSPZOiNKJu0g",
+     "handle": "@econplusdal",
+     "name": "EconplusDal",
+     "language": "en",
+     "country": "global"
+    },
+    {
+     "channelId": "UCp5hG8rt1z2MJ9aNVxY2Xdg",
+     "handle": "@NewEconomicThinking",
+     "name": "New Economic Thinking",
+     "language": "en",
+     "country": "global"
+    },
+    {
+     "channelId": "UC2-Q6VJ4ozwkxUKdVGz-ClQ",
+     "handle": "@ReviewEcon",
+     "name": "ReviewEcon",
+     "language": "en",
+     "country": "US"
+    },
+    {
+     "channelId": "UCy2manvGDTPPlkm0N3gIYTQ",
+     "handle": "@ECOHOLICS",
+     "name": "ECOHOLICS - Largest Platform for Economics",
+     "language": "en",
+     "country": "IN"
+    },
+    {
+     "channelId": "UCRA3ghUww8Ba-n4SP-k5CFw",
+     "handle": "@MSStudyGuru",
+     "name": "MS Study Guru by Dr. Simranjit Kaur",
+     "language": "hi",
+     "country": "IN"
+    },
+    {
+     "channelId": "UC7z9zuoGgYNerqqq5g8gnRg",
+     "handle": "@economicsinhindi",
+     "name": "अर्थशास्त्र की नगरी",
+     "language": "hi",
+     "country": "IN"
+    },
+    {
+     "channelId": "UC_8DobBhmb8cgy3bTqUA_WQ",
+     "handle": "@MrShayanSiddiqui",
+     "name": "Mr. Shayan Siddiqui",
+     "language": "ur",
+     "country": "PK"
+    },
+    {
+     "channelId": "UC3q4yE1YFdQ7CCPm_iIolxA",
+     "handle": "@ZeaTutor",
+     "name": "Zea Tutor",
+     "language": "ur",
+     "country": "PK"
+    },
+    {
+     "channelId": "UCGBlqeok8usB7VOyOr0G_JQ",
+     "handle": "@economicscenterbyakmalhuss2779",
+     "name": "Economics Center by Akmal Hussain Maliha",
+     "language": "bn",
+     "country": "BD"
+    },
+    {
+     "channelId": "UCorGJageXugR48GUzziMX-A",
+     "handle": "@ElEconomistaCamuflado",
+     "name": "El Economista Camuflado",
+     "language": "es",
+     "country": "global"
+    },
+    {
+     "channelId": "UCYRJ02GY2erCfXTCvSfKZew",
+     "handle": "@ieunicampbr",
+     "name": "Instituto de Economia da Unicamp",
+     "language": "pt",
+     "country": "BR"
+    },
+    {
+     "channelId": "UCGrqiBJuPq73c12iWOcu3lw",
+     "handle": "@IlmuEkonomiFEBUGM",
+     "name": "Economics FEB UGM",
+     "language": "id",
+     "country": "ID"
+    }
+   ]
+  },
+  {
+   "id": "deg_psychology",
+   "kind": "degree",
+   "name": {
+    "en": "Psychology"
+   },
+   "shortName": "Psychology",
+   "group": "arts",
+   "specialization": {
+    "en": "Psychology"
+   },
+   "languages": [
+    "en",
+    "hi",
+    "es",
+    "pt"
+   ],
+   "subjects": [
+    "General psychology",
+    "Biological psychology",
+    "Cognitive psychology",
+    "Developmental psychology",
+    "Social psychology",
+    "Abnormal psychology and psychopathology",
+    "Research methods and statistics",
+    "Counselling and clinical psychology"
+   ],
+   "keywords": [
+    "psychology lecture",
+    "introduction to psychology",
+    "cognitive psychology",
+    "developmental psychology",
+    "social psychology",
+    "abnormal psychology",
+    "psychopathology",
+    "personality theories",
+    "Freud",
+    "Piaget",
+    "learning theories",
+    "memory",
+    "motivation and emotion",
+    "research methods psychology",
+    "psychological testing",
+    "clinical psychology",
+    "counselling psychology",
+    "UGC NET Psychology",
+    "CUET PG Psychology",
+    "AP Psychology",
+    "psychometrician board exam",
+    "psicología",
+    "psicologia",
+    "मनोविज्ञान"
+   ],
+   "blockedWords": [
+    "vlog",
+    "prank",
+    "reaction",
+    "shorts compilation",
+    "house tour",
+    "giveaway",
+    "motivation status",
+    "salary reveal",
+    "personality quiz",
+    "astrology",
+    "manifestation",
+    "dark psychology tricks"
+   ],
+   "chips": [
+    "Intro psychology",
+    "Learning",
+    "Memory",
+    "Development",
+    "Personality",
+    "Social psychology",
+    "Psychopathology",
+    "Research methods",
+    "Counselling",
+    "UGC NET Psychology"
+   ],
+   "channels": [
+    {
+     "channelId": "UC4EY_qnSeAP1xGsh61eOoJA",
+     "handle": "@YaleCourses",
+     "name": "YaleCourses",
+     "language": "en",
+     "country": "global"
+    },
+    {
+     "channelId": "UCX6b17PVsYBQ0ip5gyeme-Q",
+     "handle": "@crashcourse",
+     "name": "CrashCourse",
+     "language": "en",
+     "country": "global"
+    },
+    {
+     "channelId": "UCyI9ZKZqlfaWhGLKTVTz9cA",
+     "handle": "@MrSinn",
+     "name": "Mr. Sinn",
+     "language": "en",
+     "country": "US"
+    },
+    {
+     "channelId": "UCGhiatsKfOjJD8l1tsIqghw",
+     "handle": "@TimSteadman",
+     "name": "Get Psyched with Tim Steadman",
+     "language": "en",
+     "country": "US"
+    },
+    {
+     "channelId": "UCXtOpEK3Zgz0HznAXN9uYrA",
+     "handle": "@powerwithinpsychology",
+     "name": "Power Within Psychology (PWP)",
+     "language": "en",
+     "country": "IN"
+    },
+    {
+     "channelId": "UCcKDnZy484OqAyLFr8E-MHQ",
+     "handle": "@MindReview",
+     "name": "Mind Review",
+     "language": "hi",
+     "country": "IN"
+    },
+    {
+     "channelId": "UCwXSCvafE2n3_FLNuZnP06g",
+     "handle": "@claritywithvishal",
+     "name": "Learn Psychology with Vishal Pandey",
+     "language": "hi",
+     "country": "IN"
+    },
+    {
+     "channelId": "UCSOoGSp9LOcfn9Mk8ni_RTQ",
+     "handle": "@JPBuduan",
+     "name": "JP Buduan",
+     "language": "en",
+     "country": "PH"
+    },
+    {
+     "channelId": "UCqHMOz8IZukdHaz1_lGEGog",
+     "handle": "@UNAMPsicología-y2r",
+     "name": "UNAM Psicología",
+     "language": "es",
+     "country": "MX"
+    },
+    {
+     "channelId": "UCFXt71mX_7dxwQua633KQrQ",
+     "handle": "@PsicologiaUSP",
+     "name": "Instituto de Psicologia da USP",
+     "language": "pt",
+     "country": "BR"
+    }
+   ]
+  },
+  {
+   "id": "deg_history",
+   "kind": "degree",
+   "name": {
+    "en": "History"
+   },
+   "shortName": "History",
+   "group": "arts",
+   "specialization": {
+    "en": "History"
+   },
+   "languages": [
+    "en",
+    "hi",
+    "pt",
+    "es",
+    "id"
+   ],
+   "subjects": [
+    "Ancient history",
+    "Medieval history",
+    "Modern world history",
+    "National history",
+    "Historiography and sources",
+    "Economic and social history",
+    "Military and political history"
+   ],
+   "keywords": [
+    "history lecture",
+    "world history",
+    "ancient history",
+    "medieval history",
+    "modern history",
+    "early modern Europe",
+    "colonialism",
+    "decolonisation",
+    "industrial revolution",
+    "French Revolution",
+    "world war",
+    "cold war",
+    "historiography",
+    "primary sources",
+    "historical method",
+    "Indian history",
+    "Mughal empire",
+    "freedom struggle",
+    "UPSC history optional",
+    "DBQ",
+    "history of Nigeria",
+    "Philippine history",
+    "sejarah",
+    "história",
+    "historia",
+    "इतिहास"
+   ],
+   "blockedWords": [
+    "vlog",
+    "prank",
+    "reaction",
+    "shorts compilation",
+    "house tour",
+    "giveaway",
+    "motivation status",
+    "salary reveal",
+    "conspiracy",
+    "ancient aliens",
+    "mystery",
+    "horror story"
+   ],
+   "chips": [
+    "Ancient world",
+    "Medieval",
+    "Modern world",
+    "Colonialism",
+    "World wars",
+    "Indian history",
+    "Historiography",
+    "Primary sources",
+    "Essay writing",
+    "History optional"
+   ],
+   "channels": [
+    {
+     "channelId": "UC4EY_qnSeAP1xGsh61eOoJA",
+     "handle": "@YaleCourses",
+     "name": "YaleCourses",
+     "language": "en",
+     "country": "global"
+    },
+    {
+     "channelId": "UC1t6kKXoBvjdr8m9KJ2Fx7A",
+     "handle": "@GreshamCollege",
+     "name": "Gresham College",
+     "language": "en",
+     "country": "global"
+    },
+    {
+     "channelId": "UCMmaBzfCCwZ2KqaBJjkj0fw",
+     "handle": "@KingsandGenerals",
+     "name": "Kings and Generals",
+     "language": "en",
+     "country": "global"
+    },
+    {
+     "channelId": "UC_bOoi0e3L3SJ1xx5TZWHPw",
+     "handle": "@heimlershistory",
+     "name": "Heimler's History",
+     "language": "en",
+     "country": "US"
+    },
+    {
+     "channelId": "UCUGwVgtUewevtLvu7NaxVrw",
+     "handle": "@DrRoyCasagranda",
+     "name": "Dr. Roy Casagranda",
+     "language": "en",
+     "country": "US"
+    },
+    {
+     "channelId": "UCBMfaGYFl3LwC_416k6CpxA",
+     "handle": "@HistoryOptionalforUPSC",
+     "name": "History Optional for UPSC",
+     "language": "en",
+     "country": "IN"
+    },
+    {
+     "channelId": "UC1gBk2nNZ9_VgJ5CrdQjnyQ",
+     "handle": "@TheStudyIAS",
+     "name": "The Study IAS By Manikant Singh",
+     "language": "hi",
+     "country": "IN"
+    },
+    {
+     "channelId": "UCx7HKmnCIIbRBF2FjAoV0bg",
+     "handle": "@deboraaladim",
+     "name": "Débora Aladim",
+     "language": "pt",
+     "country": "BR"
+    },
+    {
+     "channelId": "UC8Or2M0CYQDQKQkIXXxiU6w",
+     "handle": "@HistoriaconÑ",
+     "name": "Historia con Ñ",
+     "language": "es",
+     "country": "ES"
+    },
+    {
+     "channelId": "UCzDmu6QviXbf0cbeFBh2_zA",
+     "handle": "@Lacunadehalicarnaso",
+     "name": "La cuna de Halicarnaso",
+     "language": "es",
+     "country": "ES"
+    },
+    {
+     "channelId": "UCgHuj6UueYXORliGqtbvjRw",
+     "handle": "@ASISIChannel",
+     "name": "ASISI Channel",
+     "language": "id",
+     "country": "ID"
+    },
+    {
+     "channelId": "UCLdHxodB8o1nAhJTstCoWlw",
+     "handle": "@KirbyAraullo",
+     "name": "Kirby Araullo (Historian)",
+     "language": "en",
+     "country": "PH"
+    },
+    {
+     "channelId": "UCsCV5niAD3cNm6jVyFqw_Gw",
+     "handle": "@HistoryVille",
+     "name": "HistoryVille",
+     "language": "en",
+     "country": "NG"
+    },
+    {
+     "channelId": "UCfC-KU6Nx3aA1eX6FCCBTSg",
+     "handle": "@backinhistory9",
+     "name": "Back in History",
+     "language": "en",
+     "country": "NG"
+    }
+   ]
+  },
+  {
+   "id": "deg_literature",
+   "kind": "degree",
+   "name": {
+    "en": "Literature"
+   },
+   "shortName": "Literature",
+   "group": "arts",
+   "specialization": {
+    "en": "Literature"
+   },
+   "languages": [
+    "en",
+    "hi",
+    "pt",
+    "es"
+   ],
+   "subjects": [
+    "British literature by age",
+    "American literature",
+    "Literary theory and criticism",
+    "Poetry",
+    "Drama",
+    "Novel",
+    "Indian writing in English",
+    "Hindi literature",
+    "Comparative literature"
+   ],
+   "keywords": [
+    "english literature lecture",
+    "literary theory",
+    "literary criticism",
+    "poetry analysis",
+    "Shakespeare",
+    "Chaucer",
+    "Romantic poets",
+    "Victorian novel",
+    "modernism",
+    "postmodernism",
+    "feminist criticism",
+    "postcolonial literature",
+    "Foucault",
+    "Derrida",
+    "Indian writing in English",
+    "American literature",
+    "UGC NET English literature",
+    "PYQ literature",
+    "हिंदी साहित्य",
+    "UGC NET Hindi",
+    "literatura",
+    "literatura brasileira",
+    "close reading"
+   ],
+   "blockedWords": [
+    "vlog",
+    "prank",
+    "reaction",
+    "shorts compilation",
+    "house tour",
+    "giveaway",
+    "motivation status",
+    "salary reveal",
+    "book haul",
+    "booktok",
+    "audiobook full"
+   ],
+   "chips": [
+    "British literature",
+    "Poetry analysis",
+    "Drama",
+    "Novel",
+    "Literary theory",
+    "Feminism",
+    "Postcolonialism",
+    "Shakespeare",
+    "Hindi sahitya",
+    "UGC NET English"
+   ],
+   "channels": [
+    {
+     "channelId": "UCJPpE22GR3Tt8TJQmFtQjwQ",
+     "handle": "@BenjaminMcEvoy",
+     "name": "Benjamin McEvoy",
+     "language": "en",
+     "country": "global"
+    },
+    {
+     "channelId": "UCXItQpmW5lAzX8GpPmiidmw",
+     "handle": "@theliteraturechannel9755",
+     "name": "The Literature Channel",
+     "language": "en",
+     "country": "global"
+    },
+    {
+     "channelId": "UC4EY_qnSeAP1xGsh61eOoJA",
+     "handle": "@YaleCourses",
+     "name": "YaleCourses",
+     "language": "en",
+     "country": "global"
+    },
+    {
+     "channelId": "UCX6b17PVsYBQ0ip5gyeme-Q",
+     "handle": "@crashcourse",
+     "name": "CrashCourse",
+     "language": "en",
+     "country": "global"
+    },
+    {
+     "channelId": "UCgde7SHoGdviHQMKF6XvWBQ",
+     "handle": "@UGCNETJRFEnglishLiterature",
+     "name": "UGC NET English Literature",
+     "language": "en",
+     "country": "IN"
+    },
+    {
+     "channelId": "UCHJN-ZhwBPDSrY5qA72fZuQ",
+     "handle": "@sunainaenglish",
+     "name": "Sunaina Jethani",
+     "language": "en",
+     "country": "IN"
+    },
+    {
+     "channelId": "UCRdutJyQCrBonuDnsHAZAXA",
+     "handle": "@LearningLiteraturewithPurba",
+     "name": "Learning Literature with Purba",
+     "language": "en",
+     "country": "IN"
+    },
+    {
+     "channelId": "UC-A8zv515Sy8OQ9iYIR-wRw",
+     "handle": "@Hindisahityachannel",
+     "name": "Hindi sahitya channel",
+     "language": "hi",
+     "country": "IN"
+    },
+    {
+     "channelId": "UCc5n4M8hhYDcVcb7SVbPqlw",
+     "handle": "@LiteraturacomAlencar",
+     "name": "Literatura com Alencar",
+     "language": "pt",
+     "country": "BR"
+    },
+    {
+     "channelId": "UCS5cq5uDrH2gynzwIVC9iKA",
+     "handle": "@nosoloclasicos",
+     "name": "No solo clásicos",
+     "language": "es",
+     "country": "ES"
+    }
+   ]
+  },
+  {
+   "id": "deg_sociology_political_science",
+   "kind": "degree",
+   "name": {
+    "en": "Sociology and political science"
+   },
+   "shortName": "Sociology & politics",
+   "group": "arts",
+   "specialization": {
+    "en": "Sociology and political science"
+   },
+   "languages": [
+    "en",
+    "hi",
+    "pt",
+    "id",
+    "ar"
+   ],
+   "subjects": [
+    "Sociological theory",
+    "Indian society",
+    "Research methods",
+    "Political theory",
+    "Comparative politics",
+    "International relations",
+    "Public administration",
+    "Political thought"
+   ],
+   "keywords": [
+    "sociology lecture",
+    "political science lecture",
+    "sociological theory",
+    "Durkheim",
+    "Max Weber",
+    "Karl Marx",
+    "social stratification",
+    "caste and class",
+    "kinship",
+    "social change",
+    "research methods sociology",
+    "political theory",
+    "political thought",
+    "liberalism",
+    "Marxism",
+    "comparative politics",
+    "party system",
+    "international relations",
+    "Indian constitution",
+    "public administration",
+    "UPSC sociology optional",
+    "UGC NET political science",
+    "BA political science",
+    "समाजशास्त्र",
+    "राजनीति विज्ञान",
+    "sociologia",
+    "sosiologi"
+   ],
+   "blockedWords": [
+    "vlog",
+    "prank",
+    "reaction",
+    "shorts compilation",
+    "house tour",
+    "giveaway",
+    "motivation status",
+    "salary reveal",
+    "election live",
+    "debate fight",
+    "party rally"
+   ],
+   "chips": [
+    "Sociological theory",
+    "Marx, Weber, Durkheim",
+    "Social stratification",
+    "Caste and class",
+    "Political theory",
+    "Political thought",
+    "Comparative politics",
+    "International relations",
+    "Constitution",
+    "Sociology optional"
+   ],
+   "channels": [
+    {
+     "channelId": "UCX6b17PVsYBQ0ip5gyeme-Q",
+     "handle": "@crashcourse",
+     "name": "CrashCourse",
+     "language": "en",
+     "country": "global"
+    },
+    {
+     "channelId": "UC4EY_qnSeAP1xGsh61eOoJA",
+     "handle": "@YaleCourses",
+     "name": "YaleCourses",
+     "language": "en",
+     "country": "global"
+    },
+    {
+     "channelId": "UCkS_HP3m9NXOgswVAKbMeJQ",
+     "handle": "@ThenNow",
+     "name": "Then & Now",
+     "language": "en",
+     "country": "global"
+    },
+    {
+     "channelId": "UCK08_B5SZwoEUk2hDPMOijQ",
+     "handle": "@theLondonSchoolofEconomics",
+     "name": "LSE",
+     "language": "en",
+     "country": "global"
+    },
+    {
+     "channelId": "UCXZVeOY2keryCE3wKFTHGxQ",
+     "handle": "@SociologyClassesbyShibu",
+     "name": "Sociology Classes by Shibu",
+     "language": "en",
+     "country": "IN"
+    },
+    {
+     "channelId": "UC29sqr3kneb3yZGWggGtfXw",
+     "handle": "@IASGurukul",
+     "name": "IAS Gurukul Sociology Optional by Pranay Aggarwal",
+     "language": "en",
+     "country": "IN"
+    },
+    {
+     "channelId": "UCTn1FYWe7HDVA1DzddY-zRg",
+     "handle": "@sociologywithvivek",
+     "name": "sociology with vivek",
+     "language": "hi",
+     "country": "IN"
+    },
+    {
+     "channelId": "UCqjSVeZZIGSxOxR-vz3K-AA",
+     "handle": "@POLSCHELP",
+     "name": "POL SC HELP",
+     "language": "en",
+     "country": "IN"
+    },
+    {
+     "channelId": "UCDbxfzd2CwhnfPHEEIId7HQ",
+     "handle": "@SaarConcepts",
+     "name": "Saar Concepts",
+     "language": "en",
+     "country": "IN"
+    },
+    {
+     "channelId": "UCBhkNOK6hszOR7tryqeD9UQ",
+     "handle": "@politicalclassesBysonamchauhan",
+     "name": "political classes By sonam chauhan",
+     "language": "hi",
+     "country": "IN"
+    },
+    {
+     "channelId": "UCIyAy8lIQwnj-2CGt9e-N3g",
+     "handle": "@Taimur_Laal",
+     "name": "Taimur_Laal",
+     "language": "en",
+     "country": "PK"
+    },
+    {
+     "channelId": "UCfHlkHcMnlqfvglU0VMZ0yQ",
+     "handle": "@EhabBarakat84",
+     "name": "Ehab Barakat",
+     "language": "ar",
+     "country": "EG"
+    },
+    {
+     "channelId": "UCqDfa1r8M1o9CGxF5xsF3Sw",
+     "handle": "@SociologiacomGabi",
+     "name": "Sociologia com a Gabi",
+     "language": "pt",
+     "country": "BR"
+    },
+    {
+     "channelId": "UCKQJffONF74P7c0QMKg4E0Q",
+     "handle": "@PerspektifSosiologi",
+     "name": "Perspektif Sosiologi",
+     "language": "id",
+     "country": "ID"
+    }
+   ]
+  },
+  {
+   "id": "deg_education_teaching",
+   "kind": "degree",
+   "name": {
+    "en": "Education and teaching"
+   },
+   "shortName": "Teaching",
+   "group": "education",
+   "specialization": {
+    "en": "Education and teaching"
+   },
+   "languages": [
+    "en",
+    "hi",
+    "id",
+    "pt"
+   ],
+   "subjects": [
+    "Pedagogy and teaching methods",
+    "Educational psychology",
+    "Classroom management",
+    "Curriculum and assessment",
+    "Literacy instruction",
+    "Inclusive and special education",
+    "Teacher licensing exams",
+    "Teaching interviews"
+   ],
+   "keywords": [
+    "pedagogy",
+    "teaching methods",
+    "classroom management",
+    "lesson planning",
+    "formative assessment",
+    "learning theories",
+    "educational psychology",
+    "child development",
+    "inclusive education",
+    "special education",
+    "phonics",
+    "science of learning",
+    "B.Ed",
+    "D.El.Ed",
+    "Praxis",
+    "LET reviewer",
+    "PPG",
+    "teacher interview",
+    "KVS interview",
+    "demo class",
+    "professional education",
+    "pedagogia",
+    "concurso professor"
+   ],
+   "blockedWords": [
+    "vlog",
+    "prank",
+    "reaction",
+    "shorts compilation",
+    "house tour",
+    "giveaway",
+    "motivation status",
+    "salary reveal",
+    "teacher prank",
+    "exam result live",
+    "school drama"
+   ],
+   "chips": [
+    "Pedagogy",
+    "Learning theories",
+    "Classroom management",
+    "Lesson planning",
+    "Assessment",
+    "Literacy",
+    "Special education",
+    "Teacher exam",
+    "Teaching interview",
+    "Science of learning"
+   ],
+   "channels": [
+    {
+     "channelId": "UCdksaQxXH13BMeHo09MorBg",
+     "handle": "@edutopia",
+     "name": "Edutopia",
+     "language": "en",
+     "country": "global"
+    },
+    {
+     "channelId": "UCxEKnVOYnzM70yH7kDrU7bQ",
+     "handle": "@Cultofpedagogy",
+     "name": "Cult of Pedagogy",
+     "language": "en",
+     "country": "global"
+    },
+    {
+     "channelId": "UCH5Zc2TXbs0PhpiZHXq7gcg",
+     "handle": "@responsiveclassroom",
+     "name": "Responsive Classroom",
+     "language": "en",
+     "country": "global"
+    },
+    {
+     "channelId": "UCgMv3Yml20ijXlxraJtPr2Q",
+     "handle": "@KathleenJasperEdD",
+     "name": "Kathleen Jasper",
+     "language": "en",
+     "country": "US"
+    },
+    {
+     "channelId": "UCF0KxxScNmZneWjhlELFuBg",
+     "handle": "@Interviewguide",
+     "name": "Interview Guide",
+     "language": "hi",
+     "country": "IN"
+    },
+    {
+     "channelId": "UCM7YeZtJh2-ARsBRqEphJcQ",
+     "handle": "@dr.seemakhaneducation",
+     "name": "Dr. Seema Khan's Educational Lectures",
+     "language": "hi",
+     "country": "IN"
+    },
+    {
+     "channelId": "UChQmw0sflb5CfsergaPWKyg",
+     "handle": "@GurongPinoy",
+     "name": "Gurong Pinoy",
+     "language": "en",
+     "country": "PH"
+    },
+    {
+     "channelId": "UCDbLJ-HKd597GvKmZq7cLiA",
+     "handle": "@LET_Review_PH_Sir_Jay",
+     "name": "LET Review PH - Sir Jay",
+     "language": "en",
+     "country": "PH"
+    },
+    {
+     "channelId": "UCL_iDAWN2Btv43DTvKI38PQ",
+     "handle": "@ppgkemendikdasmen",
+     "name": "PPG Kemendikdasmen",
+     "language": "id",
+     "country": "ID"
+    },
+    {
+     "channelId": "UCI5ZnceTTOBjgtPrGbdlFAg",
+     "handle": "@pedagogiaparaconcurso",
+     "name": "Pedagogia para Concurso",
+     "language": "pt",
+     "country": "BR"
+    }
+   ]
+  },
+  {
+   "id": "deg_public_policy",
+   "kind": "degree",
+   "name": {
+    "en": "Public policy"
+   },
+   "shortName": "Public policy",
+   "group": "public",
+   "specialization": {
+    "en": "Public policy"
+   },
+   "languages": [
+    "en",
+    "es",
+    "ur"
+   ],
+   "subjects": [
+    "Policy analysis",
+    "Public economics",
+    "Public administration",
+    "Governance and institutions",
+    "Programme evaluation",
+    "Political economy",
+    "Development policy"
+   ],
+   "keywords": [
+    "public policy",
+    "policy analysis",
+    "public administration",
+    "governance",
+    "public management",
+    "public finance",
+    "regulation",
+    "programme evaluation",
+    "impact evaluation",
+    "cost-benefit analysis",
+    "political economy",
+    "development policy",
+    "state capacity",
+    "federalism",
+    "budget",
+    "legislation",
+    "MPP",
+    "MPA",
+    "Kennedy School",
+    "gestión pública",
+    "políticas públicas",
+    "administración pública"
+   ],
+   "blockedWords": [
+    "vlog",
+    "prank",
+    "reaction",
+    "shorts compilation",
+    "house tour",
+    "giveaway",
+    "motivation status",
+    "salary reveal",
+    "election live",
+    "party rally",
+    "breaking news"
+   ],
+   "chips": [
+    "Policy analysis",
+    "Public administration",
+    "Governance",
+    "Public finance",
+    "Evaluation",
+    "Regulation",
+    "Development",
+    "Political economy",
+    "Case studies",
+    "Public management"
+   ],
+   "channels": [
+    {
+     "channelId": "UCI-ouQQAQteW8IQd7dZVVzw",
+     "handle": "@HarvardKennedySchool",
+     "name": "Harvard Kennedy School",
+     "language": "en",
+     "country": "global"
+    },
+    {
+     "channelId": "UCK08_B5SZwoEUk2hDPMOijQ",
+     "handle": "@theLondonSchoolofEconomics",
+     "name": "LSE",
+     "language": "en",
+     "country": "global"
+    },
+    {
+     "channelId": "UCi7jxgIOxcRaF4Q54U7lF3g",
+     "handle": "@BrookingsInstitution",
+     "name": "Brookings Institution",
+     "language": "en",
+     "country": "global"
+    },
+    {
+     "channelId": "UCEvfzpvnlq_zY_IONa7xUZQ",
+     "handle": "@munkschool",
+     "name": "Munk School of Global Affairs & Public Policy",
+     "language": "en",
+     "country": "CA"
+    },
+    {
+     "channelId": "UCgQ-6NUEyCaKM5YUISVbPSQ",
+     "handle": "@PepperdineSPP",
+     "name": "Pepperdine School of Public Policy",
+     "language": "en",
+     "country": "US"
+    },
+    {
+     "channelId": "UC5_hqq61srTFiKC0Wio8YEA",
+     "handle": "@Roosevelt_House",
+     "name": "Roosevelt House Public Policy Institute at Hunter College",
+     "language": "en",
+     "country": "US"
+    },
+    {
+     "channelId": "UCgeKbQi5ZwthQMQSRZht4uw",
+     "handle": "@kdischool_official",
+     "name": "KDI School of Public Policy and Management",
+     "language": "en",
+     "country": "KR"
+    },
+    {
+     "channelId": "UC5AVrL4ryKhR1Vi0HxdgP2Q",
+     "handle": "@TakshashilaInst",
+     "name": "Takshashila Institution",
+     "language": "en",
+     "country": "IN"
+    },
+    {
+     "channelId": "UC8YQlU_nkh9hXbW_i4GMeow",
+     "handle": "@LearnwithAdilRiazGondal",
+     "name": "Learn with Adil Riaz Gondal",
+     "language": "en",
+     "country": "PK"
+    },
+    {
+     "channelId": "UCsDXXFW16Dxe7QqXHz6_Yhg",
+     "handle": "@ComunicacionesESAP",
+     "name": "ESAP Oficial",
+     "language": "es",
+     "country": "CO"
+    },
+    {
+     "channelId": "UCygWoFFZgERs2XiVhCeg_vQ",
+     "handle": "@politicaspublicascol",
+     "name": "Políticas Públicas",
+     "language": "es",
+     "country": "CO"
+    }
+   ]
+  },
+  {
    "id": "cls_in_cbse_6_8",
    "kind": "class",
    "name": {

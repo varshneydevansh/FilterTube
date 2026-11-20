@@ -5,7 +5,7 @@
 //
 // Sources, in this order: draft.packs (exam packs), draft.classPacks (kind "class": grade, board,
 // subjects, gradeKeywords) and draft.kidsPacks. Each pack is written as
-//   id, kind, name, [shortName], [group], [level], [area], [category], [grade], [board], [countries], [nearby], [taughtIn], [languages],
+//   id, kind, name, [shortName], [group], [level], [area], [category], [specialization], [grade], [board], [countries], [nearby], [taughtIn], [languages],
 //   [subjects], [keywords], [gradeKeywords], [blockedWords], [chips], [variantLabel], [variants],
 //   [variantsShareTopics], channels
 // shortName is the exam's short label ("GATE"); chips are the study Home's subject chips; variants
@@ -130,6 +130,9 @@ export function buildCatalog(draft) {
         const area = labels(source.area, lang => lang.toLowerCase());
         if (Object.keys(area).length) pack.area = area;
         if (['school', 'entrance', 'civil', 'professional', 'language'].includes(text(source.category))) pack.category = text(source.category);
+        // Degree packs: the specialization their track sits under ({"en": "Mechanical engineering"}).
+        const specialization = labels(source.specialization, lang => lang.toLowerCase());
+        if (Object.keys(specialization).length) pack.specialization = specialization;
         for (const key of ['grade', 'board']) if (text(source[key])) pack[key] = text(source[key]);
         for (const [key, value] of [['countries', countries(source.countries)], ['nearby', countries(source.nearby)]]) {
             if (value.length) pack[key] = value;
