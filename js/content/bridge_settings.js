@@ -2212,6 +2212,55 @@ function filterTubeIsMetadataOnlySettingsChange(changes) {
     }
 }
 
+// Applying a parent's update must never disturb a playing video unless the video is now blocked
+// (Android 79108f833 test 2026-11-21). A profiles write that changes no rules (history rows, policy
+// receipts) refreshes nothing; one that only adds or removes list entries re-filters the page but
+// leaves the running player alone: a now-blocked video is handled by the normal filter pass.
+const FILTERTUBE_PROFILE_RULE_KEYS = ['settings', 'main', 'kids', 'study', 'type', 'parentProfileId', 'locked', 'security'];
+const FILTERTUBE_LIST_KEYS = {
+    main: ['keywords', 'channels', 'whitelistKeywords', 'whitelistChannels', 'videoIds', 'blockedVideoIds', 'blockedKeywords', 'blockedChannels'],
+    kids: ['blockedKeywords', 'blockedChannels', 'whitelistKeywords', 'whitelistChannels', 'videoIds']
+};
+
+function filterTubeProfilesRuleProjection(root, withoutLists) {
+    const tree = root && typeof root === 'object' ? root : {};
+    const profiles = tree.profiles && typeof tree.profiles === 'object' ? tree.profiles : {};
+    const out = { activeProfileId: tree.activeProfileId ?? null, profiles: {} };
+    for (const id of Object.keys(profiles).sort()) {
+        const profile = profiles[id] && typeof profiles[id] === 'object' ? profiles[id] : {};
+        const row = {};
+        for (const key of FILTERTUBE_PROFILE_RULE_KEYS) {
+            let value = profile[key];
+            if (withoutLists && FILTERTUBE_LIST_KEYS[key] && value && typeof value === 'object') {
+                value = { ...value };
+                for (const listKey of FILTERTUBE_LIST_KEYS[key]) delete value[listKey];
+            }
+            row[key] = value === undefined ? null : value;
+        }
+        out.profiles[id] = row;
+    }
+    return out;
+}
+
+function filterTubeStableJson(value) {
+    if (Array.isArray(value)) return `[${value.map(filterTubeStableJson).join(',')}]`;
+    if (value && typeof value === 'object') return `{${Object.keys(value).sort().map(key => `${JSON.stringify(key)}:${filterTubeStableJson(value[key])}`).join(',')}}`;
+    return JSON.stringify(value === undefined ? null : value);
+}
+
+/** 'none' (no rule changed), 'lists' (only list entries changed) or 'other' for an ftProfilesV4 change. */
+function filterTubeProfilesChangeKind(change) {
+    try {
+        if (!change || !Object.prototype.hasOwnProperty.call(change, 'oldValue')) return 'other';
+        const same = withoutLists => filterTubeStableJson(filterTubeProfilesRuleProjection(change.oldValue, withoutLists))
+            === filterTubeStableJson(filterTubeProfilesRuleProjection(change.newValue, withoutLists));
+        if (same(false)) return 'none';
+        return same(true) ? 'lists' : 'other';
+    } catch (e) {
+        return 'other';
+    }
+}
+
 function handleStorageChanges(changes, area) {
     if (area !== 'local') return;
 
@@ -2273,8 +2322,11 @@ function handleStorageChanges(changes, area) {
     ];
     if (Object.keys(changes).some(key => relevantKeys.includes(key))) {
         if (filterTubeIsMetadataOnlySettingsChange(changes)) return;
+        const profilesOnly = changedKeys.length === 1 && changedKeys[0] === 'ftProfilesV4';
+        const profilesChange = profilesOnly ? filterTubeProfilesChangeKind(changes.ftProfilesV4) : 'other';
+        if (profilesChange === 'none') return;
         const metadataMapsOnly = changedKeys.every(key => ['channelMap', 'videoChannelMap', 'videoMetaMap'].includes(key));
-        if (!metadataMapsOnly) {
+        if (!metadataMapsOnly && profilesChange !== 'lists') {
             managedContentPlaybackPermit.clear('managed_time_storage_changed');
             try { if (typeof window !== 'undefined') window.FilterTubeContentPlayback?.invalidate?.('storage_settings_changed'); } catch (_) {}
         }
