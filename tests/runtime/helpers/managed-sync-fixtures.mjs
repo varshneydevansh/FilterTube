@@ -94,7 +94,7 @@ export async function familyFixture({ linkOverrides = {}, policyOverrides = {}, 
         const signed = await ctx.adapter.signManagedPolicyEnvelope(envelope, keys.privateKeyJwk);
         if (mutate) mutate(signed);
         return ctx.adapter.sealManagedMailboxEnvelope(signed, {
-            trustedLink: link, ...(expiresAtMs ? { createdAtMs: Date.now() - 10, expiresAtMs } : {})
+            trustedLink: link, ...(expiresAtMs ? { createdAtMs: expiresAtMs - 1000, expiresAtMs } : {})
         });
     }
     const receiver = Receiver.create({ get: ctx.get, set: ctx.set, adapter: ctx.adapter, openSync: ctx.box.FilterTubeNanahManagedOpenSync });
