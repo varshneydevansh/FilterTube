@@ -317,9 +317,21 @@
                 context.signatureVerified = true;
                 context.integrityVerified = true;
             }
-            // applyManagedMailboxItem runs validateManagedMailboxItem first and records the decision
-            // in the profile's managed history, accepted or not.
-            const result = finishDecision(await nanah.applyManagedMailboxItem(item, context), item.mailboxItemId);
+            // The dashboard's order (tab-view.js handleNanahIncomingManagedMailboxItem): validate, apply,
+            // then the same managed-history row it writes (managed_action_history.js).
+            const history = deps.history || root.FilterTubeManagedActionHistory;
+            const record = async decision => {
+                try { await history?.recordValidationHistory?.(envelope, decision, context); } catch (_) { /* history never blocks an apply */ }
+            };
+            const validation = typeof nanah.validateManagedMailboxItem === 'function'
+                ? nanah.validateManagedMailboxItem(item, context) : { accepted: false, reason: 'managed_mailbox_apply_unavailable' };
+            if (validation.accepted !== true || validation.decision === 'idempotent_same_hash') {
+                await record(validation);
+                return finishDecision({ ...validation, applied: false }, item.mailboxItemId);
+            }
+            const applied = await nanah.applyManagedMailboxItem(item, context);
+            await record(applied?.accepted === true ? validation : applied);
+            const result = finishDecision(applied, item.mailboxItemId);
             if (result.accepted === true && str(envelope.scope).toLowerCase() === 'study') {
                 const unresolved = await unresolvedStudyPacks(str(envelope.targetProfileId));
                 if (unresolved.length) result.unresolvedPackIds = unresolved;
@@ -442,7 +454,9 @@
                 appliedProfileIds.push(...arr(state.appliedProfileIds));
             }
             if (mailboxProvider) {
-                const state = await openSync.runOpenSync({ ...common, reason, provider: mailboxProvider, writeState });
+                const history = deps.history || root.FilterTubeManagedActionHistory;
+                const recordAckHistory = typeof history?.recordAckHistory === 'function' ? details => history.recordAckHistory(details) : null;
+                const state = await openSync.runOpenSync({ ...common, reason, provider: mailboxProvider, writeState, recordAckHistory });
                 states.push(state);
                 appliedProfileIds.push(...arr(state.appliedProfileIds));
             }
