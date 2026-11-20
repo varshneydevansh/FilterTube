@@ -3436,12 +3436,17 @@
                 : parsed.profilesV3.kids.strictMode;
             const desiredKidsStrict = incomingStrict !== false;
 
-            const targetNextChannels = shouldImportIntoSeparateProfile
+            // nextChannels/nextKeywords merge against the active profile's compiled lists. A target that
+            // isn't the active profile (an approved parent update for another child) merges against its
+            // own lists, so the active profile's rules never leak into it.
+            const mergeAgainstTargetLists = shouldImportIntoSeparateProfile
+                || (!!explicitTargetProfileId && explicitTargetProfileId !== localActiveId);
+            const targetNextChannels = mergeAgainstTargetLists
                 ? (strategy === 'replace'
                     ? parsedMainChannels
                     : mergeChannelLists(safeArray(targetMain.channels), parsedMainChannels))
                 : nextChannels;
-            const targetNextKeywords = shouldImportIntoSeparateProfile
+            const targetNextKeywords = mergeAgainstTargetLists
                 ? (strategy === 'replace'
                     ? parsedMainKeywords
                     : mergeKeywordLists(safeArray(targetMain.keywords), parsedMainKeywords))
