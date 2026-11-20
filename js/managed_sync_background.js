@@ -188,13 +188,31 @@
             return next;
         }
 
+        /**
+         * The Internet Pickup config holds a bearer token, so it never sits in storage.local, which
+         * YouTube content scripts can read. Chrome: storage.session (trusted contexts only), filled by
+         * the dashboard. Firefox: the background page shares the dashboard's localStorage.
+         */
+        async function mailboxConfig() {
+            try {
+                if (api.storage.session?.get) {
+                    const stored = obj(await call(api.storage.session, 'get', [MAILBOX_CONFIG_KEY]));
+                    if (stored[MAILBOX_CONFIG_KEY]) return stored[MAILBOX_CONFIG_KEY];
+                }
+            } catch (_) { /* fall through */ }
+            try {
+                const raw = root.localStorage?.getItem?.(MAILBOX_CONFIG_KEY);
+                return raw ? JSON.parse(raw) : null;
+            } catch (_) { return null; }
+        }
+
         async function context() {
             const trust = await receiver.readTrust();
-            const stored = await get([CONSENT_KEY, MAILBOX_CONFIG_KEY]);
+            const stored = await get([CONSENT_KEY]);
             return {
                 ...trust,
                 consent: obj(stored[CONSENT_KEY]).accepted === true,
-                mailboxConfig: stored[MAILBOX_CONFIG_KEY],
+                mailboxConfig: await mailboxConfig(),
                 parentLinks: trust.links.filter(isParentLink),
                 childLinks: trust.links.filter(isChildLink)
             };
@@ -526,9 +544,12 @@
             }).catch(() => null);
         });
         listen(api.storage?.onChanged, (changes, area) => {
+            if (area === 'session' && changes[MAILBOX_CONFIG_KEY]) void reconcile('storage');
             if (area !== 'local') return;
-            if (changes.ftNanahTrustedLinks || changes[CONSENT_KEY] || changes.ftNanahDeviceId || changes[MAILBOX_CONFIG_KEY]) void reconcile('storage');
+            if (changes.ftNanahTrustedLinks || changes[CONSENT_KEY] || changes.ftNanahDeviceId) void reconcile('storage');
         });
+        // An earlier build of this branch mirrored the config into storage.local; never leave it there.
+        try { Promise.resolve(call(api.storage.local, 'remove', MAILBOX_CONFIG_KEY)).catch(() => {}); } catch (_) {}
         const ready = reconcile('worker_start').catch(() => null);
 
         return Object.freeze({

@@ -18594,16 +18594,26 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
     }
 
-    // The background worker runs pickups now (SEAMLESS_SYNC_SPEC.md §5) and cannot read this page's
-    // localStorage, so the same config is mirrored into extension storage under the same key.
+    // The background worker runs pickups now (SEAMLESS_SYNC_SPEC.md §5). A Chrome worker can't read
+    // this page's localStorage, so the config (it holds a bearer token) is copied into
+    // storage.session, which only extension pages and the worker can read; never storage.local,
+    // which content scripts on YouTube can read. A Firefox background page reads localStorage itself.
+    // storage.session empties on a browser restart: the worker then has no mailbox until this page
+    // opens again (the courier path does not need one).
     function mirrorNanahManagedMailboxConfigToWorker(config) {
         try {
-            const root = safeObject(config);
-            if (normalizeString(root.endpointUrl || root.url || root.baseUrl)) {
-                void writeNanahStorage(NANAH_MANAGED_MAILBOX_CONFIG_KEY, root);
-            } else if (runtimeAPI?.storage?.local?.remove) {
-                runtimeAPI.storage.local.remove(NANAH_MANAGED_MAILBOX_CONFIG_KEY);
+            const session = runtimeAPI?.storage?.session;
+            runtimeAPI?.storage?.local?.remove?.(NANAH_MANAGED_MAILBOX_CONFIG_KEY);
+            if (!session?.set) return;
+            if (typeof session.setAccessLevel === 'function') {
+                const pending = session.setAccessLevel({ accessLevel: 'TRUSTED_CONTEXTS' });
+                if (pending && typeof pending.catch === 'function') pending.catch(() => {});
             }
+            const root = safeObject(config);
+            const pending = normalizeString(root.endpointUrl || root.url || root.baseUrl)
+                ? session.set({ [NANAH_MANAGED_MAILBOX_CONFIG_KEY]: root })
+                : session.remove(NANAH_MANAGED_MAILBOX_CONFIG_KEY);
+            if (pending && typeof pending.catch === 'function') pending.catch(() => {});
         } catch (_) {
         }
     }

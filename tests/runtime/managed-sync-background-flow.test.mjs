@@ -9,7 +9,7 @@ const Sync = require('../../js/managed_sync_background.js');
 const Doorbell = require('../../js/managed_doorbell.js');
 const Courier = require('../../js/managed_courier.js');
 
-function fakeApi(store, tabs = [{ id: 1, url: 'https://www.youtube.com/watch?v=abc', active: true }]) {
+function fakeApi(store, tabs = [{ id: 1, url: 'https://www.youtube.com/watch?v=abc', active: true }], session = null) {
     const changed = [];
     const event = list => ({ addListener: fn => list.push(fn), removeListener: () => {} });
     const messages = [];
@@ -23,8 +23,14 @@ function fakeApi(store, tabs = [{ id: 1, url: 'https://www.youtube.com/watch?v=a
                     for (const key of [].concat(keys)) if (key in store) out[key] = JSON.parse(JSON.stringify(store[key]));
                     callback(out);
                 },
-                set: (values, callback) => { Object.assign(store, JSON.parse(JSON.stringify(values))); callback?.(); }
+                set: (values, callback) => { Object.assign(store, JSON.parse(JSON.stringify(values))); callback?.(); },
+                remove: (key, callback) => { for (const k of [].concat(key)) delete store[k]; callback?.(); }
             },
+            ...(session ? { session: { get: (keys, callback) => {
+                const out = {};
+                for (const key of [].concat(keys)) if (key in session) out[key] = JSON.parse(JSON.stringify(session[key]));
+                callback(out);
+            } } } : {}),
             onChanged: event(changed)
         },
         tabs: { query: (query, callback) => callback(query.url ? tabs : tabs), get: (id, callback) => callback(tabs.find(tab => tab.id === id)),
@@ -147,4 +153,22 @@ test('dashboard-only actions refuse web pages and content scripts', async () => 
         assert.equal(await sync.handleMessage({ action, items: [], jobId: 'x' }, fromPage), undefined, action);
     }
     sync.dispose();
+});
+
+test('the Internet Pickup token is read from session storage, never left in storage.local', async () => {
+    const child = await familyFixture();
+    const config = { endpointUrl: 'https://mailbox.example', authToken: 'secret-token' };
+    const MailboxClient = { createProvider: cfg => (cfg?.authToken === 'secret-token'
+        ? { configured: true, pullDecryptedMailboxItems: async () => ({ ok: true, items: [] }) } : null) };
+    const trusted = { id: 'ext', url: 'chrome-extension://ext/html/tab-view.html' };
+    child.store.ftManagedMailboxServerConfig = config;
+    const fromLocal = Sync.install({ api: fakeApi(child.store, []), Receiver, Doorbell, Courier, MailboxClient, isTrustedUiSender: () => true });
+    await fromLocal.ready;
+    assert.equal('ftManagedMailboxServerConfig' in child.store, false, 'an old storage.local copy is removed');
+    assert.equal((await fromLocal.handleMessage({ action: 'FilterTube_ManagedPickupNow' }, trusted)).ok, false);
+    const fromSession = Sync.install({ api: fakeApi(child.store, [], { ftManagedMailboxServerConfig: config }), Receiver, Doorbell, Courier,
+        MailboxClient, isTrustedUiSender: () => true });
+    assert.equal((await fromSession.handleMessage({ action: 'FilterTube_ManagedPickupNow' }, trusted)).ok, true);
+    assert.equal(JSON.stringify(child.store).includes('secret-token'), false);
+    fromLocal.dispose(); fromSession.dispose();
 });
