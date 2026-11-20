@@ -3467,5 +3467,10 @@
   "dashboard.sync.toast.noWayToReachDevice": "Kò sí ọ̀nà láti dé ẹ̀rọ yìí síbẹ̀. Fààyè gba ìmúṣiṣẹ́pọ̀ orí íntánẹ́ẹ̀tì, tàbí ṣètò Internet Pickup.",
   "dashboard.sync.toast.parentUpdateApplied": "Òbí fi àtúnṣe ránṣẹ́",
   "dashboard.sync.outbox.appliedExceptPacks": "Ó ti ṣiṣẹ́ lórí {device}, àyàfi àwọn àpò ẹ̀kọ́ tí ẹ̀rọ yẹn kò tíì ní: {packs}. Ṣe àtúnṣe FilterTube níbẹ̀.",
-  "dashboard.sync.outbox.unverified": "{status} (a kò tíì fìdí rẹ̀ múlẹ̀)"
+  "dashboard.sync.outbox.unverified": "{status} (a kò tíì fìdí rẹ̀ múlẹ̀)",
+  "dashboard.sync.outbox.upToDate": "Ó ti wà ní òde-òní tẹ́lẹ̀",
+  "dashboard.sync.outbox.notAppliedOn": "{device} kò lo àtúnṣe yìí ({reason})",
+  "dashboard.sync.toast.sourceUnbound": "Ìsopọ̀ yìí kò ní profaili orísun. Tún so pọ̀ láti profaili tí o fẹ́ fi àwọn òfin rẹ̀ ránṣẹ́.",
+  "dashboard.sync.toast.sourceMismatch": "Ìsopọ̀ yìí ń fi àwọn òfin profaili mìíràn ránṣẹ́. Yan profaili yẹn, tàbí tún so pọ̀ láti èyí.",
+  "dashboard.sync.toast.sourceMissing": "Profaili tí ìsopọ̀ yìí ń fi ránṣẹ́ láti ọ̀dọ̀ rẹ̀ kò sí lórí ẹ̀rọ yìí mọ́. Tún so pọ̀ láti profaili tí o fẹ́ fi àwọn òfin rẹ̀ ránṣẹ́."
 }

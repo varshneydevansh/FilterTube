@@ -3467,5 +3467,10 @@
   "dashboard.sync.toast.noWayToReachDevice": "Chưa có cách nào để kết nối thiết bị này. Hãy cho phép đồng bộ qua internet hoặc thiết lập Internet Pickup.",
   "dashboard.sync.toast.parentUpdateApplied": "Phụ huynh đã gửi bản cập nhật",
   "dashboard.sync.outbox.appliedExceptPacks": "Đã áp dụng trên {device}, trừ các gói học mà thiết bị đó chưa có: {packs}. Hãy cập nhật FilterTube trên thiết bị đó.",
-  "dashboard.sync.outbox.unverified": "{status} (chưa xác minh)"
+  "dashboard.sync.outbox.unverified": "{status} (chưa xác minh)",
+  "dashboard.sync.outbox.upToDate": "Đã là mới nhất",
+  "dashboard.sync.outbox.notAppliedOn": "{device} không áp dụng bản cập nhật này ({reason})",
+  "dashboard.sync.toast.sourceUnbound": "Liên kết này không có hồ sơ nguồn. Hãy ghép nối lại từ hồ sơ có quy tắc bạn muốn gửi.",
+  "dashboard.sync.toast.sourceMismatch": "Liên kết này gửi quy tắc của hồ sơ khác. Hãy chọn hồ sơ đó, hoặc ghép nối lại từ hồ sơ này.",
+  "dashboard.sync.toast.sourceMissing": "Hồ sơ mà liên kết này gửi từ đó không còn trên thiết bị. Hãy ghép nối lại từ hồ sơ có quy tắc bạn muốn gửi."
 }

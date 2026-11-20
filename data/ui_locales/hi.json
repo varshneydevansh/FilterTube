@@ -3469,5 +3469,10 @@
   "dashboard.sync.toast.noWayToReachDevice": "इस डिवाइस तक पहुँचने का अभी कोई तरीका नहीं है। इंटरनेट सिंक की अनुमति दें, या Internet Pickup सेट अप करें।",
   "dashboard.sync.toast.parentUpdateApplied": "अभिभावक ने अपडेट भेजा",
   "dashboard.sync.outbox.appliedExceptPacks": "{device} पर लागू हुआ, सिवाय उन स्टडी पैक के जो उस डिवाइस पर अभी नहीं हैं: {packs}। वहाँ FilterTube अपडेट करें।",
-  "dashboard.sync.outbox.unverified": "{status} (असत्यापित)"
+  "dashboard.sync.outbox.unverified": "{status} (असत्यापित)",
+  "dashboard.sync.outbox.upToDate": "पहले से अप-टू-डेट",
+  "dashboard.sync.outbox.notAppliedOn": "{device} ने यह अपडेट लागू नहीं किया ({reason})",
+  "dashboard.sync.toast.sourceUnbound": "इस लिंक का कोई स्रोत प्रोफ़ाइल नहीं है। जिस प्रोफ़ाइल के नियम भेजने हैं, उससे फिर से पेयर करें।",
+  "dashboard.sync.toast.sourceMismatch": "यह लिंक किसी दूसरी प्रोफ़ाइल के नियम भेजता है। वह प्रोफ़ाइल चुनें, या इस प्रोफ़ाइल से फिर से पेयर करें।",
+  "dashboard.sync.toast.sourceMissing": "जिस प्रोफ़ाइल से यह लिंक भेजता है, वह अब इस डिवाइस पर नहीं है। जिस प्रोफ़ाइल के नियम भेजने हैं, उससे फिर से पेयर करें।"
 }

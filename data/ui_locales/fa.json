@@ -3469,5 +3469,10 @@
   "dashboard.sync.toast.noWayToReachDevice": "هنوز راهی برای رسیدن به این دستگاه نیست. همگام‌سازی اینترنتی را مجاز کنید یا Internet Pickup را راه‌اندازی کنید.",
   "dashboard.sync.toast.parentUpdateApplied": "والد یک به‌روزرسانی فرستاد",
   "dashboard.sync.outbox.appliedExceptPacks": "روی {device} اعمال شد، جز بسته‌های مطالعه‌ای که آن دستگاه هنوز ندارد: {packs}. FilterTube را آنجا به‌روز کنید.",
-  "dashboard.sync.outbox.unverified": "{status} (تأییدنشده)"
+  "dashboard.sync.outbox.unverified": "{status} (تأییدنشده)",
+  "dashboard.sync.outbox.upToDate": "از قبل به‌روز است",
+  "dashboard.sync.outbox.notAppliedOn": "{device} این به‌روزرسانی را اعمال نکرد ({reason})",
+  "dashboard.sync.toast.sourceUnbound": "این پیوند نمایه مبدأ ندارد. از نمایه‌ای که می‌خواهید قوانینش را بفرستید دوباره جفت کنید.",
+  "dashboard.sync.toast.sourceMismatch": "این پیوند قوانین نمایه دیگری را می‌فرستد. آن نمایه را انتخاب کنید یا از این نمایه دوباره جفت کنید.",
+  "dashboard.sync.toast.sourceMissing": "نمایه‌ای که این پیوند از آن می‌فرستد دیگر روی این دستگاه نیست. از نمایه‌ای که می‌خواهید قوانینش را بفرستید دوباره جفت کنید."
 }

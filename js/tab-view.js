@@ -22398,6 +22398,21 @@ document.addEventListener('DOMContentLoaded', async () => {
             });
     }
 
+    /**
+     * Spec §4.1 (Android resolveSavedUpdateSource): the local profile whose rules a Send carries is
+     * the link's bound localPolicyProfileId. A requested profile must be that one, and it must exist.
+     */
+    function resolveNanahSavedUpdateSource(link, profilesRoot, requestedProfileId = '') {
+        const trusted = safeObject(link);
+        const bound = normalizeString(trusted.localPolicyProfileId || safeObject(trusted.policy).localPolicyProfileId);
+        const requested = normalizeString(requestedProfileId);
+        if (!bound) return { ok: false, reason: 'saved_update_source_unbound' };
+        if (requested && requested !== bound) return { ok: false, reason: 'saved_update_source_mismatch' };
+        const profile = safeObject(safeObject(safeObject(profilesRoot).profiles)[bound]);
+        if (!Object.keys(profile).length) return { ok: false, reason: 'saved_update_source_missing' };
+        return { ok: true, profileId: bound, profile };
+    }
+
     function getNanahSourceManagedLinksByIds(linkIds, scope = 'active', profile = null) {
         const requested = new Set(safeArray(linkIds).map(normalizeString).filter(Boolean));
         const requiredScopes = getConcreteManagedPolicyScopesForProfile(scope, profile);
@@ -23138,6 +23153,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             mailboxUploadedCount: 0,
             localNetworkDeliveredCount: 0,
             outboxQueuedCount: 0,
+            sourceRefusals: [],
             providerMissingCount: 0,
             noLinkCount: 0
         };
@@ -23148,11 +23164,29 @@ document.addEventListener('DOMContentLoaded', async () => {
         for (const targetId of allowedTargets) {
             const targetProfile = safeObject(profiles[targetId]);
             // A selected local policy source may have a different ID from the receiver's fixed profile.
-            const links = (requestedLinkIds.size > 0
+            const candidateLinks = (requestedLinkIds.size > 0
                 ? getNanahSourceManagedLinksByIds([...requestedLinkIds], normalizedScope, targetProfile)
                 : getNanahSourceManagedLinksForTargetProfile(targetId, normalizedScope, targetProfile))
                 .filter((link) => requestedLinkIds.size === 0 || requestedLinkIds.has(normalizeString(link.linkId)));
+            // Spec §4.1: a Send carries the rules of the profile the link is bound to, never a
+            // fallback to the active profile; a link that can't say which profile is refused.
+            const links = candidateLinks.filter((link) => {
+                const source = resolveNanahSavedUpdateSource(link, authorizedRoot, targetId);
+                if (!source.ok) summary.sourceRefusals.push(source.reason);
+                return source.ok;
+            });
             summary.linkCount += links.length;
+            if (!links.length && candidateLinks.length) {
+                // Every link to this profile was refused for its source; say so instead of "no device".
+                await recordManagedParentPolicyPushHistory(targetId, {
+                    scope: normalizedScope,
+                    linkCount: candidateLinks.length,
+                    deliveredCount: 0,
+                    failedCount: candidateLinks.length,
+                    reason: summary.sourceRefusals[summary.sourceRefusals.length - 1] || 'saved_update_source_unbound'
+                });
+                continue;
+            }
             if (!links.length) {
                 summary.noLinkCount += 1;
                 await recordManagedParentPolicyPushHistory(targetId, {
@@ -23359,6 +23393,13 @@ document.addEventListener('DOMContentLoaded', async () => {
                     : 'Sent managed updates to {count} verified policy queues',
                 { count: summary.deliveredCount }
             ), 'success');
+        } else if (summary.sourceRefusals.length > 0) {
+            const reason = summary.sourceRefusals[0];
+            UIComponents.showToast(reason === 'saved_update_source_missing'
+                ? tabViewUiText('dashboard.sync.toast.sourceMissing', 'The profile this link sends from no longer exists on this device. Pair again from the profile whose rules you want to send.')
+                : reason === 'saved_update_source_mismatch'
+                    ? tabViewUiText('dashboard.sync.toast.sourceMismatch', 'This link sends another profile\'s rules. Choose that profile, or pair again from this one.')
+                    : tabViewUiText('dashboard.sync.toast.sourceUnbound', 'This link has no source profile. Pair again from the profile whose rules you want to send.'), 'error');
         } else if (summary.noLinkCount > 0) {
             UIComponents.showToast(tabViewUiText('dashboard.sync.toast.noSelectedProtectedLink', 'No selected protected profile has a verified device link yet'), 'error');
         } else if (summary.providerMissingCount > 0 && outboxConsentAsked && outboxReady !== true) {
@@ -24145,9 +24186,13 @@ document.addEventListener('DOMContentLoaded', async () => {
             case 'applied':
                 if (safeArray(latest.unresolvedPackIds).length) return formatNanahOutboxUnresolvedPacks(latest, device);
                 return tabViewUiText('dashboard.sync.outbox.applied', 'Applied');
+            case 'up_to_date':
+                if (safeArray(latest.unresolvedPackIds).length) return formatNanahOutboxUnresolvedPacks(latest, device);
+                return tabViewUiText('dashboard.sync.outbox.upToDate', 'Already up to date');
             case 'rejected':
-                return tabViewUiText('dashboard.sync.outbox.notApplied', 'Not applied ({reason})', {
-                    reason: formatManagedNanahBlockedReason(latest.reason, normalizeString(latest.reason) || 'rejected')
+                // Spec §8: the child's own reason code, so a rejection is never a mystery.
+                return tabViewUiText('dashboard.sync.outbox.notAppliedOn', "{device} didn't apply this update ({reason})", {
+                    device, reason: normalizeString(latest.reason) || 'rejected'
                 });
             case 'expired':
                 return tabViewUiText('dashboard.sync.outbox.expired', 'Expired');

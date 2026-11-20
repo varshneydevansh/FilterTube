@@ -3469,5 +3469,10 @@
   "dashboard.sync.toast.noWayToReachDevice": "या डिव्हाइसपर्यंत पोहोचण्याचा अजून कोणताही मार्ग नाही. इंटरनेट सिंकला परवानगी द्या, किंवा Internet Pickup सेट अप करा.",
   "dashboard.sync.toast.parentUpdateApplied": "पालकांनी अपडेट पाठवले",
   "dashboard.sync.outbox.appliedExceptPacks": "{device} वर लागू झाले, त्या डिव्हाइसवर अजून नसलेले स्टडी पॅक वगळता: {packs}. तिथे FilterTube अपडेट करा.",
-  "dashboard.sync.outbox.unverified": "{status} (पडताळणी न झालेले)"
+  "dashboard.sync.outbox.unverified": "{status} (पडताळणी न झालेले)",
+  "dashboard.sync.outbox.upToDate": "आधीच अद्ययावत",
+  "dashboard.sync.outbox.notAppliedOn": "{device} ने हे अपडेट लागू केले नाही ({reason})",
+  "dashboard.sync.toast.sourceUnbound": "या लिंकला स्रोत प्रोफाइल नाही. ज्या प्रोफाइलचे नियम पाठवायचे आहेत त्यावरून पुन्हा जोडणी करा.",
+  "dashboard.sync.toast.sourceMismatch": "ही लिंक दुसऱ्या प्रोफाइलचे नियम पाठवते. ते प्रोफाइल निवडा, किंवा या प्रोफाइलवरून पुन्हा जोडणी करा.",
+  "dashboard.sync.toast.sourceMissing": "ही लिंक ज्या प्रोफाइलवरून पाठवते ते आता या डिव्हाइसवर नाही. ज्या प्रोफाइलचे नियम पाठवायचे आहेत त्यावरून पुन्हा जोडणी करा."
 }

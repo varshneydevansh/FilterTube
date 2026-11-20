@@ -3469,5 +3469,10 @@
   "dashboard.sync.toast.noWayToReachDevice": "ఈ పరికరాన్ని చేరుకోవడానికి ఇంకా మార్గం లేదు. ఇంటర్నెట్ సింక్‌ను అనుమతించండి, లేదా Internet Pickup సెటప్ చేయండి.",
   "dashboard.sync.toast.parentUpdateApplied": "తల్లిదండ్రులు అప్‌డేట్ పంపారు",
   "dashboard.sync.outbox.appliedExceptPacks": "{device}లో వర్తింపజేయబడింది, ఆ పరికరంలో ఇంకా లేని స్టడీ ప్యాక్‌లు తప్ప: {packs}. అక్కడ FilterTube‌ను అప్‌డేట్ చేయండి.",
-  "dashboard.sync.outbox.unverified": "{status} (ధృవీకరించబడలేదు)"
+  "dashboard.sync.outbox.unverified": "{status} (ధృవీకరించబడలేదు)",
+  "dashboard.sync.outbox.upToDate": "ఇప్పటికే తాజాగా ఉంది",
+  "dashboard.sync.outbox.notAppliedOn": "{device} ఈ అప్‌డేట్‌ను వర్తింపజేయలేదు ({reason})",
+  "dashboard.sync.toast.sourceUnbound": "ఈ లింక్‌కు మూల ప్రొఫైల్ లేదు. ఏ ప్రొఫైల్ నియమాలు పంపాలో ఆ ప్రొఫైల్ నుండి మళ్లీ జత చేయండి.",
+  "dashboard.sync.toast.sourceMismatch": "ఈ లింక్ మరో ప్రొఫైల్ నియమాలను పంపుతుంది. ఆ ప్రొఫైల్‌ను ఎంచుకోండి, లేదా దీని నుండి మళ్లీ జత చేయండి.",
+  "dashboard.sync.toast.sourceMissing": "ఈ లింక్ పంపే ప్రొఫైల్ ఇప్పుడు ఈ పరికరంలో లేదు. ఏ ప్రొఫైల్ నియమాలు పంపాలో ఆ ప్రొఫైల్ నుండి మళ్లీ జత చేయండి."
 }

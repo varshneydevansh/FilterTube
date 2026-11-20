@@ -27,6 +27,13 @@
     // was delivered. Sends wait for an open, keyed channel (15 s) and retry once.
     const OPEN_TIMEOUT_MS = 15 * 1000;
     const OPEN_POLL_MS = 50;
+    // Android 79108f833: host() must reach the relay within 6 s, then one retry on a fresh socket.
+    const HOST_TIMEOUT_MS = 6 * 1000;
+
+    /** Step log with timings (ids and reason codes only, never items). */
+    function defaultLog(event, details) {
+        try { root.console?.info?.(`FilterTube courier: ${event}`, JSON.stringify(details || {})); } catch (_) {}
+    }
 
     /** Resolves once the channel is open and the session keys exist (Android waitForCourierOpen). */
     function waitForOpen(transport, isClosed, timeoutMs = OPEN_TIMEOUT_MS) {
@@ -68,7 +75,8 @@
             .map(item => Object.fromEntries(ITEM_FIELDS.filter(key => item[key] !== undefined).map(key => [key, item[key]])));
     }
 
-    function session({ code, mode, deviceId, nanah, timeoutMs, onReady, onData, onStarted, openTimeoutMs = OPEN_TIMEOUT_MS }) {
+    function session({ code, mode, deviceId, nanah, timeoutMs, onReady, onData, onStarted, openTimeoutMs = OPEN_TIMEOUT_MS,
+        hostTimeoutMs = HOST_TIMEOUT_MS, log = defaultLog }) {
         return new Promise(resolve => {
             const Transport = transportClass(nanah);
             if (!Transport) { resolve({ ok: false, reason: 'webrtc_unavailable' }); return; }
@@ -116,21 +124,44 @@
             };
             // A throwaway id, as on Android: the relay cannot tie a courier to a doorbell.
             const device = { deviceId: `courier-${sessionId()}` };
+            const startedAt = Date.now();
+            // A relay socket that never opens must not hold the whole courier.
+            const hostTimer = mode === 'host' ? setTimeout(() => finish({ ok: false, reason: 'courier_host_timeout' }), hostTimeoutMs) : 0;
             const start = mode === 'host'
                 ? transport.host({ code, sessionId: sessionId(), device }, hooks)
                 : transport.join({ code, device }, hooks);
-            Promise.resolve(start).then(() => { if (!finished) onStarted?.(); },
-                error => finish({ ok: false, reason: String(error?.message || 'start_failed').slice(0, 80) }));
+            Promise.resolve(start).then(() => {
+                clearTimeout(hostTimer);
+                if (mode === 'host') log('courier_host_started', { elapsedMs: Date.now() - startedAt });
+                if (!finished) onStarted?.();
+            }, error => {
+                clearTimeout(hostTimer);
+                finish({ ok: false, reason: String(error?.message || 'start_failed').slice(0, 80) });
+            });
         });
     }
 
     /** Parent: host `code`, send the sealed items, resolve with the child's ack records. */
-    function host({ code, items, deviceId, nanah, timeoutMs, onHosting, openTimeoutMs } = {}) {
+    async function host({ code, items, deviceId, nanah, timeoutMs, onHosting, openTimeoutMs, hostTimeoutMs, log = defaultLog } = {}) {
         const sealed = sealedOnly(items);
-        if (!sealed.length) return Promise.resolve({ ok: false, reason: 'no_items', acks: [] });
+        if (!sealed.length) return { ok: false, reason: 'no_items', acks: [] };
+        const startedAt = Date.now();
+        let hosted = false;
+        const attempt = () => hostOnce({ code, sealed, deviceId, nanah, timeoutMs, openTimeoutMs, hostTimeoutMs, log,
+            onHosting: () => { if (!hosted) { hosted = true; onHosting?.(); } } });
+        let result = await attempt();
+        if (!result.ok && ['courier_host_timeout', 'courier_closed'].includes(result.reason)) {
+            log('courier_host_retry', { reason: result.reason, elapsedMs: Date.now() - startedAt });
+            result = await attempt();
+        }
+        log(result.ok ? 'courier_finished' : 'courier_failed', { reason: result.reason || null, elapsedMs: Date.now() - startedAt });
+        return result;
+    }
+
+    function hostOnce({ code, sealed, deviceId, nanah, timeoutMs, onHosting, openTimeoutMs, hostTimeoutMs, log }) {
         return session({
-            code, mode: 'host', deviceId, nanah, timeoutMs, onStarted: onHosting, openTimeoutMs,
-            onReady: ({ send }) => send({ t: 'ft_courier_items', v: 1, items: sealed }),
+            code, mode: 'host', deviceId, nanah, timeoutMs, onStarted: onHosting, openTimeoutMs, hostTimeoutMs, log,
+            onReady: ({ send }) => { log('courier_connected', {}); return send({ t: 'ft_courier_items', v: 1, items: sealed }); },
             onData: (envelope, { finish }) => {
                 if (envelope.t !== 'ft_courier_acks' || envelope.v !== 1) return;
                 const acks = (Array.isArray(envelope.records) ? envelope.records : []).map(obj)
@@ -144,25 +175,32 @@
      * Child: join `code`, hand the items to onItems(items) (which verifies and applies them and
      * returns ack records), send the acks, close. Retries a missing session (§3).
      */
-    async function join({ code, deviceId, nanah, timeoutMs, openTimeoutMs, onItems, retries = JOIN_RETRIES, wait = ms => new Promise(r => setTimeout(r, ms)) } = {}) {
+    async function join({ code, deviceId, nanah, timeoutMs, openTimeoutMs, onItems, retries = JOIN_RETRIES, wait = ms => new Promise(r => setTimeout(r, ms)),
+        log = defaultLog } = {}) {
         let last = { ok: false, reason: 'not_started' };
+        const startedAt = Date.now();
         for (let attempt = 0; attempt <= retries; attempt += 1) {
             last = await session({
-                code, mode: 'join', deviceId, nanah, timeoutMs, openTimeoutMs,
+                code, mode: 'join', deviceId, nanah, timeoutMs, openTimeoutMs, log,
+                onReady: () => log('courier_joined', { elapsedMs: Date.now() - startedAt }),
                 onData: async (envelope, { send, finish }) => {
                     if (envelope.t !== 'ft_courier_items' || envelope.v !== 1) return;
                     const items = sealedOnly(envelope.items);
+                    log('courier_items', { elapsedMs: Date.now() - startedAt, count: items.length });
                     const records = await onItems(items);
                     await send({ t: 'ft_courier_acks', v: 1, records: Array.isArray(records) ? records : [] });
                     // Let the last frame leave before the channel closes.
                     setTimeout(() => finish({ ok: true, itemCount: items.length }), 300);
                 }
             });
-            if (last.ok || last.reason !== 'session_not_found' || attempt === retries) return last;
+            if (last.ok || last.reason !== 'session_not_found' || attempt === retries) {
+                if (!last.ok) log('courier_join_failed', { reason: last.reason, elapsedMs: Date.now() - startedAt });
+                return last;
+            }
             await wait(JOIN_RETRY_MS);
         }
         return last;
     }
 
-    return Object.freeze({ TIMEOUT_MS, OPEN_TIMEOUT_MS, MAX_ITEMS, CODE, sealedOnly, waitForOpen, host, join });
+    return Object.freeze({ TIMEOUT_MS, OPEN_TIMEOUT_MS, HOST_TIMEOUT_MS, MAX_ITEMS, CODE, sealedOnly, waitForOpen, host, join });
 }));

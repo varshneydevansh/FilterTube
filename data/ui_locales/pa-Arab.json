@@ -3469,5 +3469,10 @@
   "dashboard.sync.toast.noWayToReachDevice": "حالے ایس ڈیوائس تیکر اپڑن دا کوئی رستہ نئیں۔ انٹرنیٹ سنک دی اجازت دیو، یا Internet Pickup سیٹ کرو۔",
   "dashboard.sync.toast.parentUpdateApplied": "ماپیاں نے اپڈیٹ گھلی",
   "dashboard.sync.outbox.appliedExceptPacks": "{device} تے لاگو ہو گیا، اوہناں پڑھائی پیکاں توں سوا جیہڑے اوس ڈیوائس تے حالے نئیں: {packs}۔ اوتھے FilterTube اپڈیٹ کرو۔",
-  "dashboard.sync.outbox.unverified": "{status} (تصدیق نئیں ہوئی)"
+  "dashboard.sync.outbox.unverified": "{status} (تصدیق نئیں ہوئی)",
+  "dashboard.sync.outbox.upToDate": "پہلاں ای تازہ اے",
+  "dashboard.sync.outbox.notAppliedOn": "{device} نے ایہ اپڈیٹ لاگو نئیں کیتی ({reason})",
+  "dashboard.sync.toast.sourceUnbound": "ایس لنک دی کوئی سرچشمہ پروفائل نئیں۔ جس پروفائل دے اصول گھلنے نیں اوس توں فیر جوڑو۔",
+  "dashboard.sync.toast.sourceMismatch": "ایہ لنک کسے ہور پروفائل دے اصول گھلدا اے۔ اوہ پروفائل چنو، یا ایس توں فیر جوڑو۔",
+  "dashboard.sync.toast.sourceMissing": "جس پروفائل توں ایہ لنک گھلدا اے اوہ ہن ایس ڈیوائس تے نئیں۔ جس پروفائل دے اصول گھلنے نیں اوس توں فیر جوڑو۔"
 }

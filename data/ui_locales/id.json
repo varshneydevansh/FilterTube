@@ -3467,5 +3467,10 @@
   "dashboard.sync.toast.noWayToReachDevice": "Belum ada cara untuk menjangkau perangkat ini. Izinkan sinkronisasi internet, atau siapkan Internet Pickup.",
   "dashboard.sync.toast.parentUpdateApplied": "Orang tua mengirim pembaruan",
   "dashboard.sync.outbox.appliedExceptPacks": "Diterapkan di {device}, kecuali paket belajar yang belum ada di perangkat itu: {packs}. Perbarui FilterTube di sana.",
-  "dashboard.sync.outbox.unverified": "{status} (belum diverifikasi)"
+  "dashboard.sync.outbox.unverified": "{status} (belum diverifikasi)",
+  "dashboard.sync.outbox.upToDate": "Sudah terbaru",
+  "dashboard.sync.outbox.notAppliedOn": "{device} tidak menerapkan pembaruan ini ({reason})",
+  "dashboard.sync.toast.sourceUnbound": "Tautan ini tidak punya profil sumber. Pasangkan ulang dari profil yang aturannya ingin kamu kirim.",
+  "dashboard.sync.toast.sourceMismatch": "Tautan ini mengirim aturan profil lain. Pilih profil itu, atau pasangkan ulang dari profil ini.",
+  "dashboard.sync.toast.sourceMissing": "Profil sumber tautan ini sudah tidak ada di perangkat ini. Pasangkan ulang dari profil yang aturannya ingin kamu kirim."
 }

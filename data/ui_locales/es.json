@@ -3469,5 +3469,10 @@
   "dashboard.sync.toast.noWayToReachDevice": "Aún no hay forma de llegar a este dispositivo. Permite la sincronización por internet o configura Internet Pickup.",
   "dashboard.sync.toast.parentUpdateApplied": "Llegó una actualización parental",
   "dashboard.sync.outbox.appliedExceptPacks": "Aplicada en {device}, salvo los paquetes de estudio que ese dispositivo aún no tiene: {packs}. Actualiza FilterTube allí.",
-  "dashboard.sync.outbox.unverified": "{status} (sin verificar)"
+  "dashboard.sync.outbox.unverified": "{status} (sin verificar)",
+  "dashboard.sync.outbox.upToDate": "Ya está al día",
+  "dashboard.sync.outbox.notAppliedOn": "{device} no aplicó esta actualización ({reason})",
+  "dashboard.sync.toast.sourceUnbound": "Este vínculo no tiene perfil de origen. Vuelve a vincular desde el perfil cuyas reglas quieres enviar.",
+  "dashboard.sync.toast.sourceMismatch": "Este vínculo envía las reglas de otro perfil. Elige ese perfil o vuelve a vincular desde este.",
+  "dashboard.sync.toast.sourceMissing": "El perfil desde el que envía este vínculo ya no existe en este dispositivo. Vuelve a vincular desde el perfil cuyas reglas quieres enviar."
 }

@@ -3469,5 +3469,10 @@
   "dashboard.sync.toast.noWayToReachDevice": "No way to reach dis device yet. Allow internet sync, or set up Internet Pickup.",
   "dashboard.sync.toast.parentUpdateApplied": "Your parent don send update",
   "dashboard.sync.outbox.appliedExceptPacks": "E don apply for {device}, but no be di study packs wey dat device never get: {packs}. Update FilterTube for there.",
-  "dashboard.sync.outbox.unverified": "{status} (dem never confam am)"
+  "dashboard.sync.outbox.unverified": "{status} (dem never confam am)",
+  "dashboard.sync.outbox.upToDate": "E don dey up to date",
+  "dashboard.sync.outbox.notAppliedOn": "{device} no apply dis update ({reason})",
+  "dashboard.sync.toast.sourceUnbound": "Dis link no get source profile. Pair again from di profile wey you wan send im rules.",
+  "dashboard.sync.toast.sourceMismatch": "Dis link dey send another profile rules. Choose dat profile, or pair again from dis one.",
+  "dashboard.sync.toast.sourceMissing": "Di profile wey dis link dey send from no dey dis device again. Pair again from di profile wey you wan send im rules."
 }

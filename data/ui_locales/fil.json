@@ -3469,5 +3469,10 @@
   "dashboard.sync.toast.noWayToReachDevice": "Wala pang paraan para maabot ang device na ito. Payagan ang pag-sync sa internet, o i-set up ang Internet Pickup.",
   "dashboard.sync.toast.parentUpdateApplied": "Nagpadala ng update ang magulang",
   "dashboard.sync.outbox.appliedExceptPacks": "Nailapat sa {device}, maliban sa mga study pack na wala pa sa device na iyon: {packs}. I-update ang FilterTube doon.",
-  "dashboard.sync.outbox.unverified": "{status} (hindi pa beripikado)"
+  "dashboard.sync.outbox.unverified": "{status} (hindi pa beripikado)",
+  "dashboard.sync.outbox.upToDate": "Napapanahon na",
+  "dashboard.sync.outbox.notAppliedOn": "Hindi inilapat ng {device} ang update na ito ({reason})",
+  "dashboard.sync.toast.sourceUnbound": "Walang source profile ang link na ito. Mag-pair muli mula sa profile na ang mga patakaran ay gusto mong ipadala.",
+  "dashboard.sync.toast.sourceMismatch": "Ang link na ito ay nagpapadala ng mga patakaran ng ibang profile. Piliin ang profile na iyon, o mag-pair muli mula rito.",
+  "dashboard.sync.toast.sourceMissing": "Wala na sa device na ito ang profile na pinagpapadalhan ng link. Mag-pair muli mula sa profile na ang mga patakaran ay gusto mong ipadala."
 }

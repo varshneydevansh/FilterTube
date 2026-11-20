@@ -165,6 +165,21 @@
         return '';
     }
 
+    function stableJson(value) {
+        if (Array.isArray(value)) return `[${value.map(stableJson).join(',')}]`;
+        if (value && typeof value === 'object') return `{${Object.keys(value).sort().map(key => `${JSON.stringify(key)}:${stableJson(value[key])}`).join(',')}}`;
+        return JSON.stringify(value === undefined ? null : value);
+    }
+
+    /**
+     * The target's rules only (settings, Main, Kids, study), for "did this update change anything"
+     * (Android 79108f833: a new revision of the same rules reported Applied). History rows don't count.
+     */
+    function rulesFingerprint(profilesV4, profileId) {
+        const profile = obj(obj(obj(profilesV4).profiles)[str(profileId)]);
+        return stableJson(['settings', 'main', 'kids', 'study'].map(key => (profile[key] === undefined ? null : profile[key])));
+    }
+
     /** Runs fn once; a call while it runs schedules exactly one more run instead of dropping it. */
     function createCoalescingRunner(fn) {
         let running = null;
@@ -329,9 +344,17 @@
                 await record(validation);
                 return finishDecision({ ...validation, applied: false }, item.mailboxItemId);
             }
+            const rulesBefore = rulesFingerprint(trust.profilesV4, envelope.targetProfileId);
             const applied = await nanah.applyManagedMailboxItem(item, context);
             await record(applied?.accepted === true ? validation : applied);
-            const result = finishDecision(applied, item.mailboxItemId);
+            let result = finishDecision(applied, item.mailboxItemId);
+            // "Applied" only when the rules really changed; otherwise it is up to date (spec §4).
+            if (result.accepted === true && result.applied === true) {
+                const after = obj(obj(await get([PROFILES_KEY]))[PROFILES_KEY]);
+                if (rulesFingerprint(after, envelope.targetProfileId) === rulesBefore) {
+                    result = { ...result, applied: false, decision: str(result.decision) || 'unchanged' };
+                }
+            }
             if (result.accepted === true && str(envelope.scope).toLowerCase() === 'study') {
                 const unresolved = await unresolvedStudyPacks(str(envelope.targetProfileId));
                 if (unresolved.length) result.unresolvedPackIds = unresolved;
@@ -461,6 +484,14 @@
                 appliedProfileIds.push(...arr(state.appliedProfileIds));
             }
             const changed = Array.from(new Set(appliedProfileIds));
+            // A rejection is never silent (spec §8): counts by reason, in the log and the state.
+            const rejectedReasons = {};
+            for (const state of states) {
+                for (const [code, count] of Object.entries(obj(state?.rejectedReasons))) rejectedReasons[code] = (rejectedReasons[code] || 0) + (Number(count) || 0);
+            }
+            if (Object.keys(rejectedReasons).length) {
+                try { root.console?.info?.('FilterTube sync: rejected', JSON.stringify(rejectedReasons)); } catch (_) {}
+            }
             const notice = await writeNotice(changed);
             await set({
                 [STATE_KEY]: {
@@ -470,7 +501,8 @@
                     appliedProfileIds: changed,
                     pulledItemCount: states.reduce((sum, row) => sum + (Number(row?.pulledItemCount) || 0), 0),
                     appliedItemCount: states.reduce((sum, row) => sum + (Number(row?.appliedItemCount) || 0), 0),
-                    rejectedItemCount: states.reduce((sum, row) => sum + (Number(row?.rejectedItemCount) || 0), 0)
+                    rejectedItemCount: states.reduce((sum, row) => sum + (Number(row?.rejectedItemCount) || 0), 0),
+                    rejectedReasons
                 }
             });
             return { ok: true, acks, appliedProfileIds: changed, notice, states };
@@ -481,6 +513,6 @@
 
     return Object.freeze({
         TRUSTED_LINKS_KEY, DEVICE_ID_KEY, PROFILES_KEY, NOTICE_KEY, NOTICE_SCHEMA, NOTICE_TTL_MS, STATE_KEY,
-        projectTrustedLink, explainIneligible, duplicateDeviceIds, createCoalescingRunner, create
+        projectTrustedLink, explainIneligible, duplicateDeviceIds, createCoalescingRunner, rulesFingerprint, create
     });
 }));

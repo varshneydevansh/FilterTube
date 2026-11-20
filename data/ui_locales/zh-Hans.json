@@ -3467,5 +3467,10 @@
   "dashboard.sync.toast.noWayToReachDevice": "暂时无法连接到这台设备。请允许通过互联网同步，或设置 Internet Pickup。",
   "dashboard.sync.toast.parentUpdateApplied": "家长发送了更新",
   "dashboard.sync.outbox.appliedExceptPacks": "已在 {device} 上应用，但该设备还没有这些学习包：{packs}。请在该设备上更新 FilterTube。",
-  "dashboard.sync.outbox.unverified": "{status}（未验证）"
+  "dashboard.sync.outbox.unverified": "{status}（未验证）",
+  "dashboard.sync.outbox.upToDate": "已是最新",
+  "dashboard.sync.outbox.notAppliedOn": "{device} 没有应用此更新（{reason}）",
+  "dashboard.sync.toast.sourceUnbound": "此连接没有来源配置文件。请从要发送其规则的配置文件重新配对。",
+  "dashboard.sync.toast.sourceMismatch": "此连接发送的是另一个配置文件的规则。请选择那个配置文件，或从当前配置文件重新配对。",
+  "dashboard.sync.toast.sourceMissing": "此连接的来源配置文件已不在这台设备上。请从要发送其规则的配置文件重新配对。"
 }

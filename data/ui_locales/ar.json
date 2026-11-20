@@ -3493,5 +3493,10 @@
   "dashboard.sync.toast.noWayToReachDevice": "لا توجد طريقة للوصول إلى هذا الجهاز بعد. اسمح بالمزامنة عبر الإنترنت، أو أعدّ Internet Pickup.",
   "dashboard.sync.toast.parentUpdateApplied": "أرسل ولي الأمر تحديثًا",
   "dashboard.sync.outbox.appliedExceptPacks": "طُبِّق على {device}، باستثناء حزم الدراسة غير الموجودة بعد على ذلك الجهاز: {packs}. حدّث FilterTube هناك.",
-  "dashboard.sync.outbox.unverified": "{status} (غير متحقَّق منه)"
+  "dashboard.sync.outbox.unverified": "{status} (غير متحقَّق منه)",
+  "dashboard.sync.outbox.upToDate": "محدَّث بالفعل",
+  "dashboard.sync.outbox.notAppliedOn": "لم يطبّق {device} هذا التحديث ({reason})",
+  "dashboard.sync.toast.sourceUnbound": "لا يوجد ملف مصدر لهذا الربط. أعد الإقران من الملف الذي تريد إرسال قواعده.",
+  "dashboard.sync.toast.sourceMismatch": "يرسل هذا الربط قواعد ملف آخر. اختر ذلك الملف، أو أعد الإقران من هذا الملف.",
+  "dashboard.sync.toast.sourceMissing": "لم يعد الملف الذي يرسل منه هذا الربط موجودًا على هذا الجهاز. أعد الإقران من الملف الذي تريد إرسال قواعده."
 }

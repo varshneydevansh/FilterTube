@@ -32,7 +32,7 @@
     const RING_GAP_MS = 60 * 1000;
     const MAILBOX_EVERY_MS = 45 * 1000;
     const ANSWER_WAIT_MS = 20 * 1000;
-    const FINISHED = ['delivered', 'applied', 'rejected', 'expired'];
+    const FINISHED = ['delivered', 'up_to_date', 'applied', 'rejected', 'expired'];
     const VIEWER_PATTERNS = ['*://*.youtube.com/*', '*://*.youtubekids.com/*'];
 
     const str = value => (typeof value === 'string' ? value.trim() : '');
@@ -87,8 +87,10 @@
         const ackState = str(ack.ackState).toLowerCase();
         if (ackState === 'expired') return 'expired';
         if (ackState === 'rejected' || ackState === 'revoked' || ackState === 'conflict') return 'rejected';
-        if (ack.accepted === true && (ack.applied === true || str(ack.decision) === 'idempotent_same_hash')) return 'applied';
-        if (ack.accepted === true || ackState === 'delivered') return 'delivered';
+        // Spec §4 (79108f833): applied only when the child's rules changed; accepted without a change
+        // (idempotent, or the same rules again) is up_to_date. `delivered` stays for older entries only.
+        if (ack.accepted === true && ack.applied === true) return 'applied';
+        if (ack.accepted === true || ackState === 'delivered') return 'up_to_date';
         return '';
     }
 
@@ -109,7 +111,7 @@
             changed += 1;
             const unresolved = arr(ack.unresolvedPackIds).map(str).filter(id => /^[A-Za-z0-9_.-]{1,64}$/.test(id)).slice(0, 64);
             return { ...entry, state, stateAt: nowMs, reason: state === 'rejected' || state === 'expired' ? (str(ack.reason).slice(0, 80) || state) : null,
-                ...(unresolved.length && (state === 'applied' || state === 'delivered') ? { unresolvedPackIds: unresolved } : {}),
+                ...(unresolved.length && ['applied', 'delivered', 'up_to_date'].includes(state) ? { unresolvedPackIds: unresolved } : {}),
                 unverified: unverified.has(entry.entryId) };
         });
         return { outbox: { version: 1, entries }, changed };
@@ -173,6 +175,10 @@
         const selfControlActive = typeof getSelfControlSession === 'function'
             ? async () => !!(await getSelfControlSession()) : null;
         const dashboardUrl = api.runtime.getURL('html/tab-view.html');
+        // Step log (ids, counts and reason codes only), like Android's seamless-sync debug lines.
+        const log = (event, details) => {
+            try { root.console?.info?.(`FilterTube sync: ${event}`, JSON.stringify(details || {})); } catch (_) {}
+        };
 
         let listener = null;
         let listenerDevice = '';
@@ -342,6 +348,7 @@
                     }
                 }
             });
+            log('announce_result', { ok: answer.ok === true, courier: !!answer.courier, itemCount: answer.itemCount || 0, reason: answer.reason || null });
             // §2.2: run a pickup with the courier code, or without one when there is none.
             if (answer.ok && answer.courier) {
                 const deviceHash = await Doorbell.hash(ctx.deviceId);
@@ -406,6 +413,7 @@
             const ctx = await context();
             const ring = Doorbell.parseUpdateCall(payload, Doorbell.RING);
             if (ring) {
+                log('ring_received', { linkCount: ring.linkIds.length });
                 // §2.1: keep only usable replica links to that same parent device.
                 // Only links this device would apply on its own (the same rule as announceAll).
                 const kept = ring.linkIds.filter(id => ctx.childLinks
@@ -418,6 +426,7 @@
             }
             const announce = Doorbell.parseUpdateCall(payload, Doorbell.ANNOUNCE);
             if (!announce) return;
+            log('announce_received', { linkCount: announce.linkIds.length, signed: !!payload?.auth });
             // §2.2: usable source links to that same child device.
             let kept = announce.linkIds.filter(id => ctx.parentLinks
                 .some(link => link.linkId === id && str(link.remoteDeviceId) === announce.fromDeviceId));

@@ -3469,5 +3469,10 @@
   "dashboard.sync.toast.noWayToReachDevice": "இந்தச் சாதனத்தை அடைய இன்னும் வழி இல்லை. இணைய ஒத்திசைவை அனுமதிக்கவும், அல்லது Internet Pickup ஐ அமைக்கவும்.",
   "dashboard.sync.toast.parentUpdateApplied": "பெற்றோர் புதுப்பிப்பை அனுப்பினார்",
   "dashboard.sync.outbox.appliedExceptPacks": "{device} இல் பயன்படுத்தப்பட்டது, அந்தச் சாதனத்தில் இன்னும் இல்லாத படிப்புத் தொகுப்புகளைத் தவிர: {packs}. அங்கே FilterTube ஐப் புதுப்பிக்கவும்.",
-  "dashboard.sync.outbox.unverified": "{status} (சரிபார்க்கப்படவில்லை)"
+  "dashboard.sync.outbox.unverified": "{status} (சரிபார்க்கப்படவில்லை)",
+  "dashboard.sync.outbox.upToDate": "ஏற்கனவே புதுப்பித்த நிலையில் உள்ளது",
+  "dashboard.sync.outbox.notAppliedOn": "{device} இந்தப் புதுப்பிப்பைப் பயன்படுத்தவில்லை ({reason})",
+  "dashboard.sync.toast.sourceUnbound": "இந்த இணைப்புக்கு மூலச் சுயவிவரம் இல்லை. எந்தச் சுயவிவரத்தின் விதிகளை அனுப்ப வேண்டுமோ அதிலிருந்து மீண்டும் இணைக்கவும்.",
+  "dashboard.sync.toast.sourceMismatch": "இந்த இணைப்பு வேறொரு சுயவிவரத்தின் விதிகளை அனுப்புகிறது. அந்தச் சுயவிவரத்தைத் தேர்ந்தெடுக்கவும், அல்லது இதிலிருந்து மீண்டும் இணைக்கவும்.",
+  "dashboard.sync.toast.sourceMissing": "இந்த இணைப்பு அனுப்பும் சுயவிவரம் இந்தச் சாதனத்தில் இனி இல்லை. எந்தச் சுயவிவரத்தின் விதிகளை அனுப்ப வேண்டுமோ அதிலிருந்து மீண்டும் இணைக்கவும்."
 }

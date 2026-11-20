@@ -3469,5 +3469,10 @@
   "dashboard.sync.toast.noWayToReachDevice": "Bu cihaza henüz ulaşmanın bir yolu yok. İnternet üzerinden eşitlemeye izin ver veya Internet Pickup'ı kur.",
   "dashboard.sync.toast.parentUpdateApplied": "Ebeveynin bir güncelleme gönderdi",
   "dashboard.sync.outbox.appliedExceptPacks": "{device} cihazında uygulandı; o cihazda henüz olmayan çalışma paketleri hariç: {packs}. Orada FilterTube'u güncelle.",
-  "dashboard.sync.outbox.unverified": "{status} (doğrulanmadı)"
+  "dashboard.sync.outbox.unverified": "{status} (doğrulanmadı)",
+  "dashboard.sync.outbox.upToDate": "Zaten güncel",
+  "dashboard.sync.outbox.notAppliedOn": "{device} bu güncellemeyi uygulamadı ({reason})",
+  "dashboard.sync.toast.sourceUnbound": "Bu bağlantının kaynak profili yok. Kurallarını göndermek istediğin profilden yeniden eşleştir.",
+  "dashboard.sync.toast.sourceMismatch": "Bu bağlantı başka bir profilin kurallarını gönderiyor. O profili seç ya da bu profilden yeniden eşleştir.",
+  "dashboard.sync.toast.sourceMissing": "Bu bağlantının gönderdiği profil artık bu cihazda yok. Kurallarını göndermek istediğin profilden yeniden eşleştir."
 }

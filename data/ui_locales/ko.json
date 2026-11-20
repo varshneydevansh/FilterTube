@@ -3467,5 +3467,10 @@
   "dashboard.sync.toast.noWayToReachDevice": "아직 이 기기에 연결할 방법이 없어요. 인터넷 동기화를 허용하거나 Internet Pickup을 설정하세요.",
   "dashboard.sync.toast.parentUpdateApplied": "보호자가 업데이트를 보냈어요",
   "dashboard.sync.outbox.appliedExceptPacks": "{device}에 적용됐어요. 단, 그 기기에 아직 없는 학습 팩은 제외: {packs}. 그 기기에서 FilterTube를 업데이트하세요.",
-  "dashboard.sync.outbox.unverified": "{status} (확인되지 않음)"
+  "dashboard.sync.outbox.unverified": "{status} (확인되지 않음)",
+  "dashboard.sync.outbox.upToDate": "이미 최신 상태예요",
+  "dashboard.sync.outbox.notAppliedOn": "{device}에서 이 업데이트를 적용하지 않았어요({reason})",
+  "dashboard.sync.toast.sourceUnbound": "이 연결에는 원본 프로필이 없어요. 규칙을 보낼 프로필에서 다시 연결하세요.",
+  "dashboard.sync.toast.sourceMismatch": "이 연결은 다른 프로필의 규칙을 보내요. 그 프로필을 선택하거나 이 프로필에서 다시 연결하세요.",
+  "dashboard.sync.toast.sourceMissing": "이 연결이 보내는 프로필이 이 기기에 더는 없어요. 규칙을 보낼 프로필에서 다시 연결하세요."
 }

@@ -3493,5 +3493,10 @@
   "dashboard.sync.toast.noWayToReachDevice": "مفيش طريقة توصل للجهاز ده لسه. اسمح بالمزامنة عبر الإنترنت، أو جهّز Internet Pickup.",
   "dashboard.sync.toast.parentUpdateApplied": "ولي الأمر بعت تحديث",
   "dashboard.sync.outbox.appliedExceptPacks": "اتطبّق على {device}، ما عدا باقات المذاكرة اللي لسه مش موجودة على الجهاز ده: {packs}. حدّث FilterTube هناك.",
-  "dashboard.sync.outbox.unverified": "{status} (مش متأكَّد منه)"
+  "dashboard.sync.outbox.unverified": "{status} (مش متأكَّد منه)",
+  "dashboard.sync.outbox.upToDate": "محدَّث خلاص",
+  "dashboard.sync.outbox.notAppliedOn": "{device} ما طبّقش التحديث ده ({reason})",
+  "dashboard.sync.toast.sourceUnbound": "الربط ده ملوش ملف مصدر. اربط تاني من الملف اللي عايز تبعت قواعده.",
+  "dashboard.sync.toast.sourceMismatch": "الربط ده بيبعت قواعد ملف تاني. اختار الملف ده، أو اربط تاني من الملف ده.",
+  "dashboard.sync.toast.sourceMissing": "الملف اللي الربط ده بيبعت منه مبقاش موجود على الجهاز ده. اربط تاني من الملف اللي عايز تبعت قواعده."
 }

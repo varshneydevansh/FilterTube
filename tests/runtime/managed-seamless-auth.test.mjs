@@ -58,9 +58,11 @@ test('the outbox marks unverified acks and a replay can\'t move a finished entry
     let box = Sync.enqueueOutbox(Sync.emptyOutbox(), [Sync.outboxRow(item, { linkId: 'L', remoteDeviceId: 'c' }, {}, now)], now);
     const delivered = { mailboxItemId: 'm', linkId: 'L', ackState: 'delivered', accepted: true, applied: false };
     box = Sync.applyAcks(box, [delivered], 'c', () => 'c', now, new Set(['m'])).outbox;
-    assert.deepEqual([box.entries[0].state, box.entries[0].unverified], ['delivered', true]);
-    box = Sync.applyAcks(box, [{ ...delivered, applied: true }], 'c', () => 'c', now).outbox;
-    assert.deepEqual([box.entries[0].state, box.entries[0].unverified], ['applied', false]);
+    assert.deepEqual([box.entries[0].state, box.entries[0].unverified], ['up_to_date', true]);
     const replay = Sync.applyAcks(box, [{ ...delivered, ackState: 'rejected', accepted: false }], 'c', () => 'c', now);
-    assert.equal(replay.changed, 0);
+    assert.equal(replay.changed, 0, 'a finished entry never moves again');
+    // An older stored `delivered` entry can still become applied.
+    const legacy = { version: 1, entries: [{ ...box.entries[0], state: 'delivered', unverified: true }] };
+    const moved = Sync.applyAcks(legacy, [{ ...delivered, applied: true }], 'c', () => 'c', now).outbox;
+    assert.deepEqual([moved.entries[0].state, moved.entries[0].unverified], ['applied', false]);
 });

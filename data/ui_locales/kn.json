@@ -3469,5 +3469,10 @@
   "dashboard.sync.toast.noWayToReachDevice": "ಈ ಸಾಧನವನ್ನು ತಲುಪಲು ಇನ್ನೂ ದಾರಿಯಿಲ್ಲ. ಇಂಟರ್ನೆಟ್ ಸಿಂಕ್ ಅನುಮತಿಸಿ, ಅಥವಾ Internet Pickup ಹೊಂದಿಸಿ.",
   "dashboard.sync.toast.parentUpdateApplied": "ಪೋಷಕರು ಅಪ್‌ಡೇಟ್ ಕಳುಹಿಸಿದ್ದಾರೆ",
   "dashboard.sync.outbox.appliedExceptPacks": "{device} ನಲ್ಲಿ ಅನ್ವಯಿಸಲಾಗಿದೆ, ಆ ಸಾಧನದಲ್ಲಿ ಇನ್ನೂ ಇಲ್ಲದ ಅಧ್ಯಯನ ಪ್ಯಾಕ್‌ಗಳನ್ನು ಹೊರತುಪಡಿಸಿ: {packs}. ಅಲ್ಲಿ FilterTube ಅಪ್‌ಡೇಟ್ ಮಾಡಿ.",
-  "dashboard.sync.outbox.unverified": "{status} (ಪರಿಶೀಲಿಸಲಾಗಿಲ್ಲ)"
+  "dashboard.sync.outbox.unverified": "{status} (ಪರಿಶೀಲಿಸಲಾಗಿಲ್ಲ)",
+  "dashboard.sync.outbox.upToDate": "ಈಗಾಗಲೇ ಅಪ್-ಟು-ಡೇಟ್",
+  "dashboard.sync.outbox.notAppliedOn": "{device} ಈ ಅಪ್‌ಡೇಟ್ ಅನ್ವಯಿಸಲಿಲ್ಲ ({reason})",
+  "dashboard.sync.toast.sourceUnbound": "ಈ ಲಿಂಕ್‌ಗೆ ಮೂಲ ಪ್ರೊಫೈಲ್ ಇಲ್ಲ. ಯಾವ ಪ್ರೊಫೈಲ್‌ನ ನಿಯಮಗಳನ್ನು ಕಳುಹಿಸಬೇಕೋ ಅದರಿಂದ ಮತ್ತೆ ಜೋಡಿಸಿ.",
+  "dashboard.sync.toast.sourceMismatch": "ಈ ಲಿಂಕ್ ಬೇರೆ ಪ್ರೊಫೈಲ್‌ನ ನಿಯಮಗಳನ್ನು ಕಳುಹಿಸುತ್ತದೆ. ಆ ಪ್ರೊಫೈಲ್ ಆಯ್ಕೆಮಾಡಿ, ಅಥವಾ ಇದರಿಂದ ಮತ್ತೆ ಜೋಡಿಸಿ.",
+  "dashboard.sync.toast.sourceMissing": "ಈ ಲಿಂಕ್ ಕಳುಹಿಸುವ ಪ್ರೊಫೈಲ್ ಈ ಸಾಧನದಲ್ಲಿ ಈಗ ಇಲ್ಲ. ಯಾವ ಪ್ರೊಫೈಲ್‌ನ ನಿಯಮಗಳನ್ನು ಕಳುಹಿಸಬೇಕೋ ಅದರಿಂದ ಮತ್ತೆ ಜೋಡಿಸಿ."
 }

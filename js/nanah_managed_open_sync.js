@@ -324,6 +324,8 @@
                 ackHistoryFailedCount: 0,
                 // Profiles an item really changed (applied: true), for the viewer banner.
                 appliedProfileIds: [],
+                // reason code -> count, so a rejection is never silent (device test 2026-11-21).
+                rejectedReasons: {},
                 linkResults: []
             };
 
@@ -387,11 +389,15 @@
                         } else {
                             linkRow.rejectedItemCount += 1;
                             state.rejectedItemCount += 1;
+                            const reasonCode = normalizeString(applyResult?.reason) || 'rejected';
+                            state.rejectedReasons[reasonCode] = (state.rejectedReasons[reasonCode] || 0) + 1;
                             ackRecords.push(buildAckRecord(candidate, item, applyResult));
                         }
                     } catch (error) {
                         linkRow.rejectedItemCount += 1;
                         state.rejectedItemCount += 1;
+                        const reasonCode = normalizeString(error?.reason || error?.message) || 'apply_failed';
+                        state.rejectedReasons[reasonCode] = (state.rejectedReasons[reasonCode] || 0) + 1;
                         ackRecords.push(buildAckRecord(candidate, item, { accepted: false }, error));
                     }
                 }

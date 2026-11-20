@@ -3467,5 +3467,10 @@
   "dashboard.sync.toast.noWayToReachDevice": "このデバイスにはまだ届けられません。インターネット同期を許可するか、Internet Pickup を設定してください。",
   "dashboard.sync.toast.parentUpdateApplied": "保護者が更新を送りました",
   "dashboard.sync.outbox.appliedExceptPacks": "{device} に適用しました。ただし、そのデバイスにまだない学習パックを除きます：{packs}。そちらの FilterTube を更新してください。",
-  "dashboard.sync.outbox.unverified": "{status}（未確認）"
+  "dashboard.sync.outbox.unverified": "{status}（未確認）",
+  "dashboard.sync.outbox.upToDate": "すでに最新です",
+  "dashboard.sync.outbox.notAppliedOn": "{device} はこの更新を適用しませんでした（{reason}）",
+  "dashboard.sync.toast.sourceUnbound": "このリンクには送信元プロフィールがありません。ルールを送りたいプロフィールからペアリングし直してください。",
+  "dashboard.sync.toast.sourceMismatch": "このリンクは別のプロフィールのルールを送ります。そのプロフィールを選ぶか、このプロフィールからペアリングし直してください。",
+  "dashboard.sync.toast.sourceMissing": "このリンクの送信元プロフィールはこのデバイスにもうありません。ルールを送りたいプロフィールからペアリングし直してください。"
 }

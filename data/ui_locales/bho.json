@@ -3469,5 +3469,10 @@
   "dashboard.sync.toast.noWayToReachDevice": "एह डिवाइस तक पहुँचे के अबहीं कवनो रास्ता नइखे। इंटरनेट सिंक के अनुमति दीं, भा Internet Pickup सेट करीं।",
   "dashboard.sync.toast.parentUpdateApplied": "अभिभावक अपडेट भेजले बाड़ें",
   "dashboard.sync.outbox.appliedExceptPacks": "{device} पर लागू हो गइल, ओह डिवाइस पर अबहीं ना होखे वाला स्टडी पैक छोड़ के: {packs}। उहाँ FilterTube अपडेट करीं।",
-  "dashboard.sync.outbox.unverified": "{status} (पुष्टि ना भइल)"
+  "dashboard.sync.outbox.unverified": "{status} (पुष्टि ना भइल)",
+  "dashboard.sync.outbox.upToDate": "पहिले से अप-टू-डेट बा",
+  "dashboard.sync.outbox.notAppliedOn": "{device} ई अपडेट लागू ना कइलस ({reason})",
+  "dashboard.sync.toast.sourceUnbound": "एह लिंक के कवनो स्रोत प्रोफ़ाइल नइखे। जवना प्रोफ़ाइल के नियम भेजे के बा, ओकरा से फेर से जोड़ीं।",
+  "dashboard.sync.toast.sourceMismatch": "ई लिंक कवनो दोसर प्रोफ़ाइल के नियम भेजेला। ऊ प्रोफ़ाइल चुनीं, भा एह से फेर से जोड़ीं।",
+  "dashboard.sync.toast.sourceMissing": "जवना प्रोफ़ाइल से ई लिंक भेजेला, ऊ अब एह डिवाइस पर नइखे। जवना प्रोफ़ाइल के नियम भेजे के बा, ओकरा से फेर से जोड़ीं।"
 }

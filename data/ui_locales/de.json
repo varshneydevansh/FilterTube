@@ -3469,5 +3469,10 @@
   "dashboard.sync.toast.noWayToReachDevice": "Dieses Gerät ist noch nicht erreichbar. Erlaube die Synchronisierung über das Internet oder richte Internet Pickup ein.",
   "dashboard.sync.toast.parentUpdateApplied": "Eltern-Update erhalten",
   "dashboard.sync.outbox.appliedExceptPacks": "Auf {device} angewendet, außer Lernpaketen, die dieses Gerät noch nicht hat: {packs}. Aktualisiere FilterTube dort.",
-  "dashboard.sync.outbox.unverified": "{status} (nicht bestätigt)"
+  "dashboard.sync.outbox.unverified": "{status} (nicht bestätigt)",
+  "dashboard.sync.outbox.upToDate": "Bereits aktuell",
+  "dashboard.sync.outbox.notAppliedOn": "{device} hat dieses Update nicht angewendet ({reason})",
+  "dashboard.sync.toast.sourceUnbound": "Diese Verknüpfung hat kein Quellprofil. Kopple erneut vom Profil, dessen Regeln du senden willst.",
+  "dashboard.sync.toast.sourceMismatch": "Diese Verknüpfung sendet die Regeln eines anderen Profils. Wähle dieses Profil oder kopple erneut von diesem.",
+  "dashboard.sync.toast.sourceMissing": "Das Profil, von dem diese Verknüpfung sendet, gibt es auf diesem Gerät nicht mehr. Kopple erneut vom Profil, dessen Regeln du senden willst."
 }

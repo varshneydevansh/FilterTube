@@ -3469,5 +3469,10 @@
   "dashboard.sync.toast.noWayToReachDevice": "Bado hakuna njia ya kufikia kifaa hiki. Ruhusu usawazishaji kupitia intaneti, au weka Internet Pickup.",
   "dashboard.sync.toast.parentUpdateApplied": "Mzazi ametuma sasisho",
   "dashboard.sync.outbox.appliedExceptPacks": "Imetumika kwenye {device}, isipokuwa vifurushi vya masomo ambavyo kifaa hicho bado hakina: {packs}. Sasisha FilterTube huko.",
-  "dashboard.sync.outbox.unverified": "{status} (haijathibitishwa)"
+  "dashboard.sync.outbox.unverified": "{status} (haijathibitishwa)",
+  "dashboard.sync.outbox.upToDate": "Tayari iko sasa",
+  "dashboard.sync.outbox.notAppliedOn": "{device} haikutumia sasisho hili ({reason})",
+  "dashboard.sync.toast.sourceUnbound": "Kiungo hiki hakina wasifu wa chanzo. Unganisha upya kutoka kwenye wasifu ambao sheria zake unataka kutuma.",
+  "dashboard.sync.toast.sourceMismatch": "Kiungo hiki kinatuma sheria za wasifu mwingine. Chagua wasifu huo, au unganisha upya kutoka kwenye huu.",
+  "dashboard.sync.toast.sourceMissing": "Wasifu ambao kiungo hiki kinatuma kutoka kwake haupo tena kwenye kifaa hiki. Unganisha upya kutoka kwenye wasifu ambao sheria zake unataka kutuma."
 }

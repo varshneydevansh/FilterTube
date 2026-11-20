@@ -3467,5 +3467,10 @@
   "dashboard.sync.toast.noWayToReachDevice": "暂时还呒没办法连到搿只设备。请允许通过互联网同步，或者设置 Internet Pickup。",
   "dashboard.sync.toast.parentUpdateApplied": "家长发来一只更新",
   "dashboard.sync.outbox.appliedExceptPacks": "已经辣 {device} 上用上了，只是搿只设备还呒没搿眼学习包：{packs}。请辣搿面更新 FilterTube。",
-  "dashboard.sync.outbox.unverified": "{status}（还呒没核实）"
+  "dashboard.sync.outbox.unverified": "{status}（还呒没核实）",
+  "dashboard.sync.outbox.upToDate": "已经是最新个了",
+  "dashboard.sync.outbox.notAppliedOn": "{device} 呒没用上搿只更新（{reason}）",
+  "dashboard.sync.toast.sourceUnbound": "搿只连接呒没来源配置。请从侬想发规则个配置重新配对。",
+  "dashboard.sync.toast.sourceMismatch": "搿只连接发个是另一只配置个规则。请选搿只配置，或者从搿只重新配对。",
+  "dashboard.sync.toast.sourceMissing": "搿只连接个来源配置已经勿辣搿只设备上了。请从侬想发规则个配置重新配对。"
 }

@@ -3493,5 +3493,10 @@
   "dashboard.sync.toast.noWayToReachDevice": "لسه ما في طريقة نوصل بيها الجهاز ده. اسمح بالمزامنة عبر الإنترنت، أو جهّز Internet Pickup.",
   "dashboard.sync.toast.parentUpdateApplied": "ولي الأمر رسل تحديث",
   "dashboard.sync.outbox.appliedExceptPacks": "اتطبّق في {device}، إلا باقات القراية الما موجودة لسه في الجهاز ده: {packs}. حدّث FilterTube هناك.",
-  "dashboard.sync.outbox.unverified": "{status} (ما متأكَّد منه)"
+  "dashboard.sync.outbox.unverified": "{status} (ما متأكَّد منه)",
+  "dashboard.sync.outbox.upToDate": "محدَّث من قبل",
+  "dashboard.sync.outbox.notAppliedOn": "{device} ما طبّق التحديث ده ({reason})",
+  "dashboard.sync.toast.sourceUnbound": "الربط ده ما عندو ملف مصدر. اربط تاني من الملف الدايرة تبعت قواعدو.",
+  "dashboard.sync.toast.sourceMismatch": "الربط ده بيبعت قواعد ملف تاني. اختار الملف داك، أو اربط تاني من ده.",
+  "dashboard.sync.toast.sourceMissing": "الملف البيبعت منو الربط ده ما بقى موجود في الجهاز ده. اربط تاني من الملف الدايرة تبعت قواعدو."
 }

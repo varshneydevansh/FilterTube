@@ -3467,5 +3467,10 @@
   "dashboard.sync.toast.noWayToReachDevice": "暫時未有方法聯絡呢部裝置。請允許經互聯網同步，或者設定 Internet Pickup。",
   "dashboard.sync.toast.parentUpdateApplied": "家長傳咗更新",
   "dashboard.sync.outbox.appliedExceptPacks": "已經喺 {device} 套用，但嗰部裝置仲未有呢啲溫習包：{packs}。請喺嗰度更新 FilterTube。",
-  "dashboard.sync.outbox.unverified": "{status}（未核實）"
+  "dashboard.sync.outbox.unverified": "{status}（未核實）",
+  "dashboard.sync.outbox.upToDate": "已經係最新",
+  "dashboard.sync.outbox.notAppliedOn": "{device} 冇套用呢個更新（{reason}）",
+  "dashboard.sync.toast.sourceUnbound": "呢個連結冇來源設定檔。請由你想傳送規則嘅設定檔重新配對。",
+  "dashboard.sync.toast.sourceMismatch": "呢個連結傳送緊另一個設定檔嘅規則。請揀返嗰個設定檔，或者由呢個重新配對。",
+  "dashboard.sync.toast.sourceMissing": "呢個連結嘅來源設定檔已經唔喺呢部裝置。請由你想傳送規則嘅設定檔重新配對。"
 }

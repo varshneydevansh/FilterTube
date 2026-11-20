@@ -3469,5 +3469,10 @@
   "dashboard.sync.toast.noWayToReachDevice": "ወደዚህ መሣሪያ የሚደርስበት መንገድ ገና የለም። የበይነመረብ ማመሳሰልን ይፍቀዱ፣ ወይም Internet Pickup ያዋቅሩ።",
   "dashboard.sync.toast.parentUpdateApplied": "ወላጅ ዝማኔ ልከዋል",
   "dashboard.sync.outbox.appliedExceptPacks": "በ{device} ላይ ተተግብሯል፣ ያ መሣሪያ ገና የሌሉትን የጥናት ጥቅሎች ሳይጨምር፦ {packs}። እዚያ FilterTubeን ያዘምኑ።",
-  "dashboard.sync.outbox.unverified": "{status} (ያልተረጋገጠ)"
+  "dashboard.sync.outbox.unverified": "{status} (ያልተረጋገጠ)",
+  "dashboard.sync.outbox.upToDate": "ቀድሞውኑ ወቅታዊ ነው",
+  "dashboard.sync.outbox.notAppliedOn": "{device} ይህን ዝማኔ አልተገበረም ({reason})",
+  "dashboard.sync.toast.sourceUnbound": "ይህ ግንኙነት የምንጭ መገለጫ የለውም። ደንቦቹን መላክ ከሚፈልጉት መገለጫ እንደገና ያጣምሩ።",
+  "dashboard.sync.toast.sourceMismatch": "ይህ ግንኙነት የሌላ መገለጫ ደንቦችን ይልካል። ያንን መገለጫ ይምረጡ፣ ወይም ከዚህ እንደገና ያጣምሩ።",
+  "dashboard.sync.toast.sourceMissing": "ይህ ግንኙነት የሚልክበት መገለጫ በዚህ መሣሪያ ላይ የለም። ደንቦቹን መላክ ከሚፈልጉት መገለጫ እንደገና ያጣምሩ።"
 }

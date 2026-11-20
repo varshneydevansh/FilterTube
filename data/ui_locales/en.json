@@ -3469,5 +3469,10 @@
   "dashboard.sync.toast.noWayToReachDevice": "There's no way to reach this device yet. Allow internet sync, or set up Internet Pickup.",
   "dashboard.sync.toast.parentUpdateApplied": "Parent sent an update",
   "dashboard.sync.outbox.appliedExceptPacks": "Applied on {device}, except study packs that device doesn't have yet: {packs}. Update FilterTube there.",
-  "dashboard.sync.outbox.unverified": "{status} (unverified)"
+  "dashboard.sync.outbox.unverified": "{status} (unverified)",
+  "dashboard.sync.outbox.upToDate": "Already up to date",
+  "dashboard.sync.outbox.notAppliedOn": "{device} didn't apply this update ({reason})",
+  "dashboard.sync.toast.sourceUnbound": "This link has no source profile. Pair again from the profile whose rules you want to send.",
+  "dashboard.sync.toast.sourceMismatch": "This link sends another profile's rules. Choose that profile, or pair again from this one.",
+  "dashboard.sync.toast.sourceMissing": "The profile this link sends from no longer exists on this device. Pair again from the profile whose rules you want to send."
 }
