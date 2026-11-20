@@ -378,6 +378,18 @@
         of(catalog, minChannels = 0) {
             return array(catalog?.packs).filter(pack => pack.kind === KIND_INTERVIEW && array(pack.channels).length >= minChannels);
         },
+        /** Career groups in the order the Interview list shows them; packs without a known group go last ("other"). */
+        GROUPS: Object.freeze(['software', 'management', 'law', 'public', 'health', 'other']),
+        /** The interview packs under their career groups as [group, packs] pairs, in GROUPS order, catalog order inside each. */
+        grouped(catalog, minChannels = 0) {
+            const groups = new Map();
+            for (const pack of StudyInterviews.of(catalog, minChannels)) {
+                const group = StudyInterviews.GROUPS.includes(pack.group) ? pack.group : 'other';
+                if (!groups.has(group)) groups.set(group, []);
+                groups.get(group).push(pack);
+            }
+            return StudyInterviews.GROUPS.filter(group => groups.has(group)).map(group => [group, groups.get(group)]);
+        },
         /** "DSA, System design, Finance": the tile's examples, from the packs' short names. */
         examples(catalog, minChannels = 0, count = 3) {
             return [...new Set(StudyInterviews.of(catalog, minChannels).map(pack => text(pack.shortName)).filter(Boolean))].slice(0, count);

@@ -5,7 +5,7 @@
 //
 // Sources, in this order: draft.packs (exam packs), draft.classPacks (kind "class": grade, board,
 // subjects, gradeKeywords) and draft.kidsPacks. Each pack is written as
-//   id, kind, name, [shortName], [grade], [board], [countries], [nearby], [taughtIn], [languages],
+//   id, kind, name, [shortName], [group], [grade], [board], [countries], [nearby], [taughtIn], [languages],
 //   [subjects], [keywords], [gradeKeywords], [blockedWords], [chips], [variantLabel], [variants],
 //   [variantsShareTopics], channels
 // shortName is the exam's short label ("GATE"); chips are the study Home's subject chips; variants
@@ -120,6 +120,8 @@ export function buildCatalog(draft) {
         Object.entries(source.name || {}).forEach(([lang, value]) => { if (text(value)) name[lang] = text(value); });
         const pack = { id, kind: text(source.kind) || 'study', name };
         if (text(source.shortName)) pack.shortName = text(source.shortName);
+        // Interview packs: the career group the setup list files them under ("software", "management", ...).
+        if (/^[a-z_]{1,24}$/.test(text(source.group))) pack.group = text(source.group);
         for (const key of ['grade', 'board']) if (text(source[key])) pack[key] = text(source[key]);
         for (const [key, value] of [['countries', countries(source.countries)], ['nearby', countries(source.nearby)]]) {
             if (value.length) pack[key] = value;

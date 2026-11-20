@@ -96,6 +96,8 @@
                 blockedWords: strings(json.blockedWords),
                 // The exam's short label ("GATE"), the study Home's subject chips and the branches.
                 shortName: text(json.shortName) || null,
+                // Interview packs: the career group setup lists them under ("software", "management", "law", ...).
+                group: text(json.group) || null,
                 chips: strings(json.chips),
                 variants: parseVariants(json.variants),
                 // True when the variants are levels of one syllabus (JEE Main and Advanced), not branches.

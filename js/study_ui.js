@@ -756,6 +756,16 @@
         };
         const back = () => go(Setup.StudySetupPath.back(s.step, needsStream()), false);
         const goNext = () => go(Setup.StudySetupPath.next(s.step, needsStream()));
+        /** Saves the plan (the default branch for any pack without one) and, when asked, starts a round. */
+        const savePlan = async startNowToo => {
+            const result = await options.onPatch?.({ activePackIds: s.selected.slice(), packEdits: Setup.savedEdits(s.selected, s.edits, catalog) });
+            if (result?.ok === false) { notify(panel, errorText(result.error), null); return; }
+            if (startNowToo) {
+                const started = await options.onStart?.(50, s.lockMode);
+                if (started?.ok === false) { notify(panel, errorText(started.error), null); return; }
+            }
+            close();
+        };
         const toggle = id => { s.selected = s.selected.includes(id) ? s.selected.filter(item => item !== id) : [...s.selected, id]; render(); };
         const chipLabel = pack => Setup.StudyExamList.chipLabel(pack, language());
 
@@ -800,6 +810,23 @@
             go.disabled = !enabled;
             node.appendChild(go);
             if (!label) node.classList.add('is-wide');
+            return node;
+        }
+
+        /**
+         * One tap to start (Android 34afba385): on the list steps, someone studying for themselves gets
+         * Start, which saves the plan with its defaults (the default branch, every channel and topic on,
+         * a gentle lock) and starts a round; "Review channels" walks the rest of setup. A parent setting
+         * a plan for someone else keeps next, since nothing starts on this device.
+         */
+        function startBar(label, next) {
+            if (!isSelf) return bar(label, next, goNext);
+            const node = el('div', 'ft-setup__bar is-start');
+            if (label) node.appendChild(el('span', 'ft-setup__bar-label', label));
+            const row = el('div', 'ft-setup__bar-row');
+            row.append(button(t('study.setup.reviewFirst', 'Review channels'), 'btn-secondary ft-setup__bar-action', goNext),
+                button(t('study.setup.startNow', 'Start now'), 'btn-primary ft-setup__bar-action', () => { s.lockMode = 'gentle'; savePlan(true); }));
+            node.appendChild(row);
             return node;
         }
 
@@ -935,7 +962,7 @@
 
         function listBar() {
             if (!s.selected.length) return null;
-            return bar(packsShortLabel(s.selected, catalog), t('study.setup.next', 'Next'), goNext);
+            return startBar(packsShortLabel(s.selected, catalog), t('study.setup.next', 'Next'));
         }
 
         // ---- Step 2a: exams
@@ -1016,7 +1043,7 @@
                     el('p', 'ft-study-muted', t('study.setup.schoolNoneBody', 'These work with any curriculum. You can also add your own channels.')),
                     button(t('study.setup.schoolCheckExams', 'Check exams'), 'btn-secondary', () => { s.mode = 'exam'; s.query = ''; go('list'); }));
                 addGlobals(body, globals);
-                return s.selected.length ? bar(null, t('study.setup.nextChannels', 'Next: check channels'), goNext) : null;
+                return s.selected.length ? startBar(packsShortLabel(s.selected, catalog), t('study.setup.nextChannels', 'Next: check channels')) : null;
             }
             const located = Setup.StudySchool.locate(boards, s.selected);
             const current = boards.find(board => board.key === s.board) || located?.board || boards[0];
@@ -1074,7 +1101,7 @@
             }
             addGlobals(body, globals);
             body.appendChild(el('p', 'ft-study-muted', t('study.setup.schoolOtherCountry', 'Studying another country\'s board? Change the country first.')));
-            return s.selected.length ? bar(null, t('study.setup.nextChannels', 'Next: check channels'), goNext) : null;
+            return s.selected.length ? startBar(packsShortLabel(s.selected, catalog), t('study.setup.nextChannels', 'Next: check channels')) : null;
         }
 
         function addGlobals(body, globals) {
@@ -1139,9 +1166,26 @@
             body.append(el('h3', 'ft-setup-h1', t('study.setup.interviewQuestion', 'Which interview are you preparing for?')),
                 el('p', 'ft-study-muted', t('study.setup.skillBody', 'Pick one or more. You can add your own channels next.')));
             const list = el('div', 'ft-setup-picks');
-            Setup.StudyInterviews.of(catalog, Setup.MIN_CHANNELS).forEach(pack => list.appendChild(pickRow(pack)));
+            const groups = Setup.StudyInterviews.grouped(catalog, Setup.MIN_CHANNELS);
+            for (const [group, items] of groups) {
+                // One career group per heading; a single group needs none.
+                if (groups.length > 1) list.appendChild(el('p', 'ft-setup-h2', interviewGroupName(group)));
+                items.forEach(pack => list.appendChild(pickRow(pack)));
+            }
             body.appendChild(list);
             return listBar();
+        }
+
+        function interviewGroupName(group) {
+            const names = {
+                software: ['study.setup.interviewGroup.software', 'Computer science and software'],
+                management: ['study.setup.interviewGroup.management', 'MBA and management'],
+                law: ['study.setup.interviewGroup.law', 'Law'],
+                public: ['study.setup.interviewGroup.public', 'Government and defence'],
+                health: ['study.setup.interviewGroup.health', 'Healthcare']
+            };
+            const [key, fallback] = names[group] || ['study.setup.interviewGroup.other', 'Other careers'];
+            return t(key, fallback);
         }
 
         // ---- Step 3: stream
@@ -1439,15 +1483,7 @@
                     : t('study.setup.lockGentleBody', 'You can end early after a 30-second pause.')));
                 actions.appendChild(lockCard);
             }
-            const save = async startNowToo => {
-                const result = await options.onPatch?.({ activePackIds: s.selected.slice(), packEdits: Setup.savedEdits(s.selected, s.edits, catalog) });
-                if (result?.ok === false) { notify(panel, errorText(result.error), null); return; }
-                if (startNowToo) {
-                    const started = await options.onStart?.(50, s.lockMode);
-                    if (started?.ok === false) { notify(panel, errorText(started.error), null); return; }
-                }
-                close();
-            };
+            const save = savePlan;
             actions.appendChild(button(t('study.setup.savePlan', 'Save plan'), isSelf ? 'btn-secondary' : 'btn-primary', () => save(false)));
             if (isSelf) actions.appendChild(button(t('study.setup.startNow', 'Start now'), 'btn-primary', () => save(true)));
             body.appendChild(actions);

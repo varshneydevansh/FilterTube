@@ -127,3 +127,23 @@ test('an interview plan\'s Home ranks interview walk-throughs first', () => {
     assert.equal(Feed.rank([{ videoId: 'c', title: 'Mock interview tips', publishedAt: 1 }, { videoId: 'd', title: 'Weekend vlog', publishedAt: 2 }], gate)[0].title,
         'Weekend vlog', 'newest first when no title names a topic');
 });
+
+test('interview packs list under their career groups in a fixed order', () => {
+    const packs = Packs.parseCatalog({
+        ...raw,
+        packs: [rawPack('interview_hr', 'interview', { group: 'management' }), rawPack('interview_ssb', 'interview', { group: 'public' }),
+            rawPack('interview_dsa', 'interview', { group: 'software' }), rawPack('interview_new', 'interview', { group: 'astronauts' }),
+            rawPack('interview_frontend', 'interview', { group: 'software' })]
+    });
+    const grouped = Setup.StudyInterviews.grouped(packs, 3);
+    assert.deepEqual(grouped.map(([group]) => group), ['software', 'management', 'public', 'other']);
+    assert.deepEqual(grouped[0][1].map(pack => pack.id), ['interview_dsa', 'interview_frontend']);
+    assert.deepEqual(grouped.at(-1)[1].map(pack => pack.id), ['interview_new']);
+});
+
+test('the catalog carries each interview pack\'s group', () => {
+    for (const pack of Setup.StudyInterviews.of(catalog, 3)) assert.ok(Setup.StudyInterviews.GROUPS.includes(pack.group), pack.id);
+    const one = Packs.parseCatalog({ schema: 'filtertube_study_packs', version: 1,
+        packs: [{ id: 'interview_x', kind: 'interview', name: { en: 'X' }, group: 'law', channels: [{ handle: '@x', name: 'X' }] }] });
+    assert.equal(Packs.packById(one, 'interview_x')?.group, 'law');
+});
