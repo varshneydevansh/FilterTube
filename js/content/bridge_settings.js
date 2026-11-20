@@ -2252,6 +2252,9 @@ function filterTubeStableJson(value) {
 function filterTubeProfilesChangeKind(change) {
     try {
         if (!change || !Object.prototype.hasOwnProperty.call(change, 'oldValue')) return 'other';
+        // A first write, a reset or a malformed tree is never "no change".
+        const isTree = value => !!value && typeof value === 'object' && !!value.profiles && typeof value.profiles === 'object';
+        if (!isTree(change.oldValue) || !isTree(change.newValue)) return 'other';
         const same = withoutLists => filterTubeStableJson(filterTubeProfilesRuleProjection(change.oldValue, withoutLists))
             === filterTubeStableJson(filterTubeProfilesRuleProjection(change.newValue, withoutLists));
         if (same(false)) return 'none';
