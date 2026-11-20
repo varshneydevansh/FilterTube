@@ -98,7 +98,12 @@
         interview_data_science: ['sql interview questions', 'a/b testing'],
         interview_product: ['product sense', 'prioritization'],
         interview_consulting: ['market sizing', 'profitability case'],
-        interview_finance: ['dcf', 'walk me through'],
+        interview_investment_banking: ['dcf', 'walk me through'],
+        interview_equity_research: ['stock pitch', 'valuation'],
+        interview_corporate_finance: ['fp&a', 'budgeting'],
+        interview_accounting: ['three statements', 'deferred revenue'],
+        interview_mba_admissions: ['why mba', 'group discussion'],
+        interview_ux_design: ['portfolio review', 'design challenge'],
         interview_hr: ['tell me about yourself', 'star method']
     });
     /**

@@ -5,7 +5,7 @@
 //
 // Sources, in this order: draft.packs (exam packs), draft.classPacks (kind "class": grade, board,
 // subjects, gradeKeywords) and draft.kidsPacks. Each pack is written as
-//   id, kind, name, [shortName], [group], [grade], [board], [countries], [nearby], [taughtIn], [languages],
+//   id, kind, name, [shortName], [group], [level], [area], [category], [grade], [board], [countries], [nearby], [taughtIn], [languages],
 //   [subjects], [keywords], [gradeKeywords], [blockedWords], [chips], [variantLabel], [variants],
 //   [variantsShareTopics], channels
 // shortName is the exam's short label ("GATE"); chips are the study Home's subject chips; variants
@@ -56,6 +56,9 @@ function channel(row) {
     out.name = text(row.name);
     const language = text(row.language).toLowerCase();
     if (language) out.language = language;
+    // Where the channel's audience is: an ISO country ("IN") or "global"; the apps put the user's own country first.
+    const country = text(row.country);
+    if (/^[A-Z]{2}$/.test(country.toUpperCase()) || country.toLowerCase() === 'global') out.country = country.toLowerCase() === 'global' ? 'global' : country.toUpperCase();
     return out.name && (out.channelId || out.handle) ? out : null;
 }
 
@@ -122,6 +125,11 @@ export function buildCatalog(draft) {
         if (text(source.shortName)) pack.shortName = text(source.shortName);
         // Interview packs: the career group the setup list files them under ("software", "management", ...).
         if (/^[a-z_]{1,24}$/.test(text(source.group))) pack.group = text(source.group);
+        // Exam packs: "national" or "regional" (a state or province, named in area), and the picker's category.
+        if (['national', 'regional'].includes(text(source.level))) pack.level = text(source.level);
+        const area = labels(source.area, lang => lang.toLowerCase());
+        if (Object.keys(area).length) pack.area = area;
+        if (['school', 'entrance', 'civil', 'professional', 'language'].includes(text(source.category))) pack.category = text(source.category);
         for (const key of ['grade', 'board']) if (text(source[key])) pack[key] = text(source[key]);
         for (const [key, value] of [['countries', countries(source.countries)], ['nearby', countries(source.nearby)]]) {
             if (value.length) pack[key] = value;

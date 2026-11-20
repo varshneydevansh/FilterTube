@@ -165,13 +165,13 @@
      */
     const RULES = Object.freeze([
         ['skills', ['coding', 'programming', 'interview']],
-        ['defence', ['nda', 'cds', 'afcat', 'agniveer', 'ssb']],
-        ['engineering', ['gate', 'jee', 'ioe', 'bitsat', 'ecat', 'engineering', 'fe', 'passport']],
+        ['defence', ['nda', 'cds', 'afcat', 'agniveer', 'ssb', 'capf']],
+        ['engineering', ['gate', 'jee', 'ioe', 'bitsat', 'ecat', 'engineering', 'fe', 'passport', 'ese']],
         ['medical', ['neet', 'mbbs', 'mdcat', 'mcat', 'usmle', 'ucat', 'plab', 'nclex', 'mecee', 'gamsat', 'medical',
             'tus', 'medicina', 'enarm', 'residencia', 'mccqe', 'tms', 'pass', 'las']],
         ['civil', ['upsc', 'psc', 'lok', 'sewa', 'css', 'bcs', 'wbcs', 'tnpsc', 'kpsc', 'mpsc', 'appsc',
-            'tspsc', 'cpns', 'kpss', 'civil', 'concursos', 'oposiciones', 'concorsi', 'kedinasan', 'ppsc', 'fpsc']],
-        ['jobs', ['banking', 'ssc', 'rrb', 'police', 'ibps', 'sbi', 'bank', 'bumn']],
+            'tspsc', 'cpns', 'kpss', 'civil', 'concursos', 'oposiciones', 'concorsi', 'kedinasan', 'ppsc', 'fpsc', 'uppsc', 'bpsc', 'rpsc', 'ras', 'mppsc', 'hpsc', 'hcs', 'ukpsc', 'cgpsc', 'jpsc', 'opsc', 'gpsc', 'hppsc', 'apsc', 'jkpsc', 'epfo']],
+        ['jobs', ['banking', 'ssc', 'rrb', 'police', 'ibps', 'sbi', 'bank', 'bumn', 'rbi', 'nabard', 'sebi']],
         ['law', ['clat', 'cat', 'lsat', 'bar', 'gmat', 'judiciary', 'ailet', 'law', 'oab', 'jura', 'sqe', 'lnat', 'takken']],
         ['finance', ['ca', 'icai', 'cs', 'icsi', 'cma', 'icmai', 'cfa', 'frm', 'acca', 'cima', 'cpa', 'boki', 'ican', 'kasneb', 'finra', 'icap']],
         ['teaching', ['ctet', 'tet', 'ugc', 'net', 'kvs', 'praxis', 'docente', 'crpe', 'teacher', 'tsc']],
@@ -182,7 +182,7 @@
             'hsc', 'vce', 'atar', 'ncea', 'national', 'gcse', 'level', 'ib', 'cbse', 'waec', 'wassce', 'jamb', 'utme', 'kcse',
             'nsc', 'matric', 'uneb', 'gce', 'al', 'eju', 'gaokao', 'lgs', 'brevet', 'comipems', 'koukou', 'juken',
             'prep', 'certificate', 'osmoklasisty', 'oge', 'dgnl', 'vao10', 'tka', 'bece', 'neco', 'kjsea', 'ged', 'ales', 'dgs', 'exit',
-            'cuet', 'plus', 'scholarship']]
+            'cuet', 'plus', 'scholarship', 'zimsec', 'ecz', 'nesa', 'msce', 'necta', 'bachillerato', 'centraal', 'leaving', 'junior', 'exames', 'panhellenic', 'bacalaureat', 'evaluare', 'erettsegi', 'bem', 'tawjihi', 'preparatory', 'dse', 'gsat', 'unt', 'dtm', 'cet', 'kcet', 'wbjee', 'eamcet', 'keam', 'ojee', 'dcece', 'polytechnic', 'regents', 'staar', 'tsi', 'qce', 'epreuves']]
     ]);
 
     /** Name words for packs no id rule knows (a pack added later): the same fields, by the English name. */

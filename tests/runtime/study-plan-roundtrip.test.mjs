@@ -19,11 +19,11 @@ const UC = c => `UC${c.repeat(22)}`;
 
 const plan = () => ({
   version: 1,
-  activePackIds: ['global_coding_interview', 'interview_finance', 'in_gate', 'cls_in_cbse_11_12'],
+  activePackIds: ['global_coding_interview', 'interview_hr', 'in_gate', 'cls_in_cbse_11_12'],
   packEdits: {
-    interview_finance: { channelsAdded: [{ channelId: UC('a'), handle: '@financeprep', name: 'Finance Prep' }],
+    interview_hr: { channelsAdded: [{ channelId: UC('a'), handle: '@financeprep', name: 'Finance Prep' }],
       channelsRemoved: ['@noisyfinance'], topicsAdded: ['dcf model'], topicsRemoved: ['crypto'],
-      variant: 'investment_banking', futureEditKey: 'kept' },
+      variant: 'hr_roles', futureEditKey: 'kept' },
     in_gate: { channelsAdded: [{ handle: '@gateacademy', name: 'GATE Academy' }], channelsRemoved: [UC('b')],
       topicsAdded: [], topicsRemoved: ['aptitude'], variant: 'cse' },
     cls_in_cbse_11_12: { channelsAdded: [], channelsRemoved: [], topicsAdded: ['organic chemistry'], topicsRemoved: [], variant: 'pcm' },
@@ -38,7 +38,7 @@ const plan = () => ({
   breakMode: 'normal',
   progress: { 'aarav-phone': { '2026-11-19': 45, '2026-11-20': 20 } },
   weekView: false,
-  packCopies: { interview_finance: { channels: [{ channelId: UC('c'), name: 'Copy Channel' }], topics: ['valuation'], blockedWords: ['gambling'] } },
+  packCopies: { interview_hr: { channels: [{ channelId: UC('c'), name: 'Copy Channel' }], topics: ['valuation'], blockedWords: ['gambling'] } },
   packChannelsOnly: false,
   futureStudyKey: { nested: [1, 2] }
 });
@@ -86,7 +86,7 @@ test('a full backup, plain and encrypted, carries the study plan unchanged', asy
   const backup = await mum.io.exportV3({ scope: 'full' });
   assert.deepEqual(clone(backup.profilesV4.profiles[CHILD].study), plan());
   const sealed = await mum.io.exportV3Encrypted({ scope: 'full', password: 'correct horse' });
-  assert.equal(JSON.stringify(sealed).includes('interview_finance'), false, 'the plan is inside the ciphertext');
+  assert.equal(JSON.stringify(sealed).includes('interview_hr'), false, 'the plan is inside the ciphertext');
   const opened = await (await device(tree(undefined))).io.importV3Encrypted(clone(sealed), { password: 'correct horse', strategy: 'replace', scope: 'full' });
   assert.equal(opened.ok, true);
 });

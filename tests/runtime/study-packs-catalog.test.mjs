@@ -55,7 +55,7 @@ test('the bundled catalog has at least 3 approved channels per pack and fits the
   }
   const ids = bundled.packs.map(pack => pack.id);
   assert.equal(new Set(ids).size, ids.length);
-  for (const hidden of ['cn_gaokao', 'cn_kaoyan', 'tz_necta', 'my_stpm', 'cm_gce_bac']) assert.equal(ids.includes(hidden), false, hidden);
+  for (const hidden of ['cn_gaokao', 'cn_kaoyan', 'my_stpm', 'cm_gce_bac']) assert.equal(ids.includes(hidden), false, hidden);
   // us_praxis was thin until 2026-11-16, when it got five verified channels (app StudyPackCatalogTest).
   assert.ok(bundled.packs.find(pack => pack.id === 'us_praxis').channels.length >= 3);
   assert.deepEqual([...new Set(bundled.packs.map(pack => pack.kind))].sort(), ['class', 'interview', 'kids_age', 'kids_classic', 'study']);

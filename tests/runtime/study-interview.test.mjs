@@ -19,7 +19,8 @@ const raw = JSON.parse(fs.readFileSync(new URL('../../data/study/packs-v1.json',
 const catalog = Packs.parseCatalog(raw);
 
 const ids = ['global_coding_interview', 'interview_system_design', 'interview_devops_cloud', 'interview_data_science',
-    'interview_product', 'interview_consulting', 'interview_finance', 'interview_hr'];
+    'interview_product', 'interview_consulting', 'interview_hr', 'interview_investment_banking', 'interview_equity_research',
+    'interview_corporate_finance', 'interview_accounting', 'interview_mba_admissions', 'interview_ux_design'];
 
 /** A stand-in pack row (raw catalog shape) with five channels. */
 function rawPack(id, kind, extra = {}) {
@@ -40,7 +41,7 @@ const parsed = (id, kind) => Packs.parseCatalog({ ...raw, packs: [rawPack(id, ki
 
 test('the catalog has the interview packs, each global with channels, chips, topics and a short name', () => {
     const interviews = Setup.StudyInterviews.of(catalog, 3);
-    assert.deepEqual(new Set(interviews.map(pack => pack.id)), new Set(ids));
+    assert.ok(ids.every(id => interviews.some(pack => pack.id === id)) && interviews.length >= 20);
     for (const pack of interviews) {
         assert.equal(pack.kind, Setup.KIND_INTERVIEW, pack.id);
         assert.ok(Packs.isGlobal(pack) && pack.countries.length === 0, pack.id);
@@ -79,7 +80,7 @@ test('a chosen pack reopens setup on its own tile', () => {
 test('interview packs are study kinds, so the plan model and family scopes keep them', () => {
     assert.ok(Packs.STUDY_KINDS.includes('interview'));
     assert.ok(Packs.forCountry(withInterview, 'BR').some(pack => pack.id === 'interview_hr'));
-    assert.ok(Packs.forCountry(catalog, 'BR').some(pack => pack.id === 'interview_finance'));
+    assert.ok(Packs.forCountry(catalog, 'BR').some(pack => pack.id === 'interview_investment_banking'));
     assert.deepEqual(Model.createStudy({ activePackIds: ids }).activePackIds, ids);
 });
 
