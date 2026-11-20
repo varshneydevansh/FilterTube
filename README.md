@@ -56,7 +56,7 @@ Free, no ads, nothing locked, no FilterTube sign-up.
 
 | Platform | Availability | Install or learn more |
 | --- | --- | --- |
-| **iPhone and iPad** | New in 3.6.2. Install with SideStore (recommended) or AltStore while the App Store version waits on trouble on Apple's side. The IPA is attached to every GitHub release. | [iPhone and iPad guide](https://filtertube.in/ios) |
+| **iPhone and iPad** | Available since 3.6.2; 3.6.3 is the current version. Install with SideStore (recommended) or AltStore while the App Store version waits on trouble on Apple's side. The IPA is attached to every GitHub release. | [iPhone and iPad guide](https://filtertube.in/ios) |
 | **Android phone and tablet** | The full Main and Kids app on Google Play. No invitation or email needed. | [Google Play](https://play.google.com/store/apps/details?id=com.filtertube.app) · [Android overview](https://filtertube.in/android) |
 | **Android TV / Google TV** | On the same Google Play listing as the phone app. A TV APK is attached to every GitHub release. | [Android TV](https://filtertube.in/android-tv) · [Latest release](https://github.com/varshneydevansh/FilterTube/releases/latest) |
 | **Direct Android build** | GitHub-only phone/tablet and TV APKs with offline video saving (encrypted copies that expire after 30 days) and in-app update checks. Installs beside the Play app. The Google Play builds do not download videos. | [Latest release](https://github.com/varshneydevansh/FilterTube/releases/latest) |
@@ -121,7 +121,7 @@ Auto-sync is a choice, not a consequence of trusting a device. [Step-by-step par
 
 ## Features in the extension
 
-This is a current capability guide, not a claim that every store package or platform has identical support. See the [changelog](CHANGELOG.md) and the [3.6.2 release record](docs/RELEASE_3_6_2_2026-11-18.md).
+This is a current capability guide, not a claim that every store package or platform has identical support. See the [changelog](CHANGELOG.md) for 3.6.3 and the [3.6.2 release record](docs/RELEASE_3_6_2_2026-11-18.md).
 
 | What you control | Capabilities |
 | --- | --- |
