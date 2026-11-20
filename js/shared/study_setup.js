@@ -221,14 +221,38 @@
         return code.length === 2 ? code : null;
     }
 
-    function groupByField(packs) {
+    /**
+     * Countries where one field leads the list (Android 3e7ce41e6): India opens on civil services,
+     * UPSC first, then the state PSCs taught in the person's language.
+     */
+    const LEADING_FIELD = Object.freeze({ IN: 'civil' });
+
+    function groupByField(packs, lead = null, language = null) {
         const groups = new Map();
         for (const pack of packs) {
             const field = StudyExamFields.of(pack);
             if (!groups.has(field)) groups.set(field, []);
             groups.get(field).push(pack);
         }
-        return FIELDS.filter(field => groups.has(field)).map(field => ({ field, packs: groups.get(field) }));
+        const order = lead && groups.has(lead) ? [lead, ...FIELDS.filter(field => field !== lead)] : FIELDS;
+        return order.filter(field => groups.has(field))
+            .map(field => ({ field, packs: field === lead ? leadOrder(groups.get(field), language) : groups.get(field) }));
+    }
+
+    /**
+     * The leading field's order: the national exam first (id words "upsc" and "cse"), then exams taught
+     * first in language (a Tamil phone sees TNPSC, a Hindi one the Hindi-belt PSCs), then the rest in
+     * catalog order.
+     */
+    function leadOrder(packs, language) {
+        const lang = text(language).toLowerCase().split(/[-_]/)[0] || null;
+        const rank = pack => {
+            const words = StudyExamFields.words(pack.id);
+            if (words.includes('upsc') && words.includes('cse')) return 0;
+            if (lang && text(array(pack.languages)[0]).toLowerCase() === lang && pack.id !== 'in_state_psc') return 1;
+            return 2;
+        };
+        return array(packs).map((pack, index) => [rank(pack), index, pack]).sort((a, b) => a[0] - b[0] || a[1] - b[1]).map(item => item[2]);
     }
 
     /** Search: the name in any language, the short name, keywords and subjects. */
@@ -247,8 +271,9 @@
          * exams people there take (folded, quiet); `elsewhere` only while searching, every other exam that
          * matches. With no country, `own` holds the global exams.
          */
-        of(catalog, country, query = '', minChannels = 0) {
+        of(catalog, country, query = '', minChannels = 0, language = null) {
             const code = countryCode(country);
+            const lead = code ? LEADING_FIELD[code] || null : null;
             const exams = array(catalog?.packs).filter(pack => EXAM_KINDS.includes(pack.kind)
                 && array(pack.channels).length >= minChannels && StudyExamFields.of(pack) !== 'skills');
             const own = code === null ? exams.filter(isGlobal) : exams.filter(pack => array(pack.countries).includes(code));
@@ -256,8 +281,8 @@
             const also = code === null ? [] : exams.filter(pack => !ownIds.has(pack.id) && (array(pack.nearby).includes(code) || isGlobal(pack)));
             const words = text(query).toLowerCase();
             const model = (ownList, alsoList, elsewhere) => {
-                const alsoGroups = groupByField(alsoList);
-                const ownGroups = groupByField(ownList);
+                const alsoGroups = groupByField(alsoList, lead, language);
+                const ownGroups = groupByField(ownList, lead, language);
                 return {
                     own: ownGroups, also: alsoGroups, elsewhere,
                     alsoPacks: alsoGroups.flatMap(group => group.packs),
@@ -270,6 +295,7 @@
             return model(own.filter(pack => matches(pack, words)), also.filter(pack => matches(pack, words)), elsewhere);
         },
         matches,
+        leadOrder,
         /**
          * The short label on an exam chip: the pack's short name, else its name without a leading
          * "Country: " and without the bracketed detail ("CAT (MBA entrance)" -> "CAT").

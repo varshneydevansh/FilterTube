@@ -53,11 +53,25 @@ test('a pack no id rule knows falls back to its name', () => {
 
 // ---- Exam list ----------------------------------------------------------------------------------
 
-test('India\'s exams are grouped by field in order, with neighbours and global exams folded', () => {
+test('India\'s civil services put UPSC first, then the state PSCs in the phone\'s language', () => {
+    const civil = language => ids(StudyExamList.of(catalog, 'IN', '', 3, language).own[0].packs);
+    assert.equal(civil('ta')[0], 'in_upsc_cse');
+    assert.equal(civil('ta')[1], 'in_tnpsc');
+    assert.equal(civil('ml')[1], 'in_kerala_psc');
+    assert.equal(civil(null)[0], 'in_upsc_cse');
+    // Other countries keep the field order.
+    const fields = StudyExamList.of(catalog, 'US', '', 3, 'en').own.map(section => section.field);
+    assert.deepEqual(fields, [...fields].sort((a, b) => StudyExamFields.FIELDS.indexOf(a) - StudyExamFields.FIELDS.indexOf(b)));
+});
+
+test('India\'s exams open on civil services, then fields in order, with neighbours and global exams folded', () => {
     const model = StudyExamList.of(catalog, 'IN', '', 3);
     const fields = model.own.map(section => section.field);
-    assert.deepEqual(fields, [...fields].sort((a, b) => StudyExamFields.FIELDS.indexOf(a) - StudyExamFields.FIELDS.indexOf(b)));
-    assert.equal(fields[0], 'engineering');
+    // India opens on civil services, UPSC first; the other fields follow in order.
+    assert.equal(fields[0], 'civil');
+    const rest = fields.slice(1);
+    assert.deepEqual(rest, [...rest].sort((a, b) => StudyExamFields.FIELDS.indexOf(a) - StudyExamFields.FIELDS.indexOf(b)));
+    assert.equal(model.own[0].packs[0].id, 'in_upsc_cse');
     assert.ok(model.own.find(section => section.field === 'engineering').packs.some(item => item.id === 'in_gate'));
     const own = new Set(model.own.flatMap(section => ids(section.packs)));
     const also = new Set(ids(model.alsoPacks));

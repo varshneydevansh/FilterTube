@@ -926,7 +926,7 @@
             if (kriti) question.appendChild(kriti);
             body.appendChild(question);
 
-            const own = Setup.StudyExamList.of(catalog, s.country, '', Setup.MIN_CHANNELS).own.flatMap(section => section.packs);
+            const own = Setup.StudyExamList.of(catalog, s.country, '', Setup.MIN_CHANNELS, language()).own.flatMap(section => section.packs);
             const examLine = !s.country || !own.length ? t('study.setup.kindExamAnywhere', 'Exams people take anywhere, like IELTS and GRE')
                 : t('study.setup.kindExamples', '{names} and more', { names: [...new Set([...own].sort((a, b) => (a.shortName ? 0 : 1) - (b.shortName ? 0 : 1))
                     .map(chipLabel).filter(label => label.length <= 12))].slice(0, 5).join(', ') });
@@ -967,7 +967,7 @@
 
         // ---- Step 2a: exams
         function renderExams(body) {
-            const model = Setup.StudyExamList.of(catalog, s.country, '', Setup.MIN_CHANNELS);
+            const model = Setup.StudyExamList.of(catalog, s.country, '', Setup.MIN_CHANNELS, language());
             const example = model.own.flatMap(section => section.packs).find(pack => pack.shortName);
             const search = el('input', 'text-input ft-setup-search');
             search.type = 'search';
@@ -982,7 +982,7 @@
         }
 
         function drawExamList(host) {
-            const model = Setup.StudyExamList.of(catalog, s.country, s.query, Setup.MIN_CHANNELS);
+            const model = Setup.StudyExamList.of(catalog, s.country, s.query, Setup.MIN_CHANNELS, language());
             host.replaceChildren();
             if (model.isEmpty) { host.appendChild(el('p', 'ft-study-muted ft-setup-center', t('study.setup.empty', 'Nothing matches. Try another country or word.'))); return; }
             const section = (name, list, { withCountry = false, quiet = false } = {}) => {
