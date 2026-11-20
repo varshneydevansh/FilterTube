@@ -3467,5 +3467,6 @@
   "dashboard.sync.outbox.expired": "Caducada",
   "dashboard.sync.label.delivery": "Entrega",
   "dashboard.sync.toast.noWayToReachDevice": "Aún no hay forma de llegar a este dispositivo. Permite la sincronización por internet o configura Internet Pickup.",
-  "dashboard.sync.toast.parentUpdateApplied": "Llegó una actualización parental"
+  "dashboard.sync.toast.parentUpdateApplied": "Llegó una actualización parental",
+  "dashboard.sync.outbox.appliedExceptPacks": "Aplicada en {device}, salvo los paquetes de estudio que ese dispositivo aún no tiene: {packs}. Actualiza FilterTube allí."
 }

@@ -3467,5 +3467,6 @@
   "dashboard.sync.outbox.expired": "Ya ƙare",
   "dashboard.sync.label.delivery": "Isarwa",
   "dashboard.sync.toast.noWayToReachDevice": "Babu hanyar isa wannan na'ura tukuna. Ka ba da izinin daidaitawa ta intanet, ko ka saita Internet Pickup.",
-  "dashboard.sync.toast.parentUpdateApplied": "Iyaye sun aiko da sabuntawa"
+  "dashboard.sync.toast.parentUpdateApplied": "Iyaye sun aiko da sabuntawa",
+  "dashboard.sync.outbox.appliedExceptPacks": "An aiwatar a {device}, sai dai fakitin karatu da na'urar ba ta da su tukuna: {packs}. Sabunta FilterTube a can."
 }

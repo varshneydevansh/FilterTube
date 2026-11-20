@@ -3467,5 +3467,6 @@
   "dashboard.sync.outbox.expired": "مدت مک گئی",
   "dashboard.sync.label.delivery": "پہنچ",
   "dashboard.sync.toast.noWayToReachDevice": "حالے ایس ڈیوائس تیکر اپڑن دا کوئی رستہ نئیں۔ انٹرنیٹ سنک دی اجازت دیو، یا Internet Pickup سیٹ کرو۔",
-  "dashboard.sync.toast.parentUpdateApplied": "ماپیاں نے اپڈیٹ گھلی"
+  "dashboard.sync.toast.parentUpdateApplied": "ماپیاں نے اپڈیٹ گھلی",
+  "dashboard.sync.outbox.appliedExceptPacks": "{device} تے لاگو ہو گیا، اوہناں پڑھائی پیکاں توں سوا جیہڑے اوس ڈیوائس تے حالے نئیں: {packs}۔ اوتھے FilterTube اپڈیٹ کرو۔"
 }

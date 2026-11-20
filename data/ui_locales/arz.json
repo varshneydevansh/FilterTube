@@ -3491,5 +3491,6 @@
   "dashboard.sync.outbox.expired": "انتهت صلاحيته",
   "dashboard.sync.label.delivery": "التوصيل",
   "dashboard.sync.toast.noWayToReachDevice": "مفيش طريقة توصل للجهاز ده لسه. اسمح بالمزامنة عبر الإنترنت، أو جهّز Internet Pickup.",
-  "dashboard.sync.toast.parentUpdateApplied": "ولي الأمر بعت تحديث"
+  "dashboard.sync.toast.parentUpdateApplied": "ولي الأمر بعت تحديث",
+  "dashboard.sync.outbox.appliedExceptPacks": "اتطبّق على {device}، ما عدا باقات المذاكرة اللي لسه مش موجودة على الجهاز ده: {packs}. حدّث FilterTube هناك."
 }

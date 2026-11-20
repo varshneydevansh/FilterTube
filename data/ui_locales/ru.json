@@ -3479,5 +3479,6 @@
   "dashboard.sync.outbox.expired": "Истекло",
   "dashboard.sync.label.delivery": "Доставка",
   "dashboard.sync.toast.noWayToReachDevice": "Пока нет способа связаться с этим устройством. Разрешите синхронизацию через интернет или настройте Internet Pickup.",
-  "dashboard.sync.toast.parentUpdateApplied": "Родитель отправил обновление"
+  "dashboard.sync.toast.parentUpdateApplied": "Родитель отправил обновление",
+  "dashboard.sync.outbox.appliedExceptPacks": "Применено на {device}, кроме учебных наборов, которых там ещё нет: {packs}. Обновите FilterTube на этом устройстве."
 }

@@ -319,7 +319,30 @@
             }
             // applyManagedMailboxItem runs validateManagedMailboxItem first and records the decision
             // in the profile's managed history, accepted or not.
-            return finishDecision(await nanah.applyManagedMailboxItem(item, context), item.mailboxItemId);
+            const result = finishDecision(await nanah.applyManagedMailboxItem(item, context), item.mailboxItemId);
+            if (result.accepted === true && str(envelope.scope).toLowerCase() === 'study') {
+                const unresolved = await unresolvedStudyPacks(str(envelope.targetProfileId));
+                if (unresolved.length) result.unresolvedPackIds = unresolved;
+            }
+            return result;
+        }
+
+        /**
+         * SEAMLESS_SYNC_SPEC.md §9.3: the active packs this device can't resolve (no catalog entry
+         * and no pack copy with channels). They stay in the plan; the parent is told in the ack.
+         */
+        async function unresolvedStudyPacks(profileId) {
+            const packs = deps.studyPacks || root.FilterTubeStudyPacks;
+            if (typeof packs?.load !== 'function') return [];
+            let catalog;
+            try { catalog = await packs.load(); } catch (_) { return []; }
+            const profilesV4 = obj(obj(await get([PROFILES_KEY]))[PROFILES_KEY]);
+            const study = obj(obj(obj(profilesV4.profiles)[profileId]).study);
+            const known = new Set(arr(obj(catalog).packs).map(pack => str(obj(pack).id)));
+            const copies = obj(study.packCopies);
+            return arr(study.activePackIds).map(str)
+                .filter(id => id && !known.has(id) && !arr(obj(copies[id]).channels).length)
+                .slice(0, 64);
         }
 
         async function openItem(sealed, trust, linkId) {

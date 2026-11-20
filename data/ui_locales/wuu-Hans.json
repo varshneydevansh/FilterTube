@@ -3465,5 +3465,6 @@
   "dashboard.sync.outbox.expired": "过期了",
   "dashboard.sync.label.delivery": "送达",
   "dashboard.sync.toast.noWayToReachDevice": "暂时还呒没办法连到搿只设备。请允许通过互联网同步，或者设置 Internet Pickup。",
-  "dashboard.sync.toast.parentUpdateApplied": "家长发来一只更新"
+  "dashboard.sync.toast.parentUpdateApplied": "家长发来一只更新",
+  "dashboard.sync.outbox.appliedExceptPacks": "已经辣 {device} 上用上了，只是搿只设备还呒没搿眼学习包：{packs}。请辣搿面更新 FilterTube。"
 }

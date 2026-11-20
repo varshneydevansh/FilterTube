@@ -3467,5 +3467,6 @@
   "dashboard.sync.outbox.expired": "காலாவதியானது",
   "dashboard.sync.label.delivery": "வழங்கல்",
   "dashboard.sync.toast.noWayToReachDevice": "இந்தச் சாதனத்தை அடைய இன்னும் வழி இல்லை. இணைய ஒத்திசைவை அனுமதிக்கவும், அல்லது Internet Pickup ஐ அமைக்கவும்.",
-  "dashboard.sync.toast.parentUpdateApplied": "பெற்றோர் புதுப்பிப்பை அனுப்பினார்"
+  "dashboard.sync.toast.parentUpdateApplied": "பெற்றோர் புதுப்பிப்பை அனுப்பினார்",
+  "dashboard.sync.outbox.appliedExceptPacks": "{device} இல் பயன்படுத்தப்பட்டது, அந்தச் சாதனத்தில் இன்னும் இல்லாத படிப்புத் தொகுப்புகளைத் தவிர: {packs}. அங்கே FilterTube ஐப் புதுப்பிக்கவும்."
 }

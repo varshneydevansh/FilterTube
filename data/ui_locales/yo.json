@@ -3465,5 +3465,6 @@
   "dashboard.sync.outbox.expired": "Ó ti parí",
   "dashboard.sync.label.delivery": "Ìfijíṣẹ́",
   "dashboard.sync.toast.noWayToReachDevice": "Kò sí ọ̀nà láti dé ẹ̀rọ yìí síbẹ̀. Fààyè gba ìmúṣiṣẹ́pọ̀ orí íntánẹ́ẹ̀tì, tàbí ṣètò Internet Pickup.",
-  "dashboard.sync.toast.parentUpdateApplied": "Òbí fi àtúnṣe ránṣẹ́"
+  "dashboard.sync.toast.parentUpdateApplied": "Òbí fi àtúnṣe ránṣẹ́",
+  "dashboard.sync.outbox.appliedExceptPacks": "Ó ti ṣiṣẹ́ lórí {device}, àyàfi àwọn àpò ẹ̀kọ́ tí ẹ̀rọ yẹn kò tíì ní: {packs}. Ṣe àtúnṣe FilterTube níbẹ̀."
 }

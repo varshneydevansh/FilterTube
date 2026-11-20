@@ -42,6 +42,17 @@
     const STUDY_PACK_ID = /^[A-Za-z0-9_.-]{1,64}$/;
     const STUDY_TIME = /^([01]\d|2[0-3]):[0-5]\d$/;
 
+    // SEAMLESS_SYNC_SPEC.md §9: keys the study scope models; any other key travels in `extra`, except
+    // the ones reserved for another scope (timetable rides on schedule).
+    const STUDY_KNOWN_KEYS = ['version', 'activePackIds', 'packEdits', 'focus', 'plan', 'lock', 'savedListMode',
+        'breakMode', 'progress', 'weekView', 'packCopies', 'packChannelsOnly'];
+    const STUDY_RESERVED_EXTRA_KEYS = { timetable: 'schedule' };
+    const STUDY_FORBIDDEN_KEYS = ['__proto__', 'prototype', 'constructor'];
+
+    function studyPlainObject(value) {
+        return !!value && typeof value === 'object' && !Array.isArray(value);
+    }
+
     function studyPlanValid(plan) {
         const root = safeObject(plan);
         return STUDY_TIME.test(normalizeString(root.start)) && STUDY_TIME.test(normalizeString(root.end));
@@ -55,11 +66,25 @@
             if (has('packEdits') && (!root.packEdits || typeof root.packEdits !== 'object' || Array.isArray(root.packEdits))) return 'invalid_study_payload';
             if (has('focus') && (!root.focus || typeof root.focus !== 'object' || Array.isArray(root.focus))) return 'invalid_study_payload';
             if (has('weekView') && root.weekView !== null && typeof root.weekView !== 'boolean') return 'invalid_study_payload';
+            if (has('packCopies')) {
+                const copies = root.packCopies;
+                if (!studyPlainObject(copies)) return 'invalid_study_payload';
+                const ids = Object.keys(copies);
+                if (ids.length > 64 || ids.some(id => !STUDY_PACK_ID.test(id) || !studyPlainObject(copies[id]))) return 'invalid_study_payload';
+            }
+            if (has('packChannelsOnly') && root.packChannelsOnly !== null && typeof root.packChannelsOnly !== 'boolean') return 'invalid_study_payload';
+            if (has('extra')) {
+                if (!studyPlainObject(root.extra)) return 'invalid_study_payload';
+                const keys = Object.keys(root.extra);
+                if (keys.length > 32 || keys.some(key => STUDY_KNOWN_KEYS.includes(key) || STUDY_RESERVED_EXTRA_KEYS[key]
+                    || STUDY_FORBIDDEN_KEYS.includes(key))) return 'invalid_study_payload';
+            }
             return '';
         }
         if (scope === 'schedule') {
             if (!has('plan') || (root.plan !== null && !studyPlanValid(root.plan))) return 'invalid_schedule_payload';
             if (has('breakMode') && !['rest', 'normal'].includes(root.breakMode)) return 'invalid_schedule_payload';
+            if (has('timetable') && root.timetable !== null && !studyPlainObject(root.timetable)) return 'invalid_schedule_payload';
             return '';
         }
         if (!has('lock') || (root.lock !== null && !normalizeString(safeObject(root.lock).sessionId))) return 'invalid_focus_lock_payload';
@@ -87,13 +112,33 @@
         const owner = value => normalizeString(safeObject(value).setByParentId);
         let next;
         if (scope === 'study') {
+            const has = key => Object.prototype.hasOwnProperty.call(root, key);
+            const activePackIds = Array.from(new Set(root.activePackIds.map(normalizeString)));
             next = {
                 ...base,
-                activePackIds: Array.from(new Set(root.activePackIds.map(normalizeString))),
-                packEdits: Object.prototype.hasOwnProperty.call(root, 'packEdits') ? safeObject(root.packEdits) : base.packEdits,
-                focus: Object.prototype.hasOwnProperty.call(root, 'focus') ? safeObject(root.focus) : base.focus,
+                // Unknown study keys pass through as sent; the child's own other keys stay.
+                ...(has('extra') ? safeObject(root.extra) : {}),
+                activePackIds,
+                packEdits: has('packEdits') ? safeObject(root.packEdits) : base.packEdits,
+                focus: has('focus') ? safeObject(root.focus) : base.focus,
                 weekView: typeof root.weekView === 'boolean' ? root.weekView : base.weekView
             };
+            if (has('packCopies')) {
+                // The parent's copies for its packs; a copy the child already had stays only for an active
+                // pack the parent sent none for (Android StudyMerge replace).
+                const sent = safeObject(root.packCopies);
+                const kept = {};
+                for (const [id, copy] of Object.entries(safeObject(base.packCopies))) {
+                    if (activePackIds.includes(id) && !Object.prototype.hasOwnProperty.call(sent, id)) kept[id] = copy;
+                }
+                const copies = { ...sent, ...kept };
+                if (Object.keys(copies).length) next.packCopies = copies; else delete next.packCopies;
+            }
+            if (has('packChannelsOnly')) {
+                // An explicit off (false) reaches the child; null returns to the default.
+                if (typeof root.packChannelsOnly === 'boolean') next.packChannelsOnly = root.packChannelsOnly;
+                else delete next.packChannelsOnly;
+            }
         } else if (scope === 'schedule') {
             if (owner(base.plan) && owner(base.plan) !== parentId) throw new Error('Another parent set this study plan');
             next = {
@@ -101,6 +146,10 @@
                 plan: root.plan === null ? null : { ...safeObject(root.plan), setByParentId: parentId },
                 breakMode: root.breakMode === 'normal' || root.breakMode === 'rest' ? root.breakMode : base.breakMode
             };
+            // study.timetable is reserved for this scope (the planned Study timetable).
+            if (Object.prototype.hasOwnProperty.call(root, 'timetable')) {
+                if (root.timetable === null) delete next.timetable; else next.timetable = root.timetable;
+            }
         } else {
             if (owner(base.lock) && owner(base.lock) !== parentId) throw new Error('Another parent set this study lock');
             const lock = safeObject(root.lock);

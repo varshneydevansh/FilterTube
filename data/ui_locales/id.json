@@ -3465,5 +3465,6 @@
   "dashboard.sync.outbox.expired": "Kedaluwarsa",
   "dashboard.sync.label.delivery": "Pengiriman",
   "dashboard.sync.toast.noWayToReachDevice": "Belum ada cara untuk menjangkau perangkat ini. Izinkan sinkronisasi internet, atau siapkan Internet Pickup.",
-  "dashboard.sync.toast.parentUpdateApplied": "Orang tua mengirim pembaruan"
+  "dashboard.sync.toast.parentUpdateApplied": "Orang tua mengirim pembaruan",
+  "dashboard.sync.outbox.appliedExceptPacks": "Diterapkan di {device}, kecuali paket belajar yang belum ada di perangkat itu: {packs}. Perbarui FilterTube di sana."
 }

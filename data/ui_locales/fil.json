@@ -3467,5 +3467,6 @@
   "dashboard.sync.outbox.expired": "Nag-expire",
   "dashboard.sync.label.delivery": "Paghahatid",
   "dashboard.sync.toast.noWayToReachDevice": "Wala pang paraan para maabot ang device na ito. Payagan ang pag-sync sa internet, o i-set up ang Internet Pickup.",
-  "dashboard.sync.toast.parentUpdateApplied": "Nagpadala ng update ang magulang"
+  "dashboard.sync.toast.parentUpdateApplied": "Nagpadala ng update ang magulang",
+  "dashboard.sync.outbox.appliedExceptPacks": "Nailapat sa {device}, maliban sa mga study pack na wala pa sa device na iyon: {packs}. I-update ang FilterTube doon."
 }

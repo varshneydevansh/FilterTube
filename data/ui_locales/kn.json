@@ -3467,5 +3467,6 @@
   "dashboard.sync.outbox.expired": "ಅವಧಿ ಮುಗಿದಿದೆ",
   "dashboard.sync.label.delivery": "ವಿತರಣೆ",
   "dashboard.sync.toast.noWayToReachDevice": "ಈ ಸಾಧನವನ್ನು ತಲುಪಲು ಇನ್ನೂ ದಾರಿಯಿಲ್ಲ. ಇಂಟರ್ನೆಟ್ ಸಿಂಕ್ ಅನುಮತಿಸಿ, ಅಥವಾ Internet Pickup ಹೊಂದಿಸಿ.",
-  "dashboard.sync.toast.parentUpdateApplied": "ಪೋಷಕರು ಅಪ್‌ಡೇಟ್ ಕಳುಹಿಸಿದ್ದಾರೆ"
+  "dashboard.sync.toast.parentUpdateApplied": "ಪೋಷಕರು ಅಪ್‌ಡೇಟ್ ಕಳುಹಿಸಿದ್ದಾರೆ",
+  "dashboard.sync.outbox.appliedExceptPacks": "{device} ನಲ್ಲಿ ಅನ್ವಯಿಸಲಾಗಿದೆ, ಆ ಸಾಧನದಲ್ಲಿ ಇನ್ನೂ ಇಲ್ಲದ ಅಧ್ಯಯನ ಪ್ಯಾಕ್‌ಗಳನ್ನು ಹೊರತುಪಡಿಸಿ: {packs}. ಅಲ್ಲಿ FilterTube ಅಪ್‌ಡೇಟ್ ಮಾಡಿ."
 }

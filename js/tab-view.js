@@ -24088,6 +24088,27 @@ document.addEventListener('DOMContentLoaded', async () => {
         nanahManagedOutboxState = { version: 1, entries: safeArray(raw.entries) };
     }
 
+    // §9.3: pack names come from this device's catalog, with the id as the fallback.
+    let nanahOutboxStudyCatalog = null;
+    try {
+        window.FilterTubeStudyPacks?.load?.().then(catalog => {
+            nanahOutboxStudyCatalog = catalog;
+            renderNanahTrustedLinks();
+        }).catch(() => {});
+    } catch (_) {
+    }
+
+    function formatNanahOutboxUnresolvedPacks(latest, device) {
+        const Packs = window.FilterTubeStudyPacks;
+        const names = safeArray(latest.unresolvedPackIds).map(id => {
+            const pack = nanahOutboxStudyCatalog && Packs?.packById ? Packs.packById(nanahOutboxStudyCatalog, id) : null;
+            return pack && Packs?.packName ? Packs.packName(pack, tabViewIntlLocale()) : id;
+        });
+        return tabViewUiText('dashboard.sync.outbox.appliedExceptPacks',
+            "Applied on {device}, except study packs that device doesn't have yet: {packs}. Update FilterTube there.",
+            { device, packs: names.join(', ') });
+    }
+
     /** §8 status line for a parent→child link: the newest outbox entry for it, or nothing. */
     function formatNanahManagedOutboxStatus(entry) {
         const linkId = normalizeString(entry?.linkId);
@@ -24101,8 +24122,10 @@ document.addEventListener('DOMContentLoaded', async () => {
             case 'queued':
                 return tabViewUiText('dashboard.sync.outbox.waiting', 'Waiting for {device} to open FilterTube', { device });
             case 'delivered':
+                if (safeArray(latest.unresolvedPackIds).length) return formatNanahOutboxUnresolvedPacks(latest, device);
                 return tabViewUiText('dashboard.sync.outbox.delivered', 'Delivered');
             case 'applied':
+                if (safeArray(latest.unresolvedPackIds).length) return formatNanahOutboxUnresolvedPacks(latest, device);
                 return tabViewUiText('dashboard.sync.outbox.applied', 'Applied');
             case 'rejected':
                 return tabViewUiText('dashboard.sync.outbox.notApplied', 'Not applied ({reason})', {

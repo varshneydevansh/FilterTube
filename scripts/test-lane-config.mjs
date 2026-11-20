@@ -188,6 +188,7 @@ const AUTO_SYNC_TESTS = Object.freeze([
   'tests/runtime/managed-doorbell-outbox.test.mjs',
   'tests/runtime/managed-sync-background-flow.test.mjs',
   'tests/runtime/managed-update-banner.test.mjs',
+  'tests/runtime/managed-study-scope-fields.test.mjs',
 ]);
 const STUDY_TESTS = Object.freeze([
   'tests/runtime/nanah-keyword-merge-identity.test.mjs',

@@ -103,7 +103,9 @@
             const state = stateFromAck(ack);
             if (!state) return entry;
             changed += 1;
-            return { ...entry, state, stateAt: nowMs, reason: state === 'rejected' || state === 'expired' ? (str(ack.reason).slice(0, 80) || state) : null };
+            const unresolved = arr(ack.unresolvedPackIds).map(str).filter(id => /^[A-Za-z0-9_.-]{1,64}$/.test(id)).slice(0, 64);
+            return { ...entry, state, stateAt: nowMs, reason: state === 'rejected' || state === 'expired' ? (str(ack.reason).slice(0, 80) || state) : null,
+                ...(unresolved.length && (state === 'applied' || state === 'delivered') ? { unresolvedPackIds: unresolved } : {}) };
         });
         return { outbox: { version: 1, entries }, changed };
     }

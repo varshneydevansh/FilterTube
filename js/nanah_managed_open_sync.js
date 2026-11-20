@@ -58,8 +58,8 @@
             return accepted;
         }
 
-        // includeInactiveFixedTargets (SEAMLESS_SYNC_SPEC.md §6): a link pinned to one child profile
-        // is checked even while another profile is active, so its update lands in the background.
+        // includeInactiveFixedTargets (seamless sync spec §6): a link bound to one fixed child profile
+        // is checked even when another profile is active; every apply check is unchanged.
         function explainIneligibleLink(link, { activeProfileId = '', profilesV4 = {}, includeInactiveFixedTargets = false } = {}) {
             const root = safeObject(link);
             const policy = getPolicy(root);
@@ -94,7 +94,8 @@
             return '';
         }
 
-        function collectManagedOpenSyncLinks({ links = [], activeProfileId = '', profilesV4 = {}, targetDeviceId = '', includeInactiveFixedTargets = false } = {}) {
+        function collectManagedOpenSyncLinks({ links = [], activeProfileId = '', profilesV4 = {}, targetDeviceId = '',
+            includeInactiveFixedTargets = false } = {}) {
             const profiles = safeObject(safeObject(profilesV4).profiles);
             return safeArray(links)
                 .map((link) => {
@@ -207,7 +208,9 @@
                 accepted: result.accepted === true,
                 applied: result.applied === true,
                 decision: normalizeString(result.decision),
-                reason: normalizeString(result.reason) || errorReason || null
+                reason: normalizeString(result.reason) || errorReason || null,
+                // Study packs the child couldn't resolve (seamless sync spec §9); empty otherwise.
+                ...(safeArray(result.unresolvedPackIds).length ? { unresolvedPackIds: safeArray(result.unresolvedPackIds).slice(0, 64) } : {})
             };
         }
 
@@ -296,10 +299,12 @@
             recordAckHistory = null,
             writeState = null,
             includeInactiveFixedTargets = false,
+            // One run with another provider (the extension's courier, SEAMLESS_SYNC_SPEC.md §3.1).
             provider: explicitProvider = null
         } = {}) {
             const startedAt = now();
-            const candidates = collectManagedOpenSyncLinks({ links, activeProfileId, profilesV4, targetDeviceId, includeInactiveFixedTargets });
+            const candidates = collectManagedOpenSyncLinks({ links, activeProfileId, profilesV4, targetDeviceId,
+                includeInactiveFixedTargets });
             const state = {
                 schema: STATE_SCHEMA,
                 version: 1,
@@ -317,6 +322,7 @@
                 ackFailedCount: 0,
                 ackHistoryRecordedCount: 0,
                 ackHistoryFailedCount: 0,
+                // Profiles an item really changed (applied: true), for the viewer banner.
                 appliedProfileIds: [],
                 linkResults: []
             };
@@ -373,12 +379,9 @@
                         if (applyResult?.accepted === true || applyResult?.applied === true || applyResult === true) {
                             linkRow.appliedItemCount += 1;
                             state.appliedItemCount += 1;
-                            // §7: the profiles an item actually changed, for the viewer's banner.
-                            if (applyResult === true || applyResult?.applied === true) {
-                                const changedProfileId = normalizeString(applyResult?.profileId) || candidate.targetProfileId;
-                                if (changedProfileId && !state.appliedProfileIds.includes(changedProfileId)) {
-                                    state.appliedProfileIds.push(changedProfileId);
-                                }
+                            if ((applyResult === true || applyResult?.applied === true)
+                                && candidate.targetProfileId && !state.appliedProfileIds.includes(candidate.targetProfileId)) {
+                                state.appliedProfileIds.push(candidate.targetProfileId);
                             }
                             ackRecords.push(buildAckRecord(candidate, item, applyResult === true ? { accepted: true, applied: true } : applyResult));
                         } else {

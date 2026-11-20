@@ -68,15 +68,29 @@
             });
         }
 
+        // SEAMLESS_SYNC_SPEC.md §9 (Android StudyFamilyScopes.payload): the study scope also carries pack
+        // copies, an explicit "Pack channels only" and unknown study keys; timetable rides on schedule.
+        const STUDY_KNOWN_KEYS = ['version', 'activePackIds', 'packEdits', 'focus', 'plan', 'lock', 'savedListMode',
+            'breakMode', 'progress', 'weekView', 'packCopies', 'packChannelsOnly'];
+        const STUDY_RESERVED_EXTRA_KEYS = { timetable: 'schedule' };
+
         function buildStudyPayload(scope, profile) {
             const study = safeObject(safeObject(profile).study);
             if (scope === 'study') {
+                const extra = {};
+                for (const [key, value] of Object.entries(study)) {
+                    if (!STUDY_KNOWN_KEYS.includes(key) && !Object.prototype.hasOwnProperty.call(STUDY_RESERVED_EXTRA_KEYS, key)) extra[key] = value;
+                }
                 return { scope, replace: true, activePackIds: safeArray(study.activePackIds), packEdits: safeObject(study.packEdits),
-                    focus: safeObject(study.focus), weekView: typeof study.weekView === 'boolean' ? study.weekView : null };
+                    focus: safeObject(study.focus), weekView: typeof study.weekView === 'boolean' ? study.weekView : null,
+                    packCopies: safeObject(study.packCopies),
+                    packChannelsOnly: typeof study.packChannelsOnly === 'boolean' ? study.packChannelsOnly : null,
+                    extra };
             }
             if (scope === 'focus_lock') return { scope, lock: study.lock && typeof study.lock === 'object' ? study.lock : null };
             return { scope, plan: study.plan && typeof study.plan === 'object' ? study.plan : null,
-                breakMode: study.breakMode === 'normal' ? 'normal' : 'rest' };
+                breakMode: study.breakMode === 'normal' ? 'normal' : 'rest',
+                timetable: Object.prototype.hasOwnProperty.call(study, 'timetable') && study.timetable !== undefined ? study.timetable : null };
         }
 
         function safeArray(value) {

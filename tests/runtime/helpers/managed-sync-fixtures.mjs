@@ -28,7 +28,7 @@ export function workerContext(initial = {}) {
         atob: v => Buffer.from(v, 'base64').toString('binary'), btoa: v => Buffer.from(v, 'binary').toString('base64') };
     box.globalThis = box;
     vm.createContext(box);
-    for (const file of ['js/security_manager.js', 'js/shared/backup_integrity.js', 'js/io_manager.js', 'js/nanah_sync_adapter.js', 'js/nanah_managed_open_sync.js']) {
+    for (const file of ['js/security_manager.js', 'js/shared/backup_integrity.js', 'js/shared/study_model.js', 'js/io_manager.js', 'js/nanah_sync_adapter.js', 'js/nanah_managed_open_sync.js']) {
         vm.runInContext(read(file), box, { filename: file });
     }
     const get = keys => new Promise(resolve => chrome.storage.local.get(keys, resolve));
@@ -36,7 +36,7 @@ export function workerContext(initial = {}) {
     return { box, store, get, set, adapter: box.FilterTubeNanahAdapter };
 }
 
-export async function familyFixture({ linkOverrides = {}, policyOverrides = {}, activeProfileId = 'Parent' } = {}) {
+export async function familyFixture({ linkOverrides = {}, policyOverrides = {}, activeProfileId = 'Parent', childStudy = null, studyPacks = null } = {}) {
     const ctx = workerContext();
     const keys = await ctx.adapter.createManagedNanahSigningKeyPair({ sourcePublicKeyId: 'parent-key-1', keyVersion: 1 });
     const wrapping = Buffer.from(webcrypto.getRandomValues(new Uint8Array(32))).toString('base64url');
@@ -71,15 +71,16 @@ export async function familyFixture({ linkOverrides = {}, policyOverrides = {}, 
             activeProfileId,
             profiles: {
                 Parent: { type: 'account', name: 'Parent', main: { keywords: [] }, settings: {}, security: {} },
-                Child: { type: 'child', name: 'Child', parentProfileId: 'Parent', main: { keywords: [] }, settings: {}, security: {} }
+                Child: { type: 'child', name: 'Child', parentProfileId: 'Parent', main: { keywords: [] }, settings: {}, security: {},
+                    ...(childStudy ? { study: childStudy } : {}) }
             }
         }
     });
-    async function sealedItem({ revision = 1, word = 'scary clown', mutate = null, expiresAtMs = null } = {}) {
+    async function sealedItem({ revision = 1, word = 'scary clown', mutate = null, expiresAtMs = null, scope = 'keywords', payload = null } = {}) {
         const envelope = {
             type: 'filtertube_managed_policy',
             linkId: link.linkId,
-            scope: 'keywords',
+            scope,
             sourceDeviceId: 'parent-device',
             targetDeviceId: 'child-device',
             sourceProfileId: 'Parent',
@@ -88,7 +89,7 @@ export async function familyFixture({ linkOverrides = {}, policyOverrides = {}, 
             sourcePublicKeyId: 'parent-key-1',
             keyVersion: 1,
             issuedAt: Date.now(),
-            payload: { operations: [{ op: 'add_keyword', value: word }] }
+            payload: payload || { operations: [{ op: 'add_keyword', value: word }] }
         };
         envelope.policyHash = ctx.adapter.buildManagedPolicyPayloadHash(envelope);
         const signed = await ctx.adapter.signManagedPolicyEnvelope(envelope, keys.privateKeyJwk);
@@ -97,7 +98,8 @@ export async function familyFixture({ linkOverrides = {}, policyOverrides = {}, 
             trustedLink: link, ...(expiresAtMs ? { createdAtMs: expiresAtMs - 1000, expiresAtMs } : {})
         });
     }
-    const receiver = Receiver.create({ get: ctx.get, set: ctx.set, adapter: ctx.adapter, openSync: ctx.box.FilterTubeNanahManagedOpenSync });
+    const receiver = Receiver.create({ get: ctx.get, set: ctx.set, adapter: ctx.adapter, openSync: ctx.box.FilterTubeNanahManagedOpenSync,
+        ...(studyPacks ? { studyPacks } : {}) });
     return { ...ctx, link, keys, sealedItem, receiver };
 }
 

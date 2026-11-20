@@ -3467,5 +3467,6 @@
   "dashboard.sync.outbox.expired": "मुदत संपली",
   "dashboard.sync.label.delivery": "वितरण",
   "dashboard.sync.toast.noWayToReachDevice": "या डिव्हाइसपर्यंत पोहोचण्याचा अजून कोणताही मार्ग नाही. इंटरनेट सिंकला परवानगी द्या, किंवा Internet Pickup सेट अप करा.",
-  "dashboard.sync.toast.parentUpdateApplied": "पालकांनी अपडेट पाठवले"
+  "dashboard.sync.toast.parentUpdateApplied": "पालकांनी अपडेट पाठवले",
+  "dashboard.sync.outbox.appliedExceptPacks": "{device} वर लागू झाले, त्या डिव्हाइसवर अजून नसलेले स्टडी पॅक वगळता: {packs}. तिथे FilterTube अपडेट करा."
 }

@@ -70,10 +70,25 @@ test('a child that advertises filtertube.study.v1 gets the study scopes after th
   const envelopes = plain(await s.helper.buildEnvelopeBatchForLiveSend({ scope: 'active' }));
   assert.deepEqual(envelopes.map(e => e.scope), [...LEGACY, 'study', 'focus_lock', 'schedule']);
   const byScope = Object.fromEntries(envelopes.map(e => [e.scope, e.payload]));
+  // SEAMLESS_SYNC_SPEC.md §9.1 (updated on purpose): copies, "Pack channels only" and unknown keys ride
+  // in the study scope; the schedule carries the timetable (null when there is none).
   assert.deepEqual(byScope.study, { scope: 'study', replace: true, activePackIds: ['in_upsc_cse'], packEdits: {},
-    focus: { roundMinutes: 40, breakMinutes: 10, dailyGoalMinutes: 120 }, weekView: false }, 'progress never goes from parent to child');
+    focus: { roundMinutes: 40, breakMinutes: 10, dailyGoalMinutes: 120 }, weekView: false,
+    packCopies: {}, packChannelsOnly: null, extra: {} }, 'progress never goes from parent to child');
   assert.deepEqual(byScope.focus_lock.lock.sessionId, 'exam-week');
-  assert.deepEqual(byScope.schedule, { scope: 'schedule', plan: parentStudy().plan, breakMode: 'normal' });
+  assert.deepEqual(byScope.schedule, { scope: 'schedule', plan: parentStudy().plan, breakMode: 'normal', timetable: null });
+});
+
+test('§9: pack copies, an explicit Pack channels only, unknown keys and the timetable reach the payloads', async () => {
+  const copy = { channels: [{ channelId: 'UC' + 'c'.repeat(22), name: 'Copy' }], topics: ['valuation'], blockedWords: [] };
+  const study = { ...parentStudy(), packCopies: { interview_finance: copy }, packChannelsOnly: false,
+    futureStudyKey: { nested: [1] }, timetable: { lanes: ['maths'] } };
+  const envelopes = plain(await sender({ live: ['sync.receive', 'filtertube.study.v1'], study }).helper.buildEnvelopeBatchForLiveSend({ scope: 'active' }));
+  const byScope = Object.fromEntries(envelopes.map(e => [e.scope, e.payload]));
+  assert.deepEqual(byScope.study.packCopies, { interview_finance: copy });
+  assert.equal(byScope.study.packChannelsOnly, false, 'an explicit off is sent');
+  assert.deepEqual(byScope.study.extra, { futureStudyKey: { nested: [1] } }, 'timetable is reserved for schedule');
+  assert.deepEqual(byScope.schedule.timetable, { lanes: ['maths'] });
 });
 
 test('a lock or plan is sent only when a parent set it', async () => {

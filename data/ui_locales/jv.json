@@ -3465,5 +3465,6 @@
   "dashboard.sync.outbox.expired": "Kadaluwarsa",
   "dashboard.sync.label.delivery": "Pangiriman",
   "dashboard.sync.toast.noWayToReachDevice": "Durung ana cara kanggo nggayuh piranti iki. Idinake sinkronisasi internet, utawa atur Internet Pickup.",
-  "dashboard.sync.toast.parentUpdateApplied": "Wong tuwa ngirim pembaruan"
+  "dashboard.sync.toast.parentUpdateApplied": "Wong tuwa ngirim pembaruan",
+  "dashboard.sync.outbox.appliedExceptPacks": "Wis ditrapake ing {device}, kajaba paket sinau sing durung ana ing piranti kuwi: {packs}. Anyarana FilterTube ing kana."
 }

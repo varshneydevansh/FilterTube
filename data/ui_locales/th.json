@@ -3465,5 +3465,6 @@
   "dashboard.sync.outbox.expired": "หมดอายุ",
   "dashboard.sync.label.delivery": "การส่ง",
   "dashboard.sync.toast.noWayToReachDevice": "ยังไม่มีวิธีเข้าถึงอุปกรณ์นี้ อนุญาตการซิงค์ผ่านอินเทอร์เน็ต หรือตั้งค่า Internet Pickup",
-  "dashboard.sync.toast.parentUpdateApplied": "ผู้ปกครองส่งอัปเดตมาแล้ว"
+  "dashboard.sync.toast.parentUpdateApplied": "ผู้ปกครองส่งอัปเดตมาแล้ว",
+  "dashboard.sync.outbox.appliedExceptPacks": "ใช้กับ {device} แล้ว ยกเว้นแพ็กการเรียนที่อุปกรณ์นั้นยังไม่มี: {packs} โปรดอัปเดต FilterTube ที่อุปกรณ์นั้น"
 }

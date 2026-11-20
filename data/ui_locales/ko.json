@@ -3465,5 +3465,6 @@
   "dashboard.sync.outbox.expired": "만료됨",
   "dashboard.sync.label.delivery": "전달",
   "dashboard.sync.toast.noWayToReachDevice": "아직 이 기기에 연결할 방법이 없어요. 인터넷 동기화를 허용하거나 Internet Pickup을 설정하세요.",
-  "dashboard.sync.toast.parentUpdateApplied": "보호자가 업데이트를 보냈어요"
+  "dashboard.sync.toast.parentUpdateApplied": "보호자가 업데이트를 보냈어요",
+  "dashboard.sync.outbox.appliedExceptPacks": "{device}에 적용됐어요. 단, 그 기기에 아직 없는 학습 팩은 제외: {packs}. 그 기기에서 FilterTube를 업데이트하세요."
 }
