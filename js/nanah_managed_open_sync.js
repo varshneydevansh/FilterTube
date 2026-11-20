@@ -58,7 +58,9 @@
             return accepted;
         }
 
-        function explainIneligibleLink(link, { activeProfileId = '', profilesV4 = {} } = {}) {
+        // includeInactiveFixedTargets (SEAMLESS_SYNC_SPEC.md §6): a link pinned to one child profile
+        // is checked even while another profile is active, so its update lands in the background.
+        function explainIneligibleLink(link, { activeProfileId = '', profilesV4 = {}, includeInactiveFixedTargets = false } = {}) {
             const root = safeObject(link);
             const policy = getPolicy(root);
             if (normalizeString(root.linkType) !== 'managed_link') return 'not_managed_link';
@@ -78,7 +80,9 @@
             if (!safeObject(profiles[targetProfileId]) || Object.keys(safeObject(profiles[targetProfileId])).length === 0) {
                 return 'target_profile_missing';
             }
-            if (normalizeString(activeProfileId) && targetProfileId !== normalizeString(activeProfileId)) {
+            const fixedTarget = normalizeString(policy.targetProfileBehavior).toLowerCase() === 'fixed_profile';
+            if (normalizeString(activeProfileId) && targetProfileId !== normalizeString(activeProfileId)
+                && !(includeInactiveFixedTargets === true && fixedTarget)) {
                 return 'different_target_profile';
             }
             const sourceDeviceId = normalizeString(root.sourceDeviceId || policy.sourceDeviceId) || normalizeString(root.remoteDeviceId);
@@ -90,12 +94,12 @@
             return '';
         }
 
-        function collectManagedOpenSyncLinks({ links = [], activeProfileId = '', profilesV4 = {}, targetDeviceId = '' } = {}) {
+        function collectManagedOpenSyncLinks({ links = [], activeProfileId = '', profilesV4 = {}, targetDeviceId = '', includeInactiveFixedTargets = false } = {}) {
             const profiles = safeObject(safeObject(profilesV4).profiles);
             return safeArray(links)
                 .map((link) => {
                     const root = safeObject(link);
-                    const reason = explainIneligibleLink(link, { activeProfileId, profilesV4 });
+                    const reason = explainIneligibleLink(link, { activeProfileId, profilesV4, includeInactiveFixedTargets });
                     if (reason) return null;
                     const policy = getPolicy(root);
                     const targetProfileId = resolveTargetProfileId(root, activeProfileId);
@@ -290,10 +294,12 @@
             reason = 'dashboard_open',
             applyMailboxItem = null,
             recordAckHistory = null,
-            writeState = null
+            writeState = null,
+            includeInactiveFixedTargets = false,
+            provider: explicitProvider = null
         } = {}) {
             const startedAt = now();
-            const candidates = collectManagedOpenSyncLinks({ links, activeProfileId, profilesV4, targetDeviceId });
+            const candidates = collectManagedOpenSyncLinks({ links, activeProfileId, profilesV4, targetDeviceId, includeInactiveFixedTargets });
             const state = {
                 schema: STATE_SCHEMA,
                 version: 1,
@@ -311,10 +317,11 @@
                 ackFailedCount: 0,
                 ackHistoryRecordedCount: 0,
                 ackHistoryFailedCount: 0,
+                appliedProfileIds: [],
                 linkResults: []
             };
 
-            const provider = getProvider();
+            const provider = explicitProvider || getProvider();
             state.providerAvailable = !!(provider && typeof provider.pullDecryptedMailboxItems === 'function');
             if (!state.providerAvailable || candidates.length === 0 || typeof applyMailboxItem !== 'function') {
                 if (!state.providerAvailable && candidates.length > 0) {
@@ -366,6 +373,13 @@
                         if (applyResult?.accepted === true || applyResult?.applied === true || applyResult === true) {
                             linkRow.appliedItemCount += 1;
                             state.appliedItemCount += 1;
+                            // §7: the profiles an item actually changed, for the viewer's banner.
+                            if (applyResult === true || applyResult?.applied === true) {
+                                const changedProfileId = normalizeString(applyResult?.profileId) || candidate.targetProfileId;
+                                if (changedProfileId && !state.appliedProfileIds.includes(changedProfileId)) {
+                                    state.appliedProfileIds.push(changedProfileId);
+                                }
+                            }
                             ackRecords.push(buildAckRecord(candidate, item, applyResult === true ? { accepted: true, applied: true } : applyResult));
                         } else {
                             linkRow.rejectedItemCount += 1;

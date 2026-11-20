@@ -1354,6 +1354,21 @@ function handleAutoSyncAuthorization(request, sender, respond) {
 try { globalThis.FilterTubeAutoSyncWakeup?.install({ api: browserAPI, promiseApi: IS_FIREFOX }); }
 catch (_) { /* Wakeup failure cannot interfere with filtering. */ }
 
+// Seamless parent->child sync (docs/sync/SEAMLESS_SYNC_SPEC.md): doorbell, outbox and pickup run
+// here, not in the dashboard. Firefox loads these files from the manifest's background scripts.
+try {
+    if (typeof importScripts === 'function' && !globalThis.FilterTubeManagedSyncBackground) {
+        importScripts('io_manager.js', 'nanah_sync_adapter.js', 'nanah_managed_open_sync.js', 'nanah_managed_mailbox_client.js',
+            'managed_update_receiver.js', 'managed_doorbell.js', 'managed_courier.js', 'managed_sync_background.js');
+    }
+    globalThis.FilterTubeManagedSyncBackground?.install({
+        api: browserAPI,
+        promiseApi: IS_FIREFOX,
+        isTrustedUiSender,
+        getSelfControlSession: () => getActiveSelfControlSession()
+    });
+} catch (_) { /* Sync failure cannot interfere with filtering. */ }
+
 const SHORTS_PARTIAL_STREAM_LIMIT = 51200;
 const WATCH_PARTIAL_STREAM_LIMIT = 2000000;
 const SHORTS_FETCH_TIMEOUT_MS = 8000;

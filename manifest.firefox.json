@@ -5,7 +5,7 @@
   "default_locale": "en",
   "version": "3.6.3",
   "background": {
-    "scripts": ["js/shared/identity.js", "js/content/admission_overlay.js", "js/imported_channel_enrichment.js", "js/shared/saved_video_notes.js", "js/shared/local_playlists.js", "js/shared/study_model.js", "js/shared/study_packs.js", "js/shared/study_engine.js", "js/shared/study_clock_guard.js", "js/study_background.js", "js/shared/kids_youtube_profiles.js", "js/video_notes_store.js", "js/video_notes_background.js", "js/local_playlists_store.js", "js/kids_youtube_profiles_background.js", "js/personal_sync.js", "js/device_auto_sync.js", "js/auto_sync_wakeup.js", "js/shared/ask_parent.js", "js/ask_parent_background.js", "js/shared/backup_integrity.js", "js/background.js"]
+    "scripts": ["js/shared/identity.js", "js/content/admission_overlay.js", "js/imported_channel_enrichment.js", "js/shared/saved_video_notes.js", "js/shared/local_playlists.js", "js/shared/study_model.js", "js/shared/study_packs.js", "js/shared/study_engine.js", "js/shared/study_clock_guard.js", "js/study_background.js", "js/shared/kids_youtube_profiles.js", "js/video_notes_store.js", "js/video_notes_background.js", "js/local_playlists_store.js", "js/kids_youtube_profiles_background.js", "js/personal_sync.js", "js/device_auto_sync.js", "js/auto_sync_wakeup.js", "js/shared/ask_parent.js", "js/ask_parent_background.js", "js/shared/backup_integrity.js", "js/io_manager.js", "js/nanah_sync_adapter.js", "js/nanah_managed_open_sync.js", "js/nanah_managed_mailbox_client.js", "js/managed_update_receiver.js", "js/managed_doorbell.js", "js/vendor/nanah.bundle.js", "js/managed_courier.js", "js/managed_sync_background.js", "js/background.js"]
   },
   "browser_specific_settings": {
     "gecko": {
@@ -45,7 +45,7 @@
         "js/content/bridge_settings.js",
         "js/content/handle_resolver.js",
         "js/content/collab_dialog.js",
-        "js/content/release_notes_prompt.js",
+        "js/content/release_notes_prompt.js", "js/content/managed_update_banner.js",
         "js/content/first_run_prompt.js",
         "js/shared/content_playback_source.js",
         "js/shared/content_playback_resolver.js",
@@ -79,7 +79,7 @@
         "js/content/bridge_settings.js",
         "js/content/handle_resolver.js",
         "js/content/collab_dialog.js",
-        "js/content/release_notes_prompt.js",
+        "js/content/release_notes_prompt.js", "js/content/managed_update_banner.js",
         "js/content/first_run_prompt.js",
         "js/content_bridge.js"
       ],
@@ -114,7 +114,7 @@
   "web_accessible_resources": [
     {
       "resources": [
-        "html/video-notes.html",
+        "html/video-notes.html", "html/managed_courier.html",
         "js/injector.js",
         "js/content/content_playback_response.js",
         "js/filter_logic.js",

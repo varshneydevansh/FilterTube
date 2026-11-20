@@ -183,6 +183,10 @@ const AUTO_SYNC_TESTS = Object.freeze([
   'tests/runtime/kids-youtube-profiles.test.mjs',
   'tests/runtime/auto-sync-background-authority.test.mjs',
   'tests/runtime/auto-sync-dashboard-integration.test.mjs',
+  'tests/runtime/managed-update-receiver.test.mjs',
+  'tests/runtime/managed-doorbell-outbox.test.mjs',
+  'tests/runtime/managed-sync-background-flow.test.mjs',
+  'tests/runtime/managed-update-banner.test.mjs',
 ]);
 const STUDY_TESTS = Object.freeze([
   'tests/runtime/nanah-keyword-merge-identity.test.mjs',
