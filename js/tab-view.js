@@ -30615,6 +30615,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             const importOptions = {
                 strategy: 'merge',
                 scope: 'auto',
+                restoreStudyLock: true,
                 auth: {
                     ...(auth || {}),
                     restoreTrustedNanahState

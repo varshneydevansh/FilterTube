@@ -2994,7 +2994,11 @@
         return coordinator.run(() => importV3Unlocked(json, options), options.nanahStorageLockToken ?? null);
     }
 
-    async function importV3Unlocked(json, { strategy = 'merge', scope = 'auto', auth = null, targetProfileId = null, beforeProfileWrite = null, adoptKidsPersonaLinks = false, carryStudyLock = false, verifyIntegrity = true } = {}) {
+    async function importV3Unlocked(json, { strategy = 'merge', scope = 'auto', auth = null, targetProfileId = null, beforeProfileWrite = null, adoptKidsPersonaLinks = false, carryStudyLock = false, restoreStudyLock = false, verifyIntegrity = true } = {}) {
+        // A backup restore brings the backup's Study lock back on Replace or into a profile this
+        // device doesn't have yet (Android/iOS parity); a Merge into an existing profile keeps this
+        // device's lock. Nanah copies never pass restoreStudyLock (only Move account carries a lock).
+        const backupStudyLock = restoreStudyLock === true;
         const convertedJson = convertAppProfileBackup(json);
         if (convertedJson !== json && !convertedBackupOriginals.has(convertedJson)) convertedBackupOriginals.set(convertedJson, json);
         json = convertedJson;
@@ -3336,7 +3340,7 @@
                             // Replacing rules never ends a lock running here or drops this device's progress.
                             replacedProfiles[profileId] = {
                                 ...withoutStudyField(incProfile),
-                                ...mergedStudyFields(localProfiles[profileId], incProfile, 'replace', carryStudyLock === true)
+                                ...mergedStudyFields(localProfiles[profileId], incProfile, 'replace', carryStudyLock === true || backupStudyLock)
                             };
                         }
                         nextV4 = { ...sanitizedIncoming, profiles: replacedProfiles };
@@ -3351,7 +3355,7 @@
                             if (!existingProfile || Object.keys(existingProfile).length === 0) {
                                 mergedProfiles[profileId] = {
                                     ...withoutStudyField(incProfile),
-                                    ...mergedStudyFields(null, incProfile, 'merge', carryStudyLock === true),
+                                    ...mergedStudyFields(null, incProfile, 'merge', carryStudyLock === true || backupStudyLock),
                                     main: normalizeMainProfileAliasFields(safeObject(incProfile.main))
                                 };
                                 continue;
@@ -3474,7 +3478,7 @@
             // Only a v4 profile snapshot carries a study object; a legacy file leaves this profile's alone.
             const targetStudyFields = incomingProfileForImport
                 ? mergedStudyFields(targetProfile, incomingProfileForImport, strategy === 'replace' ? 'replace' : 'merge',
-                    carryStudyLock === true && effectiveScope === 'full')
+                    (carryStudyLock === true && effectiveScope === 'full') || (backupStudyLock && strategy === 'replace'))
                 : (safeObject(targetProfile).study ? { study: targetProfile.study } : {});
             profiles[targetProfileId] = {
                 ...withoutStudyField(targetProfile),
@@ -3712,7 +3716,7 @@
         };
     }
 
-    async function importV3Encrypted(container, { password = '', strategy = 'merge', scope = 'auto', auth = null, nanahStorageLockToken = null } = {}) {
+    async function importV3Encrypted(container, { password = '', strategy = 'merge', scope = 'auto', auth = null, nanahStorageLockToken = null, restoreStudyLock = true } = {}) {
         const Security = global.FilterTubeSecurity || null;
         if (!Security || typeof Security.decryptJson !== 'function') {
             throw new Error('Security manager unavailable');
@@ -3723,7 +3727,7 @@
             throw new Error('Invalid encrypted backup');
         }
         const decrypted = await Security.decryptJson(root.encrypted, password);
-        return importV3(decrypted, { strategy, scope, auth, nanahStorageLockToken });
+        return importV3(decrypted, { strategy, scope, auth, nanahStorageLockToken, restoreStudyLock });
     }
 
     // ============================================================================
