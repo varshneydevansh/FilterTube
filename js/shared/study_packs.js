@@ -32,7 +32,16 @@
         const handle = text(row.handle) || null;
         const name = text(row.name);
         if ((!channelId && !handle) || !name) return null;
-        return { channelId, handle, name, language: text(row.language) || null };
+        // country: the channel's audience, an ISO country ("IN"), "global", or null when the curators didn't say.
+        return { channelId, handle, name, language: text(row.language) || null, country: text(row.country) || null };
+    }
+
+    /** {"en": "Tamil Nadu", "ta": "..."}: a label per language, keys lowercased, blanks dropped. */
+    function parseLabels(value) {
+        const out = {};
+        if (!value || typeof value !== 'object' || Array.isArray(value)) return out;
+        for (const [lang, label] of Object.entries(value)) if (text(lang) && text(label)) out[text(lang).toLowerCase()] = text(label);
+        return out;
     }
 
     function parseGradeKeywords(value) {
@@ -98,6 +107,11 @@
                 shortName: text(json.shortName) || null,
                 // Interview packs: the career group setup lists them under ("software", "management", "law", ...).
                 group: text(json.group) || null,
+                // Exam packs: "regional" for a state or province exam (area names it), else national;
+                // category is the picker's (school, entrance, civil, professional, language).
+                level: text(json.level) || null,
+                area: parseLabels(json.area),
+                category: text(json.category) || null,
                 chips: strings(json.chips),
                 variants: parseVariants(json.variants),
                 // True when the variants are levels of one syllabus (JEE Main and Advanced), not branches.

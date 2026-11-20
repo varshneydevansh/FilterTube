@@ -340,8 +340,12 @@
 /* Start bar (Android 34afba385): what's chosen on top, then "Review channels" and Start side by side. */
 .ft-setup__bar.is-start { flex-direction: column; align-items: stretch; gap: 8px; }
 .ft-setup__bar.is-start .ft-setup__bar-label { overflow: hidden; white-space: nowrap; text-overflow: ellipsis; font-size: 0.95rem; }
-.ft-setup__bar-row { display: flex; gap: 10px; }
-.ft-setup__bar-row .ft-setup__bar-action { flex: 1; min-width: 0; }
+.ft-setup__bar-row { display: flex; align-items: center; gap: 10px; }
+/* One obvious action (Android 420df66be): Start; "Review channels" is a quiet chip beside it. */
+.ft-setup__bar-row .ft-setup-chip { flex: 1 1 auto; min-width: 0; justify-content: center; }
+.ft-setup__bar-row .ft-setup__bar-action { flex: 0 0 auto; min-width: 140px; }
+.ft-setup-filters { display: flex; flex-direction: column; gap: 4px; margin-top: 6px; }
+.ft-setup-filters:empty { display: none; }
 
 @media (prefers-reduced-motion: reduce) {
     .ft-setup__body.is-forward, .ft-setup__body.is-back { animation: none; }

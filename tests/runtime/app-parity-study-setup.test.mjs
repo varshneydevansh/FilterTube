@@ -64,6 +64,30 @@ test('India\'s civil services put UPSC first, then the state PSCs in the phone\'
     assert.deepEqual(fields, [...fields].sort((a, b) => StudyExamFields.FIELDS.indexOf(a) - StudyExamFields.FIELDS.indexOf(b)));
 });
 
+test('the picker narrows by level, state and category', () => {
+    const { StudyExamFilter, StudyExamCategory } = Setup;
+    assert.ok(['Tamil Nadu', 'Kerala', 'Karnataka'].every(area => StudyExamList.areas(catalog, 'IN', 3).includes(area)));
+    assert.equal(StudyExamList.defaultArea(catalog, 'IN', 'ta', 3), 'Tamil Nadu');
+    assert.equal(StudyExamList.defaultArea(catalog, 'IN', 'ml-IN', 3), 'Kerala');
+    const filtered = filter => ids(StudyExamList.of(catalog, 'IN', '', 3, null, filter).own.flatMap(section => section.packs));
+    const national = filtered(StudyExamFilter.of({ level: 'national' }));
+    assert.ok(national.includes('in_upsc_cse') && !national.includes('in_tnpsc'));
+    assert.deepEqual(filtered(StudyExamFilter.of({ level: 'regional', area: 'Tamil Nadu' })), ['in_tnpsc']);
+    const entrance = filtered(StudyExamFilter.of({ category: 'entrance' }));
+    assert.ok(entrance.includes('in_jee') && !entrance.includes('in_upsc_cse'));
+    assert.ok(StudyExamList.categories(catalog, 'IN', 3).includes('civil'));
+    // Bar exams and medical boards are professional, though their fields read as law and medical.
+    assert.equal(StudyExamCategory.of(pack('us_bar')), 'professional');
+    assert.equal(StudyExamCategory.of(pack('us_usmle')), 'professional');
+    // Every bundled exam carries its level and category.
+    for (const item of catalog.packs.filter(entry => StudyExamList.EXAM_KINDS.includes(entry.kind))) {
+        assert.ok(['national', 'regional'].includes(item.level) && StudyExamCategory.parse(item.category), item.id);
+        if (Setup.isRegional(item)) assert.ok(Setup.areaName(item, 'en'), item.id);
+    }
+    // A country without state exams offers no level chips.
+    assert.deepEqual(StudyExamList.areas(catalog, 'FR', 3), []);
+});
+
 test('India\'s exams open on civil services, then fields in order, with neighbours and global exams folded', () => {
     const model = StudyExamList.of(catalog, 'IN', '', 3);
     const fields = model.own.map(section => section.field);

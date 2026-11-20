@@ -126,7 +126,8 @@
 
     /** The tile a chosen pack lives under (Android StudySetupMode.of), so changing a plan reopens on its list. */
     function modeOf(pack) {
-        if (pack?.kind === 'kids_age' || pack?.kind === 'kids_classic') return MODES.SKILL;
+        // Kids learning by age lives under School (Android 420df66be: parents look there).
+        if (pack?.kind === 'kids_age' || pack?.kind === 'kids_classic') return MODES.SCHOOL;
         if (pack?.kind === KIND_INTERVIEW) return MODES.INTERVIEW;
         if (isGlobal(pack) && (pack?.kind === KIND_CLASS || StudyExamFields.of(pack) === 'skills')) return MODES.SKILL;
         if (pack?.kind === KIND_CLASS) return MODES.SCHOOL;
@@ -221,6 +222,52 @@
         return code.length === 2 ? code : null;
     }
 
+    // ---- Exam picker filters (Android StudyExamCategory, StudyExamLevel, StudyExamFilter) ----------
+
+    /** The picker's categories, in the chips' order: country -> level -> category -> exam. */
+    const CATEGORIES = Object.freeze(['school', 'entrance', 'civil', 'professional', 'language']);
+    const LEVELS = Object.freeze({ ALL: 'all', NATIONAL: 'national', REGIONAL: 'regional' });
+
+    function isRegional(pack) { return pack?.level === 'regional'; }
+
+    /** The state or province, in language when the catalog has it. */
+    function areaName(pack, language) {
+        const area = object(pack?.area);
+        const lang = text(language).toLowerCase().split(/[-_]/)[0];
+        return (lang && area[lang]) || area.en || Object.values(area)[0] || null;
+    }
+
+    const StudyExamCategory = Object.freeze({
+        CATEGORIES,
+        parse(key) { return CATEGORIES.includes(key) ? key : null; },
+        /** The pack's own category, else one from its field (bar exams and medical boards carry their own). */
+        of(pack) {
+            const own = StudyExamCategory.parse(pack?.category);
+            if (own) return own;
+            const field = StudyExamFields.of(pack);
+            if (field === 'school') return 'school';
+            if (field === 'engineering' || field === 'medical' || field === 'law') return 'entrance';
+            if (field === 'civil' || field === 'jobs' || field === 'defence') return 'civil';
+            if (field === 'languages') return 'language';
+            return 'professional';
+        }
+    });
+
+    const StudyExamFilter = Object.freeze({
+        LEVELS,
+        /** What the exam list is narrowed to: {level, area (its English name), category}; the default keeps everything. */
+        of({ level = LEVELS.ALL, area = null, category = null } = {}) { return { level, area, category }; },
+        isDefault(filter) { const f = object(filter); return (f.level || LEVELS.ALL) === LEVELS.ALL && !f.area && !f.category; },
+        keeps(filter, pack) {
+            const f = object(filter);
+            const level = f.level || LEVELS.ALL;
+            if (level === LEVELS.NATIONAL && isRegional(pack)) return false;
+            if (level === LEVELS.REGIONAL && !isRegional(pack)) return false;
+            if (level === LEVELS.REGIONAL && f.area && areaName(pack, 'en') !== f.area) return false;
+            return !f.category || StudyExamCategory.of(pack) === f.category;
+        }
+    });
+
     /**
      * Countries where one field leads the list (Android 3e7ce41e6): India opens on civil services,
      * UPSC first, then the state PSCs taught in the person's language.
@@ -271,11 +318,11 @@
          * exams people there take (folded, quiet); `elsewhere` only while searching, every other exam that
          * matches. With no country, `own` holds the global exams.
          */
-        of(catalog, country, query = '', minChannels = 0, language = null) {
+        of(catalog, country, query = '', minChannels = 0, language = null, filter = null) {
             const code = countryCode(country);
             const lead = code ? LEADING_FIELD[code] || null : null;
             const exams = array(catalog?.packs).filter(pack => EXAM_KINDS.includes(pack.kind)
-                && array(pack.channels).length >= minChannels && StudyExamFields.of(pack) !== 'skills');
+                && array(pack.channels).length >= minChannels && StudyExamFields.of(pack) !== 'skills' && StudyExamFilter.keeps(filter, pack));
             const own = code === null ? exams.filter(isGlobal) : exams.filter(pack => array(pack.countries).includes(code));
             const ownIds = new Set(own.map(pack => pack.id));
             const also = code === null ? [] : exams.filter(pack => !ownIds.has(pack.id) && (array(pack.nearby).includes(code) || isGlobal(pack)));
@@ -293,6 +340,28 @@
             const seen = new Set([...ownIds, ...also.map(pack => pack.id)]);
             const elsewhere = exams.filter(pack => !seen.has(pack.id) && matches(pack, words));
             return model(own.filter(pack => matches(pack, words)), also.filter(pack => matches(pack, words)), elsewhere);
+        },
+        /** The country's exams before any filter: what the level, area and category chips offer. */
+        exams(catalog, country, minChannels = 0) {
+            const code = countryCode(country);
+            return array(catalog?.packs).filter(pack => EXAM_KINDS.includes(pack.kind) && array(pack.channels).length >= minChannels
+                && StudyExamFields.of(pack) !== 'skills' && (code === null ? isGlobal(pack) : array(pack.countries).includes(code)));
+        },
+        /** The states and provinces with exams in country (English names), in catalog order. */
+        areas(catalog, country, minChannels = 0) {
+            return [...new Set(StudyExamList.exams(catalog, country, minChannels).filter(isRegional).map(pack => areaName(pack, 'en')).filter(Boolean))];
+        },
+        /** The categories country's exams fall in, in the chips' order. */
+        categories(catalog, country, minChannels = 0) {
+            const present = new Set(StudyExamList.exams(catalog, country, minChannels).map(StudyExamCategory.of));
+            return CATEGORIES.filter(category => present.has(category));
+        },
+        /** The state or province to open on: the first whose exams teach in language first (Tamil -> Tamil Nadu), else the first. */
+        defaultArea(catalog, country, language, minChannels = 0) {
+            const lang = text(language).toLowerCase().split(/[-_]/)[0] || null;
+            const regional = StudyExamList.exams(catalog, country, minChannels).filter(pack => isRegional(pack) && areaName(pack, 'en'));
+            const pick = regional.find(pack => lang && text(array(pack.languages)[0]).toLowerCase() === lang) || regional[0];
+            return pick ? areaName(pick, 'en') : null;
         },
         matches,
         leadOrder,
@@ -692,6 +761,7 @@
         MIN_CHANNELS, ROWS_FOLDED, TOPICS_FOLDED, MAX_TOPICS, MODES, STEPS, KIND_INTERVIEW, modeOf,
         StudySetupPath, StudyExamFields, StudyExamList, StudySchool, StudySkills, StudyInterviews, StudyReviewGroups, StudyChannelInput,
         channelsFor, topicsFor, normalizeKey, refKey, topicKey, isGlobal, packName, variant, variantName,
-        savedEdits, planLabel, reopenAt, countries
+        savedEdits, planLabel, reopenAt, countries,
+        StudyExamCategory, StudyExamFilter, isRegional, areaName
     });
 }));

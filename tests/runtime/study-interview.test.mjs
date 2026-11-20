@@ -73,7 +73,7 @@ test('a chosen pack reopens setup on its own tile', () => {
     assert.equal(Setup.modeOf(Packs.packById(catalog, 'in_gate')), Setup.MODES.EXAM);
     assert.equal(Setup.modeOf(Packs.packById(catalog, 'cls_in_cbse_9_10')), Setup.MODES.SCHOOL);
     assert.equal(Setup.modeOf(Packs.packById(catalog, 'global_cls_khan_academy')), Setup.MODES.SKILL);
-    assert.equal(Setup.modeOf(parsed('kids_age_5_7', 'kids_age')), Setup.MODES.SKILL);
+    assert.equal(Setup.modeOf(parsed('kids_age_5_7', 'kids_age')), Setup.MODES.SCHOOL);
     assert.deepEqual(Setup.reopenAt(['interview_hr'], withInterview, 'IN'), { step: 'list', mode: 'interview', country: 'IN' });
 });
 
@@ -147,4 +147,19 @@ test('the catalog carries each interview pack\'s group', () => {
     const one = Packs.parseCatalog({ schema: 'filtertube_study_packs', version: 1,
         packs: [{ id: 'interview_x', kind: 'interview', name: { en: 'X' }, group: 'law', channels: [{ handle: '@x', name: 'X' }] }] });
     assert.equal(Packs.packById(one, 'interview_x')?.group, 'law');
+});
+
+test('each pack lists the device country\'s channels first, then global ones, then other countries\'', () => {
+    const channel = (n, country) => ({ channelId: `UC${'y'.repeat(21)}${n}`, name: `Channel ${n}`, language: 'en', country });
+    const pack = Packs.parseCatalog({ ...raw, packs: [rawPack('deg_x', 'study', {
+        channels: [channel(1, 'US'), channel(2, 'global'), channel(3, 'IN'), channel(4, undefined), channel(5, 'IN')]
+    })] }).packs[0];
+    assert.equal(pack.channels[0].country, 'US');
+    assert.equal(Engine.localRank(pack.channels[2], 'in'), 0);
+    assert.equal(Engine.localRank(pack.channels[3], 'IN'), 1, 'untagged counts as global');
+    assert.equal(Engine.localRank(pack.channels[0], 'IN'), 2);
+    const order = layerCountry => Engine.packLayer(pack, {}, layerCountry).channels.map(row => row.name.slice(-1));
+    assert.deepEqual(order('IN'), ['3', '5', '2', '4', '1']);
+    assert.deepEqual(order('US'), ['1', '2', '4', '3', '5']);
+    assert.deepEqual(order(null), ['2', '4', '1', '3', '5']);
 });

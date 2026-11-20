@@ -725,7 +725,7 @@
         const deviceCountry = Packs.countryFromLocale(root.navigator?.language || '') || Packs.countryFromLocale(language()) || null;
         const start = Setup.reopenAt(array(study.activePackIds), catalog, deviceCountry);
         const s = {
-            step: start.step, mode: start.mode, country: start.country, query: '', alsoOpen: false, board: null,
+            step: start.step, mode: start.mode, country: start.country, query: '', filtersOpen: false, examFilter: null, board: null,
             selected: array(study.activePackIds).filter(id => Packs.packById(catalog, id)),
             edits: clone(object(study.packEdits)) || {},
             opened: {}, showAll: new Set(), keptOwn: {}, grade: {}, lockMode: 'gentle', direction: 0, addFor: null
@@ -823,8 +823,9 @@
             if (!isSelf) return bar(label, next, goNext);
             const node = el('div', 'ft-setup__bar is-start');
             if (label) node.appendChild(el('span', 'ft-setup__bar-label', label));
+            // One obvious action (Android 420df66be): Start; "Review channels" is a quiet link beside it.
             const row = el('div', 'ft-setup__bar-row');
-            row.append(button(t('study.setup.reviewFirst', 'Review channels'), 'btn-secondary ft-setup__bar-action', goNext),
+            row.append(setupChip(t('study.setup.reviewFirst', 'Review channels'), false, goNext, { quiet: true }),
                 button(t('study.setup.startNow', 'Start now'), 'btn-primary ft-setup__bar-action', () => { s.lockMode = 'gentle'; savePlan(true); }));
             node.appendChild(row);
             return node;
@@ -881,7 +882,7 @@
                     const current = (code || null) === (s.country || null);
                     const row = button('', `ft-sheet__row${current ? ' is-current' : ''}`, () => {
                         close();
-                        if ((code || null) !== (s.country || null)) { s.country = code || null; s.board = null; s.alsoOpen = false; render(); }
+                        if ((code || null) !== (s.country || null)) { s.country = code || null; s.board = null; s.filtersOpen = false; s.examFilter = null; render(); }
                     });
                     row.setAttribute('role', 'option');
                     row.setAttribute('aria-selected', current ? 'true' : 'false');
@@ -944,7 +945,7 @@
                     t('study.setup.kindInterviewBody', 'Coding, system design, finance, HR and more. Add your own channels too.'), 'clip']
             ].filter(([mode]) => mode !== 'interview' || hasInterviews)) {
                 const tile = button('', `ft-setup-tile is-${mode}`, () => {
-                    if (s.mode !== mode) { s.query = ''; s.alsoOpen = false; }
+                    if (s.mode !== mode) { s.query = ''; s.filtersOpen = false; s.examFilter = null; }
                     s.mode = mode;
                     go('list');
                 });
@@ -975,14 +976,62 @@
             search.placeholder = t('study.setup.examsSearch', 'Search exams, like {example}', { example: example ? chipLabel(example) : 'IELTS' });
             search.setAttribute('aria-label', search.placeholder);
             const host = el('div', 'ft-setup-list');
+            const filters = el('div', 'ft-setup-filters');
             search.addEventListener('input', () => { s.query = search.value; drawExamList(host); });
-            body.append(search, host);
+            body.append(search, filters, host);
+            const redraw = () => { drawExamFilters(filters, redraw); drawExamList(host); };
+            drawExamFilters(filters, redraw);
             drawExamList(host);
             return listBar();
         }
 
+        /**
+         * Country -> level -> category (Android 420df66be), behind one quiet "More choices". Level chips
+         * (All, National, State or province) only where the country has state or province exams; State
+         * opens on the area whose exams teach in the UI language. Category chips list only categories
+         * the country has. Opening it also shows the "Also taken from {country}" exams.
+         */
+        function drawExamFilters(host, redraw) {
+            host.replaceChildren();
+            const filter = s.examFilter || Setup.StudyExamFilter.of();
+            const areas = Setup.StudyExamList.areas(catalog, s.country, Setup.MIN_CHANNELS);
+            const categories = Setup.StudyExamList.categories(catalog, s.country, Setup.MIN_CHANNELS);
+            const hasAlso = Setup.StudyExamList.of(catalog, s.country, '', Setup.MIN_CHANNELS).also.length > 0;
+            if (!areas.length && categories.length <= 1 && !hasAlso) return;
+            const set = patch => { s.examFilter = { ...filter, ...patch }; redraw(); };
+            if (!s.filtersOpen && Setup.StudyExamFilter.isDefault(filter)) {
+                const more = setupChip(t('study.setup.examsMore', 'More choices'), false, () => { s.filtersOpen = true; redraw(); }, { quiet: true });
+                more.setAttribute('aria-expanded', 'false');
+                host.appendChild(more);
+                return;
+            }
+            const all = t('study.home.all', 'All');
+            const { ALL, NATIONAL, REGIONAL } = Setup.StudyExamFilter.LEVELS;
+            if (areas.length) {
+                const levels = el('div', 'ft-setup-flow');
+                for (const [level, name] of [[ALL, all], [NATIONAL, t('study.setup.level.national', 'National')], [REGIONAL, t('study.setup.level.regional', 'State or province')]]) {
+                    levels.appendChild(setupChip(name, filter.level === level, () => set({ level,
+                        area: level === REGIONAL ? filter.area || Setup.StudyExamList.defaultArea(catalog, s.country, language(), Setup.MIN_CHANNELS) : null })));
+                }
+                host.appendChild(levels);
+                if (filter.level === REGIONAL && areas.length > 1) {
+                    const names = new Map(Setup.StudyExamList.exams(catalog, s.country, Setup.MIN_CHANNELS).filter(Setup.isRegional)
+                        .map(pack => [Setup.areaName(pack, 'en'), Setup.areaName(pack, language())]));
+                    const flow = el('div', 'ft-setup-flow');
+                    areas.forEach(area => flow.appendChild(setupChip(names.get(area) || area, filter.area === area, () => set({ area }))));
+                    host.appendChild(flow);
+                }
+            } else if (filter.level !== ALL) s.examFilter = { ...filter, level: ALL, area: null };
+            if (categories.length > 1) {
+                const flow = el('div', 'ft-setup-flow');
+                flow.appendChild(setupChip(all, !filter.category, () => set({ category: null })));
+                categories.forEach(category => flow.appendChild(setupChip(t(`study.setup.category.${category}`, category), filter.category === category, () => set({ category }))));
+                host.appendChild(flow);
+            } else if (filter.category) s.examFilter = { ...(s.examFilter || filter), category: null };
+        }
+
         function drawExamList(host) {
-            const model = Setup.StudyExamList.of(catalog, s.country, s.query, Setup.MIN_CHANNELS, language());
+            const model = Setup.StudyExamList.of(catalog, s.country, s.query, Setup.MIN_CHANNELS, language(), s.examFilter);
             host.replaceChildren();
             if (model.isEmpty) { host.appendChild(el('p', 'ft-study-muted ft-setup-center', t('study.setup.empty', 'Nothing matches. Try another country or word.'))); return; }
             const section = (name, list, { withCountry = false, quiet = false } = {}) => {
@@ -1002,20 +1051,12 @@
             const fieldName = field => t(`study.setup.field.${field}`, field);
             model.own.forEach(group => section(fieldName(group.field), group.packs));
             const searching = !!text(s.query);
-            if (model.also.length) {
-                // A chosen exam is never hidden inside the fold.
-                const open = s.alsoOpen || searching || model.alsoPacks.some(pack => s.selected.includes(pack.id));
-                const names = model.alsoPacks.slice(0, 3).map(chipLabel).join(', ');
-                const line = model.alsoPacks.length > 3 ? pluralWith('study.setup.andMore', model.alsoPacks.length - 3, { names }, '{names} and {count} more') : names;
-                const fold = button('', `ft-setup-fold${open ? ' is-open' : ''}`, () => { if (!searching) { s.alsoOpen = !s.alsoOpen; drawExamList(host); } });
-                fold.setAttribute('aria-expanded', open ? 'true' : 'false');
-                const words = el('span', 'ft-setup-fold__words');
-                words.appendChild(el('span', 'ft-setup-fold__title', t('study.setup.examsAlso', 'Also taken from {country}', { country: countryName(s.country) })));
-                if (!open) words.appendChild(el('span', 'ft-study-muted', line));
-                fold.append(words, el('span', 'ft-setup-fold__chevron', '⌄'));
+            // One disclosure (Android 420df66be): the neighbours' and global exams sit behind "More choices";
+            // a chosen exam is never hidden, and search always shows them.
+            if (model.also.length && (s.filtersOpen || searching || model.alsoPacks.some(pack => s.selected.includes(pack.id)))) {
                 host.appendChild(el('hr', 'ft-setup-dashed'));
-                host.appendChild(fold);
-                if (open) model.also.forEach(group => section(fieldName(group.field), group.packs, { quiet: true }));
+                host.appendChild(el('p', 'ft-setup-h2', t('study.setup.examsAlso', 'Also taken from {country}', { country: countryName(s.country) })));
+                model.also.forEach(group => section(fieldName(group.field), group.packs, { quiet: true }));
             }
             if (model.elsewhere.length) section(t('study.setup.examsElsewhere', 'From other countries'), model.elsewhere, { withCountry: true, quiet: true });
             // The bar follows the choice without redrawing the list.
@@ -1043,6 +1084,7 @@
                     el('p', 'ft-study-muted', t('study.setup.schoolNoneBody', 'These work with any curriculum. You can also add your own channels.')),
                     button(t('study.setup.schoolCheckExams', 'Check exams'), 'btn-secondary', () => { s.mode = 'exam'; s.query = ''; go('list'); }));
                 addGlobals(body, globals);
+                addKidsPacks(body);
                 return s.selected.length ? startBar(packsShortLabel(s.selected, catalog), t('study.setup.nextChannels', 'Next: check channels')) : null;
             }
             const located = Setup.StudySchool.locate(boards, s.selected);
@@ -1100,8 +1142,19 @@
                 body.appendChild(el('p', 'ft-study-muted', t('study.setup.covers', '{who} covers {topics}.', { who, topics: topicLine(chips) })));
             }
             addGlobals(body, globals);
+            addKidsPacks(body);
             body.appendChild(el('p', 'ft-study-muted', t('study.setup.schoolOtherCountry', 'Studying another country\'s board? Change the country first.')));
             return s.selected.length ? startBar(packsShortLabel(s.selected, catalog), t('study.setup.nextChannels', 'Next: check channels')) : null;
+        }
+
+        /** Kids learning by age, under School (Android 420df66be: parents look there); these packs fill the Kids space during study. */
+        function addKidsPacks(body) {
+            const kids = Packs.forTab(catalog, '', 'kids');
+            if (!kids.length) return;
+            const list = el('div', 'ft-setup-picks');
+            list.appendChild(el('p', 'ft-setup-h2', t('study.setup.skillKidsHeading', 'Kids learning')));
+            kids.forEach(pack => list.appendChild(pickRow(pack)));
+            body.appendChild(list);
         }
 
         function addGlobals(body, globals) {
@@ -1151,12 +1204,6 @@
                 el('p', 'ft-study-muted', t('study.setup.skillBody', 'Pick one or more. You can add your own channels next.')));
             const list = el('div', 'ft-setup-picks');
             Setup.StudySkills.of(catalog, Setup.MIN_CHANNELS).forEach(pack => list.appendChild(pickRow(pack)));
-            // Kids learning by age: these packs fill the Kids space during study.
-            const kids = Packs.forTab(catalog, '', 'kids');
-            if (kids.length) {
-                list.appendChild(el('p', 'ft-setup-h2', t('study.setup.skillKidsHeading', 'Kids learning')));
-                kids.forEach(pack => list.appendChild(pickRow(pack)));
-            }
             body.appendChild(list);
             return listBar();
         }

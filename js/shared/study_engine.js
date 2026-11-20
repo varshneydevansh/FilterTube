@@ -1113,12 +1113,36 @@
         return kidsPackIds(selected, catalog).length ? 'kids_learning' : 'kids_hold';
     }
 
-    function packLayer(pack, edits) {
+    /**
+     * Local first, then global (Android StudyHomeFeed.localRank, 420df66be): a channel for the user's own
+     * country, then global ones, then other countries' channels; untagged channels count as global.
+     */
+    function localRank(channel, country) {
+        const code = text(channel?.country).toUpperCase();
+        if (country && code === text(country).toUpperCase()) return 0;
+        if (!code || code === 'GLOBAL') return 1;
+        return 2;
+    }
+
+    /** The browser's region ("en-IN" -> "IN"), for localRank; null when the locale has none. */
+    function deviceCountry() {
+        const parts = text(globalThis.navigator?.language).split(/[-_]/);
+        const region = parts.slice(1).find(part => /^[A-Za-z]{2}$/.test(part));
+        return region ? region.toUpperCase() : null;
+    }
+
+    /** A pack's channels for a branch, the device country's first, then global, then other countries' (stable). */
+    function localOrder(channels, country) {
+        return array(channels).map((channel, index) => [localRank(channel, country), index, channel])
+            .sort((a, b) => a[0] - b[0] || a[1] - b[1]).map(item => item[2]);
+    }
+
+    function packLayer(pack, edits, country = deviceCountry()) {
         const change = object(edits);
         const removedChannels = array(change.channelsRemoved);
         const removedTopics = new Set(array(change.topicsRemoved).map(wordKey));
         const channels = [];
-        for (const channel of [...packChannelsFor(pack, change.variant), ...array(change.channelsAdded)]) {
+        for (const channel of [...localOrder(packChannelsFor(pack, change.variant), country), ...array(change.channelsAdded)]) {
             if (removedChannels.some(removed => sameChannel(channel, removed))) continue;
             if (channels.some(existing => sameChannel(existing, channel))) continue;
             channels.push({ channelId: text(channel.channelId) || null, handle: text(channel.handle) || null, name: text(channel.name) });
@@ -1413,7 +1437,7 @@
         dayRing, ringBoundaries, currentBreak,
         PAGE_STATES, PAGE_BAND_PX, PAGE_LAST_FIVE_MS, PAGE_CROSSFADE_MS, pageState, pageEvening, pagePalette, mixColor,
         studySubjects, subjectOf, withSkips, sessionSeal, sessionEndStep, pendingSessionEnd, SESSION_END_STALE_MS, SESSION_CLOSE_SLACK_MS,
-        packVariant, packLayer, activePackLayers, stampPackCopies, studyEffectiveProfile,
+        packVariant, packLayer, activePackLayers, localRank, localOrder, stampPackCopies, studyEffectiveProfile,
         BRANCH_SOURCE, KIDS_KINDS, KIDS_SPACE, AMBIGUOUS_BRANCH_WORDS,
         packChannelsFor, packTopicsFor, hasSeparateBranches, branchTopics, otherBranchTopics,
         studyBranchFilter, branchFilterDrops, branchFilterRow,
