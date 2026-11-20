@@ -2,7 +2,121 @@
 
 ## Unreleased
 
-No additional changes recorded after the 3.6.2 release.
+No additional changes recorded after the 3.6.3 release.
+
+## Version 3.6.3 — Allowed Only And Study On Every Page, Auto-Next And Tamper-Checked Backups
+
+Prepared November 20, 2026. Extension changes since v3.6.2, released together
+with the FilterTube 3.6.3 apps. It is a fix-up release: older bugs found after
+3.6.2, the narrowed mode for Allowed only and Study, and the extension's side of
+the lossless backup format the apps now share.
+
+What was checked: the automated test lanes, including new regression tests for
+each fix below (the collaborator menu test fails on 3.6.2). Some fixes were
+reproduced in Chromium with the unpacked extension while they were made: the
+blank tab after an extension reload, the regex on the blocked card and the page
+log. Not yet checked: the narrowed mode walked through end to end on a real
+signed-in account, auto-next on Firefox (where issue #82 was reported), Firefox
+and Opera in general, Kids Quiet blocking on the Kids site, a backup moved
+between the extension and the apps by hand, and the store builds. The new
+strings in every language are machine-drafted; yo, ha, jv, bho, apd, apc,
+wuu-Hans, pa-Arab, am and pcm want a native read.
+
+### Allowed only and Study on every page
+
+- **One narrowed mode.** Allowed only and a Study round now share one layer
+  that decides, per page, what the page shows. Leaving the mode removes
+  FilterTube's elements and the page is exactly as it was.
+- **Home** is the feed FilterTube builds from your allowed channels or study
+  plan. The site's own grid, chip bar, shelves and loader stay hidden under it,
+  so empty "Shorts" headers and chips that load into nothing are gone. The
+  feed's chips are the plan's subjects or your allowed words.
+- **Search** has one calm line saying what waits until study ends (or stays
+  hidden in allowed-only mode), and says so when your plan's channels have
+  nothing for the query, with "Search all your study channels". The page is
+  never left blank, and a redraw of the same results no longer blinks.
+- **Watch** shows a small mode bar above the title: the plan, the round and
+  minutes left, why this video is shown, and End where the lock rules allow it.
+- **Channel pages** outside your list are held with a card that says why
+  ("This channel isn't in your study plan" or "Not on your allowed list")
+  instead of a silent jump to Home.
+- **The left pane** lists your study or allowed channels in place of Explore
+  and the site's channel list.
+- **Study feed ranking.** The study Home puts videos on your plan's topics
+  first, newest first, and during study leaves out posts that aren't lessons
+  and titles that name only another exam. Allowed-only mode leaves nothing of
+  your chosen channels out.
+- **Corrected study packs.** Exam packs point at each exam's own channels: GMAT
+  and SAT/ACT no longer include GRE channels, and general, marketing or
+  look-alike channels are removed. The catalog matches the apps' byte for byte.
+
+### Playback
+
+- **Auto-next goes on to the next allowed video** (fixes #82), in Allow only
+  selected too. With "Skip blocked autoplay videos" on, a blocked video reached
+  by autoplay or Next moves to the first allowed Up next or related video, at
+  most 25 in a row and never back to one this tab just played. If the site's
+  autoplay is on and nothing has moved 9 seconds after a video ends, FilterTube
+  goes on to the next allowed video. The setting is now on for new installs and
+  new or reset profiles; existing choices are kept.
+- **Playlists and Mixes skip late blocks.** A video blocked only once its Watch
+  page loads (a description keyword, for example) moves on to the next allowed
+  row when Next, the playlist's own advance or a skip brought it there. A video
+  you opened yourself keeps the blocked card. A short toast says "Skipped a
+  video your filters hide"; with nothing allowed left, the card says so.
+
+### Blocking and Kids
+
+- **The blocked card names the word you typed.** It reads `Matched: "AI"
+  (exact word)` and `Found in: the video description` instead of the compiled
+  pattern, in every language. The page log names the matching keyword, channel
+  or video too.
+- **Kids Quiet blocking.** Kids Mode › Content Controls has its own Quiet
+  blocking switch, off by default and parent-protected. Main's setting no
+  longer quiets the Kids site. Backups and Personal Auto-sync carry it.
+- **Collaborator multi-select is back.** For a video with three or more
+  collaborating channels, tapping a channel in the 3-dot menu ticks it again,
+  and "Done • Block N Selected" blocks the ticked ones. It had blocked the
+  tapped channel at once since v3.3.3 (June). Already-blocked channels no
+  longer count towards N.
+
+### Backups and sync
+
+- **Tamper-checked backups.** Every plain JSON export carries an integrity
+  block (keyed by the master PIN when one is set). The import screen says
+  "This backup was changed outside FilterTube" when a backup was altered, and a
+  protected backup that can't be verified needs the PIN.
+- **PIN for weakening imports.** A restore, merge or one-time Nanah import that
+  would weaken a protected profile (remove a block rule, add an allow rule,
+  loosen a mode or time limit, change its Study lock or PINs) asks for the
+  master PIN or that profile's parent PIN. A child's own PIN never counts.
+  Imports that don't weaken anything need no PIN.
+- **Lossless.** Backups carry app preferences and keep keys this extension does
+  not model, so a backup from Android or iPhone comes back with everything.
+  Main's content and category filters kept by the apps, the "Follow system"
+  theme and an unset "Skip blocked autoplay videos" now survive sync and
+  restore.
+
+### Dashboard
+
+- **Source colours are back.** Keywords and Channels rows show their source
+  tints again (from comments, Kids, collaborators), as in the popup, which now
+  shares the same rules. Rows no longer shrink under their chips.
+- **Join the community.** Home has a quiet row with Discord, Reddit and
+  Instagram, and About lists the same three first.
+- **Clearer text.** Eyebrow labels, page-describing intros and static badges
+  are gone, em dashes in warnings are replaced, and the Support trust
+  paragraph is one sentence, in every language.
+
+### Fixes
+
+- **No blank tab after an extension reload.** A blocked video in a tab that was
+  open while the extension reloaded or updated showed a flat grey window. The
+  blocked card now draws inside the player, and late redraws keep it there.
+  The bug dated from 3.4.0.
+- **No longer runs on YouTube Studio.** Studio matched the extension's site
+  pattern, so its reload and auto-next logic could refresh the creator
+  dashboard.
 
 ## Version 3.6.2 — Kriti And Uljhan, Study, Ask A Parent And A New Home
 

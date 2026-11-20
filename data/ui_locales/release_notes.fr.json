@@ -1,4 +1,20 @@
 {
+  "3.6.3": {
+    "headline": "Autorisés seulement et Études sur chaque page, lecture automatique vers la prochaine vidéo autorisée et sauvegardes vérifiées contre toute modification",
+    "summary": "FilterTube 3.6.3 fait en sorte qu'Autorisés seulement et Études restreignent toute la page : l'accueil, la recherche, la page de lecture, les pages de chaîne et le volet de gauche n'affichent que ce que votre liste ou votre plan autorise, et indiquent ce qui est en attente. La lecture automatique et les playlists passent à la prochaine vidéo autorisée, les sauvegardes sont vérifiées pour détecter toute modification faite hors de FilterTube, et plusieurs anciens bogues sont corrigés.",
+    "bannerSummary": "Autorisés seulement et Études sur chaque page, lecture automatique vers la prochaine vidéo autorisée et sauvegardes vérifiées contre toute modification.",
+    "ctaLabel": "Voir les nouveautés",
+    "highlights": [
+      "Autorisés seulement et Études restreignent désormais chaque page. L'accueil affiche un flux construit à partir de vos chaînes autorisées ou de votre plan d'étude, la recherche indique ce qui attend la fin de l'étude, la page de lecture a une petite barre avec la série et les minutes restantes, une chaîne hors de votre liste affiche une carte qui explique pourquoi, et le volet de gauche liste vos chaînes d'étude ou autorisées. Quand le mode se termine, la page redevient exactement comme avant.",
+      "L'accueil Études place d'abord les leçons sur les sujets de votre plan et écarte les publications qui ne sont pas des leçons ainsi que les vidéos destinées à d'autres examens. Les packs d'examens pointent désormais vers les chaînes propres à chaque examen.",
+      "La lecture automatique passe à la prochaine vidéo autorisée, y compris dans Autoriser uniquement la sélection (ticket GitHub #82). « Passer les vidéos bloquées en lecture automatique » est activé pour les nouvelles installations et couvre aussi Suivant. Dans une playlist ou un Mix, une vidéo qui n'est bloquée qu'une fois sa page chargée, par exemple à cause d'un mot de sa description, passe à la prochaine vidéo autorisée.",
+      "Les sauvegardes conservent chaque profil, filtre et réglage et comportent un contrôle d'intégrité. L'écran d'importation vous prévient lorsqu'une sauvegarde a été modifiée hors de FilterTube, et une importation qui affaiblirait un profil protégé nécessite le PIN d'un parent.",
+      "Le mode Enfants a son propre interrupteur Blocage discret, de sorte que le réglage Principal ne décide plus de ce que le site Enfants affiche.",
+      "La carte de blocage indique le mot que vous avez saisi, par exemple « AI » (mot exact) trouvé dans la description de la vidéo, au lieu d'un motif.",
+      "Correctifs : avec trois chaînes collaboratrices ou plus, toucher les chaînes dans le menu les coche de nouveau pour « Bloquer les N éléments sélectionnés » (cassé depuis juin). Les lignes Mots-clés et Chaînes affichent de nouveau leurs couleurs de source, une vidéo bloquée ne laisse plus l'onglet vide après le rechargement ou la mise à jour de l'extension, et FilterTube ne s'exécute plus sur les pages Studio des créateurs.",
+      "L'accueil a une ligne « Rejoindre la communauté » avec Discord, Reddit et Instagram, et le texte du tableau de bord est plus court et plus clair."
+    ]
+  },
   "3.6.2": {
     "headline": "Voici Kriti et Uljhan, un planificateur Study repensé et Demander à un parent",
     "summary": "FilterTube 3.6.2 adopte son propre style, avec Kriti et Uljhan, des icônes au crayon, des griffonnages et des sons facultatifs. Study est repensé autour d’un planificateur de journée avec des packs prêts à l’emploi pour 29 pays, les enfants peuvent demander à un parent une vidéo ou une chaîne, et le lecteur, les profils, les tablettes et les téléviseurs reçoivent une refonte plus apaisée avec des notes de confidentialité plus claires.",

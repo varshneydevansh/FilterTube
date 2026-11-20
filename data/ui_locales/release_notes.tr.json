@@ -1,4 +1,20 @@
 {
+  "3.6.3": {
+    "headline": "Yalnızca izin verilenler ve Ders her sayfada, bir sonraki izinli videoya otomatik geçiş ve değişikliğe karşı denetlenen yedekler",
+    "summary": "FilterTube 3.6.3, Yalnızca izin verilenler ve Ders modlarının tüm sayfayı daraltmasını sağlar: Ana sayfa, arama, izleme, kanal sayfaları ve sol bölme yalnızca listenizin veya planınızın izin verdiğini gösterir ve nelerin beklediğini söyler. Otomatik geçiş ve oynatma listeleri bir sonraki izinli videoya geçer, yedekler FilterTube dışında yapılan değişiklikler için denetlenir ve birkaç eski hata düzeltildi.",
+    "bannerSummary": "Yalnızca izin verilenler ve Ders her sayfada, bir sonraki izinli videoya otomatik geçiş ve değişikliğe karşı denetlenen yedekler.",
+    "ctaLabel": "Yenilikleri Gör",
+    "highlights": [
+      "Yalnızca izin verilenler ve Ders artık her sayfayı daraltıyor. Ana sayfa, izinli kanallarınızdan veya ders planınızdan oluşan bir akış gösterir, arama ders bitene kadar nelerin beklediğini söyler, İzleme sayfasında tur ve kalan dakikaları gösteren küçük bir çubuk bulunur, listenizin dışındaki bir kanal nedenini söyleyen bir kart gösterir ve sol bölme ders veya izinli kanallarınızı listeler. Mod bittiğinde sayfa tam olarak eskisi gibi olur.",
+      "Ders Ana sayfası, planınızın konularındaki dersleri öne koyar; ders olmayan gönderileri ve başka sınavlara ait videoları dışarıda bırakır. Sınav paketleri artık her sınavın kendi kanallarına işaret ediyor.",
+      "Otomatik geçiş bir sonraki izinli videoya gider, \"Yalnızca seçilenlere izin ver\" modunda da (GitHub sorunu #82). \"Engellenen otomatik oynatma videolarını atla\" yeni kurulumlarda açıktır ve İleri'yi de kapsar. Bir oynatma listesinde veya Mix'te, yalnızca sayfası yüklendikten sonra, örneğin açıklamasındaki bir sözcük nedeniyle, engellenen video bir sonraki izinli videoya geçer.",
+      "Yedekler her profili, filtreyi ve ayarı korur ve bütünlük denetimi taşır. İçe aktarma ekranı bir yedeğin FilterTube dışında değiştirildiğini söyler ve korumalı bir profili zayıflatacak bir içe aktarma ebeveyn PIN'i ister.",
+      "Çocuk modunun kendi Sessiz engelleme anahtarı var, bu yüzden Main ayarı artık Çocuk sitesinin ne göstereceğine karar vermiyor.",
+      "Engellenen kart, bir örüntü yerine, yazdığınız sözcüğü, örneğin video açıklamasında bulunan \"AI\" (tam sözcük) ifadesini belirtir.",
+      "Düzeltmeler: üç veya daha fazla iş birliği yapan kanal olduğunda, menüde kanallara dokunmak onları yine \"Seçilen N öğeyi engelle\" için işaretliyor (Haziran'dan beri bozuktu). Anahtar sözcükler ve Kanallar satırları kaynak renklerini yeniden gösteriyor, engellenen bir video artık uzantı yeniden yüklendikten veya güncellendikten sonra sekmeyi boş bırakmıyor ve FilterTube artık içerik üreticilerin Studio sayfalarında çalışmıyor.",
+      "Ana sayfada Discord, Reddit ve Instagram'lı bir \"Topluluğa katıl\" satırı var ve panelin metni daha kısa ve daha açık."
+    ]
+  },
   "3.6.2": {
     "headline": "Kriti ve Uljhan ile tanışın, yeniden yapılan Çalışma planlayıcısı ve Ebeveyne sor",
     "summary": "FilterTube 3.6.2 kendi görünümüne kavuşuyor: Kriti ve Uljhan, mum boya simgeler, karalamalar ve isteğe bağlı sesler. Çalışma, 29 ülke için hazır paketlerle bir gün planlayıcısı etrafında yeniden yapıldı; çocuklar bir video veya kanal için ebeveynden izin isteyebilir; izleyici, profiller, tabletler ve TV'ler daha sakin bir yeniden tasarım ve daha net gizlilik notları alıyor.",

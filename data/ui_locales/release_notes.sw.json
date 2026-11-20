@@ -1,4 +1,20 @@
 {
+  "3.6.3": {
+    "headline": "Vinavyoruhusiwa tu na Masomo kwenye kila ukurasa, uchezaji wa kiotomatiki hadi video inayofuata iliyoruhusiwa, na nakala rudufu zinazokaguliwa dhidi ya mabadiliko",
+    "summary": "FilterTube 3.6.3 inafanya Vinavyoruhusiwa tu na Masomo yabane ukurasa mzima: Nyumbani, utafutaji, Kutazama, kurasa za vituo na kidirisha cha kushoto vinaonyesha tu kile orodha au mpango wako unachoruhusu, na vinasema nini kinasubiri. Kuendelea kiotomatiki na orodha za kucheza huhamia video inayofuata iliyoruhusiwa, nakala rudufu hukaguliwa kwa mabadiliko yaliyofanywa nje ya FilterTube, na hitilafu kadhaa za zamani zimerekebishwa.",
+    "bannerSummary": "Vinavyoruhusiwa tu na Masomo kwenye kila ukurasa, uchezaji wa kiotomatiki hadi video inayofuata iliyoruhusiwa, na nakala rudufu zinazokaguliwa dhidi ya mabadiliko.",
+    "ctaLabel": "Angalia mapya",
+    "highlights": [
+      "Vinavyoruhusiwa tu na Masomo sasa vinabana kila ukurasa. Nyumbani huonyesha mlisho uliojengwa kutoka vituo vyako vilivyoruhusiwa au mpango wako wa masomo, utafutaji husema nini kinasubiri hadi masomo yaishe, Kutazama kuna upau mdogo wenye raundi na dakika zilizobaki, kituo kilicho nje ya orodha yako huonyesha kadi inayosema sababu, na kidirisha cha kushoto huorodhesha vituo vyako vya masomo au vilivyoruhusiwa. Hali ikiisha, ukurasa unarudi kuwa kama ulivyokuwa kabisa.",
+      "Nyumbani ya masomo huweka kwanza masomo yaliyo kwenye mada za mpango wako, na huacha machapisho yasiyo masomo na video za mitihani mingine. Vifurushi vya mitihani sasa vinaelekeza kwenye vituo vya kila mtihani.",
+      "Kuendelea kiotomatiki huhamia video inayofuata iliyoruhusiwa, pia katika \"Ruhusu vilivyochaguliwa pekee\" (tatizo la GitHub #82). \"Ruka video zilizozuiwa za uchezaji wa kiotomatiki\" imewashwa kwa usakinishaji mpya na inajumuisha pia Endelea. Katika orodha ya kucheza au Mix, video inayozuiwa tu baada ya ukurasa wake kupakia, kwa mfano kwa neno lililo kwenye maelezo yake, huhamia video inayofuata iliyoruhusiwa.",
+      "Nakala rudufu huhifadhi kila wasifu, kichujio na mpangilio, na zina ukaguzi wa uadilifu. Skrini ya kuleta hukuambia nakala rudufu inapobadilishwa nje ya FilterTube, na uletaji utakaodhoofisha wasifu uliolindwa unahitaji PIN ya mzazi.",
+      "Hali ya watoto ina swichi yake ya Kuzuia kimyakimya, kwa hivyo mpangilio wa Main haubadilishi tena kile kinachoonyeshwa kwenye tovuti ya watoto.",
+      "Kadi iliyozuiwa inataja neno ulilochapa, kwa mfano \"AI\" (neno kamili) lililopatikana kwenye maelezo ya video, badala ya muundo.",
+      "Marekebisho: vituo vitatu au zaidi vinavyoshirikiana vikiwepo, kugusa vituo kwenye menyu kunavichagua tena kwa \"Zuia N zilizochaguliwa\" (iliharibika tangu Juni). Safu za Maneno muhimu na Vituo zinaonyesha tena rangi za chanzo chake, video iliyozuiwa haiachi tena kichupo tupu baada ya kiendelezi kupakiwa upya au kusasishwa, na FilterTube haifanyi kazi tena kwenye kurasa za Studio za watayarishaji.",
+      "Nyumbani ina safu ya \"Jiunge na jumuiya\" yenye Discord, Reddit na Instagram, na maandishi ya dashibodi ni mafupi na wazi zaidi."
+    ]
+  },
   "3.6.2": {
     "headline": "Kutana na Kriti na Uljhan, kipanga Masomo kilichojengwa upya na Muulize mzazi",
     "summary": "FilterTube 3.6.2 inapata mwonekano wake yenyewe, ikiwa na Kriti na Uljhan, aikoni za kalamu za rangi, michoro na sauti za hiari. Masomo yamejengwa upya kuzunguka kipanga siku chenye vifurushi vilivyo tayari kwa nchi 29, watoto wanaweza kumwomba mzazi video au chaneli, na kitazamaji, wasifu, kompyuta kibao na TV zinapata muundo mpya tulivu zaidi wenye maelezo ya faragha yaliyo wazi zaidi.",

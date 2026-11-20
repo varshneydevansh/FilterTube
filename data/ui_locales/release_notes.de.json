@@ -1,4 +1,20 @@
 {
+  "3.6.3": {
+    "headline": "Nur erlaubt und Lernen auf jeder Seite, Autoplay zum nächsten erlaubten Video und Backups mit Manipulationsprüfung",
+    "summary": "FilterTube 3.6.3 sorgt dafür, dass Nur erlaubt und Lernen die ganze Seite eingrenzen: Start, Suche, Watch, Kanalseiten und die linke Leiste zeigen nur, was deine Liste oder dein Plan erlaubt, und sagen, was wartet. Autoplay und Playlists gehen zum nächsten erlaubten Video weiter, Backups werden auf Änderungen außerhalb von FilterTube geprüft, und mehrere ältere Fehler sind behoben.",
+    "bannerSummary": "Nur erlaubt und Lernen auf jeder Seite, Autoplay zum nächsten erlaubten Video und Backups mit Manipulationsprüfung.",
+    "ctaLabel": "Neuigkeiten ansehen",
+    "highlights": [
+      "Nur erlaubt und Lernen grenzen jetzt jede Seite ein. Start zeigt einen Feed aus deinen erlaubten Kanälen oder deinem Lernplan, die Suche sagt, was bis zum Ende des Lernens wartet, Watch hat eine kleine Leiste mit der Runde und den verbleibenden Minuten, ein Kanal außerhalb deiner Liste zeigt eine Karte, die erklärt, warum, und die linke Leiste listet deine Lern- oder erlaubten Kanäle auf. Wenn der Modus endet, ist die Seite genau wie vorher.",
+      "Der Lernen-Start zeigt zuerst Lektionen zu den Themen deines Plans und lässt Beiträge, die keine Lektionen sind, sowie Videos für andere Prüfungen weg. Prüfungspakete verweisen jetzt auf die eigenen Kanäle jeder Prüfung.",
+      "Autoplay geht zum nächsten erlaubten Video weiter, auch bei Nur Auswahl zulassen (GitHub-Issue #82). \"Blockierte Autoplay-Videos überspringen\" ist bei Neuinstallationen aktiv und gilt auch für Weiter. In einer Playlist oder einem Mix geht ein Video, das erst blockiert wird, wenn seine Seite geladen ist, zum Beispiel wegen eines Worts in der Beschreibung, zum nächsten erlaubten weiter.",
+      "Backups behalten jedes Profil, jeden Filter und jede Einstellung und tragen eine Integritätsprüfung. Der Importbildschirm sagt dir, wenn ein Backup außerhalb von FilterTube geändert wurde, und ein Import, der ein geschütztes Profil schwächen würde, braucht die Eltern-PIN.",
+      "Der Kindermodus hat einen eigenen Schalter für Stilles Blockieren, sodass die Einstellung Hauptbereich nicht mehr bestimmt, was die Kinderseite zeigt.",
+      "Die Blockkarte nennt das Wort, das du eingegeben hast, zum Beispiel \"AI\" (exaktes Wort) in der Videobeschreibung, statt eines Musters.",
+      "Korrekturen: Bei drei oder mehr zusammenarbeitenden Kanälen setzt das Antippen der Kanäle im Menü wieder Häkchen für \"Ausgewählte (N) blockieren\" (seit Juni defekt). Zeilen bei Schlüsselwörtern und Kanälen zeigen wieder ihre Quellfarben, ein blockiertes Video lässt den Tab nach dem Neuladen oder Aktualisieren der Erweiterung nicht mehr leer, und FilterTube läuft nicht mehr auf den Studio-Seiten für Ersteller.",
+      "Start hat eine Zeile \"Werde Teil der Community\" mit Discord, Reddit und Instagram, und der Text des Dashboards ist kürzer und klarer."
+    ]
+  },
   "3.6.2": {
     "headline": "Lerne Kriti und Uljhan kennen, einen neu gebauten Lernplaner und Eltern fragen",
     "summary": "FilterTube 3.6.2 bekommt einen eigenen Look mit Kriti und Uljhan, Wachsmalstift-Symbolen, Kritzeleien und optionalen Klängen. Lernen ist rund um einen Tagesplaner mit fertigen Paketen für 29 Länder neu aufgebaut, Kinder können Eltern um ein Video oder einen Kanal bitten, und Player, Profile, Tablets und Fernseher bekommen ein ruhigeres Design mit klareren Datenschutzhinweisen.",

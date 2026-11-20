@@ -1,4 +1,20 @@
 {
+  "3.6.3": {
+    "headline": "Hanya yang diizinkan dan Study di setiap halaman, putar otomatis ke video diizinkan berikutnya, dan cadangan yang diperiksa dari perubahan",
+    "summary": "FilterTube 3.6.3 membuat Hanya yang diizinkan dan Study mempersempit seluruh halaman: Beranda, pencarian, Watch, halaman channel, dan panel kiri hanya menampilkan apa yang diizinkan daftar atau rencana Anda, dan memberi tahu apa yang menunggu. Putar otomatis berikutnya dan playlist berlanjut ke video diizinkan berikutnya, cadangan diperiksa apakah diubah di luar FilterTube, dan beberapa bug lama diperbaiki.",
+    "bannerSummary": "Hanya yang diizinkan dan Study di setiap halaman, putar otomatis ke video diizinkan berikutnya, dan cadangan yang diperiksa dari perubahan.",
+    "ctaLabel": "Lihat Yang Baru",
+    "highlights": [
+      "Hanya yang diizinkan dan Study kini mempersempit setiap halaman. Beranda menampilkan feed yang dibuat dari channel yang Anda izinkan atau rencana Study, pencarian memberi tahu apa yang menunggu sampai Study selesai, Watch memiliki bilah kecil berisi ronde dan sisa menit, channel di luar daftar Anda menampilkan kartu yang menjelaskan alasannya, dan panel kiri mencantumkan channel Study atau channel yang diizinkan. Saat mode berakhir, halaman kembali persis seperti semula.",
+      "Beranda Study menempatkan pelajaran sesuai topik rencana Anda lebih dulu, dan menyisihkan postingan yang bukan pelajaran serta video untuk ujian lain. Paket ujian kini mengarah ke channel milik tiap ujian.",
+      "Putar otomatis berikutnya berlanjut ke video diizinkan berikutnya, termasuk di Izinkan hanya yang dipilih (GitHub issue #82). \"Lewati video putar otomatis yang diblokir\" aktif untuk pemasangan baru dan juga mencakup Berikutnya. Di playlist atau Mix, video yang baru diblokir setelah halamannya dimuat, misalnya karena kata di deskripsinya, berlanjut ke video diizinkan berikutnya.",
+      "Cadangan menyimpan setiap profil, filter, dan pengaturan serta disertai pemeriksaan integritas. Layar impor memberi tahu Anda saat cadangan diubah di luar FilterTube, dan impor yang akan melemahkan profil terlindungi memerlukan PIN orang tua.",
+      "Mode Anak memiliki sakelar Pemblokiran senyap sendiri, jadi pengaturan Utama tidak lagi menentukan apa yang ditampilkan situs Kids.",
+      "Kartu yang diblokir menyebut kata yang Anda ketik, misalnya \"AI\" (kata persis) yang ditemukan di deskripsi video, bukan sebuah pola.",
+      "Perbaikan: dengan tiga channel kolaborasi atau lebih, mengetuk channel di menu kembali mencentangnya untuk \"Blokir N yang Dipilih\" (rusak sejak Juni). Baris Kata kunci dan Channel kembali menampilkan warna sumbernya, video yang diblokir tidak lagi membuat tab kosong setelah ekstensi dimuat ulang atau diperbarui, dan FilterTube tidak lagi berjalan di halaman Studio kreator.",
+      "Beranda memiliki baris \"Gabung komunitas\" dengan Discord, Reddit, dan Instagram, dan teks dasbor menjadi lebih singkat dan jelas."
+    ]
+  },
   "3.6.2": {
     "headline": "Kenalan dengan Kriti dan Uljhan, perencana Study yang dibangun ulang, dan Tanya orang tua",
     "summary": "FilterTube 3.6.2 punya tampilan sendiri, dengan Kriti dan Uljhan, ikon krayon, coretan, dan suara opsional. Study dibangun ulang di sekitar perencana harian dengan paket siap pakai untuk 29 negara, anak dapat meminta video atau channel kepada orang tua, dan penampil, profil, tablet, serta TV mendapat desain ulang yang lebih tenang dengan catatan privasi yang lebih jelas.",

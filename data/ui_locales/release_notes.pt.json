@@ -1,4 +1,20 @@
 {
+  "3.6.3": {
+    "headline": "Só permitidos e Estudo em todas as páginas, reprodução automática para o próximo vídeo permitido e backups com verificação de alterações",
+    "summary": "O FilterTube 3.6.3 faz com que Só permitidos e Estudo restrinjam a página inteira: Início, pesquisa, a página de reprodução, páginas de canal e o painel esquerdo mostram apenas o que sua lista ou seu plano permite e dizem o que está aguardando. A reprodução automática e as playlists passam para o próximo vídeo permitido, os backups são verificados quanto a alterações feitas fora do FilterTube e vários bugs antigos foram corrigidos.",
+    "bannerSummary": "Só permitidos e Estudo em todas as páginas, reprodução automática para o próximo vídeo permitido e backups com verificação de alterações.",
+    "ctaLabel": "Ver novidades",
+    "highlights": [
+      "Só permitidos e Estudo agora restringem todas as páginas. O Início mostra um feed montado com seus canais permitidos ou seu plano de estudo, a pesquisa diz o que aguarda até o estudo terminar, a página de reprodução tem uma barrinha com a rodada e os minutos restantes, um canal fora da sua lista mostra um cartão que explica o motivo, e o painel esquerdo lista seus canais de estudo ou permitidos. Quando o modo termina, a página volta a ficar exatamente como era.",
+      "O Início de Estudo coloca primeiro as aulas sobre os tópicos do seu plano e deixa de fora publicações que não são aulas e vídeos de outras provas. Os pacotes de provas agora apontam para os canais próprios de cada prova.",
+      "A reprodução automática passa para o próximo vídeo permitido, também em Permitir apenas selecionadas (issue #82 do GitHub). \"Pular vídeos bloqueados na reprodução automática\" vem ativado em novas instalações e também vale para Próximo. Em uma playlist ou Mix, um vídeo que só é bloqueado depois que a página dele carrega, por exemplo por uma palavra na descrição, passa para o próximo permitido.",
+      "Os backups mantêm todos os perfis, filtros e configurações e trazem uma verificação de integridade. A tela de importação avisa quando um backup foi alterado fora do FilterTube, e uma importação que enfraqueceria um perfil protegido exige o PIN de um responsável.",
+      "O Modo infantil tem seu próprio botão de Bloqueio discreto, então a configuração Principal não decide mais o que o site Kids mostra.",
+      "O cartão de bloqueio mostra a palavra que você digitou, por exemplo \"AI\" (palavra exata) encontrada na descrição do vídeo, em vez de um padrão.",
+      "Correções: com três ou mais canais colaboradores, tocar nos canais no menu volta a marcá-los para \"Bloquear os N selecionados\" (quebrado desde junho). As linhas de Palavras-chave e Canais voltam a mostrar as cores de origem, um vídeo bloqueado não deixa mais a aba em branco depois que a extensão é recarregada ou atualizada, e o FilterTube não roda mais nas páginas do Studio para criadores.",
+      "O Início tem uma linha \"Junte-se à comunidade\" com Discord, Reddit e Instagram, e o texto do painel ficou mais curto e claro."
+    ]
+  },
   "3.6.2": {
     "headline": "Conheça Kriti e Uljhan, um planejador de Estudo reconstruído e Pedir a um responsável",
     "summary": "O FilterTube 3.6.2 ganha um visual próprio, com Kriti e Uljhan, ícones de giz de cera, rabiscos e sons opcionais. O Estudo foi reconstruído em torno de um planejador do dia com pacotes prontos para 29 países, as crianças podem pedir a um responsável um vídeo ou canal, e o visualizador, os perfis, os tablets e as TVs recebem um redesenho mais calmo com avisos de privacidade mais claros.",

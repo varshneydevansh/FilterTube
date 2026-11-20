@@ -1,4 +1,20 @@
 {
+  "3.6.3": {
+    "headline": "Solo consentiti e Studio in ogni pagina, riproduzione automatica verso il prossimo video consentito e backup con controllo delle modifiche",
+    "summary": "FilterTube 3.6.3 fa sì che Solo consentiti e Studio restringano l'intera pagina: Home, ricerca, Watch, pagine dei canali e riquadro a sinistra mostrano solo ciò che la tua lista o il tuo piano consente, e dicono cosa è in attesa. La riproduzione automatica e le playlist passano al prossimo video consentito, i backup vengono controllati per rilevare modifiche fatte fuori da FilterTube e sono stati corretti diversi vecchi bug.",
+    "bannerSummary": "Solo consentiti e Studio in ogni pagina, riproduzione automatica verso il prossimo video consentito e backup con controllo delle modifiche.",
+    "ctaLabel": "Scopri le novità",
+    "highlights": [
+      "Solo consentiti e Studio ora restringono ogni pagina. La Home mostra un feed costruito con i tuoi canali consentiti o il tuo piano di studio, la ricerca dice cosa attende la fine dello studio, Watch ha una piccola barra con il round e i minuti rimasti, un canale fuori dalla tua lista mostra una scheda che spiega il motivo, e il riquadro a sinistra elenca i tuoi canali di studio o consentiti. Quando la modalità finisce, la pagina torna esattamente com'era.",
+      "La Home di Studio mette per primo le lezioni sugli argomenti del tuo piano e lascia fuori i post che non sono lezioni e i video per altri esami. I pacchetti d'esame ora puntano ai canali propri di ciascun esame.",
+      "La riproduzione automatica passa al prossimo video consentito, anche in Consenti solo selezionati (issue #82 di GitHub). \"Salta i video bloccati nella riproduzione automatica\" è attivo per le nuove installazioni e vale anche per Avanti. In una playlist o in un Mix, un video che viene bloccato solo dopo il caricamento della sua pagina, per esempio per una parola nella descrizione, passa al prossimo consentito.",
+      "I backup conservano ogni profilo, filtro e impostazione e includono un controllo di integrità. La schermata di importazione ti avvisa quando un backup è stato modificato fuori da FilterTube, e un'importazione che indebolirebbe un profilo protetto richiede il PIN di un genitore.",
+      "La modalità Bambini ha un proprio interruttore Blocco discreto, quindi l'impostazione Principale non decide più cosa mostra il sito Bambini.",
+      "La scheda di blocco indica la parola che hai digitato, per esempio \"AI\" (parola esatta) trovata nella descrizione del video, invece di un modello.",
+      "Correzioni: con tre o più canali in collaborazione, toccare i canali nel menu li spunta di nuovo per \"Blocca i N selezionati\" (rotto da giugno). Le righe Parole chiave e Canali mostrano di nuovo i colori della fonte, un video bloccato non lascia più la scheda vuota dopo che l'estensione si ricarica o si aggiorna, e FilterTube non viene più eseguito sulle pagine Studio dei creator.",
+      "La Home ha una riga \"Unisciti alla community\" con Discord, Reddit e Instagram, e il testo della dashboard è più breve e chiaro."
+    ]
+  },
   "3.6.2": {
     "headline": "Ecco Kriti e Uljhan, un planner Study rifatto e Chiedi a un genitore",
     "summary": "FilterTube 3.6.2 ha un aspetto tutto suo, con Kriti e Uljhan, icone a pastello, scarabocchi e suoni facoltativi. Study è rifatto attorno a un planner giornaliero con pacchetti pronti per 29 paesi, i bambini possono chiedere a un genitore un video o un canale, e il lettore, i profili, i tablet e le TV hanno un design più calmo con note sulla privacy più chiare.",

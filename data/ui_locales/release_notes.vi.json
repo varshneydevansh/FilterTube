@@ -1,4 +1,20 @@
 {
+  "3.6.3": {
+    "headline": "Chỉ được phép và Học tập trên mọi trang, tự chuyển sang video được phép tiếp theo, và bản sao lưu được kiểm tra xem có bị can thiệp",
+    "summary": "FilterTube 3.6.3 giúp Chỉ được phép và Học tập thu hẹp toàn bộ trang: Trang chủ, tìm kiếm, trang Xem, trang kênh và ngăn bên trái chỉ hiện những gì danh sách hoặc kế hoạch của bạn cho phép, và cho biết còn gì đang chờ. Tự chuyển tiếp và danh sách phát sẽ sang video được phép tiếp theo, bản sao lưu được kiểm tra xem có bị thay đổi bên ngoài FilterTube không, và nhiều lỗi cũ đã được sửa.",
+    "bannerSummary": "Chỉ được phép và Học tập trên mọi trang, tự chuyển sang video được phép tiếp theo, và bản sao lưu được kiểm tra xem có bị can thiệp.",
+    "ctaLabel": "Xem điểm mới",
+    "highlights": [
+      "Chỉ được phép và Học tập giờ thu hẹp mọi trang. Trang chủ hiện một nguồn cấp được tạo từ các kênh được phép hoặc kế hoạch học tập của bạn, tìm kiếm cho biết điều gì phải chờ đến khi học xong, trang Xem có một thanh nhỏ cho biết vòng học và số phút còn lại, kênh nằm ngoài danh sách hiện một thẻ nói rõ lý do, và ngăn bên trái liệt kê các kênh học tập hoặc kênh được phép của bạn. Khi chế độ kết thúc, trang trở về đúng như trước.",
+      "Trang chủ Học tập đặt các bài học thuộc chủ đề trong kế hoạch của bạn lên trước, và bỏ đi những bài đăng không phải bài học cùng các video cho kỳ thi khác. Các gói kỳ thi giờ trỏ tới kênh riêng của từng kỳ thi.",
+      "Tự chuyển tiếp sẽ sang video được phép tiếp theo, kể cả trong Chỉ cho phép mục đã chọn (GitHub issue #82). “Bỏ qua video tự động phát bị chặn” được bật cho bản cài mới và cũng áp dụng cho Tiếp theo. Trong danh sách phát hoặc Mix, video chỉ bị chặn sau khi trang tải xong, ví dụ do một từ trong phần mô tả, sẽ chuyển sang video được phép tiếp theo.",
+      "Bản sao lưu giữ lại mọi hồ sơ, bộ lọc và cài đặt, kèm kiểm tra tính toàn vẹn. Màn hình nhập sẽ báo khi bản sao lưu bị thay đổi bên ngoài FilterTube, và việc nhập làm yếu đi một hồ sơ được bảo vệ cần có PIN phụ huynh.",
+      "Chế độ trẻ em có công tắc Chặn âm thầm riêng, nên cài đặt Chính không còn quyết định trang Trẻ em hiển thị gì.",
+      "Thẻ bị chặn nêu từ bạn đã nhập, ví dụ “AI” (đúng từ) tìm thấy trong mô tả video, thay vì một mẫu.",
+      "Sửa lỗi: khi có từ ba kênh cộng tác trở lên, chạm vào các kênh trong menu lại đánh dấu chúng cho “Chặn N mục đã chọn” (hỏng từ tháng 6). Các hàng Từ khóa và Kênh lại hiện màu theo nguồn, video bị chặn không còn làm tab trống trơn sau khi tiện ích tải lại hoặc cập nhật, và FilterTube không còn chạy trên các trang Studio dành cho nhà sáng tạo.",
+      "Trang chủ có hàng “Tham gia cộng đồng” với Discord, Reddit và Instagram, và chữ trên bảng điều khiển ngắn gọn, rõ ràng hơn."
+    ]
+  },
   "3.6.2": {
     "headline": "Gặp gỡ Kriti và Uljhan, trình lập kế hoạch Học tập được làm lại và Hỏi phụ huynh",
     "summary": "FilterTube 3.6.2 có diện mạo riêng với Kriti và Uljhan, biểu tượng bút sáp, hình vẽ nguệch ngoạc và âm thanh tùy chọn. Học tập được làm lại xoay quanh trình lập kế hoạch ngày với các gói soạn sẵn cho 29 quốc gia, trẻ em có thể xin phụ huynh cho xem một video hoặc kênh, còn trình xem, hồ sơ, máy tính bảng và TV được thiết kế lại nhẹ nhàng hơn với ghi chú quyền riêng tư rõ ràng hơn.",

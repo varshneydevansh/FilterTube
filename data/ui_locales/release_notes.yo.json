@@ -1,4 +1,20 @@
 {
+  "3.6.3": {
+    "headline": "Àwọn tí a gbà nìkan àti Ẹ̀kọ́ lórí gbogbo ojúewé, ìṣiṣẹ́ aládàáṣe sí fídíò tí a gbà tó kàn, àti àwọn ìpamọ́ tí a ṣàyẹ̀wò fún ìyípadà",
+    "summary": "FilterTube 3.6.3 mú kí Àwọn tí a gbà nìkan àti Ẹ̀kọ́ dín gbogbo ojúewé kù: Ilé, ìwádìí, Watch, àwọn ojúewé ikanni àti pánẹ́ẹ̀lì òsì ń fi ohun tí àkójọ tàbí ètò rẹ gbà nìkan hàn, wọ́n sì ń sọ ohun tó ń dúró. Ìṣiṣẹ́ aládàáṣe àti àwọn àkójọ orin ń lọ sí fídíò tí a gbà tó kàn, a ń ṣàyẹ̀wò àwọn ìpamọ́ fún àwọn ìyípadà tí a ṣe lóde FilterTube, a sì ti tún àwọn àṣìṣe àtijọ́ kan ṣe.",
+    "bannerSummary": "Àwọn tí a gbà nìkan àti Ẹ̀kọ́ lórí gbogbo ojúewé, ìṣiṣẹ́ aládàáṣe sí fídíò tí a gbà tó kàn, àti àwọn ìpamọ́ tí a ṣàyẹ̀wò fún ìyípadà.",
+    "ctaLabel": "Wo ohun tuntun",
+    "highlights": [
+      "Àwọn tí a gbà nìkan àti Ẹ̀kọ́ ń dín gbogbo ojúewé kù báyìí. Ilé ń fi ìfúnni tí a kọ́ láti inú àwọn ikanni tí o gbà tàbí ètò ẹ̀kọ́ rẹ hàn, ìwádìí ń sọ ohun tó ń dúró títí ẹ̀kọ́ yóò fi parí, Watch ní ọpá kékeré tó ń fi ìyípo àti ìṣẹ́jú tó kù hàn, ikanni tí kò sí nínú àkójọ rẹ ń fi káàdì tó ṣàlàyé ìdí hàn, pánẹ́ẹ̀lì òsì sì ń ṣàkójọ àwọn ikanni ẹ̀kọ́ tàbí àwọn tí o gbà. Nígbà tí ipò náà bá parí, ojúewé á padà bí ó ṣe wà gẹ́lẹ́.",
+      "Ilé ẹ̀kọ́ ń fi àwọn ẹ̀kọ́ lórí àwọn kókó ètò rẹ sí iwájú, ó sì fi àwọn ìfìwéránṣẹ́ tí kì í ṣe ẹ̀kọ́ àti àwọn fídíò fún àwọn ìdánwò mìíràn sílẹ̀. Àwọn àkójọ ìdánwò ń tọ́ka sí àwọn ikanni ìdánwò kọ̀ọ̀kan báyìí.",
+      "Ìṣiṣẹ́ aládàáṣe ń lọ sí fídíò tí a gbà tó kàn, pẹ̀lú nínú Fọwọ́ sí àwọn tí a yàn nìkan (ọ̀rọ̀ GitHub #82). \"Fo àwọn fídíò ìṣiṣẹ́ aládàáṣe tí a dí\" wà ní títàn fún àwọn ìfisílẹ̀ tuntun, ó sì bo Tókàn pẹ̀lú. Nínú àkójọ orin tàbí Mix, fídíò tí a dí nígbà tí ojúewé rẹ̀ bá ti gbé wọlé nìkan, fún àpẹẹrẹ nítorí ọ̀rọ̀ kan nínú àpèjúwe rẹ̀, ń lọ sí èyí tí a gbà tó kàn.",
+      "Àwọn ìpamọ́ ń pa gbogbo profaili, àlẹ̀mọ́ àti ètò mọ́, wọ́n sì ní àyẹ̀wò ìdúróṣinṣin. Ojú-ìwé ìgbewọlé ń sọ fún ọ nígbà tí a bá yí ìpamọ́ kan padà lóde FilterTube, ìgbewọlé tí yóò sọ profaili tí a dáàbò bò di aláìlera sì nílò PIN òbí.",
+      "Ipò àwọn ọmọdé ní kọ́kọ́rọ́ Ìdínà ní ìdákẹ́jẹ́ẹ́ tirẹ̀, nítorí náà ètò Main kò pinnu ohun tí ojúlé àwọn ọmọdé ń fihàn mọ́.",
+      "Káàdì ìdínà ń dárúkọ ọ̀rọ̀ tí o tẹ̀, fún àpẹẹrẹ \"AI\" (ọ̀rọ̀ gẹ́lẹ́) tí a rí nínú àpèjúwe fídíò, dípò àpẹẹrẹ ìdánimọ̀.",
+      "Àwọn àtúnṣe: pẹ̀lú ikanni mẹ́ta tàbí jù bẹ́ẹ̀ lọ tó ń ṣiṣẹ́ papọ̀, títẹ àwọn ikanni nínú àtòkọ ń ṣàmì sí wọn padà fún \"Dènà àwọn N tí a yàn\" (ó bàjẹ́ láti oṣù Kẹfà). Àwọn ìlà Àwọn ọ̀rọ̀ pàtàkì àti Àwọn ikanni ń fi àwọn àwọ̀ orísun wọn hàn padà, fídíò tí a dí kò fi táàbù sílẹ̀ ní òfo mọ́ lẹ́yìn tí ìmúgbòòrò bá tún gbé wọlé tàbí ṣe ìmúdójúìwọ̀n, FilterTube kò sì ṣiṣẹ́ lórí àwọn ojúewé Studio àwọn olùṣẹ̀dá mọ́.",
+      "Ilé ní ìlà \"Darapọ̀ mọ́ àwùjọ\" pẹ̀lú Discord, Reddit àti Instagram, ọ̀rọ̀ pánẹ́ẹ̀lì ìṣàkóso sì ti kúrú, ó sì ṣe kedere jù."
+    ]
+  },
   "3.6.2": {
     "headline": "Pàdé Kriti àti Uljhan, olùṣètò Ẹ̀kọ́ tí a tún kọ́, àti Béèrè lọ́wọ́ òbí",
     "summary": "FilterTube 3.6.2 ní ìrísí tirẹ̀ báyìí, pẹ̀lú Kriti àti Uljhan, àwọn àmì crayon, àwọn àwòrán doodle àti àwọn ohùn àṣàyàn. A tún Ẹ̀kọ́ kọ́ yí olùṣètò ọjọ́ ká, pẹ̀lú àwọn àkójọ tí a ti pèsè sílẹ̀ fún orílẹ̀-èdè 29. Àwọn ọmọdé lè béèrè lọ́wọ́ òbí fún fídíò tàbí ikanni kan, àti pé olùwò, àwọn profaili, tábìlẹ́ẹ̀tì àti TV gba àtúnṣe ìrísí tó parọ́rọ́ síi pẹ̀lú àlàyé ìpamọ́ tó ṣe kedere síi.",

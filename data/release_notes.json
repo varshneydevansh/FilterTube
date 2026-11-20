@@ -3,6 +3,23 @@
     "_comment": "Shared release notes source for the dashboard What's New tab and the YouTube release banner. Keep entries sorted newest-first by version."
   },
   {
+    "version": "3.6.3",
+    "headline": "Allowed only and Study across every page, auto-next to the next allowed video, and tamper-checked backups",
+    "summary": "FilterTube 3.6.3 makes Allowed only and Study narrow the whole page: Home, search, Watch, channel pages and the left pane show only what your list or plan allows, and say what waits. Auto-next and playlists move on to the next allowed video, backups are checked for changes made outside FilterTube, and several older bugs are fixed.",
+    "bannerSummary": "Allowed only and Study across every page, auto-next to the next allowed video, and tamper-checked backups.",
+    "highlights": [
+      "Allowed only and Study now narrow every page. Home shows a feed built from your allowed channels or study plan, search says what waits until study ends, Watch has a small bar with the round and minutes left, a channel outside your list shows a card that says why, and the left pane lists your study or allowed channels. When the mode ends, the page is exactly as it was.",
+      "The study Home puts lessons on your plan's topics first and leaves out posts that aren't lessons and videos for other exams. Exam packs now point at each exam's own channels.",
+      "Auto-next goes on to the next allowed video, in Allow only selected too (GitHub issue #82). \"Skip blocked autoplay videos\" is on for new installs and also covers Next. In a playlist or Mix, a video that is blocked only once its page loads, for example by a word in its description, moves on to the next allowed one.",
+      "Backups keep every profile, filter and setting and carry an integrity check. The import screen tells you when a backup was changed outside FilterTube, and an import that would weaken a protected profile needs a parent PIN.",
+      "Kids Mode has its own Quiet blocking switch, so the Main setting no longer decides what the Kids site shows.",
+      "The blocked card names the word you typed, for example \"AI\" (exact word) found in the video description, instead of a pattern.",
+      "Fixes: with three or more collaborating channels, tapping channels in the menu ticks them again for \"Block N Selected\" (broken since June). Keywords and Channels rows show their source colours again, a blocked video no longer turns the tab blank after the extension reloads or updates, and FilterTube no longer runs on the creator Studio pages.",
+      "Home has a \"Join the community\" row with Discord, Reddit and Instagram, and the dashboard's text is shorter and clearer."
+    ],
+    "detailsUrl": "https://github.com/varshneydevansh/FilterTube/releases/tag/v3.6.3"
+  },
+  {
     "version": "3.6.2",
     "headline": "Meet Kriti and Uljhan, a rebuilt Study planner and Ask a parent",
     "summary": "FilterTube 3.6.2 gets its own look, with Kriti and Uljhan, crayon icons, doodles and optional sounds. Study is rebuilt around a day planner with ready-made packs for 29 countries, children can ask a parent for a video or channel, and the viewer, profiles, tablets and TVs get a calmer redesign with clearer privacy notes.",

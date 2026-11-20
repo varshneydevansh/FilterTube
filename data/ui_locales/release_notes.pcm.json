@@ -1,4 +1,20 @@
 {
+  "3.6.3": {
+    "headline": "Allowed only and Study for every page, auto-next go di next allowed video, and backups wey dem check say nobody change dem",
+    "summary": "FilterTube 3.6.3 make Allowed only and Study narrow di whole page: Home, search, Watch, channel pages and di left pane dey show only wetin your list or plan allow, and dem go tell you wetin dey wait. Auto-next and playlists dey move go di next allowed video, dem dey check backups for changes wey dem make outside FilterTube, and dem don fix some old bugs.",
+    "bannerSummary": "Allowed only and Study for every page, auto-next go di next allowed video, and backups wey dem check say nobody change dem.",
+    "ctaLabel": "See Wetin New",
+    "highlights": [
+      "Allowed only and Study don now narrow every page. Home dey show feed wey dem build from your allowed channels or study plan, search dey tell you wetin dey wait until study finish, Watch get small bar wey show di round and minutes wey remain, channel wey no dey your list dey show card wey talk why, and di left pane dey list your study or allowed channels. When di mode end, di page go be exactly as e been before.",
+      "Di study Home dey put lessons for your plan topics first and e dey leave posts wey no be lessons and videos for other exams. Exam packs don now point to each exam own channels.",
+      "Auto-next dey go di next allowed video, even for Allow only wetin you select (GitHub issue #82). \"Skip autoplay videos wey dem block\" dey on for new installs and e cover Next too. For playlist or Mix, video wey dem block only after im page load, for example because of one word for im description, dey move go di next allowed one.",
+      "Backups dey keep every profile, filter and setting and dem get integrity check. Di import screen dey tell you when person change backup outside FilterTube, and import wey fit make protected profile weak need parent PIN.",
+      "Kids mode get im own Block am quietly switch, so di Main setting no dey decide wetin di Kids site dey show again.",
+      "Di blocked card dey call di word wey you type, for example \"AI\" (exact word) wey dem find for di video description, instead of pattern.",
+      "Fixes: when three or more channels dey work together, to tap channels for di menu dey tick dem again for \"Block di N wey dem select\" (e don spoil since June). Keywords and Channels rows dey show dia source colours again, blocked video no dey leave di tab blank again after di extension reload or update, and FilterTube no dey run for di creator Studio pages again.",
+      "Home get \"Join di community\" row with Discord, Reddit and Instagram, and di dashboard text don short and clear pass."
+    ]
+  },
   "3.6.2": {
     "headline": "Meet Kriti and Uljhan, Study planner wey dem rebuild, and Ask a parent",
     "summary": "FilterTube 3.6.2 don get im own look, with Kriti and Uljhan, crayon icons, doodles and sounds wey you fit choose. Study don rebuild around day planner with ready-made packs for 29 countries, pikin fit ask parent for one video or channel, and the viewer, profiles, tablets and TVs get calmer redesign with privacy notes wey clear well.",

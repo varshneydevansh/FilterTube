@@ -1,4 +1,20 @@
 {
+  "3.6.3": {
+    "headline": "Waɗanda aka yarda kawai da Karatu a kowane shafi, tafiya kai tsaye zuwa bidiyo na gaba da aka yarda, da madadin da ake bincika don gano sauyi",
+    "summary": "FilterTube 3.6.3 yana sa Waɗanda aka yarda kawai da Karatu su taƙaita shafin gaba ɗaya: Gida, bincike, Kallo, shafukan tasha da sashen hagu suna nuna abin da jerinka ko tsarinka ya yarda kawai, kuma suna faɗin abin da ke jira. Tafiya kai tsaye da jerin waƙa suna ci gaba zuwa bidiyo na gaba da aka yarda, ana bincika madadin don gano sauye-sauyen da aka yi a wajen FilterTube, kuma an gyara wasu tsofaffin kurakurai.",
+    "bannerSummary": "Waɗanda aka yarda kawai da Karatu a kowane shafi, tafiya kai tsaye zuwa bidiyo na gaba da aka yarda, da madadin da ake bincika don gano sauyi.",
+    "ctaLabel": "Duba sababbin abubuwa",
+    "highlights": [
+      "Waɗanda aka yarda kawai da Karatu yanzu suna taƙaita kowane shafi. Gida yana nuna rafi da aka gina daga tashoshinka da aka yarda ko tsarin karatunka, bincike yana faɗin abin da ke jira har sai karatu ya ƙare, Kallo yana da ƙaramin sandar da ke nuna zagaye da mintocin da suka rage, tashar da ke wajen jerinka tana nuna kati da ke faɗin dalili, kuma sashen hagu yana jera tashoshin karatunka ko na waɗanda aka yarda. Idan yanayin ya ƙare, shafin yana komawa yadda yake daidai.",
+      "Gida na karatu yana sanya darussan da ke kan batutuwan tsarinka a gaba, kuma yana barin rubuce-rubucen da ba darussa ba da bidiyon wasu jarrabawa. Fakitin jarrabawa yanzu suna nuni zuwa tashoshin kowace jarrabawa.",
+      "Tafiya kai tsaye tana zuwa bidiyo na gaba da aka yarda, a cikin \"Ba da izini ga zaɓaɓɓu kaɗai\" ma (batun GitHub #82). \"Tsallake bidiyoyin kunnawa kai tsaye da aka toshe\" yana kunne ga sababbin shigarwa kuma yana rufe Na gaba ma. A cikin jerin waƙa ko Mix, bidiyon da ake toshewa kawai bayan shafinsa ya yi lodi, misali saboda kalma a bayaninsa, yana ci gaba zuwa bidiyo na gaba da aka yarda.",
+      "Madadin yana adana kowane bayanin martaba, tace da saiti kuma yana da binciken cikakken yanayi. Allon shigo da kaya yana gaya maka lokacin da aka canza madadin a wajen FilterTube, kuma shigo da kayan da zai raunana bayanin martaba da aka kare yana buƙatar PIN na iyaye.",
+      "Yanayin yara yana da maɓallin Toshewa a natse nasa, don haka saitin Babban ba ya yanke shawarar abin da shafin yara yake nunawa kuma.",
+      "Katin da aka toshe yana ambaton kalmar da ka rubuta, misali \"AI\" (kalma ta ainihi) da aka samu a bayanin bidiyo, maimakon tsari.",
+      "Gyare-gyare: idan akwai tashoshi uku ko fiye masu haɗin gwiwa, taɓa tashoshi a menu yana sake yi musu alama don \"Toshe N ɗin da aka zaɓa\" (ya lalace tun Yuni). Layukan Mahimman kalmomi da Tashoshi suna sake nuna launukan tushensu, bidiyon da aka toshe ba ya sa shafin ya zama fanko bayan an sake loda ƙarin ko an sabunta shi, kuma FilterTube ba ya aiki a shafukan Studio na masu ƙirƙira kuma.",
+      "Gida yana da layin \"Shiga cikin al’umma\" tare da Discord, Reddit da Instagram, kuma rubutun dashboard ya fi guntu da bayyana."
+    ]
+  },
   "3.6.2": {
     "headline": "Ku haɗu da Kriti da Uljhan, sabon tsarin Study da Tambayi iyaye",
     "summary": "FilterTube 3.6.2 ya samu kamanninsa na kansa, tare da Kriti da Uljhan, gumakan fensirin launi, zane-zane da sautuka na zaɓi. An sake gina Study a kan tsarin ayyukan rana tare da fakitin da aka shirya don ƙasashe 29, yara za su iya roƙon iyaye bidiyo ko tasha, kuma mai kallo, bayanan martaba, kwamfutar hannu da TV sun samu sabon zane mai natsuwa tare da bayanan sirri masu bayyana.",

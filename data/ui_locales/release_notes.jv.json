@@ -1,4 +1,20 @@
 {
+  "3.6.3": {
+    "headline": "Mung sing diidinake lan Study ing saben kaca, otomatis menyang video sing diidinake sabanjure, lan serep sing dipriksa saka owah-owahan",
+    "summary": "FilterTube 3.6.3 gawe Mung sing diidinake lan Study nyempitake kabeh kaca: Ngarep, panelusuran, Watch, kaca channel lan panel kiwa mung nuduhake apa sing diidinake dhaptar utawa rencana sampeyan, lan menehi weruh apa sing lagi ngenteni. Puter otomatis sabanjure lan playlist terus menyang video sing diidinake sabanjure, serep dipriksa apa diowahi ing njaba FilterTube, lan sawetara bug lawas didandani.",
+    "bannerSummary": "Mung sing diidinake lan Study ing saben kaca, otomatis menyang video sing diidinake sabanjure, lan serep sing dipriksa saka owah-owahan.",
+    "ctaLabel": "Deleng Sing Anyar",
+    "highlights": [
+      "Mung sing diidinake lan Study saiki nyempitake saben kaca. Ngarep nuduhake feed sing digawe saka channel sing sampeyan idini utawa rencana Study, panelusuran menehi weruh apa sing ngenteni nganti Study rampung, Watch duwe bar cilik sing nuduhake babak lan sisa menit, channel ing njaba dhaptar sampeyan nuduhake kertu sing nerangake sebabe, lan panel kiwa nampilake channel Study utawa channel sing diidinake. Yèn mode wis rampung, kaca bali persis kaya wiwitan.",
+      "Ngarep Study nyelehake pelajaran miturut topik rencana sampeyan luwih dhisik, lan ngilangi kiriman sing dudu pelajaran lan video kanggo ujian liyane. Paket ujian saiki nuduhake channel duweké saben ujian.",
+      "Puter otomatis sabanjure terus menyang video sing diidinake sabanjure, uga ing Idini mung sing dipilih (GitHub issue #82). \"Liwati video puter otomatis sing diblokir\" aktif kanggo instalasi anyar lan uga nyakup Sabanjure. Ing playlist utawa Mix, video sing lagi diblokir sawisé kacané dimuat, umpamane merga tembung ing katrangan, terus menyang video sing diidinake sabanjure.",
+      "Serep nyimpen saben profil, saringan lan setelan, lan nganggo pamriksan integritas. Layar impor menehi weruh yèn serep diowahi ing njaba FilterTube, lan impor sing bakal ngenthengake profil sing dilindhungi mbutuhake PIN wong tuwa.",
+      "Mode bocah duwe saklar Mblokir kanthi meneng dhewe, dadi setelan Utama ora nemtokake maneh apa sing ditampilake situs Kids.",
+      "Kertu sing diblokir nyebutake tembung sing sampeyan ketik, umpamane \"AI\" (tembung pas) sing ditemokake ing katrangan video, dudu pola.",
+      "Dandanan: yèn ana telung channel kolaborasi utawa luwih, ngetok channel ing menu centhang maneh kanggo \"Blokir N sing dipilih\" (rusak wiwit Juni). Baris Tembung kunci lan Saluran nampilake warna sumbere maneh, video sing diblokir ora gawe tab dadi kosong sawisé ekstensi dimuat ulang utawa dianyari, lan FilterTube ora mlaku maneh ing kaca Studio kreator.",
+      "Ngarep duwe baris \"Melu komunitas\" kanthi Discord, Reddit lan Instagram, lan teks dashboard dadi luwih cekak lan cetha."
+    ]
+  },
   "3.6.2": {
     "headline": "Kenalan karo Kriti lan Uljhan, perencana Study sing digawe anyar, lan Takon wong tuwa",
     "summary": "FilterTube 3.6.2 duwe tampilan dhewe, kanthi Kriti lan Uljhan, ikon krayon, corètan lan swara opsional. Study digawe anyar adhedhasar perencana dina kanthi paket siap pakai kanggo 29 negara, bocah bisa njaluk video utawa channel marang wong tuwa, lan pamuter, profil, tablet lan TV éntuk desain anyar sing luwih tenang kanthi cathetan privasi sing luwih cetha.",

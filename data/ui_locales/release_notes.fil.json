@@ -1,4 +1,20 @@
 {
+  "3.6.3": {
+    "headline": "Allowed only at Study sa bawat page, auto-next sa susunod na pinapayagang video, at mga backup na sinusuri laban sa pakikialam",
+    "summary": "Ginagawa ng FilterTube 3.6.3 na pinapaliit ng Allowed only at Study ang buong page: ang Home, search, Watch, mga page ng channel at kaliwang pane ay nagpapakita lang ng pinapayagan ng listahan o plano mo, at sinasabi kung ano ang naghihintay. Lumilipat ang auto-next at mga playlist sa susunod na pinapayagang video, sinusuri ang mga backup para sa mga pagbabagong ginawa sa labas ng FilterTube, at naayos ang ilang lumang bug.",
+    "bannerSummary": "Allowed only at Study sa bawat page, auto-next sa susunod na pinapayagang video, at mga backup na sinusuri laban sa pakikialam.",
+    "ctaLabel": "Tingnan ang mga bago",
+    "highlights": [
+      "Pinapaliit na ngayon ng Allowed only at Study ang bawat page. Ang Home ay nagpapakita ng feed na binuo mula sa mga pinapayagan mong channel o study plan, sinasabi ng search kung ano ang naghihintay hanggang matapos ang pag-aaral, may maliit na bar ang Watch na nagpapakita ng round at natitirang minuto, ang channel na wala sa listahan mo ay nagpapakita ng card na nagsasabi kung bakit, at inililista ng kaliwang pane ang iyong mga channel sa pag-aaral o pinapayagan. Kapag natapos ang mode, eksaktong gaya ng dati ang page.",
+      "Inuuna ng study Home ang mga aralin sa mga paksa ng plano mo at inaalis ang mga post na hindi aralin at mga video para sa ibang exam. Itinuturo na ngayon ng mga exam pack ang sariling mga channel ng bawat exam.",
+      "Lumilipat ang auto-next sa susunod na pinapayagang video, pati sa Pahintulutan lang ang napili (GitHub issue #82). Naka-on ang \"Laktawan ang mga naka-block na video sa autoplay\" para sa mga bagong install at sakop din nito ang Susunod. Sa isang playlist o Mix, ang video na naba-block lang kapag na-load na ang page nito, halimbawa dahil sa isang salita sa description, ay lumilipat sa susunod na pinapayagan.",
+      "Pinapanatili ng mga backup ang bawat profile, filter at setting at may kasamang integrity check. Sinasabi ng import screen kapag nabago ang isang backup sa labas ng FilterTube, at ang import na magpapahina sa protektadong profile ay nangangailangan ng PIN ng magulang.",
+      "May sariling switch na Tahimik na pag-block ang Mode para sa mga bata, kaya hindi na ang setting na Main ang nagpapasya kung ano ang ipinapakita ng Kids site.",
+      "Pinapangalanan ng blocked card ang salitang itinype mo, halimbawa ang \"AI\" (eksaktong salita) na nakita sa description ng video, sa halip na isang pattern.",
+      "Mga ayos: kapag tatlo o higit pang nagtutulungang channel, ang pag-tap sa mga channel sa menu ay muling nagmamarka sa mga ito para sa \"I-block ang N napili\" (sira mula pa noong Hunyo). Muling ipinapakita ng mga row ng Mga keyword at Mga channel ang kanilang mga kulay ng pinagmulan, hindi na nagiging blangko ang tab dahil sa naka-block na video matapos mag-reload o mag-update ang extension, at hindi na tumatakbo ang FilterTube sa mga page ng creator Studio.",
+      "May row na \"Sumali sa komunidad\" ang Home na may Discord, Reddit at Instagram, at mas maikli at mas malinaw na ang teksto ng dashboard."
+    ]
+  },
   "3.6.2": {
     "headline": "Kilalanin sina Kriti at Uljhan, ang binagong Study planner at Magtanong sa magulang",
     "summary": "May sariling hitsura na ang FilterTube 3.6.2, kasama sina Kriti at Uljhan, mga icon na krayola, mga doodle at opsyonal na tunog. Binago ang Study batay sa isang planner ng araw na may mga handang pack para sa 29 na bansa, puwedeng humiling ang mga bata sa magulang ng video o channel, at mas payapa ang bagong disenyo ng viewer, mga profile, tablet at TV na may mas malinaw na mga paalala sa privacy.",
