@@ -193,6 +193,7 @@ const STUDY_TESTS = Object.freeze([
   'tests/runtime/nanah-keyword-merge-identity.test.mjs',
   'tests/runtime/study-model.test.mjs',
   'tests/runtime/study-backup-roundtrip.test.mjs',
+  'tests/runtime/study-plan-roundtrip.test.mjs',
   'tests/runtime/study-personal-sync.test.mjs',
   'tests/runtime/study-family-scopes.test.mjs',
   'tests/runtime/study-scope-routes.test.mjs',
