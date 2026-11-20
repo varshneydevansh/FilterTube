@@ -119,7 +119,7 @@ test('courier sends sealed items only and returns the child acks', async () => {
         async host(session, hooks) { this.hooks = hooks; this.session = session; setTimeout(() => this.ready(), 0); }
         async join(session, hooks) { this.hooks = hooks; this.session = session; setTimeout(() => this.ready(), 0); }
         ready() { this.hooks.onSas({ phrase: 'auto' }); }
-        async confirmSas() { this.confirmed = true; if (sides.every(side => side.confirmed) && sides.length === 2) for (const side of sides) side.hooks.onConnected(); }
+        async confirmSas() { this.confirmed = true; this.dataChannel = { readyState: 'open' }; this.sendKey = {}; if (sides.every(side => side.confirmed) && sides.length === 2) for (const side of sides) side.hooks.onConnected(); }
         async send(envelope) { const other = sides.find(side => side !== this); setTimeout(() => other.hooks.onData(JSON.parse(JSON.stringify(envelope))), 0); }
         async close() {}
     }

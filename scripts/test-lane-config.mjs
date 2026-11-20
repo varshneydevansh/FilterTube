@@ -191,6 +191,8 @@ const AUTO_SYNC_TESTS = Object.freeze([
   'tests/runtime/managed-study-scope-fields.test.mjs',
   'tests/runtime/managed-action-history-parity.test.mjs',
   'tests/runtime/managed-seamless-auth.test.mjs',
+  'tests/runtime/managed-courier-open.test.mjs',
+  'tests/runtime/managed-merge-keeps-child-identity.test.mjs',
 ]);
 const STUDY_TESTS = Object.freeze([
   'tests/runtime/nanah-keyword-merge-identity.test.mjs',

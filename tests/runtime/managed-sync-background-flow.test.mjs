@@ -62,7 +62,7 @@ test('Send → ring → announce → courier → applied on the child and "appli
             host.peer = this; this.peer = host;
             for (const side of [host, this]) setTimeout(() => side.hooks.onSas({ phrase: 'auto' }), 0);
         }
-        async confirmSas() { this.confirmed = true; if (this.peer?.confirmed) for (const side of [this, this.peer]) side.hooks.onConnected(); }
+        async confirmSas() { this.confirmed = true; this.dataChannel = { readyState: 'open' }; this.sendKey = {}; if (this.peer?.confirmed) for (const side of [this, this.peer]) side.hooks.onConnected(); }
         async send(envelope) { setTimeout(() => this.peer.hooks.onData(JSON.parse(JSON.stringify(envelope))), 0); }
         async close() {}
     }

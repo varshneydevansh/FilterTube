@@ -22,6 +22,27 @@
     const JOIN_RETRIES = 3;
     const JOIN_RETRY_MS = 1500;
     const CODE = /^ftcour-[a-z2-7]{26}$/;
+    // Android cf8520e63 (device test 2026-11-21): the transport reports "connected" when the peer
+    // connection connects, but the data channel can open later, so a first send threw and nothing
+    // was delivered. Sends wait for an open, keyed channel (15 s) and retry once.
+    const OPEN_TIMEOUT_MS = 15 * 1000;
+    const OPEN_POLL_MS = 50;
+
+    /** Resolves once the channel is open and the session keys exist (Android waitForCourierOpen). */
+    function waitForOpen(transport, isClosed, timeoutMs = OPEN_TIMEOUT_MS) {
+        return new Promise((resolve, reject) => {
+            const startedAt = Date.now();
+            const check = () => {
+                if (isClosed()) { reject(new Error('courier_closed')); return; }
+                if (transport.dataChannel && transport.dataChannel.readyState === 'open' && transport.sendKey) { resolve(); return; }
+                if (Date.now() - startedAt >= timeoutMs) { reject(new Error('courier_channel_open_timeout')); return; }
+                setTimeout(check, OPEN_POLL_MS);
+            };
+            check();
+        });
+    }
+
+    const reasonOf = error => String(error?.message || 'courier_failed').slice(0, 80);
     const obj = value => (value && typeof value === 'object' && !Array.isArray(value) ? value : {});
 
     function transportClass(nanah) {
@@ -47,7 +68,7 @@
             .map(item => Object.fromEntries(ITEM_FIELDS.filter(key => item[key] !== undefined).map(key => [key, item[key]])));
     }
 
-    function session({ code, mode, deviceId, nanah, timeoutMs, onReady, onData, onStarted }) {
+    function session({ code, mode, deviceId, nanah, timeoutMs, onReady, onData, onStarted, openTimeoutMs = OPEN_TIMEOUT_MS }) {
         return new Promise(resolve => {
             const Transport = transportClass(nanah);
             if (!Transport) { resolve({ ok: false, reason: 'webrtc_unavailable' }); return; }
@@ -61,16 +82,37 @@
                 Promise.resolve().then(() => transport.close()).catch(() => {});
                 resolve(result);
             };
-            const timer = setTimeout(() => finish({ ok: false, reason: 'timeout' }), timeoutMs || TIMEOUT_MS);
-            const send = envelope => transport.send(envelope);
+            const timer = setTimeout(() => finish({ ok: false, reason: 'courier_timeout' }), timeoutMs || TIMEOUT_MS);
+            const isClosed = () => finished;
+            // Waits for the data channel, and retries once if the first send still fails.
+            const send = async envelope => {
+                await waitForOpen(transport, isClosed, openTimeoutMs);
+                try {
+                    await transport.send(envelope);
+                } catch (_) {
+                    await waitForOpen(transport, isClosed, openTimeoutMs);
+                    await transport.send(envelope);
+                }
+            };
+            let connected = false;
             const hooks = {
                 onStageChange() {},
                 onProgress() {},
                 onSas() { void transport.confirmSas(); },
-                onConnected() { Promise.resolve(onReady?.({ send, finish })).catch(() => finish({ ok: false, reason: 'send_failed' })); },
-                onData(envelope) { Promise.resolve(onData?.(obj(envelope), { send, finish })).catch(() => finish({ ok: false, reason: 'receive_failed' })); },
-                onClosed() { finish({ ok: false, reason: 'closed' }); },
-                onError(error) { finish({ ok: false, reason: String(error?.message || 'error').slice(0, 80) }); }
+                // Connected is not yet open: onReady runs once the channel can carry a message.
+                onConnected() {
+                    if (connected) return;
+                    connected = true;
+                    waitForOpen(transport, isClosed, openTimeoutMs)
+                        .then(() => onReady?.({ send, finish }))
+                        .catch(error => finish({ ok: false, reason: reasonOf(error) }));
+                },
+                onData(envelope) {
+                    Promise.resolve(onData?.(obj(envelope), { send, finish })).catch(error => finish({ ok: false, reason: reasonOf(error) }));
+                },
+                // A close or an error ends the wait at once, the child's wait for items included.
+                onClosed() { finish({ ok: false, reason: 'courier_closed' }); },
+                onError(error) { finish({ ok: false, reason: reasonOf(error) }); }
             };
             // A throwaway id, as on Android: the relay cannot tie a courier to a doorbell.
             const device = { deviceId: `courier-${sessionId()}` };
@@ -83,11 +125,11 @@
     }
 
     /** Parent: host `code`, send the sealed items, resolve with the child's ack records. */
-    function host({ code, items, deviceId, nanah, timeoutMs, onHosting } = {}) {
+    function host({ code, items, deviceId, nanah, timeoutMs, onHosting, openTimeoutMs } = {}) {
         const sealed = sealedOnly(items);
         if (!sealed.length) return Promise.resolve({ ok: false, reason: 'no_items', acks: [] });
         return session({
-            code, mode: 'host', deviceId, nanah, timeoutMs, onStarted: onHosting,
+            code, mode: 'host', deviceId, nanah, timeoutMs, onStarted: onHosting, openTimeoutMs,
             onReady: ({ send }) => send({ t: 'ft_courier_items', v: 1, items: sealed }),
             onData: (envelope, { finish }) => {
                 if (envelope.t !== 'ft_courier_acks' || envelope.v !== 1) return;
@@ -102,11 +144,11 @@
      * Child: join `code`, hand the items to onItems(items) (which verifies and applies them and
      * returns ack records), send the acks, close. Retries a missing session (§3).
      */
-    async function join({ code, deviceId, nanah, timeoutMs, onItems, retries = JOIN_RETRIES, wait = ms => new Promise(r => setTimeout(r, ms)) } = {}) {
+    async function join({ code, deviceId, nanah, timeoutMs, openTimeoutMs, onItems, retries = JOIN_RETRIES, wait = ms => new Promise(r => setTimeout(r, ms)) } = {}) {
         let last = { ok: false, reason: 'not_started' };
         for (let attempt = 0; attempt <= retries; attempt += 1) {
             last = await session({
-                code, mode: 'join', deviceId, nanah, timeoutMs,
+                code, mode: 'join', deviceId, nanah, timeoutMs, openTimeoutMs,
                 onData: async (envelope, { send, finish }) => {
                     if (envelope.t !== 'ft_courier_items' || envelope.v !== 1) return;
                     const items = sealedOnly(envelope.items);
@@ -122,5 +164,5 @@
         return last;
     }
 
-    return Object.freeze({ TIMEOUT_MS, MAX_ITEMS, CODE, sealedOnly, host, join });
+    return Object.freeze({ TIMEOUT_MS, OPEN_TIMEOUT_MS, MAX_ITEMS, CODE, sealedOnly, waitForOpen, host, join });
 }));

@@ -346,8 +346,16 @@
             if (answer.ok && answer.courier) {
                 const deviceHash = await Doorbell.hash(ctx.deviceId);
                 const result = await runCourier({ role: 'join', code: answer.courier, deviceHash });
+                if (!result?.ok) {
+                    // The courier's own error is the reason for this check (Android cf8520e63), not a
+                    // mailbox or Home Pickup reason.
+                    const reason = `courier:${str(result?.reason) || 'courier_failed'}`.slice(0, 96);
+                    await set({ [Receiver.STATE_KEY]: { version: 1, lastPickupAt: now(), reason, appliedProfileIds: [] } }).catch(() => null);
+                    void pickupRunner('courier');
+                    return { ok: false, courier: true, reason };
+                }
                 void pickupRunner('courier');
-                return { ok: !!result?.ok, courier: true };
+                return { ok: true, courier: true };
             }
             void pickupRunner('announce');
             return { ok: answer.ok === true, courier: false, reason: answer.reason };
@@ -434,6 +442,12 @@
             const answer = () => { if (!answered) { answered = true; reply(Doorbell.announceAnswer(code, queued.length)); } };
             const result = await runCourier({ role: 'host', code, deviceHash, items: queued.map(entry => entry.item), onHosting: answer });
             if (!answered) answer();
+            if (!result?.ok) {
+                // The parent keeps the courier's reason on the waiting entries (still queued, retried).
+                const reason = `courier:${str(result?.reason) || 'courier_failed'}`.slice(0, 96);
+                await mutateOutbox(box => ({ outbox: { version: 1, entries: box.entries.map(entry =>
+                    queued.some(row => row.entryId === entry.entryId) && entry.state === 'queued' ? { ...entry, lastAttemptReason: reason } : entry) } }));
+            }
             if (result?.ok) {
                 const linkDevice = id => str(ctx.parentLinks.find(link => link.linkId === id)?.remoteDeviceId);
                 // §10.3: a wrong MAC is ignored; no MAC (an older child) applies but stays "unverified".
