@@ -52,7 +52,7 @@ test('ring and announce follow the spec bounds and answer shapes', () => {
     assert.equal(Doorbell.parseAnnounceAnswer({ type: 'ft_update_announce_answer', v: 1, courier: 'ABCD', itemCount: 1 }).courier, '');
 });
 
-test('a caller reaches a listening doorbell, the answer goes back, and the listener hosts again', async () => {
+test('a caller reaches a listening doorbell, the answer goes back, and the session is kept for the next caller', async () => {
     const relay = fakeRelay();
     const seen = [];
     const handle = Doorbell.listen({ ownDeviceId: 'child', WebSocketImpl: relay.WebSocketImpl, timers: globalThis,
@@ -63,9 +63,12 @@ test('a caller reaches a listening doorbell, the answer goes back, and the liste
     assert.equal(result.ok, true);
     assert.deepEqual(result.answer, Doorbell.ringAnswer());
     assert.equal(seen[0].type, 'ft_update_ring');
-    const sessions = () => relay.frames.filter(frame => frame.type === 'host_session').map(frame => frame.sessionId);
-    await until(() => new Set(sessions()).size >= 2);
-    assert.notEqual(sessions()[0], sessions()[1], 'a fresh session after answering');
+    // §2.3 (Android e741ca0b1): no re-host after answering; the next caller joins the same session.
+    await new Promise(resolve => setTimeout(resolve, 400));
+    const second = await Doorbell.call({ remoteDeviceId: 'child', fromDeviceId: 'parent', WebSocketImpl: relay.WebSocketImpl,
+        converse: async ({ send, next }) => { send(Doorbell.ringMessage('parent', ['l1'])); return { ok: true, answer: await next() }; } });
+    assert.equal(second.ok, true);
+    assert.equal(relay.frames.filter(frame => frame.type === 'host_session').length, 1, 'one session for both callers');
     const offline = await Doorbell.call({ remoteDeviceId: 'nobody', fromDeviceId: 'parent', WebSocketImpl: relay.WebSocketImpl,
         converse: async () => ({ ok: true }) });
     assert.deepEqual(offline, { ok: false, reason: 'offline' });
@@ -95,8 +98,10 @@ test('outbox: replace queued per link and scope, ack states, expiry and the 64 c
         { mailboxItemId: 'c', linkId: 'L', ackState: 'rejected', accepted: false, reason: 'scope_not_allowed' }
     ], 'child', linkDevice, now);
     assert.deepEqual(result.outbox.entries.map(entry => [entry.state, entry.reason]), [['applied', null], ['rejected', 'scope_not_allowed']]);
-    assert.equal(Sync.stateFromAck({ ackState: 'delivered', accepted: true, applied: false, decision: 'idempotent_same_hash' }), 'applied');
-    assert.equal(Sync.stateFromAck({ ackState: 'delivered', accepted: true, applied: false }), 'delivered');
+    // Spec §4 (79108f833): applied only on a real change; otherwise up to date.
+    assert.equal(Sync.stateFromAck({ ackState: 'delivered', accepted: true, applied: false, decision: 'idempotent_same_hash' }), 'up_to_date');
+    assert.equal(Sync.stateFromAck({ ackState: 'delivered', accepted: true, applied: false, decision: 'unchanged' }), 'up_to_date');
+    assert.equal(Sync.stateFromAck({ ackState: 'delivered', accepted: true, applied: true }), 'applied');
     assert.equal(Sync.stateFromAck({ ackState: 'expired' }), 'expired');
     assert.equal(Sync.stateFromAck({ ackState: 'conflict' }), 'rejected');
     const later = Sync.pruneOutbox(Sync.enqueueOutbox(Sync.emptyOutbox(), [first], now), now + Sync.OUTBOX_TTL_MS + 1);

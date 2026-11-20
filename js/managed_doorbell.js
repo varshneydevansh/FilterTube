@@ -93,13 +93,6 @@
             attempt += 1;
             retry = timers.setTimeout(open, delay);
         }
-        function cycle(ws) {
-            if (socket !== ws || stopped) return;
-            socket = null;
-            clearTimers();
-            try { ws.close(1000, 'answered'); } catch (_) {}
-            retry = timers.setTimeout(open, 250);
-        }
         async function open() {
             if (stopped) return;
             if (typeof WebSocketImpl !== 'function') { state('unsupported'); return; }
@@ -122,19 +115,17 @@
                 if (message.type === 'session_ready') { state('listening'); return; }
                 if (message.type !== 'signal' || !message.payload || typeof message.payload !== 'object') return;
                 const replySession = str(message.sessionId) || sessionId;
-                // §2.3: after answering, leave and host again with a fresh session, so the next
-                // caller never meets an occupied one.
+                // §2.3 (Android e741ca0b1): keep this session after answering. The relay clears the
+                // caller when it leaves; re-hosting raced the old socket's close on the deployed
+                // relay, which deleted the new session, so callers got session_not_found.
                 // The answer may come seconds later (a courier starting): it goes out on this socket.
                 let replied = false;
                 const reply = payload => {
                     if (replied) return;
                     replied = true;
                     try { if (ws.readyState === 1) ws.send(JSON.stringify({ type: 'signal', sessionId: replySession, payload })); } catch (_) {}
-                    cycle(ws);
                 };
-                // Whatever the handler decides, this session is not reused afterwards: an ignored
-                // caller must not keep the doorbell occupied until the next re-host.
-                Promise.resolve().then(() => onSignal?.(message.payload, reply)).catch(() => null).finally(() => cycle(ws));
+                Promise.resolve().then(() => onSignal?.(message.payload, reply)).catch(() => null);
             };
             ws.onclose = () => { if (socket === ws) { socket = null; scheduleRetry(); } };
             ws.onerror = () => { try { ws.close(); } catch (_) {} };
