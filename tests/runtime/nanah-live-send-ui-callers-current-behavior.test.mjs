@@ -83,6 +83,11 @@ function commandCenterFixture(options = {}) {
   });
   context.window.FilterTubeIO = { loadProfilesV4: async () => root };
   context.nanahManagedLivePolicy.createSendOperation = () => ({ buildEnvelopeBatchForTrustedLinks: context.nanahManagedLivePolicy.buildEnvelopeBatchForTrustedLinks });
+  // Spec §4.1 (updated on purpose): a Send uses each link's bound source profile, so the saved link
+  // is bound to the child whose rules are sent, and the real resolver runs.
+  for (const link of f.links) link.localPolicyProfileId = 'child';
+  const resolverStart = source.indexOf('    function resolveNanahSavedUpdateSource(');
+  vm.runInNewContext(source.slice(resolverStart, source.indexOf('\n    }\n', resolverStart) + '\n    }'.length), context);
   const functionStart = source.indexOf('    async function sendManagedParentPolicyToVerifiedDevices(');
   const functionEnd = source.indexOf('\n    }\n', functionStart) + '\n    }'.length;
   vm.runInNewContext(source.slice(functionStart, functionEnd), context);
