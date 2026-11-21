@@ -268,8 +268,8 @@ body.ft-extension-surface #sidebarNav .nav-item.nav-item--quiet[aria-current="pa
 }
 .ft-home-study__studied { margin: 6px 0 0; font-size: 13px; color: var(--pk-muted); }
 /* Today's plan, read-only (DESIGN_PASS_2026-11-21 §4 decision 3): the flat bar, then Edit; no slider. */
-.ft-home-study__plan { display: flex; align-items: flex-end; gap: 12px; margin-top: 14px; padding-top: 12px; border-top: 1px solid var(--pk-line, #dcd1c2); }
-.ft-home-study__plan > .ft-dayplan { flex: 1 1 auto; min-width: 0; padding: 26px 0 0; }
+.ft-home-study__plan { display: block; margin-top: 14px; padding-top: 12px; border-top: 1px solid var(--pk-line, #dcd1c2); }
+.ft-home-study__plan > .ft-dayplan { padding: 26px 0 0; }
 .ft-home-study__plan .ft-dayplan__scale { margin-top: 8px; }
 .ft-home-study__edit { flex: none; }
 .ft-home-study__actions { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 16px; }

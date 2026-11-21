@@ -137,7 +137,8 @@
         return {
             kind: 'plan', planned, today, studying,
             until: studying && Number(value.until) > now ? Number(value.until) : null,
-            nextAt, studied,
+            // Only a study round is "Next round"; the next change may be the daily limit or a break.
+            nextAt, nextIsStudy: String(value.next?.state || '').toUpperCase() === 'STUDY', studied,
             progress: planned > 0 ? Math.min(1, studied / planned) : 0
         };
     }
@@ -352,7 +353,7 @@
             big.append(el('span', 'ft-home-study__minutes', formatCount(view.planned)), el('span', 'ft-home-study__unit', t('study.ring.planned', 'min planned')));
             let lineText = '';
             if (view.studying && view.until) lineText = t('home.study.now', 'Studying now, until {time}', { time: formatTime(view.until) });
-            else if (view.nextAt) lineText = t('home.study.next', 'Next round at {time}', { time: formatTime(view.nextAt) });
+            else if (view.nextAt && view.nextIsStudy) lineText = t('home.study.next', 'Next round at {time}', { time: formatTime(view.nextAt) });
             else if (!view.today) lineText = t('home.study.offToday', 'No study planned today.');
             const line = el('p', 'ft-home-study__line', lineText);
             const bar = el('div', 'ft-home-study__bar');
@@ -388,11 +389,14 @@
             try {
                 if (study.plan) plan = root.FilterTubeStudyUi?.planBar?.(study.plan, study.focus || {}, study.breakMode === 'normal' ? 'normal' : 'rest', { editable: false }) || null;
             } catch (e) { plan = null; }
+            // The bar takes the card's full width; Edit sits with the other actions and opens the plan editor.
             const planRow = el('div', 'ft-home-study__plan');
             if (plan) planRow.appendChild(plan);
-            const edit = button(t('home.study.edit', 'Edit'), 'btn-secondary ft-home-study__edit', openStudy);
-            planRow.appendChild(edit);
-            body.append(big, line, bar, studied, planRow, actions);
+            if (plan) actions.appendChild(button(t('home.study.edit', 'Edit'), 'btn-secondary ft-home-study__edit', () => {
+                openStudy();
+                root.FilterTubeStudyUi?.openPlanEditor?.();
+            }));
+            body.append(big, line, bar, studied, ...(plan ? [planRow] : []), actions);
         };
         draw();
         let drawing = false;

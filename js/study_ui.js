@@ -3614,10 +3614,19 @@
         return t('study.hoursMinutes', '{hours} h {minutes} min', { hours: Math.floor(minutes / 60), minutes: minutes % 60 });
     }
 
+    /** The Study page mounted on this page, so Home's Edit can open the plan editor itself. */
+    let mountedDashboard = null;
+    /** Opens the Study page's plan editor (the one day-bar editor); false when there is no Study page here. */
+    function openPlanEditor() {
+        if (!mountedDashboard?.setMode) return false;
+        mountedDashboard.setMode('plan');
+        return true;
+    }
+
     root.FilterTubeStudyUi = Object.freeze({
         t, phaseInfo, planSegments, segmentWords, setByLabel, packLabel, renderStrip, mountStrip,
         renderPlanPage, renderDashboard, mountDashboard, showLooseningNotice, lengthLabel, dayRing, ringState, heroLines, renderParentPlans, searchExplainerCard, askForTime, applyCountryAccent, openSetup,
-        renderTimetablePage, timetableStatus, planBar
+        renderTimetablePage, timetableStatus, planBar, openPlanEditor
     });
 
     // Any page that loads this file shows the sheet when the background puts a loosening back.
@@ -3642,7 +3651,7 @@
             mountStrip(strip);
         }
         const dashboard = doc.getElementById('ftStudyDashboard');
-        if (dashboard) mountDashboard(dashboard);
+        if (dashboard) mountedDashboard = mountDashboard(dashboard);
     }
     if (root.document) {
         if (root.document.readyState === 'loading') root.document.addEventListener('DOMContentLoaded', autoMount, { once: true });

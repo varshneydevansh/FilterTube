@@ -162,7 +162,10 @@ test('one editor (DESIGN_PASS_2026-11-21 §4 decision 3): no length slider; Home
     const home = fs.readFileSync('js/dashboard_home.js', 'utf8');
     assert.doesNotMatch(ui + home, /mountLengthSlider|ft-length/);
     assert.match(home, /planBar\?\.\(study\.plan, [^)]*\{ editable: false \}\)/);
-    assert.match(home, /t\('home\.study\.edit', 'Edit'\), 'btn-secondary ft-home-study__edit', openStudy/);
+    // Edit sits with the actions (the bar keeps the card's width) and opens the plan editor itself.
+    assert.match(home, /t\('home\.study\.edit', 'Edit'\), 'btn-secondary ft-home-study__edit', \(\) => \{\s*openStudy\(\);\s*root\.FilterTubeStudyUi\?\.openPlanEditor\?\.\(\);/);
+    assert.equal(typeof Ui.openPlanEditor, 'function');
+    assert.equal(Ui.openPlanEditor(), false, 'no Study page mounted: nothing to open');
 });
 
 test('the plan page\'s steppers: START never pushes END, the limit steps from the end, each says its step', async () => {

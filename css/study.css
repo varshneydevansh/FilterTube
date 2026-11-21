@@ -598,8 +598,11 @@ body.ft-extension-surface .ft-study-card[data-study-page],
 .ft-dayplan__track { position: relative; height: 40px; border-radius: 4px; background: var(--pk-track); }
 .ft-dayplan__seg { position: absolute; top: 0; bottom: 0; padding: 0; border: 0; cursor: pointer; }
 .ft-dayplan__seg.is-study { background: var(--pk-sage-ink); }
-.ft-dayplan__seg.is-break { background: var(--pk-sun); top: 8px; bottom: 8px; border-radius: 3px; }
-.ft-dayplan__seg.is-limit { background: repeating-linear-gradient(45deg, var(--pk-faint) 0 3px, transparent 3px 7px); }
+/* As on Android: the plan is one sage block; each break is a sun notch rising from the bottom edge, with a
+   paper rim, so 25/5 rounds never turn the bar into a barcode. The limit is the track a step deeper. */
+.ft-dayplan__seg.is-break { background: var(--pk-sage-ink); }
+.ft-dayplan__seg.is-break::after { content: ''; position: absolute; left: 50%; top: 45%; bottom: -2px; width: 3.5px; margin-left: -1.75px; border-radius: 2px; background: var(--pk-sun); box-shadow: 0 0 0 1px var(--pk-paper); }
+.ft-dayplan__seg.is-limit { background: color-mix(in srgb, var(--pk-track) 65%, var(--pk-muted)); border-start-end-radius: 4px; border-end-end-radius: 4px; }
 .ft-dayplan__now { position: absolute; top: -14px; width: 0; height: 0; margin-left: -6px; border: 6px solid transparent; border-top: 9px solid var(--pk-ink); }
 .ft-dayplan__now::after { content: ''; position: absolute; left: -1px; top: 0; width: 2px; height: 46px; background: var(--pk-ink); }
 /* The handles (StudyDayPlannerView): a 2 px line through the bar and a 24 px paper knob on its bottom edge,
@@ -609,6 +612,8 @@ body.ft-extension-surface .ft-study-card[data-study-page],
 .ft-dayplan__handle::after { content: ''; position: absolute; left: 50%; bottom: -12px; width: 24px; height: 24px; margin-left: -12px; box-sizing: border-box; border-radius: 50%; border: 2px solid var(--pk-ink); background: var(--pk-paper); transition: transform 140ms ease-out; }
 /* Android 3d92defa7: the bar fits its width; each handle has a 44 px target around its knob. */
 .ft-dayplan__segs { position: absolute; inset: 0; }
+/* Touching segments overlap by a pixel: no hairline seam between rounds at fractional widths. */
+.ft-dayplan__seg.is-study, .ft-dayplan__seg.is-break { box-shadow: 1px 0 0 var(--pk-sage-ink); }
 .ft-dayplan__handle::before { content: ''; position: absolute; left: 50%; top: -2px; width: 44px; height: 44px; margin-left: -22px; }
 .ft-dayplan__handle:focus { outline: none; }
 .ft-dayplan__handle.is-limit { background: var(--pk-muted); }
@@ -686,3 +691,10 @@ body.ft-extension-surface .ft-dayplan__handle:focus-visible { outline: none !imp
 .ft-tt__actions { flex-wrap: wrap; }
 .ft-tt__copy { display: flex; flex-direction: column; gap: 10px; align-items: flex-start; }
 .ft-tt__hits:empty { display: none; }
+
+/* Narrow windows (a phone-width popup tab, a split screen): the day bar gets the width, not the gutters. */
+@media (max-width: 480px) {
+    #studyView .ft-study-page { padding-left: 8px; padding-right: 8px; }
+    #studyView .ft-plan-card { padding-left: 12px; padding-right: 12px; }
+    .ft-dayplan { padding-left: 8px; padding-right: 8px; }
+}
