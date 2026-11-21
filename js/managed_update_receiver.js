@@ -180,6 +180,18 @@
         return stableJson(['settings', 'main', 'kids', 'study'].map(key => (profile[key] === undefined ? null : profile[key])));
     }
 
+    /**
+     * Spec §9.2: another parent's timetable stays until that parent changes it (Android keeps this in
+     * its native lease; here it is checked before the adapter writes). Returns a refusal reason or ''.
+     */
+    function timetableOwnerConflict(profilesV4, envelope) {
+        const root = obj(envelope);
+        if (str(root.scope).toLowerCase() !== 'schedule' || !Object.prototype.hasOwnProperty.call(obj(root.payload), 'timetable')) return '';
+        const study = obj(obj(obj(obj(profilesV4).profiles)[str(root.targetProfileId)]).study);
+        const owner = str(obj(study.timetable).setByParentId);
+        return owner && owner !== str(root.sourceProfileId) ? 'timetable_owned_by_other_parent' : '';
+    }
+
     /** Runs fn once; a call while it runs schedules exactly one more run instead of dropping it. */
     function createCoalescingRunner(fn) {
         let running = null;
@@ -343,6 +355,12 @@
             if (validation.accepted !== true || validation.decision === 'idempotent_same_hash') {
                 await record(validation);
                 return finishDecision({ ...validation, applied: false }, item.mailboxItemId);
+            }
+            const ownerConflict = timetableOwnerConflict(trust.profilesV4, envelope);
+            if (ownerConflict) {
+                const refused = { accepted: false, reason: ownerConflict };
+                await record(refused);
+                return finishDecision(refused, item.mailboxItemId);
             }
             const rulesBefore = rulesFingerprint(trust.profilesV4, envelope.targetProfileId);
             const applied = await nanah.applyManagedMailboxItem(item, context);
@@ -513,6 +531,6 @@
 
     return Object.freeze({
         TRUSTED_LINKS_KEY, DEVICE_ID_KEY, PROFILES_KEY, NOTICE_KEY, NOTICE_SCHEMA, NOTICE_TTL_MS, STATE_KEY,
-        projectTrustedLink, explainIneligible, duplicateDeviceIds, createCoalescingRunner, rulesFingerprint, create
+        projectTrustedLink, explainIneligible, duplicateDeviceIds, createCoalescingRunner, rulesFingerprint, timetableOwnerConflict, create
     });
 }));

@@ -55,7 +55,8 @@ test('schedule: timetable replaces, null removes, absent leaves it', async () =>
         assert.equal(result.acks[0].ackState, 'delivered', result.acks[0].reason);
         return f.store.ftProfilesV4.profiles.Child.study;
     };
-    assert.deepEqual((await run({ timetable: { lanes: ['maths 6pm'] } })).timetable, { lanes: ['maths 6pm'] });
+    // §9.2 (7e212cf3e): the timetable names its signing parent, like the plan.
+    assert.deepEqual((await run({ timetable: { lanes: ['maths 6pm'] } })).timetable, { lanes: ['maths 6pm'], setByParentId: 'Parent' });
     assert.equal('timetable' in (await run({ timetable: null })), false);
     assert.deepEqual((await run({})).timetable, { lanes: ['old'] });
 });

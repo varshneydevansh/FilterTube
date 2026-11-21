@@ -23486,13 +23486,28 @@ document.addEventListener('DOMContentLoaded', async () => {
                 policy: { ...safeObject(current.policy), ...safeObject(nextEntry.policy) } });
         } else {
             rows.unshift(nextEntry);
-            const reservations = nanahLinkReservations();
-            if (reservations && nextEntry.linkType === 'managed_link' && nextEntry.localRole === 'source') {
-                trackNewSourceLink = nextLinkId;
-                // §11: a removed link's reservation holds unless this fresh, confirmed pairing may release it.
+        }
+        const reservations = nanahLinkReservations();
+        if (reservations && nextEntry.linkType === 'managed_link' && nextEntry.localRole === 'source') {
+            if (existingIndex < 0) trackNewSourceLink = nextLinkId;
+            {
+                // §11 / §13: any write of this link id meets the removed link's reservation, and
+                // releases what it provably doesn't need.
                 const removed = safeObject(await readNanahStorage(reservations.REMOVED_KEY));
                 const record = removed[nextLinkId];
-                if (record) {
+                const stillReserved = record && Object.values(safeObject(record.transports))
+                    .some(row => !['purged', 'released'].includes(normalizeString(safeObject(row).state)));
+                if (record && existingIndex < 0) {
+                    // §13: a re-paired link continues the removed link's signed revisions, so the
+                    // child never rejects its first update as stale_revision.
+                    const kept = safeObject(record.revisionState);
+                    const target = rows[0];
+                    target.policy = { ...safeObject(target.policy) };
+                    for (const key of ['outgoingManagedPolicies', 'outboundManagedPolicyHistory', 'inboundManagedAckHistory']) {
+                        if (kept[key] !== undefined && target.policy[key] === undefined) target.policy[key] = kept[key];
+                    }
+                }
+                if (record && stillReserved) {
                     if (!nanahSessionState.sasConfirmed) refuseNanahTrustWrite('repair_requires_confirmed_phrase');
                     const decision = reservations.evaluateRepair({ record, ledger: await readNanahStorage(reservations.EXPOSURE_KEY) });
                     for (const outcome of safeArray(decision.outcomes)) {
@@ -23516,12 +23531,13 @@ document.addEventListener('DOMContentLoaded', async () => {
         if (saved && reservations && trackNewSourceLink) {
             await writeNanahStorage(reservations.EXPOSURE_KEY,
                 reservations.markTracked(await readNanahStorage(reservations.EXPOSURE_KEY), trackNewSourceLink));
-            if (repair) {
-                const removed = { ...safeObject(await readNanahStorage(reservations.REMOVED_KEY)) };
-                removed[trackNewSourceLink] = reservations.releaseRecord(repair.record, repair.released);
-                await writeNanahStorage(reservations.REMOVED_KEY, removed);
-                console.info(`FilterTube: nanah_repair_released link=${trackNewSourceLink} transports=${repair.released.join(',') || 'none'}`);
-            }
+        }
+        if (saved && reservations && repair) {
+            const savedId = normalizeString(saved.linkId);
+            const removed = { ...safeObject(await readNanahStorage(reservations.REMOVED_KEY)) };
+            removed[savedId] = reservations.releaseRecord(repair.record, repair.released);
+            await writeNanahStorage(reservations.REMOVED_KEY, removed);
+            console.info(`FilterTube: nanah_repair_released link=${savedId} transports=${repair.released.join(',') || 'none'}`);
         }
         return saved;
     }
@@ -23616,6 +23632,10 @@ document.addEventListener('DOMContentLoaded', async () => {
                 courier: { configured: true, ok: dropped?.ok === true, digest: digestsAtRemoval.courier }
             }
         });
+        // §13: the signed revision state goes with the record, for a later re-pair to continue.
+        const policy = safeObject(trusted.policy);
+        record.revisionState = Object.fromEntries(['outgoingManagedPolicies', 'outboundManagedPolicyHistory', 'inboundManagedAckHistory']
+            .filter(key => policy[key] !== undefined).map(key => [key, JSON.parse(JSON.stringify(policy[key]))]));
         const removed = { ...safeObject(await readNanahStorage(reservations.REMOVED_KEY)), [linkId]: record };
         await writeNanahStorage(reservations.REMOVED_KEY, removed);
     }
@@ -24305,12 +24325,20 @@ document.addEventListener('DOMContentLoaded', async () => {
             { device, packs: names.join(', ') });
     }
 
+    // Spec §13: the line summarises the newest Send (its entries share createdAt); the worst item
+    // wins, so a rejected item is never hidden behind up-to-date duplicates.
+    const NANAH_OUTBOX_STATE_RANK = { rejected: 6, expired: 5, queued: 4, delivered: 3, applied: 2, up_to_date: 1 };
+    function pickNanahOutboxStatusEntry(entries, linkId) {
+        const rows = safeArray(entries).filter(row => normalizeString(row?.linkId) === normalizeString(linkId));
+        if (!rows.length) return null;
+        const newest = Math.max(...rows.map(row => Number(row?.createdAt) || 0));
+        return rows.filter(row => (Number(row?.createdAt) || 0) === newest)
+            .sort((a, b) => (NANAH_OUTBOX_STATE_RANK[normalizeString(b?.state)] || 0) - (NANAH_OUTBOX_STATE_RANK[normalizeString(a?.state)] || 0))[0];
+    }
+
     /** §8 status line for a parent→child link: the newest outbox entry for it, or nothing. */
     function formatNanahManagedOutboxStatus(entry) {
-        const linkId = normalizeString(entry?.linkId);
-        const latest = safeArray(nanahManagedOutboxState.entries)
-            .filter(row => normalizeString(row?.linkId) === linkId)
-            .sort((a, b) => (Number(b?.createdAt) || 0) - (Number(a?.createdAt) || 0))[0];
+        const latest = pickNanahOutboxStatusEntry(nanahManagedOutboxState.entries, entry?.linkId);
         if (!latest) return '';
         const device = normalizeString(latest.remoteLabel) || normalizeString(entry?.deviceLabel)
             || tabViewUiText('dashboard.sync.copy.trustedDevice', 'Trusted device');
@@ -27112,6 +27140,16 @@ document.addEventListener('DOMContentLoaded', async () => {
                 await recordManagedNanahPolicyValidationHistory(envelope, decision, context);
                 await sendNanahManagedLivePolicyAck(envelope, decision);
                 UIComponents.showToast(tabViewUiText('dashboard.sync.toast.managedPolicyApplyUnavailable', 'Managed policy apply is unavailable'), 'error');
+                return;
+            }
+            // §9.2: another parent's timetable stays until that parent changes it.
+            const timetableOwner = normalizeString(safeObject(safeObject(safeObject(safeObject(localProfilesV4).profiles)[normalizeString(envelope?.targetProfileId)]).study).timetable?.setByParentId);
+            if (normalizeString(envelope?.scope).toLowerCase() === 'schedule' && Object.prototype.hasOwnProperty.call(safeObject(envelope?.payload), 'timetable')
+                && timetableOwner && timetableOwner !== normalizeString(envelope?.sourceProfileId)) {
+                const decision = { accepted: false, reason: 'timetable_owned_by_other_parent' };
+                await recordManagedNanahPolicyValidationHistory(envelope, decision, context);
+                await sendNanahManagedLivePolicyAck(envelope, decision);
+                UIComponents.showToast(tabViewUiText('dashboard.sync.toast.managedPolicyRejected', 'Managed policy rejected: {reason}', { reason: formatManagedNanahBlockedReason(decision.reason) }), 'error');
                 return;
             }
             const result = await adapter.applyManagedPolicyEnvelope(envelope, context);
