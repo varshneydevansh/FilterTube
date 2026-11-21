@@ -2424,52 +2424,376 @@
         } catch (e) { }
     }
 
+    /** Width of text in the bar's block font, for blockLabel (a rough count without a canvas). */
+    let measureCanvas = null;
+    function textWidth(value, px = 12) {
+        try {
+            measureCanvas = measureCanvas || root.document?.createElement?.('canvas');
+            const context = measureCanvas?.getContext?.('2d');
+            if (context) { context.font = `700 ${px}px system-ui, sans-serif`; return context.measureText(value).width; }
+        } catch (e) { }
+        return Array.from(String(value)).length * px * 0.62;
+    }
+
+    function rtlOf(node) {
+        try { if (node?.isConnected && root.getComputedStyle) return root.getComputedStyle(node).direction === 'rtl'; } catch (e) { }
+        const dir = node?.closest?.('[dir]')?.getAttribute?.('dir') || root.document?.documentElement?.getAttribute?.('dir');
+        return dir === 'rtl';
+    }
+
     /**
-     * One day at a time (today first), its periods as rows, "Add a period", then Between periods,
-     * Hide Shorts and comments, Copy this day to... and Add to my calendar. A period opens in place:
-     * what to study (the plan's packs and lanes used before, or search), From and To in 15-minute
-     * steps, Save or Remove. Every change saves at once. options: {study, catalog, editable,
-     * readOnlyLabel, ui, onSave(change) -> Promise, redraw()}.
+     * The timetable's day on the bar (Android StudyTimetableDayBarView, bfbe09df0/6af91cdbf): the plan
+     * page's paper bar with each period a sage block named for its lane (initials when the name won't
+     * fit, never a cut-off name; the full name is the spoken label); click one to edit it. Editing
+     * (options.edited = {startMinute, endMinute}): the other periods fade and the edited one gets START
+     * and END handles with 44 px targets: drag them (15-minute snap, a cancelled drag puts it back) or
+     * use the keys as on the plan bar (arrows 15 min, Shift+arrow and Page Up/Down 1 h, Home/End, Escape
+     * puts back what the keys moved since focus). The hours fit the day's periods (6 am-11 pm on a bar
+     * 600 px or wider), it never scrolls sideways and mirrors under dir="rtl". END wins a tie.
+     */
+    function timetableBar(timetable, day, { catalog, ui, edited = null, editId = 'new', onOpen, onEdit } = {}) {
+        const T = timetableApi();
+        const wrap = el('div', 'ft-dayplan ft-ttbar');
+        const track = el('div', 'ft-dayplan__track');
+        const layer = el('div', 'ft-dayplan__segs');
+        const scale = el('div', 'ft-dayplan__scale');
+        track.appendChild(layer);
+        wrap.append(track, scale);
+        const others = T.periodsOf(timetable, day).filter(item => !(edited && item.startMinute === ui.editing));
+        let current = edited ? { ...edited } : null;
+        const trackWidth = () => { try { return track.getBoundingClientRect?.().width || 0; } catch (e) { return 0; } };
+        let wide = (trackWidth() || 0) >= 600;
+        let range = T.barRange(others, current, wide);
+        let dragging = null;
+        let mirrored = false;
+        const spot = minute => {
+            const value = ((Math.max(range.start, Math.min(range.end, minute)) - range.start) / Math.max(1, range.end - range.start)) * 100;
+            return mirrored ? 100 - value : value;
+        };
+        const pct = value => `${value.toFixed(3)}%`;
+        const handles = {};
+        const editName = current ? laneName({ packIds: ui.lane }, catalog) : '';
+        const today = T.dayKeyAt(Date.now(), deviceZone()) === day;
+        const layout = () => {
+            mirrored = rtlOf(wrap);
+            if (!dragging) range = T.barRange(others, current, wide);
+            const width = trackWidth() || 340;
+            layer.replaceChildren();
+            const blocks = [...others.map(item => ({ item, edit: false })), ...(current ? [{ item: current, edit: true }] : [])]
+                .sort((x, y) => x.item.startMinute - y.item.startMinute);
+            for (const { item, edit } of blocks) {
+                const from = Math.max(range.start, item.startMinute);
+                const to = Math.min(range.end, item.endMinute);
+                if (to <= from) continue;
+                const name = edit ? editName : laneName(T.lane(timetable, item.laneId), catalog);
+                const spoken = `${timeRange(item.startMinute, item.endMinute % T.DAY_MINUTES)}, ${name}`;
+                const open = !edit && !current && onOpen ? () => onOpen(item) : null;
+                const block = open ? button('', `ft-ttbar__block${current ? ' is-faded' : ''}`, open) : el('span', `ft-ttbar__block${edit ? ' is-editing' : current ? ' is-faded' : ''}`);
+                const x = spot(from); const y = spot(to);
+                block.style.left = pct(Math.min(x, y));
+                block.style.width = pct(Math.abs(y - x));
+                const room = (Math.abs(y - x) / 100) * width - 8;
+                const label = T.blockLabel(name, text => textWidth(text) <= room);
+                if (label) block.appendChild(el('span', 'ft-ttbar__name', label));
+                block.setAttribute('aria-label', spoken);
+                if (open) block.dataset.ftFocusKey = `tt-${day}-${item.startMinute}-block`;
+                else block.setAttribute('aria-hidden', edit ? 'true' : 'false');
+                layer.appendChild(block);
+            }
+            if (today) {
+                const now = new Date();
+                const minute = now.getHours() * 60 + now.getMinutes();
+                if (minute >= range.start && minute <= range.end) {
+                    const marker = el('span', 'ft-dayplan__now');
+                    marker.setAttribute('aria-hidden', 'true');
+                    marker.style.left = pct(spot(minute));
+                    layer.appendChild(marker);
+                }
+            }
+            scale.replaceChildren();
+            const perHour = (width * 60) / Math.max(60, range.end - range.start);
+            const every = [1, 2, 3, 4, 6].find(hours => hours * perHour >= 56) || 6;
+            for (let hour = Math.ceil(range.start / 60); hour * 60 <= range.end; hour += 1) {
+                if (hour % every !== 0 || hour >= 24) continue;
+                const x = (spot(hour * 60) / 100) * width;
+                if (x < 22 || x > width - 22) continue;
+                const tick = el('span', 'ft-dayplan__hour', clockLabel(hour * 60).replace(/:00/, ''));
+                tick.style.left = pct(spot(hour * 60));
+                scale.appendChild(tick);
+            }
+            for (const which of Object.keys(handles)) {
+                const handle = handles[which];
+                const at = which === 'start' ? current.startMinute : current.endMinute;
+                const time = clockLabel(at % T.DAY_MINUTES);
+                handle.style.left = pct(spot(at));
+                handle.setAttribute('aria-valuenow', String(at));
+                handle.setAttribute('aria-valuetext', time);
+                handle.setAttribute('aria-valuemin', String(which === 'start' ? 0 : current.startMinute + T.SNAP_MINUTES));
+                handle.setAttribute('aria-valuemax', String(which === 'start' ? current.endMinute - T.SNAP_MINUTES : T.DAY_MINUTES));
+                handle.querySelector('.ft-dayplan__pill').textContent = time;
+            }
+        };
+        if (current && onEdit) {
+            const live = done => { layout(); onEdit({ ...current }, done); };
+            let keyTimer = null;
+            for (const which of ['start', 'end']) {
+                const handle = el('span', `ft-dayplan__handle is-${which}`);
+                handle.appendChild(el('span', 'ft-dayplan__pill'));
+                handle.dataset.ftFocusKey = `tt-${day}-${editId}-${which}`;
+                handle.setAttribute('role', 'slider');
+                handle.setAttribute('aria-orientation', 'horizontal');
+                handle.setAttribute('aria-label', which === 'start' ? t('study.timetable.from', 'From') : t('study.timetable.to', 'To'));
+                handle.tabIndex = 0;
+                handle.addEventListener('focus', () => { if (!(ui.keyStart && ui.keyStart.which === which)) ui.keyStart = { which, period: { ...current } }; });
+                handle.addEventListener('blur', () => {
+                    handle.classList.remove('is-active');
+                    setTimeout(() => {
+                        if (root.document?.activeElement?.dataset?.ftFocusKey !== handle.dataset.ftFocusKey && ui.keyStart?.which === which) ui.keyStart = null;
+                    }, 0);
+                });
+                handle.addEventListener('keydown', event => {
+                    if (event.key === 'Escape') {
+                        if (dragging) { event.preventDefault(); dragging.cancel(); return; }
+                        const start = ui.keyStart?.which === which ? ui.keyStart.period : null;
+                        if (!start || (start.startMinute === current.startMinute && start.endMinute === current.endMinute)) return;
+                        event.preventDefault();
+                        current = { ...start };
+                        clearTimeout(keyTimer);
+                        live(true);
+                        return;
+                    }
+                    const flip = rtlOf(wrap) ? -1 : 1;
+                    const hour = event.shiftKey ? 60 : 15;
+                    const steps = { ArrowLeft: -hour * flip, ArrowRight: hour * flip, ArrowDown: -hour, ArrowUp: hour, PageDown: -60, PageUp: 60 };
+                    const at = which === 'start' ? current.startMinute : current.endMinute;
+                    let next;
+                    if (event.key === 'Home' || event.key === 'End') next = T.moveEdge(current, which === 'start', event.key === 'End' ? T.DAY_MINUTES : 0);
+                    else if (steps[event.key]) next = T.moveEdge(current, which === 'start', at + steps[event.key]);
+                    else return;
+                    event.preventDefault();
+                    current = next;
+                    handle.classList.add('is-active');
+                    live(false);
+                    // A run of key presses settles once, a moment after the last one.
+                    clearTimeout(keyTimer);
+                    keyTimer = setTimeout(() => { handle.classList.remove('is-active'); live(true); }, 700);
+                });
+                handles[which] = handle;
+                track.appendChild(handle);
+            }
+            track.addEventListener('pointerdown', event => {
+                if (event.button !== 0 || dragging) return;
+                const box = track.getBoundingClientRect();
+                const flipped = rtlOf(wrap);
+                const minuteAtX = x => range.start + (((flipped ? box.right - x : x - box.left) / Math.max(1, box.width)) * (range.end - range.start));
+                const xOf = minute => { const share = (minute - range.start) / Math.max(1, range.end - range.start); return flipped ? box.right - share * box.width : box.left + share * box.width; };
+                // A 44 px target around each handle; END wins a tie.
+                const ds = Math.abs(xOf(current.startMinute) - event.clientX);
+                const de = Math.abs(xOf(current.endMinute) - event.clientX);
+                const which = de <= 22 && de <= ds ? 'end' : ds <= 22 ? 'start' : null;
+                if (!which) return;
+                event.preventDefault();
+                const before = { ...current };
+                const handle = handles[which];
+                try { track.setPointerCapture(event.pointerId); } catch (e) { }
+                handle.classList.add('is-dragging');
+                try { handle.focus({ preventScroll: true }); } catch (e) { }
+                const move = ev => {
+                    const next = T.moveEdge(current, which === 'start', minuteAtX(ev.clientX));
+                    if (next.startMinute === current.startMinute && next.endMinute === current.endMinute) return;
+                    current = next;
+                    live(false);
+                };
+                const finish = cancelled => {
+                    track.removeEventListener('pointermove', move);
+                    track.removeEventListener('pointerup', onUp);
+                    track.removeEventListener('pointercancel', onCancel);
+                    handle.classList.remove('is-dragging');
+                    dragging = null;
+                    if (cancelled) current = before;
+                    live(true);
+                };
+                const onUp = () => finish(false);
+                const onCancel = () => finish(true);
+                dragging = { cancel: () => finish(true) };
+                track.addEventListener('pointermove', move);
+                track.addEventListener('pointerup', onUp);
+                track.addEventListener('pointercancel', onCancel);
+            });
+        }
+        layout();
+        if (typeof root.ResizeObserver === 'function') {
+            const watcher = new root.ResizeObserver(() => {
+                const width = trackWidth();
+                if (!width) return;
+                if (!wrap.isConnected) { watcher.disconnect(); return; }
+                wide = width >= 600;
+                layout();
+            });
+            watcher.observe(track);
+        }
+        return wrap;
+    }
+
+    /**
+     * The week grid (Android StudyTimetableWeekView, 9413ee20f): seven day columns over 6 am-11 pm, grown
+     * to every period, each period a sage block named for its lane. Click a period to open it in the
+     * inspector, an empty hour to add a period there (up to the next one), a day header to show that
+     * day. The selected day's header is filled, the edited period outlined; today's column is washed and
+     * has the now line. The columns mirror under dir="rtl".
+     */
+    function timetableWeek(timetable, options) {
+        const T = timetableApi();
+        const ui = options.ui;
+        const range = T.weekRange(timetable);
+        const hours = Math.max(1, (range.end - range.start) / 60);
+        const today = T.dayKeyAt(Date.now(), deviceZone());
+        const card = el('section', 'ft-home-card ft-tt-week');
+        card.setAttribute('aria-label', t('study.timetable.title', 'Timetable'));
+        const head = el('div', 'ft-tt-week__row ft-tt-week__head');
+        head.appendChild(el('span', 'ft-tt-week__axis'));
+        const body = el('div', 'ft-tt-week__row ft-tt-week__body');
+        body.style.height = `${hours * 32}px`;
+        const axis = el('div', 'ft-tt-week__axis');
+        for (let hour = Math.ceil(range.start / 60); hour * 60 < range.end; hour += 1) {
+            const label = el('span', 'ft-tt-week__hour', clockLabel(hour * 60).replace(/:00/, ''));
+            label.style.top = `${(((hour * 60 - range.start) / (range.end - range.start)) * 100).toFixed(3)}%`;
+            axis.appendChild(label);
+        }
+        body.appendChild(axis);
+        T.DAYS.forEach((day, index) => {
+            const selected = day === ui.day;
+            const count = T.periodsOf(timetable, day).length;
+            const name = button(weekdayName(index), `ft-tt-week__day${selected ? ' is-on' : ''}${day === today ? ' is-today' : ''}`, () => {
+                Object.assign(ui, { day, editing: null, query: '', copyOpen: false });
+                options.redraw();
+            });
+            name.setAttribute('aria-pressed', selected ? 'true' : 'false');
+            name.setAttribute('aria-label', `${weekdayName(index, true)}${count ? ` · ${count}` : ''}`);
+            name.dataset.ftFocusKey = `tt-${day}-day-head`;
+            head.appendChild(name);
+            const column = el('div', `ft-tt-week__col${day === today ? ' is-today' : ''}${selected ? ' is-selected' : ''}`);
+            column.addEventListener('click', event => {
+                if (event.target !== column || !options.editable) return;
+                const box = column.getBoundingClientRect();
+                const minute = range.start + ((event.clientY - box.top) / Math.max(1, box.height)) * (range.end - range.start);
+                const open = T.slot(timetable, day, minute);
+                Object.assign(ui, { day, editing: null, query: '', copyOpen: false });
+                if (open) {
+                    const lastLane = array(timetable.lanes).slice(-1)[0];
+                    Object.assign(ui, { editing: -1, start: open.startMinute, end: open.endMinute,
+                        lane: lastLane ? lastLane.packIds.slice() : array(object(options.study).activePackIds).slice(0, 1) });
+                }
+                options.redraw();
+            });
+            for (const period of T.periodsOf(timetable, day)) {
+                const lane = T.lane(timetable, period.laneId);
+                const name = laneName(lane, options.catalog);
+                const top = ((period.startMinute - range.start) / (range.end - range.start)) * 100;
+                const height = ((period.endMinute - period.startMinute) / (range.end - range.start)) * 100;
+                const editingThis = selected && ui.editing === period.startMinute;
+                const block = button('', `ft-tt-week__block${editingThis ? ' is-editing' : ''}`, () => {
+                    Object.assign(ui, { day, editing: null, query: '', copyOpen: false });
+                    if (options.editable) Object.assign(ui, { editing: period.startMinute, start: period.startMinute, end: period.endMinute, lane: array(lane?.packIds).slice() });
+                    options.redraw();
+                });
+                block.style.top = `${top.toFixed(3)}%`;
+                block.style.height = `${height.toFixed(3)}%`;
+                // A column is about 80 px wide and an hour 32 px tall: a name needs a quarter hour's room.
+                const tall = ((period.endMinute - period.startMinute) / 60) * 32 >= 18;
+                const label = T.blockLabel(name, text => tall && textWidth(text) <= 72);
+                if (label) block.appendChild(el('span', 'ft-tt-week__name', label));
+                block.setAttribute('aria-label', `${weekdayName(index, true)}, ${timeRange(period.startMinute, period.endMinute % T.DAY_MINUTES)}, ${name}`);
+                block.dataset.ftFocusKey = `tt-${day}-${period.startMinute}-grid`;
+                column.appendChild(block);
+            }
+            if (day === today) {
+                const now = new Date();
+                const minute = now.getHours() * 60 + now.getMinutes();
+                if (minute >= range.start && minute <= range.end) {
+                    const line = el('span', 'ft-tt-week__now');
+                    line.setAttribute('aria-hidden', 'true');
+                    line.style.top = `${(((minute - range.start) / (range.end - range.start)) * 100).toFixed(3)}%`;
+                    column.appendChild(line);
+                }
+            }
+            body.appendChild(column);
+        });
+        card.append(head, body);
+        return card;
+    }
+
+    /**
+     * The Timetable page (Android StudyTimetableActivity, DESIGN_PASS_2026-11-21 §4 decision 4). 900 px
+     * and wider: the week grid with the inspector beside it (the day view or the period editor).
+     * Narrower it stacks: the day chips in one row and the day on the bar. A period opens in place:
+     * its ends on the bar, what to study (the plan's packs and lanes used before, or search), From and
+     * To steppers, Save or Remove. Clips, Copy and the calendar wait behind one quiet "More choices".
+     * Every change saves at once. options: {study, catalog, editable, readOnlyLabel, ui, onSave(change)
+     * -> Promise, redraw()}.
      */
     function renderTimetablePage(host, options) {
         const T = timetableApi();
         const ui = options.ui;
-        const catalog = options.catalog;
         const study = object(options.study);
         const timetable = isObject(study.timetable) ? study.timetable : T.create({});
-        const editable = options.editable;
         if (!T.DAYS.includes(ui.day)) ui.day = T.dayKeyAt(Date.now(), deviceZone());
-        const card = el('section', 'ft-home-card ft-tt');
-        if (options.readOnlyLabel) card.appendChild(el('p', 'ft-study-muted', options.readOnlyLabel));
-        if (ui.editing !== null && editable) {
-            renderTimetableEditor(card, timetable, options);
-            host.appendChild(card);
-            return;
-        }
+        const wrap = el('div', 'ft-tt-wrap');
+        const layout = el('div', 'ft-tt-layout');
+        const inspector = el('section', 'ft-home-card ft-tt');
+        if (options.readOnlyLabel) inspector.appendChild(el('p', 'ft-study-muted', options.readOnlyLabel));
+        if (ui.editing !== null && options.editable) renderTimetableEditor(inspector, timetable, options);
+        else renderTimetableDay(inspector, timetable, options);
+        layout.append(timetableWeek(timetable, options), inspector);
+        wrap.appendChild(layout);
+        host.appendChild(wrap);
+    }
+
+    function renderTimetableDay(card, timetable, options) {
+        const T = timetableApi();
+        const ui = options.ui;
+        const catalog = options.catalog;
+        const study = object(options.study);
+        const editable = options.editable;
         card.appendChild(el('p', 'ft-study-muted', t('study.timetable.intro', 'Give parts of your day their own subject. Outside these times, your plan works as usual.')));
-        const days = el('div', 'ft-setup-flow ft-tt__days');
+        const dayIndex = T.DAYS.indexOf(ui.day);
+        // Beside the week grid the inspector names the day; stacked, seven chips share one row.
+        card.appendChild(el('h3', 'ft-setup-h1 ft-tt-wide', weekdayName(dayIndex, true)));
+        const days = el('div', 'ft-tt__days ft-tt-narrow');
+        days.setAttribute('role', 'group');
+        days.setAttribute('aria-label', t('study.planner.days', 'Days'));
         T.DAYS.forEach((key, index) => {
             const count = T.periodsOf(timetable, key).length;
-            days.appendChild(setupChip(weekdayName(index), key === ui.day, () => { ui.day = key; ui.copyOpen = false; options.redraw(); },
-                { description: `${weekdayName(index, true)}${count ? ` · ${count}` : ''}` }));
+            // A plain day chip (no check mark) so seven share one row at 360 px, as on the plan page.
+            const chip = button(weekdayName(index), `ft-tt__day${key === ui.day ? ' is-on' : ''}`, () => { Object.assign(ui, { day: key, copyOpen: false }); options.redraw(); });
+            chip.setAttribute('aria-pressed', key === ui.day ? 'true' : 'false');
+            chip.setAttribute('aria-label', `${weekdayName(index, true)}${count ? ` · ${count}` : ''}`);
+            chip.dataset.ftFocusKey = `tt-${key}-day-chip`;
+            days.appendChild(chip);
         });
         card.appendChild(days);
         const periods = T.periodsOf(timetable, ui.day);
+        const openPeriod = period => {
+            const lane = T.lane(timetable, period.laneId);
+            Object.assign(ui, { editing: period.startMinute, start: period.startMinute, end: period.endMinute, lane: array(lane?.packIds).slice(), query: '' });
+            options.redraw();
+        };
+        if (periods.length) {
+            const bar = timetableBar(timetable, ui.day, { catalog, ui, onOpen: editable ? openPeriod : null });
+            bar.classList.add('ft-tt-narrow');
+            card.appendChild(bar);
+        }
         const list = el('div', 'ft-tt__periods');
         if (!periods.length) {
-            list.appendChild(el('p', 'ft-study-muted ft-tt__empty', t('study.timetable.emptyDay', 'Nothing on {day} yet.', { day: weekdayName(T.DAYS.indexOf(ui.day), true) })));
+            list.appendChild(el('p', 'ft-study-muted ft-tt__empty', t('study.timetable.emptyDay', 'Nothing on {day} yet.', { day: weekdayName(dayIndex, true) })));
         }
         for (const period of periods) {
             const name = laneName(T.lane(timetable, period.laneId), catalog);
             const range = timeRange(period.startMinute, period.endMinute % T.DAY_MINUTES);
-            const open = editable ? () => {
-                const lane = T.lane(timetable, period.laneId);
-                Object.assign(ui, { editing: period.startMinute, start: period.startMinute, end: period.endMinute, lane: array(lane?.packIds).slice(), query: '' });
-                options.redraw();
-            } : null;
-            const row = linkRow(name, range, open);
+            const row = linkRow(name, range, editable ? () => openPeriod(period) : null);
             row.classList.add('ft-tt__period');
             row.setAttribute('aria-label', `${range}, ${name}`);
+            row.dataset.ftFocusKey = `tt-${ui.day}-${period.startMinute}-row`;
             list.appendChild(row);
         }
         card.appendChild(list);
@@ -2483,45 +2807,50 @@
                 options.redraw();
             }));
         }
-        if (T.hasPeriods(timetable)) {
-            card.appendChild(el('p', 'ft-setup-h2', t('study.timetable.between', 'Between periods')));
-            card.appendChild(choiceRow([[T.BETWEEN_DEFAULT, t('study.timetable.betweenPlan', 'Your plan')], [T.BETWEEN_NONE, t('study.timetable.betweenNone', 'Nothing')]],
-                timetable.between, value => options.onSave(current => ({ ...current, between: value })), t('study.timetable.between', 'Between periods'), editable));
-            card.appendChild(switchRow(t('study.timetable.hideShorts', 'Hide Clips and comments during periods'), timetable.hideShortsAndComments !== false, editable,
-                on => options.onSave(current => ({ ...current, hideShortsAndComments: on }))));
-            const actions = el('div', 'ft-study-actions ft-tt__actions');
-            if (editable && periods.length) {
-                actions.appendChild(button(t('study.timetable.copy', 'Copy this day to…'), 'btn-secondary', () => {
-                    // Weekdays by default when copying from a weekday; the weekend from a weekend day.
-                    const from = T.DAYS.indexOf(ui.day);
-                    ui.copyOpen = !ui.copyOpen;
-                    ui.copyTo = T.DAYS.filter((_, index) => index !== from && (from < 5) === (index < 5));
-                    options.redraw();
-                }));
-            }
-            actions.appendChild(button(t('study.timetable.calendar', 'Add to my calendar'), 'btn-secondary', () => downloadCalendar(timetable, catalog)));
-            card.appendChild(actions);
-            if (ui.copyOpen && editable && periods.length) {
-                const pick = el('div', 'ft-tt__copy');
-                pick.setAttribute('role', 'group');
-                pick.setAttribute('aria-label', t('study.timetable.copy', 'Copy this day to…'));
-                const flow = el('div', 'ft-setup-flow');
-                T.DAYS.forEach((key, index) => {
-                    if (key === ui.day) return;
-                    flow.appendChild(setupChip(weekdayName(index), ui.copyTo.includes(key), () => {
-                        ui.copyTo = ui.copyTo.includes(key) ? ui.copyTo.filter(item => item !== key) : [...ui.copyTo, key];
-                        options.redraw();
-                    }, { description: weekdayName(index, true) }));
-                });
-                pick.append(flow, button(t('askParent.ok', 'OK'), 'btn-primary', async () => {
-                    const to = ui.copyTo.slice();
-                    ui.copyOpen = false;
-                    await options.onSave(current => T.copyDay(current, ui.day, to));
-                }));
-                card.appendChild(pick);
-            }
+        if (!T.hasPeriods(timetable)) return;
+        card.appendChild(el('p', 'ft-setup-h2', t('study.timetable.between', 'Between periods')));
+        card.appendChild(choiceRow([[T.BETWEEN_DEFAULT, t('study.timetable.betweenPlan', 'Your plan')], [T.BETWEEN_NONE, t('study.timetable.betweenNone', 'Nothing')]],
+            timetable.between, value => options.onSave(current => ({ ...current, between: value })), t('study.timetable.between', 'Between periods'), editable));
+        // Clips, Copy and the calendar wait behind one quiet "More choices" (§4 decision 4).
+        if (!ui.moreOpen) {
+            const more = setupChip(t('study.setup.examsMore', 'More choices'), false, () => { ui.moreOpen = true; options.redraw(); }, { quiet: true });
+            more.setAttribute('aria-expanded', 'false');
+            more.dataset.ftFocusKey = 'tt-more';
+            card.appendChild(more);
+            return;
         }
-        host.appendChild(card);
+        card.appendChild(switchRow(t('study.timetable.hideShorts', 'Hide Clips and comments during periods'), timetable.hideShortsAndComments !== false, editable,
+            on => options.onSave(current => ({ ...current, hideShortsAndComments: on }))));
+        const actions = el('div', 'ft-study-actions ft-tt__actions');
+        if (editable && periods.length) {
+            actions.appendChild(button(t('study.timetable.copy', 'Copy this day to…'), 'btn-secondary', () => {
+                // Weekdays by default when copying from a weekday; the weekend from a weekend day.
+                ui.copyOpen = !ui.copyOpen;
+                ui.copyTo = T.DAYS.filter((_, index) => index !== dayIndex && (dayIndex < 5) === (index < 5));
+                options.redraw();
+            }));
+        }
+        actions.appendChild(button(t('study.timetable.calendar', 'Add to my calendar'), 'btn-secondary', () => downloadCalendar(timetable, catalog)));
+        card.appendChild(actions);
+        if (ui.copyOpen && editable && periods.length) {
+            const pick = el('div', 'ft-tt__copy');
+            pick.setAttribute('role', 'group');
+            pick.setAttribute('aria-label', t('study.timetable.copy', 'Copy this day to…'));
+            const flow = el('div', 'ft-setup-flow');
+            T.DAYS.forEach((key, index) => {
+                if (key === ui.day) return;
+                flow.appendChild(setupChip(weekdayName(index), ui.copyTo.includes(key), () => {
+                    ui.copyTo = ui.copyTo.includes(key) ? ui.copyTo.filter(item => item !== key) : [...ui.copyTo, key];
+                    options.redraw();
+                }, { description: weekdayName(index, true) }));
+            });
+            pick.append(flow, button(t('askParent.ok', 'OK'), 'btn-primary', async () => {
+                const to = ui.copyTo.slice();
+                ui.copyOpen = false;
+                await options.onSave(current => T.copyDay(current, ui.day, to));
+            }));
+            card.appendChild(pick);
+        }
     }
 
     function renderTimetableEditor(card, timetable, options) {
@@ -2531,6 +2860,21 @@
         const catalog = options.catalog;
         const study = object(options.study);
         const same = (a, b) => JSON.stringify(a) === JSON.stringify(b);
+        const editing = ui.editing;
+        const day = ui.day;
+        card.appendChild(el('h3', 'ft-setup-h1 ft-tt-wide', weekdayName(T.DAYS.indexOf(day), true)));
+        // The period on its day's bar: drag its ends, or use the steppers below. The steppers follow live.
+        const outputs = {};
+        card.appendChild(timetableBar(timetable, day, {
+            catalog, ui, edited: { startMinute: ui.start, endMinute: ui.end, laneId: '' }, editId: editing >= 0 ? String(editing) : 'new',
+            onEdit: (period, done) => {
+                ui.start = period.startMinute;
+                ui.end = period.endMinute;
+                if (outputs.from) outputs.from.textContent = clockLabel(ui.start % T.DAY_MINUTES);
+                if (outputs.to) outputs.to.textContent = clockLabel(ui.end % T.DAY_MINUTES);
+                if (done) options.redraw();
+            }
+        }));
         card.appendChild(el('h3', 'ft-setup-h1', t('study.timetable.what', 'What to study')));
         // The plan's packs and the lanes used before: one tap each.
         const known = ids => ids.every(id => catalog && Packs?.packById?.(catalog, id));
@@ -2563,25 +2907,27 @@
         search.addEventListener('input', () => { ui.query = search.value; drawHits(); });
         card.append(search, hits);
         drawHits();
+        // The plan page's steppers (a real minus and plus), each saying its 15-minute step.
         const step = T.SNAP_MINUTES;
         const label = minute => clockLabel(minute % T.DAY_MINUTES);
-        card.appendChild(stepperRow(t('study.timetable.from', 'From'), label(ui.start), {
+        const fromRow = stepperRow(t('study.timetable.from', 'From'), label(ui.start), {
             onLess: () => { ui.start = Math.max(0, ui.start - step); options.redraw(); },
             onMore: () => { ui.start = Math.min(ui.end - step, ui.start + step); options.redraw(); },
             lessOk: ui.start > 0, moreOk: ui.start + step < ui.end
-        }));
-        card.appendChild(stepperRow(t('study.timetable.to', 'To'), label(ui.end), {
+        });
+        const toRow = stepperRow(t('study.timetable.to', 'To'), label(ui.end), {
             onLess: () => { ui.end = Math.max(ui.start + step, ui.end - step); options.redraw(); },
             onMore: () => { ui.end = Math.min(T.DAY_MINUTES, ui.end + step); options.redraw(); },
             lessOk: ui.end - step > ui.start, moreOk: ui.end < T.DAY_MINUTES
-        }));
+        });
+        outputs.from = fromRow.querySelector('output');
+        outputs.to = toRow.querySelector('output');
+        card.append(fromRow, toRow);
         const actions = el('div', 'ft-study-actions ft-tt__actions');
-        const editing = ui.editing;
-        const day = ui.day;
         const save = button(t('study.timetable.save', 'Save'), 'btn-primary', async () => {
             if (!ui.lane.length) return;
             const { lane, start, end } = ui;
-            ui.editing = null; ui.query = '';
+            ui.editing = null; ui.query = ''; ui.keyStart = null;
             await options.onSave(current => {
                 const base = editing >= 0 ? T.withoutPeriod(current, day, editing) : current;
                 const added = T.withLane(base, lane);
@@ -2592,7 +2938,7 @@
         actions.appendChild(save);
         if (editing >= 0) {
             actions.appendChild(button(t('study.timetable.delete', 'Remove this period'), 'btn-secondary', async () => {
-                ui.editing = null;
+                ui.editing = null; ui.keyStart = null;
                 await options.onSave(current => T.withoutPeriod(current, day, editing));
             }));
         }
@@ -3460,7 +3806,7 @@
             redrawHome: () => draw(true),
             // The Timetable page's own state: the day shown and the period being edited (null: the day).
             planBarMemory: {},
-            timetableUi: { day: null, editing: null, start: 16 * 60, end: 17 * 60, lane: [], query: '', copyOpen: false, copyTo: [] },
+            timetableUi: { day: null, editing: null, start: 16 * 60, end: 17 * 60, lane: [], query: '', copyOpen: false, copyTo: [], moreOpen: false, keyStart: null },
             setMode: next => {
                 // Back from a period being edited returns to its day first.
                 if (mode === 'timetable' && next === 'home' && ctx.timetableUi.editing !== null) {
@@ -3468,7 +3814,7 @@
                     draw(false);
                     return;
                 }
-                if (next === 'timetable' && mode !== 'timetable') Object.assign(ctx.timetableUi, { day: null, editing: null, copyOpen: false, query: '' });
+                if (next === 'timetable' && mode !== 'timetable') Object.assign(ctx.timetableUi, { day: null, editing: null, copyOpen: false, query: '', moreOpen: false, keyStart: null });
                 // The plan page's day bar starts from its own hours each time it opens.
                 if (next === 'plan' && mode !== 'plan') ctx.planBarMemory = {};
                 mode = next === 'plan' || next === 'timetable' ? next : 'home';

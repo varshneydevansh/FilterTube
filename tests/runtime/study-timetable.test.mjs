@@ -233,3 +233,46 @@ test('saving a timetable: the person\'s own is never a parent\'s, and a child ca
     const child = make('child');
     assert.deepEqual(await child.controller.update({ timetable: week() }), { ok: false, error: 'set_by_parent' });
 });
+
+// ---- DESIGN_PASS_2026-11-21 §4 decision 4 (Android bfbe09df0, 9413ee20f, 6af91cdbf) -----------------
+
+const P = (start, end, laneId = 'l1') => ({ startMinute: start, endMinute: end, laneId });
+
+test('the timetable bar fits the day\'s periods, and a dragged edge snaps and keeps 15 minutes', () => {
+    const day = [P(16 * 60, 17 * 60), P(19 * 60, 20 * 60 + 30, 'l2')];
+    assert.deepEqual(Timetable.barRange(day), { start: 15 * 60, end: 22 * 60 });
+    assert.deepEqual(Timetable.barRange([]), { start: 15 * 60, end: 21 * 60 });
+    // A short day still shows six hours; a period being edited is taken in.
+    const short = Timetable.barRange([P(9 * 60, 10 * 60)]);
+    assert.equal(short.end - short.start, 6 * 60);
+    assert.deepEqual(Timetable.barRange(day, null, true), { start: 6 * 60, end: 23 * 60 });
+    assert.equal(Timetable.barRange(day, P(5 * 60 + 30, 6 * 60, 'x'), true).start, 5 * 60);
+    const p = P(16 * 60, 17 * 60);
+    assert.equal(Timetable.moveEdge(p, true, 15 * 60 + 52).startMinute, 15 * 60 + 45);
+    assert.equal(Timetable.moveEdge(p, true, 23 * 60).startMinute, 16 * 60 + 45);
+    assert.equal(Timetable.moveEdge(p, false, 0).endMinute, 16 * 60 + 15);
+    assert.equal(Timetable.moveEdge(p, false, 2000).endMinute, Timetable.DAY_MINUTES);
+});
+
+test('the week grid shows 6 am to 11 pm grown to every period, and an empty hour offers a period up to the next one', () => {
+    const t = Timetable.withPeriod(week(), 'tue', 5 * 60, 6 * 60, 'l1');
+    assert.deepEqual(Timetable.weekRange(t), { start: 5 * 60, end: 23 * 60 });
+    // Monday has 6-7 and 7-8: 5:30 offers 5-6; 6:30 is taken; 8:10 offers 8-9.
+    assert.deepEqual(Timetable.slot(t, 'mon', 5 * 60 + 30), { startMinute: 5 * 60, endMinute: 6 * 60 });
+    assert.equal(Timetable.slot(t, 'mon', 6 * 60 + 30), null);
+    assert.deepEqual(Timetable.slot(t, 'mon', 8 * 60 + 10), { startMinute: 8 * 60, endMinute: 9 * 60 });
+    // Trimmed to where the next period starts.
+    const tight = Timetable.withPeriod(t, 'wed', 9 * 60 + 30, 10 * 60, 'l1');
+    assert.deepEqual(Timetable.slot(tight, 'wed', 9 * 60), { startMinute: 9 * 60, endMinute: 9 * 60 + 30 });
+});
+
+test('a block too narrow for its lane\'s name shows initials, never a cut-off name', () => {
+    const fits = width => text => text.length <= width;
+    assert.equal(Timetable.blockLabel('Khan Academy', fits(20)), 'Khan Academy');
+    assert.equal(Timetable.blockLabel('Khan Academy', fits(5)), 'KA');
+    assert.equal(Timetable.blockLabel('CBSE, class 6-8 + maths', fits(4)), 'CC6');
+    assert.equal(Timetable.blockLabel('GMAT', fits(3)), 'GMA');
+    assert.equal(Timetable.blockLabel('Khan Academy', fits(1)), null);
+    // A bracketed note is left out of the initials, never "KA(".
+    assert.equal(Timetable.blockLabel('Khan Academy (any curriculum)', fits(5)), 'KA');
+});

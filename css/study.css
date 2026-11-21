@@ -682,15 +682,53 @@ body.ft-extension-surface .ft-dayplan__handle:focus-visible { outline: none !imp
     .ft-day-ring__scribble { display: none; }
 }
 
-/* Timetable (Android b74369747): one day at a time, its periods as rows, the choices below. */
+/* Timetable (Android b74369747; DESIGN_PASS_2026-11-21 §4 decision 4, bfbe09df0/9413ee20f/6af91cdbf).
+ * Flat, as the dashboard (52d11d77): hairline edges, no ledge or gradient. A window 900 px and wider:
+ * the week grid with the inspector beside it; narrower it stacks (day chips in one row, the day on the bar). */
+#studyView .ft-study-page:has(.ft-study-home[data-mode="timetable"]) { max-width: 1180px; }
+.ft-tt-layout { display: grid; grid-template-columns: minmax(0, 1fr); gap: 16px; align-items: start; }
+.ft-tt-wrap .ft-home-card { box-shadow: none; border: 1px solid var(--pk-line, #dcd1c2); border-radius: 16px; }
 .ft-tt { display: flex; flex-direction: column; gap: 12px; }
-.ft-tt__days { flex-wrap: wrap; }
-.ft-tt__periods { display: flex; flex-direction: column; border: 1.5px solid var(--pk-line, #dcd1c2); border-radius: 16px; overflow: hidden; }
+.ft-tt-week, .ft-tt-wide { display: none; }
+@media (min-width: 900px) {
+  .ft-tt-layout { grid-template-columns: minmax(0, 1fr) minmax(280px, 320px); }
+  .ft-tt-week { display: block; }
+  .ft-tt-wide { display: block; }
+  .ft-tt-narrow { display: none !important; }
+}
+.ft-tt__days { display: flex; gap: 4px; }
+.ft-tt__day { flex: 1 1 0; min-width: 0; min-height: 44px; padding: 0 2px; border: 1px solid var(--pk-line, #dcd1c2); border-radius: 12px; background: transparent; color: var(--pk-ink); font: 600 min(13px, 2.8vw)/1.1 var(--pk-font-display, inherit); white-space: nowrap; overflow: hidden; cursor: pointer; }
+.ft-tt__day.is-on { background: var(--pk-ink); border-color: var(--pk-ink); color: var(--pk-paper, #fffcf6); }
+.ft-tt__day:focus-visible { outline: 3px solid var(--pk-ink); outline-offset: 2px; }
+.ft-tt__periods { display: flex; flex-direction: column; border: 1px solid var(--pk-line, #dcd1c2); border-radius: 12px; overflow: hidden; }
 .ft-tt__periods > .ft-link-row + .ft-link-row { border-top: 1px solid var(--pk-line, #dcd1c2); }
 .ft-tt__empty { margin: 0; padding: 16px; }
 .ft-tt__actions { flex-wrap: wrap; }
 .ft-tt__copy { display: flex; flex-direction: column; gap: 10px; align-items: flex-start; }
 .ft-tt__hits:empty { display: none; }
+/* The day on the bar: the plan bar's track, periods as sage blocks; editing, the others fade. */
+.ft-ttbar { padding-top: 40px; }
+.ft-ttbar__block { position: absolute; top: 0; bottom: 0; display: flex; align-items: center; justify-content: center; padding: 0 2px; border: 0; border-inline: 1px solid var(--pk-paper, #fffcf6); background: var(--pk-sage-ink); color: var(--pk-paper, #fffcf6); font: 700 12px/1 system-ui, sans-serif; overflow: hidden; white-space: nowrap; cursor: pointer; }
+.ft-ttbar__block.is-faded { background: color-mix(in srgb, var(--pk-sage-ink) 35%, var(--pk-track)); color: var(--pk-ink); cursor: default; }
+.ft-ttbar__block.is-editing { cursor: default; }
+.ft-ttbar__block:focus-visible { outline: 3px solid var(--pk-ink); outline-offset: 2px; }
+.ft-ttbar__name { overflow: hidden; }
+/* The week grid: seven day columns over the day's hours (32 px an hour). */
+.ft-tt-week { padding: 12px; }
+.ft-tt-week__row { display: grid; grid-template-columns: 44px repeat(7, minmax(0, 1fr)); gap: 4px; }
+.ft-tt-week__head { margin-bottom: 6px; }
+.ft-tt-week__day { min-height: 36px; padding: 0 4px; border: 1px solid var(--pk-line, #dcd1c2); border-radius: 10px; background: transparent; color: var(--pk-ink); font: 600 13px/1.2 var(--pk-font-display, inherit); cursor: pointer; }
+.ft-tt-week__day.is-today { border-color: var(--pk-sage-ink); }
+.ft-tt-week__day.is-on { background: var(--pk-ink); border-color: var(--pk-ink); color: var(--pk-paper, #fffcf6); }
+.ft-tt-week__axis { position: relative; }
+.ft-tt-week__hour { position: absolute; inset-inline-end: 6px; transform: translateY(-50%); font-size: 11px; color: var(--pk-muted); white-space: nowrap; }
+.ft-tt-week__col { position: relative; border-radius: 8px; background: repeating-linear-gradient(to bottom, transparent 0 31px, var(--pk-line, #dcd1c2) 31px 32px); cursor: copy; }
+.ft-tt-week__col.is-today { background-color: color-mix(in srgb, var(--pk-sage-ink) 9%, transparent); }
+.ft-tt-week__block { position: absolute; inset-inline: 2px; display: flex; align-items: flex-start; justify-content: center; padding: 3px 2px 0; border: 0; border-block: 1px solid var(--pk-paper, #fffcf6); border-radius: 6px; background: var(--pk-sage-ink); color: var(--pk-paper, #fffcf6); font: 700 12px/1.2 system-ui, sans-serif; overflow: hidden; cursor: pointer; }
+.ft-tt-week__block.is-editing { outline: 3px solid var(--pk-ink); outline-offset: 1px; }
+.ft-tt-week__block:focus-visible, .ft-tt-week__day:focus-visible { outline: 3px solid var(--pk-ink); outline-offset: 2px; }
+.ft-tt-week__name { overflow: hidden; white-space: nowrap; text-overflow: clip; }
+.ft-tt-week__now { position: absolute; inset-inline: 0; height: 2px; margin-top: -1px; background: var(--pk-ink); pointer-events: none; }
 
 /* Narrow windows (a phone-width popup tab, a split screen): the day bar gets the width, not the gutters. */
 @media (max-width: 480px) {

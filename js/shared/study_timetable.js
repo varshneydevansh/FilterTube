@@ -265,6 +265,81 @@
         return times.length ? Math.min(...times) : null;
     }
 
+    // ---- The day bar and the week grid (Android StudyTimetableBarModel / StudyTimetableWeekModel) ----
+
+    const WIDE_START = 6 * 60;
+    const WIDE_END = 23 * 60;
+    const MIN_RANGE_MINUTES = 6 * 60;
+    function floorHour(minute) { return Math.min(DAY_MINUTES, Math.max(0, Math.floor(minute / 60) * 60)); }
+    function ceilHour(minute) { return Math.min(DAY_MINUTES, Math.max(0, Math.floor((minute + 59) / 60) * 60)); }
+
+    /**
+     * The hours the day bar shows for periods ({startMinute, endMinute}) and the one being edited: an
+     * hour before the first to an hour after the last, at least six hours, inside the day; empty, 3 pm
+     * to 9 pm. wide: 6 am to 11 pm, grown to take in every period. {start, end} in minutes.
+     */
+    function barRange(periods, editing = null, wide = false) {
+        const all = [...array(periods), ...(editing ? [editing] : [])];
+        if (wide) {
+            let start = WIDE_START;
+            let end = WIDE_END;
+            for (const item of all) { start = Math.min(start, floorHour(item.startMinute)); end = Math.max(end, ceilHour(item.endMinute)); }
+            return { start, end };
+        }
+        if (!all.length) return { start: 15 * 60, end: 21 * 60 };
+        let start = floorHour(Math.min(...all.map(item => item.startMinute)) - 60);
+        let end = ceilHour(Math.max(...all.map(item => item.endMinute)) + 60);
+        while (end - start < MIN_RANGE_MINUTES && (start > 0 || end < DAY_MINUTES)) {
+            if (start > 0) start -= 60;
+            if (end - start < MIN_RANGE_MINUTES && end < DAY_MINUTES) end += 60;
+        }
+        return { start, end };
+    }
+
+    /**
+     * One edge of the period being edited dragged to minute (snapped to 15): it stays at least 15
+     * minutes long and inside the day. Neighbours aren't pushed; Save trims any overlap (withPeriod).
+     */
+    function moveEdge(period, start, minute) {
+        const target = Math.round(Number(minute) / SNAP_MINUTES) * SNAP_MINUTES;
+        if (start) return { ...period, startMinute: Math.min(period.endMinute - SNAP_MINUTES, Math.max(0, target)) };
+        return { ...period, endMinute: Math.min(DAY_MINUTES, Math.max(period.startMinute + SNAP_MINUTES, target)) };
+    }
+
+    /** The hours the week grid shows: 6 am to 11 pm, grown to take in every period of the week. */
+    function weekRange(timetable) {
+        return barRange(DAYS.flatMap(day => periodsOf(timetable, day)), null, true);
+    }
+
+    /**
+     * A new period where an empty hour was clicked: from that hour, an hour long, trimmed to end where
+     * the next period that day starts ({startMinute, endMinute}); null when the hour is taken.
+     */
+    function slot(timetable, day, minute) {
+        const periods = periodsOf(timetable, day);
+        const start = Math.floor(Number(minute) / 60) * 60;
+        if (periods.some(item => start >= item.startMinute && start < item.endMinute)) return null;
+        const later = periods.filter(item => item.startMinute > start).map(item => item.startMinute);
+        const end = Math.min(start + 60, later.length ? Math.min(...later) : DAY_MINUTES, DAY_MINUTES);
+        return end - start >= SNAP_MINUTES ? { startMinute: start, endMinute: end } : null;
+    }
+
+    /**
+     * What fits inside a period's block: the lane's full name, else its initials ("Khan Academy" -> "KA",
+     * up to three letters, a bracketed note left out; one word keeps its first three), else nothing;
+     * never a cut-off "Khan…".
+     * fits(text) says whether a text fits. The full name stays the spoken label.
+     */
+    function blockLabel(name, fits) {
+        const value = String(name || '');
+        if (fits(value)) return value;
+        // A bracketed note ("Khan Academy (any curriculum)") is left out; each word gives its first letter or digit.
+        const base = value.replace(/\s*\([^)]*\)/g, '').trim() || value;
+        const words = base.split(/[\s+/,&-]+/).map(word => (word.match(/[\p{L}\p{N}]/u) || [''])[0]).filter(Boolean);
+        const initials = words.length > 1 ? words.slice(0, 3).join('').toUpperCase() : Array.from(base).slice(0, 3).join('');
+        return initials.trim() && fits(initials) ? initials : null;
+    }
+
     // ---- Add to my calendar (Android StudyTimetableCalendar) ---------------------------------------
 
     const ICS_DAY = Object.freeze({ mon: 'MO', tue: 'TU', wed: 'WE', thu: 'TH', fri: 'FR', sat: 'SA', sun: 'SU' });
@@ -343,6 +418,7 @@
         VERSION, BETWEEN_DEFAULT, BETWEEN_NONE, SNAP_MINUTES, DAY_MINUTES, DAYS, KNOWN,
         normalize, create, lane, periodsOf, hasPeriods, packIds, withPeriod, withoutPeriod, copyDay, withLane,
         at, nextBoundary, dayKeyAt, minuteOf, timeOf, snap, validZone,
-        ics, escape, fold, utcStamp, todayIn
+        ics, escape, fold, utcStamp, todayIn,
+        barRange, moveEdge, weekRange, slot, blockLabel
     });
 }));
