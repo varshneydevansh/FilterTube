@@ -3,14 +3,14 @@
 Generated from `PORT_LEDGER.tsv` by `node tools/parity/ledger.mjs render`. Edit the TSV, never this file.
 Rules: [HOW_TO_PORT.md](HOW_TO_PORT.md). Sync point: Android `ec9d91080` (Release Android 3.6.1), in the app repository.
 
-**193 rows:** 102 ported, 2 partial, 0 todo, 89 n/a. **98.1%** of 104 applicable rows ported (99.0% counting partial as half).
+**196 rows:** 105 ported, 2 partial, 0 todo, 89 n/a. **98.1%** of 107 applicable rows ported (99.1% counting partial as half).
 
 | Area | ported | partial | todo | n/a | share |
 |---|---|---|---|---|---|
 | brand-visual | 31 | 0 | 0 | 10 | 100.0% |
 | home-viewer | 1 | 0 | 0 | 15 | 100.0% |
 | watch | 0 | 0 | 0 | 1 | - |
-| study | 42 | 1 | 0 | 7 | 98.8% |
+| study | 45 | 1 | 0 | 7 | 98.9% |
 | kids | 0 | 0 | 0 | 3 | - |
 | profiles-family | 9 | 0 | 0 | 2 | 100.0% |
 | settings-controls | 8 | 0 | 0 | 3 | 100.0% |
@@ -144,6 +144,9 @@ Rules: [HOW_TO_PORT.md](HOW_TO_PORT.md). Sync point: Android `ec9d91080` (Releas
 | `a614cc44e` | 2026-11-21 | feat(android-study): timetable model and runtime | ported | `c8cf6f25` | study_timetable.js has the timetable model (lanes, periods, between, hideShortsAndComments, examDates, setByParentId; lossless); study.timetable is a known study key; the engine runs a period as a round of its lane and between periods the plan or the normal rules, breaks and the limit unchanged, every boundary a transition; lane packs get pack copies; StudyTimetableTest ported. Family sync of study.timetable waits, as on Android |
 | `7d655a511` | 2026-11-21 | fix(android-study): Study status, the mode pill and captions follow the timetable | ported | `aeebb64a` | the Study state reads the timetable-aware clock: STUDY during a period, the lane packs and timetableLane; the extension has no captions or mode pill |
 | `3d92defa7` | 2026-11-21 | feat(android-study): day bar fits its width, no sideways scroll | ported | `611f3fbc` | planBar fits its width (narrow: the plan's own hours, at least 6 h; 600 px and wider: 6 am-11 pm grown to the plan), takes in moved handles, widens a held edge an hour every 350 ms, 44 px targets, END beats LIMIT, cancel and Escape revert, Shift/Page/Home/End/Escape keys, RTL mirror; StudyPlannerModelTest cases ported. DESIGN_PASS §4 decision 3 followed in b1126ebc (length slider removed, read-only bar with Edit on Home) and b8ff3938 (steppers follow Android) |
+| `bfbe09df0` | 2026-11-21 | feat(android-study): the timetable's day on the bar | ported | `1e59ae19` | the day on the plan-style bar (sage blocks named for their lane, a block opens its period), the editor bar with START/END handles (44 px, keys, cancel reverts, END wins a tie, RTL), day chips in one row, Clips, Copy and the calendar behind More choices; barRange and moveEdge with Android's tests |
+| `9413ee20f` | 2026-11-21 | feat(android-study): timetable week grid on tablet, today on TV, widget names the day | ported | `1e59ae19` | the week grid (seven columns over 6 am-11 pm grown to every period, today washed with the now line) with the inspector beside it at 900 px and wider; an empty hour adds a period up to the next; weekRange and slot with Android's tests. The TV remote and the home-screen widget are n/a; the next period off today already names its day (formatDayTime) |
+| `6af91cdbf` | 2026-11-21 | fix(android-study): timetable says Clips; initials in narrow blocks; real minus | ported | `1e59ae19`, `138b95b4` | Hide Clips and comments (138b95b4, every locale its own Clips word); initials in narrow blocks, never a cut-off name (blockLabel, with Android's test plus a bracketed-note case); the editor steppers are the plan page's minus and plus icons, spoken 15 minutes earlier/later |
 | `49a8ba846` | 2026-11-15 | fix(android-study): keep the planner's scroll only once it has been laid out | n/a |  | Android platform plumbing (planner scroll restore) |
 | `c2fcb8b71` | 2026-11-15 | fix(android-study): no focus wash over the page (the slate dark mode); chip check sits with its words | n/a |  | Android platform plumbing (focus highlight over the native page) |
 | `4a27d8595` | 2026-11-15 | fix(android-study): cream switch thumbs in dark setup | n/a |  | Android platform plumbing (Material switch tint) |
