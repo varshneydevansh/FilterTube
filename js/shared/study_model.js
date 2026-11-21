@@ -13,15 +13,20 @@
  *   "savedListMode": "blocklist" | "whitelist" | "layered" | null,
  *   "breakMode": "rest" | "normal",
  *   "progress": {"<deviceId>": {"2026-11-15": 45}},
- *   "weekView": true | false | null
+ *   "weekView": true | false | null,
+ *   "timetable": {lanes, periods, between, ...} (js/shared/study_timetable.js; written only when set)
  * }
- * Every key is always written; null means unset. Fields a newer app wrote are kept on each object. */
+ * Every other key is always written; null means unset. Fields a newer app wrote are kept on each object. */
 (function (root, factory) {
     const api = factory();
     if (typeof module === 'object' && module.exports) module.exports = api;
     else root.FilterTubeStudyModel = api;
 }(typeof globalThis !== 'undefined' ? globalThis : this, function () {
     'use strict';
+
+    // The timetable's own rules (Android StudyTimetable); a context without the module keeps the value as it is.
+    const Timetable = (typeof module === 'object' && module.exports)
+        ? require('./study_timetable.js') : (typeof globalThis !== 'undefined' ? globalThis.FilterTubeStudyTimetable : null);
 
     const VERSION = 1;
     const PROFILE_KEY = 'study';
@@ -45,7 +50,7 @@
     const MAX_PROGRESS_DAYS = 400;
     const MAX_DAY_MINUTES = 1440;
     const KNOWN = Object.freeze({
-        study: ['version', 'activePackIds', 'packEdits', 'focus', 'plan', 'lock', 'savedListMode', 'breakMode', 'progress', 'weekView'],
+        study: ['version', 'activePackIds', 'packEdits', 'focus', 'plan', 'lock', 'savedListMode', 'breakMode', 'progress', 'weekView', 'timetable'],
         edits: ['channelsAdded', 'channelsRemoved', 'topicsAdded', 'topicsRemoved'],
         channel: ['channelId', 'handle', 'name'],
         focus: ['roundMinutes', 'breakMinutes', 'dailyGoalMinutes'],
@@ -211,8 +216,16 @@
             savedListMode: choice(value.savedListMode, SAVED_LIST_MODES),
             breakMode: choice(value.breakMode, [BREAK_REST, BREAK_NORMAL]) || BREAK_REST,
             progress: normalizeProgress(value.progress),
-            weekView: typeof value.weekView === 'boolean' ? value.weekView : null
+            weekView: typeof value.weekView === 'boolean' ? value.weekView : null,
+            ...withTimetable(value.timetable)
         };
+    }
+
+    /** {timetable} when the value holds one (Android StudyState.timetable, a614cc44e), else {}. */
+    function withTimetable(value) {
+        if (!isObject(value)) return {};
+        const timetable = Timetable?.normalize ? Timetable.normalize(value) : clone(value);
+        return timetable ? { timetable } : {};
     }
 
     function createStudy(overrides = {}) {
@@ -309,6 +322,11 @@
             progress: mergeProgress(mine.progress, theirs.progress),
             weekView: theirs.weekView ?? mine.weekView
         };
+        // A parent's timetable is a parent plan: it stays unless carryLock; otherwise the incoming one wins.
+        const parentTimetable = !!text(object(mine.timetable).setByParentId) && !carryLock;
+        const timetable = parentTimetable || (!replace && !theirs.timetable) ? mine.timetable : theirs.timetable;
+        if (timetable) merged.timetable = timetable;
+        else delete merged.timetable;
         if (typeof packChannelsOnly === 'boolean') merged.packChannelsOnly = packChannelsOnly;
         else delete merged.packChannelsOnly;
         return merged;

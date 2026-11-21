@@ -42,6 +42,10 @@
 }(typeof globalThis !== 'undefined' ? globalThis : this, function () {
     'use strict';
 
+    /** The timetable's rules (js/shared/study_timetable.js); without the module a timetable is ignored. */
+    const Timetable = (typeof module === 'object' && module.exports)
+        ? require('./study_timetable.js') : (typeof globalThis !== 'undefined' ? globalThis.FilterTubeStudyTimetable : null);
+
     const NORMAL = 'NORMAL';
     const STUDY = 'STUDY';
     const BREAK = 'BREAK';
@@ -679,31 +683,58 @@
     }
 
     /**
+     * The timetable over the plan's state at t (Android StudyRuntime.timetableClock, a614cc44e/7d655a511):
+     * during a period its lane is a study round to the period's end; between periods the plan
+     * (between "default") or the normal rules (between "none"). Breaks, the limit and a clock hold keep
+     * their rules.
+     */
+    function withTimetable(state, timetable, t, zone) {
+        if (!Timetable || !isObject(timetable) || state.state === BREAK || state.state === LIMIT) return state;
+        const now = Timetable.at(timetable, t, zone);
+        if (now.lane) {
+            const segment = { kind: STUDY, round: 1, rounds: 1, start: now.startsAt, end: now.endsAt };
+            return {
+                state: STUDY, round: 1, rounds: 1, until: now.endsAt, sessionStart: now.startsAt, sessionEnd: now.endsAt,
+                source: 'timetable', setByParentId: text(timetable.setByParentId) || null, segments: [segment], skippedBreak: null,
+                lane: now.lane, lanePackIds: array(now.lane.packIds).slice()
+            };
+        }
+        if (timetable.between === 'none' && state.state === STUDY) return { state: NORMAL, until: null };
+        return state;
+    }
+
+    /**
      * The study state at `now`:
      *   {state, round, rounds, until, sessionStart, sessionEnd, source, breakMode, segments,
      *    next: {state, at} | null, breakNoticeAt}
      * Input: {plan, focus, breakMode, now, session?, endedUntil?, limitReached?, parentLock?, clockHold?,
-     *         skippedBreaks?: [breakStart]} (skipped breaks fold into study, Android StudyClock.withSkips).
+     *         skippedBreaks?: [breakStart], timetable?, zone?} (skipped breaks fold into study, Android
+     *         StudyClock.withSkips; a timetable's period is a round of its lane's packs: lanePackIds).
      */
     function studyClock(input = {}) {
         const now = toMs(input.now);
         const occurrences = occurrencesAround(input, now);
-        const current = stateAt(input, now, occurrences);
+        const timetable = isObject(input.timetable) ? input.timetable : null;
+        const reading = t => withTimetable(stateAt(input, t, occurrences), timetable, t, input.zone);
+        const current = reading(now);
         const boundaries = [];
         if (current.until) boundaries.push(current.until);
         for (const occurrence of occurrences) {
             if (occurrence.start > now) boundaries.push(occurrence.start);
             if (occurrence.limitAt !== null && occurrence.limitAt > now) boundaries.push(occurrence.limitAt);
         }
+        // Every period boundary is a rules transition, so caches and alarms re-decide there.
+        const periodEdge = timetable && Timetable ? Timetable.nextBoundary(timetable, now, input.zone) : null;
+        if (Number.isFinite(periodEdge)) boundaries.push(periodEdge);
         const nextAt = boundaries.filter(at => at > now).sort((a, b) => a - b)[0];
         let next = null;
         if (Number.isFinite(nextAt)) {
-            const after = stateAt(input, nextAt, occurrences);
+            const after = reading(nextAt);
             next = { state: after.state, at: nextAt, round: after.round || null };
         }
         const breakMode = text(input.breakMode) === 'normal' ? 'normal' : 'rest';
         const result = { round: null, rounds: null, sessionStart: null, sessionEnd: null, source: null, setByParentId: null,
-            clockHold: false, segments: [], skippedBreak: null, ...current, breakMode, next };
+            clockHold: false, segments: [], skippedBreak: null, lane: null, lanePackIds: null, ...current, breakMode, next };
         // Within a skipped break's own time the round runs on; the UI still says the break was skipped.
         result.breakSkipped = !!result.skippedBreak;
         result.breakNoticeAt = result.state === STUDY && next && next.state === BREAK ? Math.max(now, next.at - BREAK_NOTICE_MS) : null;
@@ -1197,7 +1228,9 @@
         if (!packs.length) return study;
         const current = object(value.packCopies);
         const copies = {};
-        for (const id of array(value.activePackIds)) {
+        // The timetable's lanes are packs too: their copies keep a period working when the catalog lacks the pack.
+        const lanePacks = Timetable ? Timetable.packIds(value.timetable) : [];
+        for (const id of [...new Set([...array(value.activePackIds), ...lanePacks])]) {
             const pack = packs.find(item => item.id === id);
             if (pack) {
                 // The chosen branch's channels and topics (Android StudyPackCopy.of).
@@ -1342,7 +1375,9 @@
             };
         }
         const packChannelsOnly = !!text(object(clock).setByParentId) && value.packChannelsOnly !== false;
-        const layers = activePackLayers(value, catalog);
+        // During a timetable period its lane's packs apply instead of the plan's (Android a614cc44e).
+        const lanePacks = phase === 'study' && Array.isArray(object(clock).lanePackIds) ? object(clock).lanePackIds : null;
+        const layers = activePackLayers(lanePacks ? { ...value, activePackIds: lanePacks } : value, catalog);
         if (!layers.length) {
             // Fail closed (audit H3): the person's own allowed channels, or rest. Never the normal rules.
             const own = !packChannelsOnly && (ownAllowedChannels(source.main) || ownAllowedChannels(source.kids));

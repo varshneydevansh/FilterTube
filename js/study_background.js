@@ -229,7 +229,9 @@
             const input = {
                 plan: study.plan, focus: study.focus, breakMode: study.breakMode, now: at,
                 session: local.session, endedUntil: local.endedUntil, limitReached: options.limitReached === true,
-                parentLock: guarded.window, clockHold
+                parentLock: guarded.window, clockHold,
+                // The timetable (Android a614cc44e): a period is a round of its lane's packs; its times read in its zone.
+                timetable: study.timetable || null, zone: zoneId()
             };
             // The clock without any skip: where the breaks really are (Skip break and Undo read it).
             const plain = Engine.studyClock(input);
