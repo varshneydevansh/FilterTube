@@ -27,8 +27,35 @@
     // was delivered. Sends wait for an open, keyed channel (15 s) and retry once.
     const OPEN_TIMEOUT_MS = 15 * 1000;
     const OPEN_POLL_MS = 50;
-    // Android 79108f833: host() must reach the relay within 6 s, then one retry on a fresh socket.
-    const HOST_TIMEOUT_MS = 6 * 1000;
+    // host() must reach the relay in time, then one retry on a fresh socket. A cold page took about
+    // 7 s to open its first relay socket (Android e7bea951e, run 6), so the first attempt gets 9 s.
+    const HOST_TIMEOUT_MS = 9 * 1000;
+
+    /**
+     * Nanah's transport queues remote ICE candidates that arrive before the remote description, but
+     * drained them only after an offer; on the host the joiner's first candidates often land while the
+     * answer is applied, so they were lost (run 6). Drain after the answer too, as nanah 01aa172 does
+     * upstream and Android's engine does for its vendored copy.
+     */
+    function patchIceDrain(api) {
+        const proto = api && api.WebRtcDataChannelTransport && api.WebRtcDataChannelTransport.prototype;
+        if (!proto || typeof proto.applySignalPayload !== 'function' || proto.ftDrainsIceAfterAnswer) return false;
+        const apply = proto.applySignalPayload;
+        proto.applySignalPayload = async function (payload) {
+            await apply.call(this, payload);
+            if (!payload || payload.type !== 'answer') return;
+            const connection = this.peerConnection;
+            const pending = Array.isArray(this.pendingIceCandidates) ? this.pendingIceCandidates : [];
+            while (connection && connection.remoteDescription && pending.length > 0) {
+                const candidate = pending.shift();
+                if (!candidate) continue;
+                try { await connection.addIceCandidate(candidate); } catch (_) { /* a stale candidate */ }
+            }
+        };
+        proto.ftDrainsIceAfterAnswer = true;
+        return true;
+    }
+    patchIceDrain(root.FilterTubeNanah);
 
     /** Step log with timings (ids and reason codes only, never items). */
     function defaultLog(event, details) {
@@ -134,6 +161,9 @@
                 : transport.join({ code, device }, hooks);
             Promise.resolve(start).then(() => {
                 clearTimeout(hostTimer);
+                // host() finished after this attempt gave up: its late socket would keep hosting the
+                // same code beside the retry, so close it (e7bea951e).
+                if (finished && !connected) { Promise.resolve(transport.close()).catch(() => {}); return; }
                 if (mode === 'host') log('courier_host_started', { elapsedMs: Date.now() - startedAt });
                 if (!finished) onStarted?.();
             }, error => {
@@ -204,5 +234,5 @@
         return last;
     }
 
-    return Object.freeze({ TIMEOUT_MS, OPEN_TIMEOUT_MS, HOST_TIMEOUT_MS, MAX_ITEMS, CODE, sealedOnly, waitForOpen, host, join });
+    return Object.freeze({ TIMEOUT_MS, OPEN_TIMEOUT_MS, HOST_TIMEOUT_MS, patchIceDrain, MAX_ITEMS, CODE, sealedOnly, waitForOpen, host, join });
 }));

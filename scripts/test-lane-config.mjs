@@ -197,6 +197,7 @@ const AUTO_SYNC_TESTS = Object.freeze([
   'tests/runtime/managed-trust-repair-and-pairing-order.test.mjs',
   'tests/runtime/nanah-persisted-verify.test.mjs',
   'tests/runtime/managed-emulator-loop-fixes.test.mjs',
+  'tests/runtime/managed-pixel-run-fixes.test.mjs',
 ]);
 const STUDY_TESTS = Object.freeze([
   'tests/runtime/nanah-keyword-merge-identity.test.mjs',

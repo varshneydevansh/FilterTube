@@ -164,7 +164,32 @@
      * payloads and awaits replies; it resolves with its own result. Resolves { ok:false, reason }
      * with 'offline' when nobody waits at that doorbell.
      */
-    function call({ remoteDeviceId, fromDeviceId, converse, WebSocketImpl = root.WebSocket, relayUrl = DEFAULT_RELAY,
+    // Run 6 (Android ea46f60f5): a busy relay session or a dropped socket is retried while time is left
+    // (three attempts, 1.5 s then 3 s apart), and every failure is logged with the relay's reason.
+    const RETRYABLE = new Set(['session_occupied', 'session_expired', 'peer_left', 'socket_closed']);
+    const RETRY_DELAYS_MS = [1500, 3000];
+
+    async function call(options = {}) {
+        const { timers = root, timeoutMs = 20000, log = defaultLog } = options;
+        const deadline = Date.now() + timeoutMs;
+        let result = null;
+        for (let attempt = 0; ; attempt += 1) {
+            result = await callOnce({ ...options, timeoutMs: Math.max(500, deadline - Date.now()) });
+            if (result.ok || !RETRYABLE.has(result.reason) || attempt >= RETRY_DELAYS_MS.length) break;
+            const wait = RETRY_DELAYS_MS[attempt];
+            if (Date.now() + wait >= deadline) break;
+            log('doorbell_signal_retry', { reason: result.reason, attempt: attempt + 1 });
+            await new Promise(resolve => timers.setTimeout(resolve, wait));
+        }
+        if (!result.ok) log('doorbell_signal_failed', { reason: result.reason || null });
+        return result;
+    }
+
+    function defaultLog(event, details) {
+        try { root.console?.info?.(`FilterTube doorbell: ${event}`, JSON.stringify(details || {})); } catch (_) {}
+    }
+
+    function callOnce({ remoteDeviceId, fromDeviceId, converse, WebSocketImpl = root.WebSocket, relayUrl = DEFAULT_RELAY,
         timers = root, timeoutMs = 20000 } = {}) {
         return new Promise(resolve => {
             let ws;
@@ -196,7 +221,8 @@
                 const message = parse(String(event?.data ?? ''));
                 if (!message) return;
                 if (message.type === 'error') {
-                    finish({ ok: false, reason: message.error === 'session_not_found' ? 'offline' : 'failed' });
+                    const relayReason = typeof message.error === 'string' ? message.error.slice(0, 40) : 'failed';
+                    finish({ ok: false, reason: relayReason === 'session_not_found' ? 'offline' : relayReason });
                 } else if (message.type === 'peer_left') {
                     finish({ ok: false, reason: 'peer_left' });
                 } else if (message.type === 'session_ready') {
@@ -209,8 +235,9 @@
                     else inbox.push(message.payload);
                 }
             };
-            ws.onclose = () => finish({ ok: false, reason: 'offline' });
-            ws.onerror = () => finish({ ok: false, reason: 'offline' });
+            // A socket that drops before the exchange ends is retried (it is not "nobody listening").
+            ws.onclose = () => finish({ ok: false, reason: 'socket_closed' });
+            ws.onerror = () => finish({ ok: false, reason: 'socket_closed' });
         });
     }
 
