@@ -126,14 +126,6 @@
 
     function lengthOf(draft) { return draft.end - draft.start; }
 
-    /** The longest study that fits after `start`. */
-    function maxLength(draft) { return LAST_END - draft.start; }
-
-    /** Today's study made `minutes` long: the start stays, the end moves (and pushes the limit). */
-    function withLength(draft, minutes) {
-        return move(draft, 'end', draft.start + clamp(snap(minutes), MIN_STUDY_MINUTES, maxLength(draft)));
-    }
-
     // ---- The bar's hours (Android StudyPlannerModel.Range) -----------------------------------------
 
     function floorHour(minute) { return clamp(Math.floor(minute / 60) * 60, 0, DAY_MINUTES); }
@@ -202,7 +194,7 @@
         SNAP_MINUTES, MIN_STUDY_MINUTES, DAY_MINUTES, LAST_END, NO_LIMIT, HANDLES,
         WIDE_START, WIDE_END, MIN_RANGE_MINUTES, EDGE_STEP_MINUTES, WIDE_MIN_PX,
         LENGTH_STEP_MINUTES, MIN_ROUND_MINUTES, MAX_ROUND_MINUTES, MAX_BREAK_MINUTES,
-        snap, draftOf, hhmm, move, step, nearestHandle, minuteAt, lengthOf, maxLength, withLength, applyToPlan,
+        snap, draftOf, hhmm, move, step, nearestHandle, minuteAt, lengthOf, applyToPlan,
         including, range, widen, sameRange, extreme, stepLimit, stepRound, stepBreak
     });
 }));

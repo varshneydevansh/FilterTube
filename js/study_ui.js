@@ -3267,16 +3267,6 @@
             return;
         }
         view.appendChild(heroCard(data, local));
-        if (isObject(study.plan) && !ended) {
-            // Study length: today's plan as one slider, right under the hero (owner, 2026-11-17).
-            const lengthCard = el('section', 'ft-home-card ft-length-card');
-            mountLengthSlider(lengthCard, { study, state: { ...state, parentName: data.parentName }, onPatch: async patch => {
-                const result = await send({ action: 'FilterTube_StudyUpdate', patch });
-                if (result?.ok !== false) ctx.refresh();
-                return result;
-            } });
-            view.appendChild(lengthCard);
-        }
         const resume = continueRow(state);
         if (resume) view.appendChild(resume);
         if (state.weekView) view.appendChild(weekCard(state));
@@ -3623,130 +3613,9 @@
         return t('study.hoursMinutes', '{hours} h {minutes} min', { hours: Math.floor(minutes / 60), minutes: minutes % 60 });
     }
 
-    /** Whether this person may change the plan here (a parent's plan or lock, or a locked session, may not). */
-    function planEditable(state) {
-        const value = object(state);
-        const study = object(value.study);
-        return value.isChild !== true && !value.setByParentId && !text(object(study.plan).setByParentId)
-            && !text(object(study.lock).setByParentId) && value.lockMode !== 'locked' && !value.lock;
-    }
-
-    /**
-     * Study length (owner, 2026-11-17: "where is the slider to make study longer or shorter?"): today's plan as
-     * one slider. The start stays; dragging moves the end in 15-minute steps (30 min at least, 23:45 at
-     * most) and pushes the daily limit along, as the plan page's END handle does. −/+ step 15 minutes.
-     * It saves once the slider rests, with the same FilterTube_StudyUpdate the plan page sends.
-     *
-     * mountLengthSlider(host, {study, state, compact, onPatch, onSetup, onChange}) -> {refresh, destroy}
-     * - study/state: FilterTube_StudyGetState's `study` (and the whole state); omitted, it asks for them.
-     * - compact: a card-sized version without the hint line.
-     * - onPatch(patch) -> Promise<{ok}>: defaults to FilterTube_StudyUpdate.
-     * - onSetup(): "Set up study" when there is no plan (default: the Study page).
-     * - onChange({start, end, minutes}): after a save.
-     */
-    function mountLengthSlider(host, options = {}) {
-        const Drag = planDrag();
-        let alive = true;
-        let saveTimer = null;
-        const onPatch = options.onPatch || (patch => send({ action: 'FilterTube_StudyUpdate', patch }));
-        const openStudy = options.onSetup || (() => {
-            const nav = root.document?.querySelector?.('.nav-item[data-tab="study"]');
-            if (nav) { nav.click(); return; }
-            try { root.open(runtime()?.runtime?.getURL?.('html/tab-view.html#study') || '#study', '_blank'); } catch (e) { }
-        });
-        function draw(study, state) {
-            if (!alive || !host) return;
-            const box = el('div', `ft-length${options.compact ? ' is-compact' : ''}`);
-            const plan = object(study).plan;
-            const head = el('div', 'ft-length__head');
-            const title = el('span', 'ft-length__title', t('study.length.title', 'Study length'));
-            title.id = `ftLengthTitle${Math.random().toString(36).slice(2, 8)}`;
-            head.appendChild(title);
-            box.appendChild(head);
-            if (!Drag || !isObject(plan) || minuteOf(plan.start) === null) {
-                box.appendChild(button(t('study.setup.title', 'Set up study'), 'btn-secondary ft-length__setup', () => openStudy()));
-                host.replaceChildren(box);
-                return;
-            }
-            let draft = Drag.draftOf(plan);
-            const saved = { ...draft };
-            const editable = planEditable(state ? { ...state, study } : { study });
-            const value = el('strong', 'ft-length__value');
-            const range = el('span', 'ft-length__range');
-            head.append(value);
-            box.appendChild(range);
-            const row = el('div', 'ft-length__row');
-            const less = button('', 'ft-stepper__btn ft-length__step', () => set(Drag.lengthOf(draft) - Drag.SNAP_MINUTES, true));
-            less.appendChild(icon('minus'));
-            less.setAttribute('aria-label', t('study.planner.earlier', '{label}: 15 minutes earlier', { label: t('study.handle.end', 'Study ends') }));
-            const more = button('', 'ft-stepper__btn ft-length__step', () => set(Drag.lengthOf(draft) + Drag.SNAP_MINUTES, true));
-            more.appendChild(icon('plus'));
-            more.setAttribute('aria-label', t('study.planner.later', '{label}: 15 minutes later', { label: t('study.handle.end', 'Study ends') }));
-            const input = el('input', 'ft-length__input');
-            input.type = 'range';
-            input.min = String(Drag.MIN_STUDY_MINUTES);
-            input.max = String(Drag.maxLength(draft));
-            input.step = String(Drag.SNAP_MINUTES);
-            input.setAttribute('aria-labelledby', title.id);
-            input.dataset.ftFocusKey = 'study-length';
-            row.append(less, input, more);
-            box.appendChild(row);
-            if (!options.compact) box.appendChild(el('p', 'ft-length__hint', editable
-                ? t('study.length.hint', 'Drag to make study longer or shorter. It starts at the same time.')
-                : setByLabel(state?.parentName)));
-            const paint = () => {
-                const minutes = Drag.lengthOf(draft);
-                value.textContent = lengthLabel(minutes);
-                range.textContent = timeRange(draft.start, draft.end);
-                input.value = String(minutes);
-                input.setAttribute('aria-valuetext', `${lengthLabel(minutes)}, ${timeRange(draft.start, draft.end)}`);
-                input.style.setProperty('--ft-length-fill', `${(((minutes - Drag.MIN_STUDY_MINUTES) / Math.max(1, Drag.maxLength(draft) - Drag.MIN_STUDY_MINUTES)) * 100).toFixed(2)}%`);
-                less.disabled = !editable || minutes <= Drag.MIN_STUDY_MINUTES;
-                more.disabled = !editable || minutes >= Drag.maxLength(draft);
-            };
-            const save = async () => {
-                if (draft.end === saved.end && draft.limit === saved.limit) return;
-                const before = Drag.applyToPlan(plan, saved);
-                const result = await onPatch({ plan: Drag.applyToPlan(plan, draft) });
-                if (result?.ok === false) {
-                    draft = { ...saved };
-                    paint();
-                    notify(host, errorText(result.error), null);
-                    return;
-                }
-                saved.end = draft.end;
-                saved.limit = draft.limit;
-                notify(host, t('study.planner.saved', 'Saved'), async () => { await onPatch({ plan: before }); refresh(); });
-                options.onChange?.({ start: draft.start, end: draft.end, minutes: Drag.lengthOf(draft) });
-            };
-            const set = (minutes, soon) => {
-                draft = Drag.withLength(draft, minutes);
-                paint();
-                clearTimeout(saveTimer);
-                saveTimer = setTimeout(save, soon ? 500 : 0);
-            };
-            input.disabled = !editable;
-            input.addEventListener('input', () => { draft = Drag.withLength(draft, Number(input.value)); paint(); });
-            // A pointer drag saves where it rests; arrow keys save a moment after the last press.
-            input.addEventListener('change', () => set(Number(input.value), true));
-            paint();
-            host.replaceChildren(box);
-        }
-        async function refresh() {
-            if (options.study) { draw(options.study, options.state || null); return; }
-            const state = await send({ action: 'FilterTube_StudyGetState' });
-            draw(object(state?.study), state);
-        }
-        refresh();
-        return {
-            refresh,
-            destroy() { alive = false; clearTimeout(saveTimer); host?.replaceChildren?.(); }
-        };
-    }
-
     root.FilterTubeStudyUi = Object.freeze({
         t, phaseInfo, planSegments, segmentWords, setByLabel, packLabel, renderStrip, mountStrip,
-        renderPlanPage, renderDashboard, mountDashboard, mountLengthSlider, showLooseningNotice, lengthLabel, dayRing, ringState, heroLines, renderParentPlans, searchExplainerCard, askForTime, applyCountryAccent, openSetup,
+        renderPlanPage, renderDashboard, mountDashboard, showLooseningNotice, lengthLabel, dayRing, ringState, heroLines, renderParentPlans, searchExplainerCard, askForTime, applyCountryAccent, openSetup,
         renderTimetablePage, timetableStatus, planBar
     });
 

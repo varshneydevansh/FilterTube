@@ -1,6 +1,6 @@
 // Android StudyDayPlannerView / StudyPlannerModel drag rules (SNAP_MINUTES 15, MIN_STUDY_MINUTES 30;
 // START 0..end-30, END start+30..23:45 pushing the limit, LIMIT end..1440 where 1440 is "No limit";
-// the nearest handle wins and LIMIT loses ties), plus the Study length slider built on them.
+// the nearest handle wins and LIMIT loses ties), and the day bar's range (Android 3d92defa7).
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { createRequire } from 'node:module';
@@ -70,14 +70,10 @@ test('a plan reads into a draft and writes back', () => {
     assert.equal(Drag.applyToPlan(plan, { start: h(9), end: h(11), limit: h(22) }).limit, '22:00');
 });
 
-test('the Study length slider moves the end and keeps the start', () => {
-    const draft = { start: h(16), end: h(18), limit: h(19) };
-    assert.equal(Drag.lengthOf(draft), 120);
-    assert.deepEqual(Drag.withLength(draft, 150), { start: h(16), end: h(18, 30), limit: h(19) });
-    assert.deepEqual(Drag.withLength(draft, 200), { start: h(16), end: h(19, 15), limit: h(19, 15) });
-    assert.equal(Drag.withLength(draft, 5).end, h(16, 30), 'at least 30 minutes');
-    assert.equal(Drag.withLength(draft, 900).end, h(23, 45), 'never past 23:45');
-    assert.equal(Drag.maxLength(draft), h(23, 45) - h(16));
+test('the plan is edited on the day bar only: the Study length slider is gone (DESIGN_PASS_2026-11-21 §4 decision 3)', () => {
+    assert.equal(Drag.lengthOf({ start: h(16), end: h(18), limit: null }), 120);
+    assert.equal(Drag.withLength, undefined);
+    assert.equal(Drag.maxLength, undefined);
 });
 
 // ---- Android 3d92defa7: the bar fits its width (DESIGN_PASS_2026-11-21 §4.0-4.2) -------------------

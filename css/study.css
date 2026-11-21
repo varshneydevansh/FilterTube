@@ -627,31 +627,8 @@ body.ft-extension-surface .ft-dayplan__handle:focus-visible { outline: none !imp
 .ft-dayplan { padding-top: 40px; }
 
 /* Study length: today's plan as one slider under the hero (and on the Home "Study today" card). */
-.ft-length { display: grid; gap: 6px; }
-.ft-length__head { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; }
-.ft-length__title { font-family: var(--pk-font-hand); font-size: 19px; color: var(--pk-ink); }
-.ft-length__value { font-family: var(--pk-font-hand); font-weight: 400; font-size: 22px; color: var(--pk-sage-ink); font-variant-numeric: tabular-nums; }
-.ft-length__range { color: var(--pk-muted); font-size: 14px; }
-.ft-length__row { display: flex; align-items: center; gap: 10px; margin-top: 4px; }
-.ft-length__hint { margin: 2px 0 0; color: var(--pk-muted); font-size: 13px; }
-.ft-length.is-compact .ft-length__title { font-size: 16px; }
-.ft-length.is-compact .ft-length__value { font-size: 19px; }
-.ft-length__input { --ft-length-fill: 50%; flex: 1; min-width: 0; height: 28px; margin: 0; background: transparent; appearance: none; -webkit-appearance: none; cursor: ew-resize; }
-.ft-length__input:disabled { cursor: not-allowed; opacity: 0.55; }
-.ft-length__input::-webkit-slider-runnable-track { height: 10px; border-radius: 6px; border: 1.5px solid color-mix(in srgb, var(--pk-ink) 30%, transparent);
-  background: linear-gradient(90deg, var(--pk-sage-ink) 0 var(--ft-length-fill), var(--pk-track) var(--ft-length-fill) 100%); }
-.ft-length__input::-moz-range-track { height: 10px; border-radius: 6px; border: 1.5px solid color-mix(in srgb, var(--pk-ink) 30%, transparent); background: var(--pk-track); }
-.ft-length__input::-moz-range-progress { height: 10px; border-radius: 6px; background: var(--pk-sage-ink); }
-.ft-length__input::-webkit-slider-thumb { -webkit-appearance: none; width: 26px; height: 26px; margin-top: -9.5px; border-radius: 50%; border: 2px solid var(--pk-ink); background: var(--pk-paper); box-shadow: 0 2px 0 var(--pk-ledge); transition: transform 140ms ease-out; }
-.ft-length__input::-moz-range-thumb { width: 22px; height: 22px; border-radius: 50%; border: 2px solid var(--pk-ink); background: var(--pk-paper); }
-.ft-length__input:hover:not(:disabled)::-webkit-slider-thumb { transform: scale(1.1); }
-.ft-length__input:active:not(:disabled)::-webkit-slider-thumb { transform: scale(1.15); }
-.ft-length__input:focus-visible { outline: none; }
-.ft-length__input:focus-visible::-webkit-slider-thumb { outline: 2px solid var(--pk-ink); outline-offset: 2px; }
-.ft-length__input:focus-visible::-moz-range-thumb { outline: 2px solid var(--pk-ink); outline-offset: 2px; }
-.ft-length__step { flex: none; }
 @media (prefers-reduced-motion: reduce) {
-  .ft-dayplan__handle::after, .ft-dayplan__pill, .ft-length__input::-webkit-slider-thumb { transition: none; }
+  .ft-dayplan__handle::after, .ft-dayplan__pill { transition: none; }
 }
 .ft-dayplan__scale { position: relative; height: 22px; margin-top: 16px; }
 .ft-dayplan__hour { position: absolute; transform: translateX(-50%); font-size: 0.72rem; color: var(--pk-muted); white-space: nowrap; }

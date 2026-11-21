@@ -154,3 +154,13 @@ test('a handle held against an edge widens that edge an hour every 350 ms; mid-d
     track.fire('pointermove', { clientX: 240 });
     assert.ok(intervals.every(item => !item.on), 'leaving the edge stops it');
 });
+
+test('one editor (DESIGN_PASS_2026-11-21 §4 decision 3): no length slider; Home shows a read-only bar and Edit', () => {
+    const { Ui } = load();
+    assert.equal(Ui.mountLengthSlider, undefined);
+    const ui = fs.readFileSync('js/study_ui.js', 'utf8');
+    const home = fs.readFileSync('js/dashboard_home.js', 'utf8');
+    assert.doesNotMatch(ui + home, /mountLengthSlider|ft-length/);
+    assert.match(home, /planBar\?\.\(study\.plan, [^)]*\{ editable: false \}\)/);
+    assert.match(home, /t\('home\.study\.edit', 'Edit'\), 'btn-secondary ft-home-study__edit', openStudy/);
+});
