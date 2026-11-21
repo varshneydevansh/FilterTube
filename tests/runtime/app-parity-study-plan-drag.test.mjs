@@ -79,3 +79,44 @@ test('the Study length slider moves the end and keeps the start', () => {
     assert.equal(Drag.withLength(draft, 900).end, h(23, 45), 'never past 23:45');
     assert.equal(Drag.maxLength(draft), h(23, 45) - h(16));
 });
+
+// ---- Android 3d92defa7: the bar fits its width (DESIGN_PASS_2026-11-21 §4.0-4.2) -------------------
+
+test('the bar fits the plan when narrow, shows 6 am to 11 pm when wide, and never leaves the day', () => {
+    const plan = { start: h(16), end: h(18), limit: h(21) };
+    // Narrow: two hours before study to an hour after the limit.
+    assert.deepEqual(Drag.range(plan, false), { start: h(14), end: h(22) });
+    // A short plan still shows six hours.
+    const short = Drag.range({ start: h(16), end: h(17), limit: null }, false);
+    assert.equal(short.end - short.start, h(6));
+    assert.ok(short.start <= h(14) && short.end >= h(18));
+    // Early morning: clamped at midnight, grown later instead.
+    assert.deepEqual(Drag.range({ start: 30, end: 90, limit: null }, false), { start: 0, end: h(6) });
+    // Wide: 6 am to 11 pm, grown to show a plan outside it.
+    assert.deepEqual(Drag.range(plan, true), { start: h(6), end: h(23) });
+    assert.deepEqual(Drag.range({ start: h(5, 45), end: h(7), limit: null }, true), { start: h(5), end: h(23) });
+    // A held edge gives an hour, never past the day.
+    assert.deepEqual(Drag.widen({ start: h(14), end: h(22) }, true), { start: h(13), end: h(22) });
+    assert.deepEqual(Drag.widen({ start: 0, end: h(24) }, false), { start: 0, end: h(24) });
+    assert.deepEqual(Drag.widen({ start: 0, end: h(22) }, true), { start: 0, end: h(22) });
+    // A handle moved outside the range pulls it out, with half an hour to spare.
+    assert.deepEqual(Drag.including({ start: h(14), end: h(22) }, { ...plan, limit: h(23) }), { start: h(14), end: h(24) });
+    assert.ok(Drag.sameRange({ start: 1, end: 2 }, { start: 1, end: 2 }));
+    assert.equal(Drag.WIDE_MIN_PX, 600);
+});
+
+test('Home and End take a handle as far as its rules allow', () => {
+    const plan = { start: h(16), end: h(18), limit: h(21) };
+    assert.equal(Drag.extreme(plan, 'start', false).start, 0);
+    assert.equal(Drag.extreme(plan, 'start', true).start, h(18) - Drag.MIN_STUDY_MINUTES);
+    assert.equal(Drag.extreme(plan, 'end', true).end, h(24) - 15);
+    // The limit at End is "no limit"; at Home it sits on the end of study.
+    assert.equal(Drag.extreme(plan, 'limit', true).limit, null);
+    assert.equal(Drag.extreme(plan, 'limit', false).limit, h(18));
+});
+
+test('on a tie END takes the press, not LIMIT', () => {
+    const plan = { start: h(16), end: h(18), limit: h(18) };
+    assert.equal(Drag.nearestHandle(plan, h(18), 20), 'end');
+    assert.equal(Drag.nearestHandle(plan, h(18, 10), 20), 'end');
+});

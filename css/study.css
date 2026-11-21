@@ -607,6 +607,10 @@ body.ft-extension-surface .ft-study-card[data-study-page],
 .ft-dayplan__track { touch-action: none; }
 .ft-dayplan__handle { position: absolute; top: 0; bottom: 0; width: 2px; margin-left: -1px; background: var(--pk-ink); z-index: 2; cursor: ew-resize; outline: none; }
 .ft-dayplan__handle::after { content: ''; position: absolute; left: 50%; bottom: -12px; width: 24px; height: 24px; margin-left: -12px; box-sizing: border-box; border-radius: 50%; border: 2px solid var(--pk-ink); background: var(--pk-paper); transition: transform 140ms ease-out; }
+/* Android 3d92defa7: the bar fits its width; each handle has a 44 px target around its knob. */
+.ft-dayplan__segs { position: absolute; inset: 0; }
+.ft-dayplan__handle::before { content: ''; position: absolute; left: 50%; top: -2px; width: 44px; height: 44px; margin-left: -22px; }
+.ft-dayplan__handle:focus { outline: none; }
 .ft-dayplan__handle.is-limit { background: var(--pk-muted); }
 .ft-dayplan__handle.is-limit::after { border-color: var(--pk-muted); }
 .ft-dayplan__handle.is-limit.is-unset { background: transparent; }
