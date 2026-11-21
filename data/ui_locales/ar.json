@@ -2524,6 +2524,8 @@
   "study.planner.normal": "القواعد العادية",
   "study.planner.earlier": "{label}: قبل 15 دقيقة",
   "study.planner.later": "{label}: بعد 15 دقيقة",
+  "study.planner.shorter": "{label} أقصر بـ5 دقائق",
+  "study.planner.longer": "{label} أطول بـ5 دقائق",
   "study.planner.rightNow": "الآن",
   "study.planner.saved": "تم الحفظ",
   "study.planner.days": "الأيام",

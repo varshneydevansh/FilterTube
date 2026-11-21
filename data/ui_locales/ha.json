@@ -2524,6 +2524,8 @@
   "study.planner.normal": "Dokokin da aka saba",
   "study.planner.earlier": "{label}: minti 15 da wuri",
   "study.planner.later": "{label}: minti 15 a makare",
+  "study.planner.shorter": "{label} ya rage minti 5",
+  "study.planner.longer": "{label} ya ƙara minti 5",
   "study.planner.rightNow": "Yanzu",
   "study.planner.saved": "An adana",
   "study.planner.days": "Ranaku",

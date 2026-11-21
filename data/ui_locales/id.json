@@ -2524,6 +2524,8 @@
   "study.planner.normal": "Aturan biasa",
   "study.planner.earlier": "{label}: 15 menit lebih awal",
   "study.planner.later": "{label}: 15 menit lebih lambat",
+  "study.planner.shorter": "{label} 5 menit lebih pendek",
+  "study.planner.longer": "{label} 5 menit lebih lama",
   "study.planner.rightNow": "Sekarang",
   "study.planner.saved": "Tersimpan",
   "study.planner.days": "Hari",

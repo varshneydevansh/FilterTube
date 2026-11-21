@@ -2524,6 +2524,8 @@
   "study.planner.normal": "வழக்கமான விதிகள்",
   "study.planner.earlier": "{label}: 15 நிமிடங்கள் முன்னதாக",
   "study.planner.later": "{label}: 15 நிமிடங்கள் தாமதமாக",
+  "study.planner.shorter": "{label} 5 நிமிடம் குறைவு",
+  "study.planner.longer": "{label} 5 நிமிடம் அதிகம்",
   "study.planner.rightNow": "இப்போதே",
   "study.planner.saved": "சேமிக்கப்பட்டது",
   "study.planner.days": "நாட்கள்",

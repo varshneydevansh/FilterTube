@@ -116,3 +116,18 @@ test('on a tie END takes the press, not LIMIT', () => {
     assert.equal(Drag.nearestHandle(plan, h(18), 20), 'end');
     assert.equal(Drag.nearestHandle(plan, h(18, 10), 20), 'end');
 });
+
+test('the steppers follow Android: the limit steps from the end of study; rounds 15-120 and breaks 0-60 in 5s', () => {
+    const plan = { start: h(16), end: h(18), limit: null };
+    assert.equal(Drag.stepLimit(plan, 1).limit, h(18), '+ from no limit starts at the end of study');
+    assert.equal(Drag.stepLimit(plan, -1).limit, h(23, 45), '− from no limit is 23:45');
+    assert.equal(Drag.stepLimit({ ...plan, limit: h(18) }, -1).limit, h(18), 'never before the end of study');
+    assert.equal(Drag.stepLimit({ ...plan, limit: h(23, 45) }, 1).limit, null, 'past 23:45 is no limit');
+    assert.equal(Drag.step(plan, 'start', 15 * 7).start, h(17, 30), 'START stops 30 minutes before END, never pushing it');
+    assert.equal(Drag.stepRound(25, 1), 30);
+    assert.equal(Drag.stepRound(15, -1), 15);
+    assert.equal(Drag.stepRound(120, 1), 120);
+    assert.equal(Drag.stepBreak(0, -1), 0);
+    assert.equal(Drag.stepBreak(55, 1), 60);
+    assert.equal(Drag.stepBreak(60, 1), 60);
+});

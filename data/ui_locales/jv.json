@@ -2524,6 +2524,8 @@
   "study.planner.normal": "Aturan biasa",
   "study.planner.earlier": "{label}: 15 menit luwih awal",
   "study.planner.later": "{label}: 15 menit luwih suwé",
+  "study.planner.shorter": "{label} luwih cendhak 5 menit",
+  "study.planner.longer": "{label} luwih suwe 5 menit",
   "study.planner.rightNow": "Saiki",
   "study.planner.saved": "Disimpen",
   "study.planner.days": "Dina",

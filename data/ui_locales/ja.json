@@ -2524,6 +2524,8 @@
   "study.planner.normal": "通常のルール",
   "study.planner.earlier": "{label}：15 分早く",
   "study.planner.later": "{label}：15 分遅く",
+  "study.planner.shorter": "{label}を5分短く",
+  "study.planner.longer": "{label}を5分長く",
   "study.planner.rightNow": "今すぐ",
   "study.planner.saved": "保存しました",
   "study.planner.days": "曜日",

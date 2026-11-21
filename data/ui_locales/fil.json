@@ -2524,6 +2524,8 @@
   "study.planner.normal": "Karaniwang mga patakaran",
   "study.planner.earlier": "{label}: 15 minutong mas maaga",
   "study.planner.later": "{label}: 15 minutong mas huli",
+  "study.planner.shorter": "{label} na 5 minutong mas maikli",
+  "study.planner.longer": "{label} na 5 minutong mas mahaba",
   "study.planner.rightNow": "Ngayon na",
   "study.planner.saved": "Na-save",
   "study.planner.days": "Mga araw",

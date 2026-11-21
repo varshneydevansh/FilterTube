@@ -2524,6 +2524,8 @@
   "study.planner.normal": "సాధారణ నియమాలు",
   "study.planner.earlier": "{label}: 15 నిమిషాలు ముందు",
   "study.planner.later": "{label}: 15 నిమిషాలు తర్వాత",
+  "study.planner.shorter": "{label} 5 నిమిషాలు తక్కువ",
+  "study.planner.longer": "{label} 5 నిమిషాలు ఎక్కువ",
   "study.planner.rightNow": "ఇప్పుడే",
   "study.planner.saved": "సేవ్ చేయబడింది",
   "study.planner.days": "రోజులు",

@@ -2524,6 +2524,8 @@
   "study.planner.normal": "সাধারণ নিয়ম",
   "study.planner.earlier": "{label}: ১৫ মিনিট আগে",
   "study.planner.later": "{label}: ১৫ মিনিট পরে",
+  "study.planner.shorter": "{label} ৫ মিনিট ছোট",
+  "study.planner.longer": "{label} ৫ মিনিট বড়",
   "study.planner.rightNow": "এখনই",
   "study.planner.saved": "সংরক্ষিত",
   "study.planner.days": "দিন",

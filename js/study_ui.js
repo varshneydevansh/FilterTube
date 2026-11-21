@@ -2611,19 +2611,25 @@
 
     // ---- The plan page (renderPlan: the day planner card, then the daily limit) -----------------
 
-    /** A ±step row: label, a round − button, the rolling value, a round + button (stepperRow). */
-    function stepperRow(label, value, { onLess, onMore, lessOk = true, moreOk = true, enabled = true }) {
+    /**
+     * A ±step row: label, a round − button, the rolling value, a round + button (stepperRow). Each button
+     * says its own step (Android study_step_earlier/later, study_step_shorter/longer): a time ("15
+     * minutes earlier") or a length ("5 minutes shorter").
+     */
+    function stepperRow(label, value, { onLess, onMore, lessOk = true, moreOk = true, enabled = true, length = false }) {
         const row = el('div', 'ft-stepper');
         row.appendChild(el('span', 'ft-stepper__label', label));
         const less = button('', 'ft-stepper__btn', () => onLess());
         less.appendChild(icon('minus'));
-        less.setAttribute('aria-label', t('study.planner.earlier', '{label}: 15 minutes earlier', { label }));
+        less.setAttribute('aria-label', length ? t('study.planner.shorter', '{label} 5 minutes shorter', { label })
+            : t('study.planner.earlier', '{label}: 15 minutes earlier', { label }));
         less.disabled = !enabled || !lessOk;
         const shown = el('output', 'ft-stepper__value', value);
         shown.setAttribute('aria-live', 'polite');
         const more = button('', 'ft-stepper__btn', () => onMore());
         more.appendChild(icon('plus'));
-        more.setAttribute('aria-label', t('study.planner.later', '{label}: 15 minutes later', { label }));
+        more.setAttribute('aria-label', length ? t('study.planner.longer', '{label} 5 minutes longer', { label })
+            : t('study.planner.later', '{label}: 15 minutes later', { label }));
         more.disabled = !enabled || !moreOk;
         row.append(less, shown, more);
         return row;
@@ -2937,17 +2943,15 @@
                 : `${segmentName(segment.kind)} · ${clockLabel(segment.start)} – ${clockLabel(segment.end)}`;
             detail.replaceChildren(el('strong', 'ft-plan-card__detail-title', titleText), el('span', 'ft-study-muted', segmentWords(segment, breakMode)));
         };
-        const start = minuteOf(plan.start) ?? 16 * 60;
-        const end = minuteOf(plan.end) ?? 18 * 60;
-        const limit = minuteOf(plan.limit);
-        const setStart = value => planPatch({ ...plan, start: hhmm(value), end: hhmm(Math.max(end, value + MIN_STUDY)) });
-        const setEnd = value => {
-            const next = Math.max(value, start + MIN_STUDY);
-            const changed = { ...plan, end: hhmm(next) };
-            if (limit !== null && limit < next) changed.limit = hhmm(next);
-            planPatch(changed);
-        };
         const Drag = planDrag();
+        // The steppers follow Android's StudyPlannerModel (step, stepRound, stepBreak): START never pushes
+        // END, END pushes the limit along, the limit steps from the end of study; rounds 15-120 min and
+        // breaks 0-60 min in 5-minute steps.
+        const current = Drag ? Drag.draftOf(plan) : { start: minuteOf(plan.start) ?? 16 * 60, end: minuteOf(plan.end) ?? 18 * 60, limit: minuteOf(plan.limit) };
+        const start = current.start;
+        const end = current.end;
+        const limit = current.limit;
+        const stepTo = next => planPatch(Drag.applyToPlan(plan, next));
         // While a handle moves: its time in the detail card ("Study starts, 4:00 PM") and the steppers below
         // follow it (StudyFocusActivity.onLiveDraft); it saves once, where it lands, with Undo.
         const liveOutputs = {};
@@ -2986,12 +2990,12 @@
             days.appendChild(chip);
         });
         card.appendChild(days);
-        const startRow = stepperRow(t('study.startLabel', 'Start'), clockLabel(start), { enabled: editable,
-            lessOk: start >= STEP, moreOk: start + STEP <= 1440 - MIN_STUDY - STEP,
-            onLess: () => setStart(start - STEP), onMore: () => setStart(start + STEP) });
-        const endRow = stepperRow(t('study.endLabel', 'End'), clockLabel(end % 1440), { enabled: editable,
+        const startRow = stepperRow(t('study.startLabel', 'Start'), clockLabel(start), { enabled: editable && !!Drag,
+            lessOk: start >= STEP, moreOk: start + STEP <= end - MIN_STUDY,
+            onLess: () => stepTo(Drag.step(current, 'start', -STEP)), onMore: () => stepTo(Drag.step(current, 'start', STEP)) });
+        const endRow = stepperRow(t('study.endLabel', 'End'), clockLabel(end % 1440), { enabled: editable && !!Drag,
             lessOk: end - STEP >= start + MIN_STUDY, moreOk: end + STEP <= 1440 - STEP,
-            onLess: () => setEnd(end - STEP), onMore: () => setEnd(end + STEP) });
+            onLess: () => stepTo(Drag.step(current, 'end', -STEP)), onMore: () => stepTo(Drag.step(current, 'end', STEP)) });
         liveOutputs.start = startRow.querySelector('output');
         liveOutputs.end = endRow.querySelector('output');
         card.append(startRow, endRow);
@@ -3009,12 +3013,12 @@
         const preset = round === 25 && rest === 5 ? 25 : round === 50 && rest === 10 ? 50 : 0;
         card.appendChild(choiceRow([[25, t('study.planner.round25', '25 / 5 min')], [50, t('study.planner.round50', '50 / 10 min')]], preset,
             value => focusPatch({ roundMinutes: value, breakMinutes: value === 50 ? 10 : 5 }), t('study.planner.rounds', 'Rounds'), editable));
-        card.appendChild(stepperRow(t('study.roundLength', 'Study round'), t('study.minutes', '{minutes} min', { minutes: round }), { enabled: editable,
-            lessOk: round > 10, moreOk: round < 120,
-            onLess: () => focusPatch({ roundMinutes: Math.max(10, round - 5) }), onMore: () => focusPatch({ roundMinutes: Math.min(120, round + 5) }) }));
-        card.appendChild(stepperRow(t('study.breakLength', 'Break'), rest === 0 ? t('study.noBreak', 'No break') : t('study.minutes', '{minutes} min', { minutes: rest }), { enabled: editable,
-            lessOk: rest > 0, moreOk: rest < 30,
-            onLess: () => focusPatch({ breakMinutes: Math.max(0, rest - 5) }), onMore: () => focusPatch({ breakMinutes: Math.min(30, rest + 5) }) }));
+        card.appendChild(stepperRow(t('study.roundLength', 'Study round'), t('study.minutes', '{minutes} min', { minutes: round }), { enabled: editable && !!Drag, length: true,
+            lessOk: round > (Drag?.MIN_ROUND_MINUTES ?? 15), moreOk: round < (Drag?.MAX_ROUND_MINUTES ?? 120),
+            onLess: () => focusPatch({ roundMinutes: Drag.stepRound(round, -1) }), onMore: () => focusPatch({ roundMinutes: Drag.stepRound(round, 1) }) }));
+        card.appendChild(stepperRow(t('study.breakLength', 'Break'), rest === 0 ? t('study.noBreak', 'No break') : t('study.minutes', '{minutes} min', { minutes: rest }), { enabled: editable && !!Drag, length: true,
+            lessOk: rest > 0, moreOk: rest < (Drag?.MAX_BREAK_MINUTES ?? 60),
+            onLess: () => focusPatch({ breakMinutes: Drag.stepBreak(rest, -1) }), onMore: () => focusPatch({ breakMinutes: Drag.stepBreak(rest, 1) }) }));
         page.appendChild(card);
 
         // The daily limit (addLimit).
@@ -3024,15 +3028,12 @@
             limitCard.appendChild(el('p', 'ft-plan-card__hint', limit === null
                 ? t('study.limit.bodyNone', 'Tap + to choose a time. After it, nothing plays until midnight.')
                 : t('study.limit.body', 'Drag the grey limit handle on the plan, or step it here. After the limit, nothing plays until midnight.')));
-            const endOfStudy = end % 1440;
+            // From "No limit", + starts at the end of study and − at 23:45; never before the end of study;
+            // + past 23:45 is "No limit" again.
             const limitRow = stepperRow(t('study.section.limit', 'Daily limit'), limit === null ? t('study.limit.noLimit', 'No limit') : clockLabel(limit), {
-                lessOk: limit !== null, moreOk: limit === null || limit + STEP <= 1440 - STEP,
-                onLess: () => {
-                    const next = { ...plan };
-                    if (limit - STEP < Math.max(endOfStudy, 0)) delete next.limit; else next.limit = hhmm(limit - STEP);
-                    planPatch(next);
-                },
-                onMore: () => planPatch({ ...plan, limit: hhmm(limit === null ? Math.max(endOfStudy, 20 * 60) : limit + STEP) })
+                enabled: !!Drag, lessOk: limit === null || limit > end,
+                onLess: () => stepTo(Drag.stepLimit(current, -1)),
+                onMore: () => stepTo(Drag.stepLimit(current, 1))
             });
             liveOutputs.limit = limitRow.querySelector('output');
             limitCard.appendChild(limitRow);

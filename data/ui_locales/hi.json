@@ -2524,6 +2524,8 @@
   "study.planner.normal": "सामान्य नियम",
   "study.planner.earlier": "{label}: 15 मिनट पहले",
   "study.planner.later": "{label}: 15 मिनट बाद",
+  "study.planner.shorter": "{label} 5 मिनट कम",
+  "study.planner.longer": "{label} 5 मिनट ज़्यादा",
   "study.planner.rightNow": "अभी",
   "study.planner.saved": "सेव हो गया",
   "study.planner.days": "दिन",

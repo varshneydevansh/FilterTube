@@ -2524,6 +2524,8 @@
   "study.planner.normal": "Àwọn òfin déédéé",
   "study.planner.earlier": "{label}: ìṣẹ́jú 15 ṣáájú",
   "study.planner.later": "{label}: ìṣẹ́jú 15 lẹ́yìn",
+  "study.planner.shorter": "{label} kúrú sí i ní ìṣẹ́jú 5",
+  "study.planner.longer": "{label} gùn sí i ní ìṣẹ́jú 5",
   "study.planner.rightNow": "Báyìí",
   "study.planner.saved": "Ti fipamọ́",
   "study.planner.days": "Àwọn ọjọ́",

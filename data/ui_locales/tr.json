@@ -2524,6 +2524,8 @@
   "study.planner.normal": "Normal kurallar",
   "study.planner.earlier": "{label}: 15 dakika erken",
   "study.planner.later": "{label}: 15 dakika geç",
+  "study.planner.shorter": "{label} 5 dakika kısa",
+  "study.planner.longer": "{label} 5 dakika uzun",
   "study.planner.rightNow": "Şu an",
   "study.planner.saved": "Kaydedildi",
   "study.planner.days": "Günler",

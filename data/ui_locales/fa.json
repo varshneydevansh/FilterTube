@@ -2524,6 +2524,8 @@
   "study.planner.normal": "قوانین عادی",
   "study.planner.earlier": "{label}: ۱۵ دقیقه زودتر",
   "study.planner.later": "{label}: ۱۵ دقیقه دیرتر",
+  "study.planner.shorter": "{label} ۵ دقیقه کوتاه‌تر",
+  "study.planner.longer": "{label} ۵ دقیقه طولانی‌تر",
   "study.planner.rightNow": "همین الان",
   "study.planner.saved": "ذخیره شد",
   "study.planner.days": "روزها",

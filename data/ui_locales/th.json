@@ -2524,6 +2524,8 @@
   "study.planner.normal": "กฎปกติ",
   "study.planner.earlier": "{label}: เร็วขึ้น 15 นาที",
   "study.planner.later": "{label}: ช้าลง 15 นาที",
+  "study.planner.shorter": "{label} สั้นลง 5 นาที",
+  "study.planner.longer": "{label} ยาวขึ้น 5 นาที",
   "study.planner.rightNow": "ตอนนี้",
   "study.planner.saved": "บันทึกแล้ว",
   "study.planner.days": "วัน",

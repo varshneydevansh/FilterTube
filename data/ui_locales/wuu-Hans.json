@@ -2524,6 +2524,8 @@
   "study.planner.normal": "平常规则",
   "study.planner.earlier": "{label}：早 15 分钟",
   "study.planner.later": "{label}：晏 15 分钟",
+  "study.planner.shorter": "{label}短5分钟",
+  "study.planner.longer": "{label}长5分钟",
   "study.planner.rightNow": "现在",
   "study.planner.saved": "保存好了",
   "study.planner.days": "日脚",

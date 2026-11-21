@@ -2524,6 +2524,8 @@
   "study.planner.normal": "Quy tắc thường lệ",
   "study.planner.earlier": "{label}: sớm hơn 15 phút",
   "study.planner.later": "{label}: muộn hơn 15 phút",
+  "study.planner.shorter": "{label} ngắn hơn 5 phút",
+  "study.planner.longer": "{label} dài hơn 5 phút",
   "study.planner.rightNow": "Ngay bây giờ",
   "study.planner.saved": "Đã lưu",
   "study.planner.days": "Ngày",

@@ -2524,6 +2524,8 @@
   "study.planner.normal": "Обычные правила",
   "study.planner.earlier": "{label}: на 15 минут раньше",
   "study.planner.later": "{label}: на 15 минут позже",
+  "study.planner.shorter": "{label}: на 5 минут короче",
+  "study.planner.longer": "{label}: на 5 минут длиннее",
   "study.planner.rightNow": "Сейчас",
   "study.planner.saved": "Сохранено",
   "study.planner.days": "Дни",

@@ -47,7 +47,7 @@ function load({ dir = 'ltr', width = 360 } = {}) {
     context.window = context;
     vm.createContext(context);
     for (const file of ['js/shared/study_plan_drag.js', 'js/shared/study_engine.js', 'js/study_ui.js']) vm.runInContext(fs.readFileSync(file, 'utf8'), context);
-    return { Ui: context.FilterTubeStudyUi, timers, intervals };
+    return { Ui: context.FilterTubeStudyUi, timers, intervals, make };
 }
 
 const handlesOf = bar => bar.children[0].children.filter(child => child.className.includes('ft-dayplan__handle'));
@@ -163,4 +163,25 @@ test('one editor (DESIGN_PASS_2026-11-21 §4 decision 3): no length slider; Home
     assert.doesNotMatch(ui + home, /mountLengthSlider|ft-length/);
     assert.match(home, /planBar\?\.\(study\.plan, [^)]*\{ editable: false \}\)/);
     assert.match(home, /t\('home\.study\.edit', 'Edit'\), 'btn-secondary ft-home-study__edit', openStudy/);
+});
+
+test('the plan page\'s steppers: START never pushes END, the limit steps from the end, each says its step', async () => {
+    const { Ui, make } = load();
+    const patches = [];
+    const host = make('div');
+    const study = { plan: { days: ['mon'], start: '16:00', end: '16:30' }, focus: { roundMinutes: 15, breakMinutes: 60 } };
+    Ui.renderPlanPage(host, { study, editable: true, onPatch: async patch => { patches.push(patch); return { ok: true }; }, toastHost: make('div') });
+    const all = [];
+    const walk = node => { all.push(node); (node.children || []).forEach(walk); };
+    walk(host);
+    const byLabel = label => all.find(node => node.attributes?.['aria-label'] === label);
+    assert.equal(byLabel('Start: 15 minutes later').disabled, true, 'START can\'t push END');
+    assert.equal(byLabel('Study round 5 minutes shorter').disabled, true, 'rounds stop at 15 minutes');
+    assert.equal(byLabel('Break 5 minutes longer').disabled, true, 'breaks stop at 60 minutes');
+    assert.equal(byLabel('Study round 5 minutes longer').disabled, false);
+    byLabel('Daily limit: 15 minutes later').fire('click');
+    assert.equal(patches.at(-1).plan.limit, '16:30', '+ from no limit starts at the end of study');
+    byLabel('End: 15 minutes later').fire('click');
+    assert.equal(patches.at(-1).plan.end, '16:45');
+    assert.equal(patches.at(-1).plan.start, '16:00');
 });

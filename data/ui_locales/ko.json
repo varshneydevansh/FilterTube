@@ -2524,6 +2524,8 @@
   "study.planner.normal": "평소 규칙",
   "study.planner.earlier": "{label}: 15분 앞당기기",
   "study.planner.later": "{label}: 15분 늦추기",
+  "study.planner.shorter": "{label} 5분 줄이기",
+  "study.planner.longer": "{label} 5분 늘리기",
   "study.planner.rightNow": "지금",
   "study.planner.saved": "저장됨",
   "study.planner.days": "요일",

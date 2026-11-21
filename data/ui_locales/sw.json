@@ -2524,6 +2524,8 @@
   "study.planner.normal": "Sheria za kawaida",
   "study.planner.earlier": "{label}: dakika 15 mapema",
   "study.planner.later": "{label}: dakika 15 baadaye",
+  "study.planner.shorter": "{label} dakika 5 pungufu",
+  "study.planner.longer": "{label} dakika 5 zaidi",
   "study.planner.rightNow": "Sasa hivi",
   "study.planner.saved": "Imehifadhiwa",
   "study.planner.days": "Siku",

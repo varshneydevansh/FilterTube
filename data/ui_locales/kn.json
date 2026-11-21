@@ -2524,6 +2524,8 @@
   "study.planner.normal": "ಸಾಮಾನ್ಯ ನಿಯಮಗಳು",
   "study.planner.earlier": "{label}: 15 ನಿಮಿಷ ಮುಂಚೆ",
   "study.planner.later": "{label}: 15 ನಿಮಿಷ ತಡವಾಗಿ",
+  "study.planner.shorter": "{label} 5 ನಿಮಿಷ ಕಡಿಮೆ",
+  "study.planner.longer": "{label} 5 ನಿಮಿಷ ಹೆಚ್ಚು",
   "study.planner.rightNow": "ಈಗಲೇ",
   "study.planner.saved": "ಉಳಿಸಲಾಗಿದೆ",
   "study.planner.days": "ದಿನಗಳು",

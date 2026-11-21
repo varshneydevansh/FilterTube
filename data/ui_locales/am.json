@@ -2524,6 +2524,8 @@
   "study.planner.normal": "መደበኛ ደንቦች",
   "study.planner.earlier": "{label}: 15 ደቂቃ ቀደም ብሎ",
   "study.planner.later": "{label}: 15 ደቂቃ ዘግይቶ",
+  "study.planner.shorter": "{label} በ5 ደቂቃ አጠር",
+  "study.planner.longer": "{label} በ5 ደቂቃ ረዘም",
   "study.planner.rightNow": "አሁኑኑ",
   "study.planner.saved": "ተቀምጧል",
   "study.planner.days": "ቀናት",

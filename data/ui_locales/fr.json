@@ -2524,6 +2524,8 @@
   "study.planner.normal": "Règles habituelles",
   "study.planner.earlier": "{label} : 15 minutes plus tôt",
   "study.planner.later": "{label} : 15 minutes plus tard",
+  "study.planner.shorter": "{label} : 5 minutes de moins",
+  "study.planner.longer": "{label} : 5 minutes de plus",
   "study.planner.rightNow": "Maintenant",
   "study.planner.saved": "Enregistré",
   "study.planner.days": "Jours",

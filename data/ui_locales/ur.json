@@ -2524,6 +2524,8 @@
   "study.planner.normal": "عام اصول",
   "study.planner.earlier": "{label}: 15 منٹ پہلے",
   "study.planner.later": "{label}: 15 منٹ بعد",
+  "study.planner.shorter": "{label} 5 منٹ کم",
+  "study.planner.longer": "{label} 5 منٹ زیادہ",
   "study.planner.rightNow": "ابھی",
   "study.planner.saved": "محفوظ ہو گیا",
   "study.planner.days": "دن",

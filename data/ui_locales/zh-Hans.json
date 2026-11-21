@@ -2524,6 +2524,8 @@
   "study.planner.normal": "常规规则",
   "study.planner.earlier": "{label}：提前 15 分钟",
   "study.planner.later": "{label}：推后 15 分钟",
+  "study.planner.shorter": "{label}缩短5分钟",
+  "study.planner.longer": "{label}延长5分钟",
   "study.planner.rightNow": "现在",
   "study.planner.saved": "已保存",
   "study.planner.days": "日期",
