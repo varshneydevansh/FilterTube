@@ -31,7 +31,10 @@
     const ANNOUNCE_GAP_MS = 30 * 1000;
     const RING_GAP_MS = 60 * 1000;
     const MAILBOX_EVERY_MS = 45 * 1000;
-    const ANSWER_WAIT_MS = 20 * 1000;
+    // Spec §14.4 (Pixel run 7): the child waits longer than the parent's whole window (a cold courier
+    // page plus two 9 s host attempts), and announces once more if the answer still doesn't come.
+    const ANSWER_WAIT_MS = 40 * 1000;
+    const WARM_TIMEOUT_MS = 15 * 1000;
     const RING_OFFLINE_RETRY_MS = 4 * 1000;
     const FINISHED = ['delivered', 'up_to_date', 'applied', 'rejected', 'expired'];
     const VIEWER_PATTERNS = ['*://*.youtube.com/*', '*://*.youtubekids.com/*'];
@@ -161,7 +164,7 @@
     function install({ api, promiseApi = false, isTrustedUiSender, getSelfControlSession = null, now = () => Date.now(),
         Receiver = root.FilterTubeManagedUpdateReceiver, Doorbell = root.FilterTubeManagedDoorbell,
         Courier = root.FilterTubeManagedCourier, MailboxClient = root.FilterTubeManagedMailboxClient,
-        Auth = root.FilterTubeManagedSeamlessAuth } = {}) {
+        Auth = root.FilterTubeManagedSeamlessAuth, answerWaitMs = ANSWER_WAIT_MS } = {}) {
         if (!api?.storage?.local || !Receiver || !Doorbell) return null;
         const call = (target, method, ...args) => (promiseApi
             ? Promise.resolve().then(() => target[method](...args))
@@ -329,8 +332,35 @@
             });
         }
 
+        /**
+         * §14.4: a Send opens (and closes) one relay socket ahead of the announce, so the courier's
+         * host a few seconds later doesn't pay for a cold connection.
+         */
+        function warmCourierRelay() {
+            return new Promise(resolve => {
+                const startedAt = now();
+                let socket = null;
+                let done = false;
+                const finish = ok => {
+                    if (done) return;
+                    done = true;
+                    clearTimeout(timer);
+                    try { socket?.close(); } catch (_) {}
+                    log('courier_warm', { ok, elapsedMs: now() - startedAt });
+                    resolve({ ok });
+                };
+                const timer = setTimeout(() => finish(false), WARM_TIMEOUT_MS);
+                if (typeof root.WebSocket !== 'function') { finish(false); return; }
+                try {
+                    socket = new root.WebSocket(Doorbell.DEFAULT_RELAY);
+                    socket.onopen = () => finish(true);
+                    socket.onerror = () => finish(false);
+                } catch (_) { finish(false); }
+            });
+        }
+
         // ------------------------------------------------------------ child: announce (§2.2)
-        async function announceTo(parentDeviceId, linkIds, { force = false, courierRetry = false } = {}) {
+        async function announceTo(parentDeviceId, linkIds, { force = false, courierRetry = false, answerRetry = false } = {}) {
             const ctx = await context();
             if (!ctx.consent || !ctx.deviceId) return { ok: false, reason: 'not_ready' };
             const last = lastAnnounce.get(parentDeviceId) || 0;
@@ -339,12 +369,12 @@
             const answer = await Doorbell.call({
                 remoteDeviceId: parentDeviceId,
                 fromDeviceId: ctx.deviceId,
-                timeoutMs: ANSWER_WAIT_MS + 5000,
+                timeoutMs: answerWaitMs + 5000,
                 converse: async ({ send, next }) => {
                     const message = Doorbell.announceMessage(ctx.deviceId, linkIds);
                     send(Auth ? await Auth.signAnnounce(message, id => rawLinkFor(ctx, id), now()).catch(() => message) : message);
                     let answerTimer = null;
-                    const timeout = new Promise(resolve => { answerTimer = setTimeout(() => resolve(null), ANSWER_WAIT_MS); });
+                    const timeout = new Promise(resolve => { answerTimer = setTimeout(() => resolve(null), answerWaitMs); });
                     try {
                         for (;;) {
                             const payload = await Promise.race([next(), timeout]);
@@ -358,6 +388,10 @@
                 }
             });
             log('announce_result', { ok: answer.ok === true, courier: !!answer.courier, itemCount: answer.itemCount || 0, reason: answer.reason || null });
+            if (!answer.ok && answer.reason === 'no_answer' && !answerRetry) {
+                log('announce_retry', { reason: 'no_answer' });
+                return announceTo(parentDeviceId, linkIds, { force: true, courierRetry, answerRetry: true });
+            }
             // §2.2: run a pickup with the courier code, or without one when there is none.
             if (answer.ok && answer.courier) {
                 const deviceHash = await Doorbell.hash(ctx.deviceId);
@@ -468,26 +502,37 @@
             const outbox = pruneOutbox((await get([OUTBOX_KEY]))[OUTBOX_KEY], now());
             const queued = outbox.entries.filter(entry => entry.state === 'queued' && kept.includes(entry.linkId)).slice(0, 16);
             if (!queued.length) { reply(Doorbell.announceAnswer('', 0)); return; }
+            // §14.4: a repeat announce while this child's courier is still starting joins it and gets
+            // the same code; only one after the code was given out (the child's join failed) replaces it.
+            const starting = hostingFor.get(announce.fromDeviceId);
+            if (starting && !starting.answered) {
+                log('courier_join_starting', {});
+                starting.joiners.push(reply);
+                return;
+            }
             const code = Doorbell.courierCode();
             const deviceHash = await Doorbell.hash(ctx.deviceId);
             await mutateOutbox(box => ({
                 outbox: { version: 1, entries: box.entries.map(entry => queued.some(row => row.entryId === entry.entryId)
                     ? { ...entry, attempts: (Number(entry.attempts) || 0) + 1, lastAttemptAt: now(), via: 'courier' } : entry) }
             }));
-            let answered = false;
-            const answer = () => { if (!answered) { answered = true; reply(Doorbell.announceAnswer(code, queued.length)); } };
+            const slot = { abort: null, answered: false, joiners: [] };
+            const answer = () => {
+                if (slot.answered) return;
+                slot.answered = true;
+                for (const send of [reply, ...slot.joiners]) send(Doorbell.announceAnswer(code, queued.length));
+            };
             const previous = hostingFor.get(announce.fromDeviceId);
             if (previous) {
                 log('courier_replaced', {});
                 previous.abort?.();
             }
-            const slot = { abort: null };
             hostingFor.set(announce.fromDeviceId, slot);
             const result = await runCourier({ role: 'host', code, deviceHash, items: queued.map(entry => entry.item), onHosting: answer,
                 registerAbort: fn => { slot.abort = fn; } }).finally(() => {
                 if (hostingFor.get(announce.fromDeviceId) === slot) hostingFor.delete(announce.fromDeviceId);
             });
-            if (!answered) answer();
+            if (!slot.answered) answer();
             if (!result?.ok) {
                 // The parent keeps the courier's reason on the waiting entries (still queued, retried).
                 const reason = `courier:${str(result?.reason) || 'courier_failed'}`.slice(0, 96);
@@ -580,6 +625,7 @@
                     if (row) rows.push(row);
                 }
                 await mutateOutbox(box => ({ outbox: enqueueOutbox(box, rows, now()) }));
+                if (rows.length) void warmCourierRelay();
                 void reconcile('outbox').then(() => ringQueued({ linkIds: rows.map(row => row.linkId), force: true })).catch(() => null);
                 return { ok: true, uploadedMailboxItemIds: rows.map(row => row.entryId) };
             }
