@@ -3,14 +3,14 @@
 Generated from `PORT_LEDGER.tsv` by `node tools/parity/ledger.mjs render`. Edit the TSV, never this file.
 Rules: [HOW_TO_PORT.md](HOW_TO_PORT.md). Sync point: Android `ec9d91080` (Release Android 3.6.1), in the app repository.
 
-**196 rows:** 105 ported, 2 partial, 0 todo, 89 n/a. **98.1%** of 107 applicable rows ported (99.1% counting partial as half).
+**197 rows:** 106 ported, 2 partial, 0 todo, 89 n/a. **98.1%** of 108 applicable rows ported (99.1% counting partial as half).
 
 | Area | ported | partial | todo | n/a | share |
 |---|---|---|---|---|---|
 | brand-visual | 31 | 0 | 0 | 10 | 100.0% |
 | home-viewer | 1 | 0 | 0 | 15 | 100.0% |
 | watch | 0 | 0 | 0 | 1 | - |
-| study | 45 | 1 | 0 | 7 | 98.9% |
+| study | 46 | 1 | 0 | 7 | 98.9% |
 | kids | 0 | 0 | 0 | 3 | - |
 | profiles-family | 9 | 0 | 0 | 2 | 100.0% |
 | settings-controls | 8 | 0 | 0 | 3 | 100.0% |
@@ -147,6 +147,7 @@ Rules: [HOW_TO_PORT.md](HOW_TO_PORT.md). Sync point: Android `ec9d91080` (Releas
 | `bfbe09df0` | 2026-11-21 | feat(android-study): the timetable's day on the bar | ported | `1e59ae19` | the day on the plan-style bar (sage blocks named for their lane, a block opens its period), the editor bar with START/END handles (44 px, keys, cancel reverts, END wins a tie, RTL), day chips in one row, Clips, Copy and the calendar behind More choices; barRange and moveEdge with Android's tests |
 | `9413ee20f` | 2026-11-21 | feat(android-study): timetable week grid on tablet, today on TV, widget names the day | ported | `1e59ae19` | the week grid (seven columns over 6 am-11 pm grown to every period, today washed with the now line) with the inspector beside it at 900 px and wider; an empty hour adds a period up to the next; weekRange and slot with Android's tests. The TV remote and the home-screen widget are n/a; the next period off today already names its day (formatDayTime) |
 | `6af91cdbf` | 2026-11-21 | fix(android-study): timetable says Clips; initials in narrow blocks; real minus | ported | `1e59ae19`, `138b95b4` | Hide Clips and comments (138b95b4, every locale its own Clips word); initials in narrow blocks, never a cut-off name (blockLabel, with Android's test plus a bracketed-note case); the editor steppers are the plan page's minus and plus icons, spoken 15 minutes earlier/later |
+| `493eff989` | 2026-11-21 | fix(android-study): block labels never cut a word | ported | `cdee70e4` | blockLabel tries the full name, then the full name at 0.8 size ({text, small}), then initials only for names of two or more words, else nothing (never 'GMA' or 'Pra'); the day bar and the week grid draw the small size; Android's test updated the same way |
 | `49a8ba846` | 2026-11-15 | fix(android-study): keep the planner's scroll only once it has been laid out | n/a |  | Android platform plumbing (planner scroll restore) |
 | `c2fcb8b71` | 2026-11-15 | fix(android-study): no focus wash over the page (the slate dark mode); chip check sits with its words | n/a |  | Android platform plumbing (focus highlight over the native page) |
 | `4a27d8595` | 2026-11-15 | fix(android-study): cream switch thumbs in dark setup | n/a |  | Android platform plumbing (Material switch tint) |
