@@ -162,9 +162,9 @@
         return Number.isFinite(until) ? Math.max(0, Math.ceil((until - at) / MINUTE)) : null;
     }
 
-    function openOptions() {
+    function openOptions(path = 'html/tab-view.html#study') {
         const api = runtime();
-        const url = api?.runtime?.getURL ? api.runtime.getURL('html/tab-view.html#study') : 'html/tab-view.html#study';
+        const url = api?.runtime?.getURL ? api.runtime.getURL(path) : path;
         try {
             const tabs = api?.tabs;
             if (tabs?.create) {
@@ -254,6 +254,39 @@
         host.append(copy, actions);
     }
 
+    /** The dashboard's plan editor (tab-view reads view=study; the Study page opens its plan for section=plan). */
+    const PLAN_EDITOR_PATH = 'html/tab-view.html?view=study&section=plan';
+
+    /**
+     * The popup's "Study today": today's plan as a read-only day bar, and "Edit in dashboard", which opens
+     * the one editor (DESIGN_PASS_2026-11-21 §4 decision 3). A child sees the bar without Edit (the
+     * dashboard needs a parent's PIN). Drawn again only when the plan or the minute changes.
+     */
+    function renderPopupPlan(host, state) {
+        if (!host) return;
+        const value = object(state);
+        const study = object(value.study);
+        const plan = study.plan && typeof study.plan === 'object' ? study.plan : null;
+        const minute = Math.floor(Date.now() / 60000);
+        const key = plan ? JSON.stringify([plan, study.focus || {}, study.breakMode || '', !!value.isChild, minute, root.FilterTubeUiLocalization?.locale || '']) : '';
+        if (host.dataset.ftPlanKey === key) return;
+        host.dataset.ftPlanKey = key;
+        host.hidden = !plan;
+        host.replaceChildren();
+        if (!plan) return;
+        const head = el('div', 'ft-study-popup-plan__head');
+        head.appendChild(el('span', 'ft-study-popup-plan__title', t('home.study.title', 'Study today')));
+        if (!value.isChild) {
+            const edit = button(t('study.popup.editInDashboard', 'Edit in dashboard'), 'ft-link-button ft-study-popup-plan__edit', () => openOptions(PLAN_EDITOR_PATH));
+            edit.dataset.ftFocusKey = 'popup-plan-edit';
+            head.appendChild(edit);
+        }
+        host.appendChild(head);
+        try {
+            host.appendChild(planBar(plan, object(study.focus), study.breakMode === 'normal' ? 'normal' : 'rest', { editable: false }));
+        } catch (e) { }
+    }
+
     function mountStrip(host) {
         if (!host) return null;
         let state = null;
@@ -306,6 +339,7 @@
         try { runtime()?.storage?.onChanged?.addListener((changes, area) => { if (area === 'local' && changes.ftAskParentV1) refresh(); }); } catch (e) { }
         function draw() {
             renderStrip(host, state, { onChange: refresh, parentName });
+            renderPopupPlan(root.document?.getElementById?.('ftStudyPlanPopup'), state);
             clearTimeout(timer);
             const ending = Number.isFinite(state?.endRequestedAt);
             const until = Number(state?.validUntil);
@@ -3626,7 +3660,7 @@
     root.FilterTubeStudyUi = Object.freeze({
         t, phaseInfo, planSegments, segmentWords, setByLabel, packLabel, renderStrip, mountStrip,
         renderPlanPage, renderDashboard, mountDashboard, showLooseningNotice, lengthLabel, dayRing, ringState, heroLines, renderParentPlans, searchExplainerCard, askForTime, applyCountryAccent, openSetup,
-        renderTimetablePage, timetableStatus, planBar, openPlanEditor
+        renderTimetablePage, timetableStatus, planBar, openPlanEditor, renderPopupPlan, PLAN_EDITOR_PATH
     });
 
     // Any page that loads this file shows the sheet when the background puts a loosening back.
@@ -3648,10 +3682,20 @@
             strip.className = 'ft-study-strip';
             strip.hidden = true;
             timeStatus.insertAdjacentElement('afterend', strip);
+            const plan = doc.createElement('section');
+            plan.id = 'ftStudyPlanPopup';
+            plan.className = 'ft-study-popup-plan';
+            plan.hidden = true;
+            strip.insertAdjacentElement('afterend', plan);
             mountStrip(strip);
         }
         const dashboard = doc.getElementById('ftStudyDashboard');
         if (dashboard) mountedDashboard = mountDashboard(dashboard);
+        // The popup's "Edit in dashboard" opens the plan editor straight away.
+        try {
+            const query = new URLSearchParams(root.location?.search || '');
+            if (dashboard && query.get('view') === 'study' && query.get('section') === 'plan') openPlanEditor();
+        } catch (e) { }
     }
     if (root.document) {
         if (root.document.readyState === 'loading') root.document.addEventListener('DOMContentLoaded', autoMount, { once: true });

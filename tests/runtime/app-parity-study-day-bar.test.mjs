@@ -188,3 +188,24 @@ test('the plan page\'s steppers: START never pushes END, the limit steps from th
     assert.equal(patches.at(-1).plan.end, '16:45');
     assert.equal(patches.at(-1).plan.start, '16:00');
 });
+
+test('the popup shows today\'s plan read-only, with Edit in dashboard (not for a child), and leaves it alone between changes', () => {
+    const { Ui, make } = load({ width: 340 });
+    const host = make('section');
+    const all = node => [node, ...node.children.flatMap(all)];
+    const study = { plan: { days: ['mon'], start: '16:00', end: '18:00', limit: '21:00' }, focus: { roundMinutes: 25, breakMinutes: 5 } };
+    Ui.renderPopupPlan(host, { study });
+    assert.equal(host.hidden, false);
+    const nodes = all(host);
+    assert.ok(nodes.some(node => node.className.includes('ft-dayplan')), 'the day bar');
+    assert.equal(nodes.filter(node => node.className.includes('ft-dayplan__handle')).length, 0, 'read-only: no handles');
+    assert.ok(nodes.some(node => node.dataset.ftFocusKey === 'popup-plan-edit'), 'Edit in dashboard');
+    assert.equal(Ui.PLAN_EDITOR_PATH, 'html/tab-view.html?view=study&section=plan');
+    const first = host.children[0];
+    Ui.renderPopupPlan(host, { study });
+    assert.equal(host.children[0], first, 'the same plan in the same minute is not redrawn');
+    Ui.renderPopupPlan(host, { study, isChild: true });
+    assert.ok(!all(host).some(node => node.dataset.ftFocusKey === 'popup-plan-edit'), 'a child gets no Edit');
+    Ui.renderPopupPlan(host, { study: {} });
+    assert.equal(host.hidden, true);
+});

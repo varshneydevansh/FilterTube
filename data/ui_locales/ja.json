@@ -3418,6 +3418,7 @@
   "kids.siteProfiles.title": "キッズサイトの子どものプロフィール",
   "home.study.offToday": "今日は学習の予定はありません。",
   "home.study.edit": "編集",
+  "study.popup.editInDashboard": "ダッシュボードで編集",
   "kids.siteProfiles.help": "youtubekids.com にあるお子さまのプロフィールです。FilterTube のプロフィールと連携すると、そのプロフィールに切り替えたときにキッズサイトでその子が選ばれます。",
   "home.tried.empty": "今日は何も通り抜けませんでした。ウルジャンはひと休み中。",
   "home.greet.morning": "おはようございます。",

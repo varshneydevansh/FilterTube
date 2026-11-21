@@ -698,3 +698,12 @@ body.ft-extension-surface .ft-dayplan__handle:focus-visible { outline: none !imp
     #studyView .ft-plan-card { padding-left: 12px; padding-right: 12px; }
     .ft-dayplan { padding-left: 8px; padding-right: 8px; }
 }
+
+/* The popup's "Study today": a read-only day bar under the strip, and "Edit in dashboard" (the one editor). */
+.ft-study-popup-plan { margin: 0.5rem 0.12rem 0; padding: 0.6rem 0.75rem 0.35rem; border: 1px solid var(--ft-tone-stroke, var(--pk-line)); border-radius: 12px; background: var(--pk-paper); }
+.ft-study-popup-plan[hidden] { display: none; }
+.ft-study-popup-plan__head { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+.ft-study-popup-plan__title { font-family: var(--pk-font-hand); font-size: 1.05rem; color: var(--pk-ink); }
+.ft-study-popup-plan__edit { min-height: 32px; padding: 4px 6px; font-size: 0.85rem; }
+.ft-study-popup-plan > .ft-dayplan { padding: 24px 0 0; }
+.ft-study-popup-plan .ft-dayplan__track { height: 28px; }
