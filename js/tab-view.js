@@ -22418,6 +22418,33 @@ document.addEventListener('DOMContentLoaded', async () => {
         return { ok: true, profileId: bound, profile };
     }
 
+    /**
+     * Spec §14 (Android savedUpdateScopes): what a Send seals for one link. A bundle request seals
+     * `active` when the link allows the whole bundle, otherwise each area it allows; a single-area
+     * request seals that area when the link allows it.
+     */
+    function getNanahSavedUpdateScopes(link, requestedScope, profile = null) {
+        const policy = safeObject(normalizeNanahTrustedLink(link)?.policy || safeObject(link).policy);
+        const allowed = getNanahManagedPolicyScopeList(policy.allowedScopes || policy.defaultScope);
+        const requested = normalizeString(requestedScope).toLowerCase() || 'active';
+        const required = getConcreteManagedPolicyScopesForProfile(requested, profile);
+        if (required.length && required.every(scope => allowed.includes(scope))) return [requested === 'full' ? 'active' : requested];
+        if (requested !== 'active' && requested !== 'full') return [];
+        return required.filter(scope => allowed.includes(scope));
+    }
+
+    /** One plan per sealed scope: which links get it. */
+    function buildNanahSendScopePlans(links, requestedScope, profile = null) {
+        const plans = new Map();
+        for (const link of safeArray(links)) {
+            for (const scope of getNanahSavedUpdateScopes(link, requestedScope, profile)) {
+                if (!plans.has(scope)) plans.set(scope, { scope, linkIds: new Set() });
+                plans.get(scope).linkIds.add(normalizeString(link.linkId));
+            }
+        }
+        return [...plans.values()];
+    }
+
     function getNanahSourceManagedLinksByIds(linkIds, scope = 'active', profile = null) {
         const requested = new Set(safeArray(linkIds).map(normalizeString).filter(Boolean));
         const requiredScopes = getConcreteManagedPolicyScopesForProfile(scope, profile);
@@ -23169,10 +23196,13 @@ document.addEventListener('DOMContentLoaded', async () => {
         for (const targetId of allowedTargets) {
             const targetProfile = safeObject(profiles[targetId]);
             // A selected local policy source may have a different ID from the receiver's fixed profile.
+            // A bundle Send also reaches links that allow only some of its areas (§14); each gets those.
+            const linkFilterScope = ['active', 'full'].includes(normalizedScope) ? '' : normalizedScope;
             const candidateLinks = (requestedLinkIds.size > 0
-                ? getNanahSourceManagedLinksByIds([...requestedLinkIds], normalizedScope, targetProfile)
-                : getNanahSourceManagedLinksForTargetProfile(targetId, normalizedScope, targetProfile))
-                .filter((link) => requestedLinkIds.size === 0 || requestedLinkIds.has(normalizeString(link.linkId)));
+                ? getNanahSourceManagedLinksByIds([...requestedLinkIds], linkFilterScope, targetProfile)
+                : getNanahSourceManagedLinksForTargetProfile(targetId, linkFilterScope, targetProfile))
+                .filter((link) => requestedLinkIds.size === 0 || requestedLinkIds.has(normalizeString(link.linkId)))
+                .filter((link) => getNanahSavedUpdateScopes(link, normalizedScope, targetProfile).length > 0);
             // Spec §4.1: a Send carries the rules of the profile the link is bound to, never a
             // fallback to the active profile; a link that can't say which profile is refused.
             const links = candidateLinks.filter((link) => {
@@ -23273,81 +23303,92 @@ document.addEventListener('DOMContentLoaded', async () => {
                     throw new Error('Managed policy source snapshot is unavailable');
                 }
                 const sendOperation = nanahManagedLivePolicy.createSendOperation();
-                if (sendLive && typeof sendOperation.buildEnvelopeBatchForTrustedLinks === 'function') {
-                    const liveClient = nanahClient;
-                    const liveEnvelopes = await sendOperation.buildEnvelopeBatchForTrustedLinks(policy, liveLinks);
-                    for (const signedEnvelope of liveEnvelopes) {
-                        if (nanahClient !== liveClient) throw new Error('The paired device changed. Review the update again.');
-                        await nanahManagedLivePolicy.sendLiveEnvelope(
-                            signedEnvelope,
-                            (envelope) => liveClient.send(envelope),
+                // Spec §14 (Android 1faed7705): a Send seals every area each link allows: the whole
+                // bundle as `active`, or each allowed area for a link that allows only some.
+                for (const plan of buildNanahSendScopePlans(links, normalizedScope, targetProfile)) {
+                    const planPolicy = { ...policy, scope: plan.scope, allowedScopes: [plan.scope] };
+                    const planLiveLinks = liveLinks.filter(link => plan.linkIds.has(normalizeString(link.linkId)));
+                    const planSavedLinks = savedUpdateLinks.filter(link => plan.linkIds.has(normalizeString(link.linkId)));
+                    if (sendLive && planLiveLinks.length && typeof sendOperation.buildEnvelopeBatchForTrustedLinks === 'function') {
+                        const liveClient = nanahClient;
+                        const liveEnvelopes = await sendOperation.buildEnvelopeBatchForTrustedLinks(planPolicy, planLiveLinks);
+                        for (const signedEnvelope of liveEnvelopes) {
+                            if (nanahClient !== liveClient) throw new Error('The paired device changed. Review the update again.');
+                            await nanahManagedLivePolicy.sendLiveEnvelope(
+                                signedEnvelope,
+                                (envelope) => liveClient.send(envelope),
+                                {
+                                    targetProfileId: signedEnvelope.targetProfileId,
+                                    targetProfileName: signedEnvelope.targetProfileName,
+                                    sourceProfileId: signedEnvelope.sourceProfileId,
+                                    sourceDeviceId: signedEnvelope.sourceDeviceId,
+                                    issuedAt: signedEnvelope.issuedAt,
+                                    delivery: 'command_center_live_session'
+                                }
+                            );
+                        }
+                        liveSent += liveEnvelopes.length;
+                        const planLive = liveEnvelopes.length;
+                        if (liveSent > 0 && !transports.includes('live_nanah_session')) transports.push('live_nanah_session');
+                        targetDelivered += planLive;
+                    }
+                    if (sendLocal && planSavedLinks.length && typeof sendOperation.deliverLocalNetworkPolicyBatch === 'function') {
+                        await markNanahProviderExposure(planSavedLinks, 'local_network');
+                        const localResult = await sendOperation.deliverLocalNetworkPolicyBatch(
+                            planPolicy,
+                            planSavedLinks,
+                            localNetworkProvider,
                             {
-                                targetProfileId: signedEnvelope.targetProfileId,
-                                targetProfileName: signedEnvelope.targetProfileName,
-                                sourceProfileId: signedEnvelope.sourceProfileId,
-                                sourceDeviceId: signedEnvelope.sourceDeviceId,
-                                issuedAt: signedEnvelope.issuedAt,
-                                delivery: 'command_center_live_session'
+                                reason: 'command_center_parent_push',
+                                requestedAt: Date.now()
                             }
                         );
+                        const planLocal = normalizeNonNegativeInteger(localResult?.deliveredCandidateCount) || 0;
+                        localNetworkDelivered += planLocal;
+                        if (localNetworkDelivered > 0 && !transports.includes('local_network')) transports.push('local_network');
+                        targetDelivered += planLocal;
+                        targetFailed += normalizeNonNegativeInteger(localResult?.failedCandidateCount) || 0;
+                        failureReason = failureReason || normalizeString(localResult?.reason);
                     }
-                    liveSent = liveEnvelopes.length;
-                    if (liveSent > 0) transports.push('live_nanah_session');
-                    targetDelivered += liveSent;
-                }
-                if (sendLocal && typeof sendOperation.deliverLocalNetworkPolicyBatch === 'function') {
-                    await markNanahProviderExposure(savedUpdateLinks, 'local_network');
-                    const localResult = await sendOperation.deliverLocalNetworkPolicyBatch(
-                        policy,
-                        savedUpdateLinks,
-                        localNetworkProvider,
-                        {
-                            reason: 'command_center_parent_push',
-                            requestedAt: Date.now()
-                        }
-                    );
-                    localNetworkDelivered = normalizeNonNegativeInteger(localResult?.deliveredCandidateCount) || 0;
-                    if (localNetworkDelivered > 0) transports.push('local_network');
-                    targetDelivered += localNetworkDelivered;
-                    targetFailed += normalizeNonNegativeInteger(localResult?.failedCandidateCount) || 0;
-                    failureReason = failureReason || normalizeString(localResult?.reason);
-                }
-                if (sendMailbox && typeof sendOperation.uploadMailboxPolicyBatch === 'function') {
-                    await markNanahProviderExposure(savedUpdateLinks, 'mailbox');
-                    const mailboxResult = await sendOperation.uploadMailboxPolicyBatch(
-                        policy,
-                        savedUpdateLinks,
-                        mailboxProvider,
-                        {
-                            reason: 'command_center_parent_push',
-                            requestedAt: Date.now()
-                        }
-                    );
-                    mailboxUploaded = normalizeNonNegativeInteger(mailboxResult?.uploadedMailboxItemCount) || 0;
-                    if (mailboxUploaded > 0) transports.push('encrypted_mailbox');
-                    targetDelivered += mailboxUploaded;
-                    targetFailed += normalizeNonNegativeInteger(mailboxResult?.failedMailboxItemCount) || 0;
-                    failureReason = failureReason || normalizeString(mailboxResult?.reason);
-                }
-                if (sendOutbox && typeof sendOperation.uploadMailboxPolicyBatch === 'function') {
-                    await markNanahProviderExposure(savedUpdateLinks, 'courier');
-                    const createdAtMs = Date.now();
-                    const outboxResult = await sendOperation.uploadMailboxPolicyBatch(
-                        policy,
-                        savedUpdateLinks,
-                        createNanahManagedOutboxProvider(targetProfile),
-                        {
-                            reason: 'command_center_parent_push',
-                            requestedAt: createdAtMs,
-                            createdAtMs,
-                            expiresAtMs: createdAtMs + NANAH_MANAGED_OUTBOX_TTL_MS
-                        }
-                    );
-                    outboxQueued = normalizeNonNegativeInteger(outboxResult?.uploadedMailboxItemCount) || 0;
-                    if (outboxQueued > 0) transports.push('outbox_courier');
-                    targetDelivered += outboxQueued;
-                    targetFailed += normalizeNonNegativeInteger(outboxResult?.failedMailboxItemCount) || 0;
-                    failureReason = failureReason || normalizeString(outboxResult?.reason);
+                    if (sendMailbox && planSavedLinks.length && typeof sendOperation.uploadMailboxPolicyBatch === 'function') {
+                        await markNanahProviderExposure(planSavedLinks, 'mailbox');
+                        const mailboxResult = await sendOperation.uploadMailboxPolicyBatch(
+                            planPolicy,
+                            planSavedLinks,
+                            mailboxProvider,
+                            {
+                                reason: 'command_center_parent_push',
+                                requestedAt: Date.now()
+                            }
+                        );
+                        const planMailbox = normalizeNonNegativeInteger(mailboxResult?.uploadedMailboxItemCount) || 0;
+                        mailboxUploaded += planMailbox;
+                        if (mailboxUploaded > 0 && !transports.includes('encrypted_mailbox')) transports.push('encrypted_mailbox');
+                        targetDelivered += planMailbox;
+                        targetFailed += normalizeNonNegativeInteger(mailboxResult?.failedMailboxItemCount) || 0;
+                        failureReason = failureReason || normalizeString(mailboxResult?.reason);
+                    }
+                    if (sendOutbox && planSavedLinks.length && typeof sendOperation.uploadMailboxPolicyBatch === 'function') {
+                        await markNanahProviderExposure(planSavedLinks, 'courier');
+                        const createdAtMs = Date.now();
+                        const outboxResult = await sendOperation.uploadMailboxPolicyBatch(
+                            planPolicy,
+                            planSavedLinks,
+                            createNanahManagedOutboxProvider(targetProfile),
+                            {
+                                reason: 'command_center_parent_push',
+                                requestedAt: createdAtMs,
+                                createdAtMs,
+                                expiresAtMs: createdAtMs + NANAH_MANAGED_OUTBOX_TTL_MS
+                            }
+                        );
+                        const planOutbox = normalizeNonNegativeInteger(outboxResult?.uploadedMailboxItemCount) || 0;
+                        outboxQueued += planOutbox;
+                        if (outboxQueued > 0 && !transports.includes('outbox_courier')) transports.push('outbox_courier');
+                        targetDelivered += planOutbox;
+                        targetFailed += normalizeNonNegativeInteger(outboxResult?.failedMailboxItemCount) || 0;
+                        failureReason = failureReason || normalizeString(outboxResult?.reason);
+                    }
                 }
             } catch (error) {
                 targetFailed += links.length;

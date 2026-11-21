@@ -86,6 +86,9 @@ function commandCenterFixture(options = {}) {
   // Spec §4.1 (updated on purpose): a Send uses each link's bound source profile, so the saved link
   // is bound to the child whose rules are sent, and the real resolver runs.
   for (const link of f.links) link.localPolicyProfileId = 'child';
+  // Spec §14 (updated on purpose): one plan per sealed scope; these links allow the whole bundle.
+  context.getNanahSavedUpdateScopes = (_link, scope) => [scope];
+  context.buildNanahSendScopePlans = (links, scope) => [{ scope, linkIds: new Set(links.map(link => link.linkId)) }];
   const resolverStart = source.indexOf('    function resolveNanahSavedUpdateSource(');
   vm.runInNewContext(source.slice(resolverStart, source.indexOf('\n    }\n', resolverStart) + '\n    }'.length), context);
   const functionStart = source.indexOf('    async function sendManagedParentPolicyToVerifiedDevices(');

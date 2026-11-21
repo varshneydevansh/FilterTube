@@ -80,7 +80,7 @@ test('a removal records what each transport still holds, and sends are recorded 
     assert.match(fn('removeNanahTrustedLink'), /recordNanahRemovedSourceLink\(removedLink/);
     assert.match(fn('recordNanahRemovedSourceLink'), /FilterTube_ManagedOutboxDropLink/);
     for (const transport of ['local_network', 'mailbox', 'courier']) {
-        assert.match(tabView, new RegExp(`await markNanahProviderExposure\\(savedUpdateLinks, '${transport}'\\);\\n\\s+const`), transport);
+        assert.match(tabView, new RegExp(`await markNanahProviderExposure\\(planSavedLinks, '${transport}'\\);\\n\\s+const`), transport);
     }
 });
 
