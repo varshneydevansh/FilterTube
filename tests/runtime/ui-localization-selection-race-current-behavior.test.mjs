@@ -8,6 +8,7 @@ const bootSource = fs.readFileSync('js/ui_localization_boot.js', 'utf8');
 
 function createHarness({ deferFrenchFetch = false, deferFirstPreferenceWrite = false } = {}) {
   const listeners = {};
+  const storageListeners = [];
   const announcements = [];
   const fetched = [];
   const writes = [];
@@ -48,7 +49,7 @@ function createHarness({ deferFrenchFetch = false, deferFirstPreferenceWrite = f
     dispatchEvent(event) { announcements.push(event.detail.locale); },
     browser: {
       runtime: { getURL(file) { return `extension://filtertube/${file}`; } },
-      storage: { local: {
+      storage: { onChanged: { addListener(listener) { storageListeners.push(listener); } }, local: {
         async get() { return { ftUiLocalePreference: storedPreference }; },
         async set(value) {
           const locale = value.ftUiLocalePreference;
@@ -94,6 +95,11 @@ function createHarness({ deferFrenchFetch = false, deferFirstPreferenceWrite = f
     async changeTo(locale) {
       selector.value = locale;
       return listeners.change();
+    },
+    /** Another page (the popup) writes the preference while this one is open. */
+    changeElsewhere(locale) {
+      storedPreference = locale;
+      for (const listener of storageListeners) listener({ ftUiLocalePreference: { newValue: locale } }, 'local');
     }
   };
 }
@@ -148,4 +154,19 @@ test('queued preference writes preserve the latest choice if an earlier write is
   assert.equal(harness.fetched.some(url => url.endsWith('/fr.json')), false,
     'superseded preference should not start a catalog request after its delayed write');
   assert.deepEqual(harness.announcements, ['en', 'hi']);
+});
+
+test('a language chosen in another page (the popup) applies here at once, without a reload', async () => {
+  const harness = createHarness();
+  await waitFor(() => harness.announcements.includes('en'), 'initial English selection did not finish');
+  harness.changeElsewhere('hi');
+  await waitFor(() => harness.locale === 'hi', 'the stored preference from another page was not applied');
+  assert.equal(harness.label.textContent, 'सेटिंग्स');
+  assert.equal(harness.document.documentElement.lang, 'hi');
+  assert.deepEqual(harness.announcements, ['en', 'hi'], 'every surface hears filtertube-ui-locale-changed');
+  // This page's own picker writes the preference too: that write isn't applied a second time.
+  await harness.changeTo('fr');
+  harness.changeElsewhere('fr');
+  await new Promise(resolve => setImmediate(resolve));
+  assert.deepEqual(harness.announcements, ['en', 'hi', 'fr']);
 });
