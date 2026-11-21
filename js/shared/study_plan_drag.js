@@ -101,10 +101,11 @@
 
     /**
      * Which handle a press at `minute` takes: the nearest within `reach` minutes, LIMIT losing ties;
-     * null when none is close enough.
+     * null when none is close enough. With no limit, the limit handle waits at `unsetLimitAt` (the bar's
+     * late end, when the bar doesn't reach midnight), as on Android.
      */
-    function nearestHandle(draft, minute, reach) {
-        const spots = [['start', draft.start], ['end', draft.end], ['limit', draft.limit ?? NO_LIMIT]];
+    function nearestHandle(draft, minute, reach, unsetLimitAt = NO_LIMIT) {
+        const spots = [['start', draft.start], ['end', draft.end], ['limit', draft.limit ?? unsetLimitAt]];
         let best = null;
         let bestDistance = Infinity;
         for (const [handle, at] of spots) {

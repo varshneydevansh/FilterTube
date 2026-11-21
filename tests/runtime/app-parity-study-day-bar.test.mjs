@@ -209,3 +209,10 @@ test('the popup shows today\'s plan read-only, with Edit in dashboard (not for a
     Ui.renderPopupPlan(host, { study: {} });
     assert.equal(host.hidden, true);
 });
+
+test('with no limit the limit handle waits at the bar\'s late end, so a phone bar can still reach it', () => {
+    const Drag = globalThis.FilterTubeStudyPlanDrag ?? (() => { const c = { window: {} }; c.window = c; vm.createContext(c); vm.runInContext(fs.readFileSync('js/shared/study_plan_drag.js', 'utf8'), c); return c.FilterTubeStudyPlanDrag; })();
+    const draft = { start: 16 * 60, end: 18 * 60, limit: null };
+    assert.equal(Drag.nearestHandle(draft, 19 * 60, 20), null, 'midnight is far from 7 pm');
+    assert.equal(Drag.nearestHandle(draft, 19 * 60, 20, 19 * 60), 'limit');
+});

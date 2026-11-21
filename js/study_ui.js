@@ -2769,7 +2769,9 @@
             }
         };
         const handles = {};
-        const spotOf = which => (which === 'limit' ? (draft.limit ?? Drag.NO_LIMIT) : draft[which]);
+        // No limit is midnight; on a bar that stops earlier the limit handle waits at the bar's late end
+        // (Android's shownMinute): drag it in to set a limit, hold it at the edge for no limit again.
+        const spotOf = which => (which === 'limit' ? (draft.limit ?? Math.min(range.end, Drag.NO_LIMIT)) : draft[which]);
         const paintHandles = () => {
             for (const which of Object.keys(handles)) {
                 const handle = handles[which];
@@ -2861,7 +2863,7 @@
                 return Math.max(range.start, Math.min(range.end, range.start + (offset / Math.max(1, box.width)) * (range.end - range.start)));
             };
             const reach = (22 / Math.max(1, box.width)) * (range.end - range.start);
-            const which = Drag.nearestHandle(draft, minuteAtX(event.clientX), reach);
+            const which = Drag.nearestHandle(draft, minuteAtX(event.clientX), reach, Math.min(range.end, Drag.NO_LIMIT));
             if (!which) return;
             event.preventDefault();
             const handle = handles[which];
