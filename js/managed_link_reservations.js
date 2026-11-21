@@ -2,8 +2,8 @@
  * SEAMLESS_SYNC_SPEC.md §11 (Android 997ac7c74, NanahRepairRelease): removing a parent→child link
  * leaves a reservation on every transport whose cleanup isn't confirmed, so an old envelope can
  * never revive the link. A fresh, phrase-confirmed pairing may release a reservation only when the
- * link was tracked from creation, nothing was ever prepared for it on that transport, and the
- * transport was and still is unconfigured. Pure functions; the dashboard stores the two records.
+ * link was tracked from creation, nothing was ever uploaded for it on that transport, and no purge
+ * for it is in flight. Pure functions; the dashboard stores the two records.
  */
 (function (root, factory) {
     const api = factory();
@@ -72,23 +72,34 @@
      * Whether a fresh pairing may save `linkId` again. `{ allowed: true, released: [...] }` or
      * `{ allowed: false, reason: 'source_link_reserved_<transport>' }`.
      */
-    function evaluateRepair({ record, ledger, currentDigests = {} }) {
+    /**
+     * Run 4 (Android bcc7097d5): what matters is whether the link ever used the transport, not why
+     * its cleanup couldn't run. A reservation is released when the link was tracked from creation,
+     * nothing was ever uploaded for it on that transport, and no purge is in flight or uncertain
+     * (`pending`). `outcomes` holds one result per reserved transport, for the
+     * `nanah_repair_release kind=… result=…` log.
+     */
+    function evaluateRepair({ record, ledger }) {
         const removed = obj(record);
-        if (!str(removed.linkId)) return { allowed: true, released: [] };
+        if (!str(removed.linkId)) return { allowed: true, released: [], outcomes: [] };
         const book = readLedger(ledger);
         const tracked = book.tracked[removed.linkId] === true;
         const exposed = obj(book.exposed[removed.linkId]);
         const released = [];
+        const outcomes = [];
+        let refusal = '';
         for (const transport of TRANSPORTS) {
             const row = obj(obj(removed.transports)[transport]);
             if (!row.state || row.state === 'purged' || row.state === 'released') continue;
-            const releasable = row.state === 'blocked' && row.reason === 'provider_unconfigured'
-                && tracked && exposed[transport] !== true
-                && row.digest === 'unconfigured' && str(currentDigests[transport]) === 'unconfigured';
-            if (!releasable) return { allowed: false, reason: `source_link_reserved_${transport}` };
-            released.push(transport);
+            const result = !tracked ? 'untracked'
+                : exposed[transport] === true ? 'transport_used'
+                    : row.state === 'pending' ? 'purge_uncertain'
+                        : 'released';
+            outcomes.push({ kind: transport, result });
+            if (result === 'released') released.push(transport);
+            else if (!refusal) refusal = `source_link_reserved_${transport}`;
         }
-        return { allowed: true, released };
+        return refusal ? { allowed: false, reason: refusal, outcomes } : { allowed: true, released, outcomes };
     }
 
     /** The record after a release: each released transport is kept as released_unexposed_repair. */

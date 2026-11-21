@@ -23494,8 +23494,10 @@ document.addEventListener('DOMContentLoaded', async () => {
                 const record = removed[nextLinkId];
                 if (record) {
                     if (!nanahSessionState.sasConfirmed) refuseNanahTrustWrite('repair_requires_confirmed_phrase');
-                    const decision = reservations.evaluateRepair({ record, ledger: await readNanahStorage(reservations.EXPOSURE_KEY),
-                        currentDigests: currentNanahProviderDigests() });
+                    const decision = reservations.evaluateRepair({ record, ledger: await readNanahStorage(reservations.EXPOSURE_KEY) });
+                    for (const outcome of safeArray(decision.outcomes)) {
+                        console.info(`FilterTube: nanah_repair_release kind=${outcome.kind} result=${outcome.result}`);
+                    }
                     if (!decision.allowed) refuseNanahTrustWrite(decision.reason);
                     repair = { record, released: decision.released };
                     getNanahTrustedLinkMutationState().denied.delete(nextLinkId);

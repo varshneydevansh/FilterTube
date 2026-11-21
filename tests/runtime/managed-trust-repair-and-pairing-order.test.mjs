@@ -22,20 +22,27 @@ const removedUnconfigured = () => R.removalRecord({ linkId: 'nm1-x', removedAt: 
 test('a tracked, never-exposed link removed with no pickup set up can be paired again', () => {
     const ledger = R.markTracked(null, 'nm1-x');
     const decision = R.evaluateRepair({ record: removedUnconfigured(), ledger, currentDigests: unconfigured });
-    assert.deepEqual(decision, { allowed: true, released: ['mailbox', 'local_network'] });
+    assert.deepEqual(decision, { allowed: true, released: ['mailbox', 'local_network'],
+        outcomes: [{ kind: 'mailbox', result: 'released' }, { kind: 'local_network', result: 'released' }] });
     const released = R.releaseRecord(removedUnconfigured(), decision.released);
     assert.equal(released.transports.mailbox.reason, 'released_unexposed_repair');
-    assert.deepEqual(R.evaluateRepair({ record: released, ledger, currentDigests: unconfigured }), { allowed: true, released: [] });
+    assert.deepEqual(R.evaluateRepair({ record: released, ledger }), { allowed: true, released: [], outcomes: [] });
 });
 
-test('the reservation holds for an exposed, untracked, still-pending or newly configured transport', () => {
+test('the reservation holds for a used, untracked or still-pending transport, and nothing else', () => {
     const tracked = R.markTracked(null, 'nm1-x');
     assert.equal(R.evaluateRepair({ record: removedUnconfigured(), ledger: R.markExposed(tracked, 'nm1-x', 'mailbox'), currentDigests: unconfigured }).reason,
         'source_link_reserved_mailbox', 'a send was prepared once: an old envelope could revive the link');
     assert.equal(R.evaluateRepair({ record: removedUnconfigured(), ledger: null, currentDigests: unconfigured }).reason,
         'source_link_reserved_mailbox', 'a link from before tracking keeps its reservation');
+    // Run 4 (bcc7097d5): the cleanup's reason or a changed config no longer matters; only use does.
     assert.equal(R.evaluateRepair({ record: removedUnconfigured(), ledger: tracked,
-        currentDigests: { ...unconfigured, local_network: 'configured:192.168.1.5' } }).reason, 'source_link_reserved_local_network');
+        currentDigests: { ...unconfigured, local_network: 'configured:192.168.1.5' } }).allowed, true);
+    const notAuthorized = R.removalRecord({ linkId: 'nm1-x', transports: { mailbox: { configured: false, reason: 'cleanup_not_authorized' },
+        local_network: { configured: false }, courier: { configured: true, ok: true } } });
+    assert.equal(R.evaluateRepair({ record: notAuthorized, ledger: tracked }).allowed, true);
+    assert.deepEqual(R.evaluateRepair({ record: removedUnconfigured(), ledger: R.markExposed(tracked, 'nm1-x', 'mailbox') }).outcomes[0],
+        { kind: 'mailbox', result: 'transport_used' });
     const pending = R.removalRecord({ linkId: 'nm1-x', transports: { mailbox: { configured: true, ok: false, reason: 'mailbox_http_500' },
         local_network: { configured: false }, courier: { configured: true, ok: true } } });
     assert.equal(R.evaluateRepair({ record: pending, ledger: tracked, currentDigests: unconfigured }).reason, 'source_link_reserved_mailbox');
@@ -44,7 +51,7 @@ test('the reservation holds for an exposed, untracked, still-pending or newly co
     assert.equal(R.evaluateRepair({ record: droppedFailed, ledger: tracked, currentDigests: unconfigured }).reason, 'source_link_reserved_courier');
     const allPurged = R.removalRecord({ linkId: 'nm1-x', transports: { mailbox: { configured: true, ok: true }, local_network: { configured: true, ok: true },
         courier: { configured: true, ok: true } } });
-    assert.deepEqual(R.evaluateRepair({ record: allPurged, ledger: null, currentDigests: unconfigured }), { allowed: true, released: [] });
+    assert.deepEqual(R.evaluateRepair({ record: allPurged, ledger: null }), { allowed: true, released: [], outcomes: [] });
 });
 
 test('trust saves: every refusal has a code, is logged, and no caller shows Paired or Trusted after one', () => {
