@@ -14,8 +14,11 @@
 
     const DEFAULT_RELAY = 'wss://nanah-signaling.varshney-devansh614.workers.dev/ws';
     const BASE32 = 'abcdefghijklmnopqrstuvwxyz234567';
-    // The relay drops a hosted code after 5 minutes; host again well before that.
+    // The relay retires a hosted session 5 minutes after it was hosted (run 4, Android d12650091):
+    // every 4 minutes the listener closes its socket and, once the close completes, hosts again on a
+    // fresh one. Re-hosting on the same socket left the old session to be purged under the next caller.
     const REHOST_MS = 4 * 60 * 1000;
+    const CLOSE_WAIT_MS = 2000;
     // Chrome keeps a service worker alive while its WebSocket sends or receives within 30 s
     // (Chrome 116+). The relay ignores unknown frame types, so this costs one tiny frame.
     const KEEPALIVE_MS = 20 * 1000;
@@ -75,7 +78,7 @@
         const state = value => { try { onState?.(value); } catch (_) {} };
 
         function clearTimers() {
-            timers.clearInterval(keepalive); timers.clearInterval(rehost); timers.clearTimeout(retry);
+            timers.clearInterval(keepalive); timers.clearTimeout(rehost); timers.clearTimeout(retry);
             keepalive = rehost = retry = null;
         }
         function send(message) {
@@ -93,6 +96,18 @@
             attempt += 1;
             retry = timers.setTimeout(open, delay);
         }
+        /** Close first, then host again once the close has completed (or after a short wait). */
+        function recycle(ws) {
+            if (socket !== ws || stopped) return;
+            socket = null;
+            clearTimers();
+            let reopened = false;
+            const reopen = () => { if (!reopened && !stopped) { reopened = true; timers.clearTimeout(retry); void open(); } };
+            ws.onclose = reopen;
+            ws.onmessage = null;
+            try { ws.close(1000, 'rehost'); } catch (_) { reopen(); return; }
+            retry = timers.setTimeout(reopen, CLOSE_WAIT_MS);
+        }
         async function open() {
             if (stopped) return;
             if (typeof WebSocketImpl !== 'function') { state('unsupported'); return; }
@@ -106,7 +121,7 @@
                 attempt = 0;
                 void host();
                 keepalive = timers.setInterval(() => send({ type: 'ft_keepalive' }), KEEPALIVE_MS);
-                rehost = timers.setInterval(() => void host(), REHOST_MS);
+                rehost = timers.setTimeout(() => recycle(ws), REHOST_MS);
             };
             ws.onmessage = event => {
                 if (socket !== ws) return;

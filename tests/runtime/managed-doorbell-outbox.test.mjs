@@ -140,3 +140,16 @@ test('courier sends sealed items only and returns the child acks', async () => {
     assert.deepEqual(sent.acks.map(row => row.mailboxItemId), ['m1']);
     assert.equal((await Courier.host({ code: 'ABCD', items: [item], nanah })).reason, 'bad_courier_code');
 });
+
+test('run 4: the doorbell re-hosts every 4 minutes on a fresh socket, after the old one closed', async () => {
+    const relay = fakeRelay();
+    const timers = { setTimeout: (fn, ms) => setTimeout(fn, ms === Doorbell.REHOST_MS ? 60 : ms), clearTimeout,
+        setInterval: (fn, ms) => setInterval(fn, ms), clearInterval };
+    const handle = Doorbell.listen({ ownDeviceId: 'child', WebSocketImpl: relay.WebSocketImpl, timers, onSignal: () => {} });
+    await until(() => relay.frames.filter(frame => frame.type === 'host_session').length >= 2, 3000);
+    handle.stop();
+    const hosts = relay.frames.filter(frame => frame.type === 'host_session');
+    assert.notEqual(hosts[0].sessionId, hosts[1].sessionId);
+    const result = await Doorbell.call({ remoteDeviceId: 'child', fromDeviceId: 'p', WebSocketImpl: relay.WebSocketImpl, converse: async () => ({ ok: true }) });
+    assert.equal(result.reason, 'offline', 'a stopped listener leaves nothing hosted');
+});

@@ -32,6 +32,7 @@
     const RING_GAP_MS = 60 * 1000;
     const MAILBOX_EVERY_MS = 45 * 1000;
     const ANSWER_WAIT_MS = 20 * 1000;
+    const RING_OFFLINE_RETRY_MS = 4 * 1000;
     const FINISHED = ['delivered', 'up_to_date', 'applied', 'rejected', 'expired'];
     const VIEWER_PATTERNS = ['*://*.youtube.com/*', '*://*.youtubekids.com/*'];
 
@@ -326,7 +327,7 @@
         }
 
         // ------------------------------------------------------------ child: announce (§2.2)
-        async function announceTo(parentDeviceId, linkIds, { force = false } = {}) {
+        async function announceTo(parentDeviceId, linkIds, { force = false, courierRetry = false } = {}) {
             const ctx = await context();
             if (!ctx.consent || !ctx.deviceId) return { ok: false, reason: 'not_ready' };
             const last = lastAnnounce.get(parentDeviceId) || 0;
@@ -339,12 +340,17 @@
                 converse: async ({ send, next }) => {
                     const message = Doorbell.announceMessage(ctx.deviceId, linkIds);
                     send(Auth ? await Auth.signAnnounce(message, id => rawLinkFor(ctx, id), now()).catch(() => message) : message);
-                    const timeout = new Promise(resolve => setTimeout(() => resolve(null), ANSWER_WAIT_MS));
-                    for (;;) {
-                        const payload = await Promise.race([next(), timeout]);
-                        if (!payload) return { ok: false, reason: 'no_answer' };
-                        const parsed = Doorbell.parseAnnounceAnswer(payload);
-                        if (parsed) return { ok: true, ...parsed };
+                    let answerTimer = null;
+                    const timeout = new Promise(resolve => { answerTimer = setTimeout(() => resolve(null), ANSWER_WAIT_MS); });
+                    try {
+                        for (;;) {
+                            const payload = await Promise.race([next(), timeout]);
+                            if (!payload) return { ok: false, reason: 'no_answer' };
+                            const parsed = Doorbell.parseAnnounceAnswer(payload);
+                            if (parsed) return { ok: true, ...parsed };
+                        }
+                    } finally {
+                        clearTimeout(answerTimer);
                     }
                 }
             });
@@ -353,6 +359,12 @@
             if (answer.ok && answer.courier) {
                 const deviceHash = await Doorbell.hash(ctx.deviceId);
                 const result = await runCourier({ role: 'join', code: answer.courier, deviceHash });
+                if (!result?.ok && !courierRetry && /webrtc connection failed/i.test(str(result?.reason))) {
+                    // Run 4 (d12650091): a courier that couldn't connect is retried once: announce
+                    // again, and the parent hosts a fresh courier.
+                    log('courier_retry', { reason: str(result?.reason) });
+                    return announceTo(parentDeviceId, linkIds, { force: true, courierRetry: true });
+                }
                 if (!result?.ok) {
                     // The courier's own error is the reason for this check (Android cf8520e63), not a
                     // mailbox or Home Pickup reason.
@@ -396,16 +408,28 @@
                 if (!byChild.has(child)) byChild.set(child, []);
                 byChild.get(child).push(link.linkId);
             }
-            await Promise.all([...byChild].map(([child, ids]) => Doorbell.call({
+            const ring = (child, ids) => Doorbell.call({
                 remoteDeviceId: child,
                 fromDeviceId: ctx.deviceId,
                 timeoutMs: 10000,
                 converse: async ({ send, next }) => {
                     send(Doorbell.ringMessage(ctx.deviceId, ids.slice(0, 16)));
-                    const payload = await Promise.race([next(), new Promise(r => setTimeout(() => r(null), 8000))]);
+                    let answerTimer = null;
+                    const payload = await Promise.race([next(), new Promise(r => { answerTimer = setTimeout(() => r(null), 8000); })]);
+                    clearTimeout(answerTimer);
                     return { ok: payload?.type === 'ft_update_ring_answer' && payload.ok === true };
                 }
-            }).catch(() => null)));
+            }).catch(() => ({ ok: false, reason: 'failed' }));
+            await Promise.all([...byChild].map(async ([child, ids]) => {
+                let result = await ring(child, ids);
+                // Run 4: a ring answered OFFLINE is tried once more after 4 s (the child's doorbell
+                // may be between sessions).
+                if (result?.reason === 'offline') {
+                    await new Promise(resolve => setTimeout(resolve, RING_OFFLINE_RETRY_MS));
+                    result = await ring(child, ids);
+                }
+                log('ring_result', { ok: result?.ok === true, reason: result?.reason || null });
+            }));
         }
 
         // ------------------------------------------------------------ doorbell signals
@@ -481,7 +505,9 @@
             reconcileChain = next.catch(() => null);
             return next;
         }
+        let disposed = false;
         async function reconcileNow(reason) {
+            if (disposed) return { listening: false, open: false };
             const ctx = await context();
             const tabs = await viewerTabs();
             const open = tabs.youtube.length > 0 || tabs.dashboards.length > 0;
@@ -491,6 +517,7 @@
                 listener = null;
                 listenerDevice = '';
             }
+            if (disposed) { listener?.stop(); listener = null; return { listening: false, open: false }; }
             if (wanted && !listener && typeof root.WebSocket === 'function') {
                 listenerDevice = ctx.deviceId;
                 listener = Doorbell.listen({ ownDeviceId: ctx.deviceId, onSignal: (payload, reply) => onSignal(payload, reply).catch(() => null) });
@@ -617,7 +644,9 @@
             ready, reconcile, onForeground, announceAll, ringQueued, handleMessage,
             pickup: reason => pickupRunner(reason),
             dispose() {
+                disposed = true;
                 listener?.stop();
+                listener = null;
                 if (mailboxTimer) clearInterval(mailboxTimer);
                 for (const [event, fn] of listeners) event.removeListener?.(fn);
             }

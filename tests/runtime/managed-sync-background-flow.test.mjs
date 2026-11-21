@@ -49,8 +49,9 @@ const until = async (check, ms = 5000) => {
     }
 };
 
-test('Send → ring → announce → courier → applied on the child and "applied" in the parent outbox', async () => {
+async function sendFlow({ failFirstJoin = false } = {}) {
     const relay = fakeRelay();
+    let failJoin = failFirstJoin;
     const sides = [];
     class PairedTransport {
         constructor() { sides.push(this); }
@@ -59,6 +60,12 @@ test('Send → ring → announce → courier → applied on the child and "appli
             this.hooks = hooks;
             const host = sides.find(side => side !== this && side.code === session.code && !side.peer);
             if (!host) { setTimeout(() => hooks.onError(new Error('session_not_found')), 0); return; }
+            if (failJoin) {
+                failJoin = false;
+                host.peer = this;
+                for (const side of [host, this]) setTimeout(() => side.hooks.onError(new Error('WebRTC connection failed')), 0);
+                return;
+            }
             host.peer = this; this.peer = host;
             for (const side of [host, this]) setTimeout(() => side.hooks.onSas({ phrase: 'auto' }), 0);
         }
@@ -104,9 +111,21 @@ test('Send → ring → announce → courier → applied on the child and "appli
         for (const frame of relay.frames) assert.equal(JSON.stringify(frame).includes('ciphertext'), false, 'the relay never sees an item');
         childSync.dispose();
         parentSync.dispose();
+        return relay;
     } finally {
         delete globalThis.WebSocket; delete globalThis.RTCPeerConnection; delete globalThis.FilterTubeNanah;
     }
+}
+
+test('Send → ring → announce → courier → applied on the child and "applied" in the parent outbox', async () => { await sendFlow(); });
+
+test('a courier that fails with a WebRTC connection error is retried once with a fresh announce and courier', async () => {
+    const relay = await sendFlow({ failFirstJoin: true });
+    const announces = relay.frames.filter(frame => frame.payload?.type === 'ft_update_announce');
+    const answers = relay.frames.filter(frame => frame.payload?.type === 'ft_update_announce_answer');
+    assert.equal(announces.length, 2);
+    assert.equal(answers.length, 2);
+    assert.notEqual(answers[0].payload.courier, answers[1].payload.courier, 'a fresh courier code');
 });
 
 test('a ring from a device that is not this child\'s parent gets no answer and starts nothing', async () => {
