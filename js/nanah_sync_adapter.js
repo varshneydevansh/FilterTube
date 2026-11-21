@@ -148,7 +148,9 @@
             };
             // study.timetable is reserved for this scope (the planned Study timetable).
             if (Object.prototype.hasOwnProperty.call(root, 'timetable')) {
-                if (root.timetable === null) delete next.timetable; else next.timetable = root.timetable;
+                // Like the plan, a parent's timetable names that parent (unknown keys at every level kept).
+                if (root.timetable === null) delete next.timetable;
+                else next.timetable = { ...safeObject(root.timetable), setByParentId: parentId };
             }
         } else {
             if (owner(base.lock) && owner(base.lock) !== parentId) throw new Error('Another parent set this study lock');
@@ -1498,7 +1500,27 @@
         if (semanticProfileJson(actualProfile) === semanticProfileJson(expected)) return;
         if (Object.keys(committedProfile).length > 0
             && semanticProfileJson(committedProfile) === semanticProfileJson(expectedProfile)) return;
+        // Names the first differing path (never values), so a store/adapter shape drift is findable.
+        if (global.console && typeof global.console.warn === 'function') {
+            global.console.warn('requirePersistedProfile mismatch at ' + firstProfileDiffPath(actualProfile, expected, profileId));
+        }
         throw new Error('Synced profile could not be verified after saving');
+    }
+
+    function firstProfileDiffPath(actual, expected, path) {
+        const a = actual === undefined ? null : actual;
+        const b = expected === undefined ? null : expected;
+        if (semanticProfileJson(a) === semanticProfileJson(b)) return '';
+        if (a && b && typeof a === 'object' && typeof b === 'object' && Array.isArray(a) === Array.isArray(b)) {
+            const keys = Array.isArray(a)
+                ? Array.from({ length: Math.max(a.length, b.length) }, (_, index) => String(index))
+                : Array.from(new Set([...Object.keys(a), ...Object.keys(b)])).sort();
+            for (const key of keys) {
+                const inner = firstProfileDiffPath(a[key], b[key], `${path}.${key}`);
+                if (inner) return inner;
+            }
+        }
+        return `${path} (${a === null ? 'missing' : Array.isArray(a) ? 'array' : typeof a} vs ${b === null ? 'missing' : Array.isArray(b) ? 'array' : typeof b})`;
     }
 
     /** Main's filters from a Main-scope transfer go to settings, which own them here (not main). */

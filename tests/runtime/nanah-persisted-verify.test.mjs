@@ -1,4 +1,4 @@
-// Copied from FilterTubeApp tools/native-nanah-persisted-verify.test.mjs (14c5ebdbc), pointed at the extension adapter.
+// Copied from FilterTubeApp tools/native-nanah-persisted-verify.test.mjs (c31561933), pointed at the extension adapter.
 // Run 4 (2026-11-21): every Kids rule item was acked "rejected" with "Synced profile could not be
 // verified after saving" although the write took effect: the adapter compared the re-read profile with
 // its own pre-save JSON byte for byte, and the native store normalises what it saves (nulls dropped,
@@ -15,8 +15,10 @@ function fn(name) {
     return adapter.slice(start, adapter.indexOf('\n    }\n', start) + 7);
 }
 const context = vm.createContext({});
-vm.runInContext(`function safeObject(v){return v&&typeof v==='object'&&!Array.isArray(v)?v:{};}
+vm.runInContext(`const global = { console: { warn: message => { globalThis.lastWarn = message; } } };
+function safeObject(v){return v&&typeof v==='object'&&!Array.isArray(v)?v:{};}
 ${fn('semanticProfileJson')}
+${fn('firstProfileDiffPath')}
 ${fn('requirePersistedProfile')}
 globalThis.verify = requirePersistedProfile;`, context);
 const io = stored => ({ loadProfilesV4: async () => JSON.parse(JSON.stringify(stored)) });
@@ -36,6 +38,8 @@ test('the committed tree the native lease returns is the receipt, even if the re
 test('a write that did not land, a failed save or a missing profile is still refused', async () => {
     const old = { profiles: { kid: { type: 'child', kids: { keywords: [], mode: 'blocklist' } } } };
     await assert.rejects(context.verify(io(old), { ok: true }, 'kid', expected), /could not be verified/);
+    // The log names where it differs, never the values.
+    assert.match(context.lastWarn, /^requirePersistedProfile mismatch at kid\.kids\.keywords\.0 \(missing vs object\)$/);
     await assert.rejects(context.verify(io(old), { ok: false }, 'kid', expected), /could not be saved/);
     await assert.rejects(context.verify(io({ profiles: {} }), { ok: true }, 'kid', expected), /could not be verified/);
     // A store "receipt" that disagrees with both the re-read and the intent doesn't pass.
@@ -45,5 +49,5 @@ test('a write that did not land, a failed save or a missing profile is still ref
 
 test('the extension adapter is byte-identical to the pinned upstream mirror', async () => {
     const { createHash } = await import('node:crypto');
-    assert.equal(createHash('sha256').update(adapter).digest('hex'), 'ba59e65ab799432eb0bd6fc3f79f8105f1b77239238df1bd4fbe812197d00c33');
+    assert.equal(createHash('sha256').update(adapter).digest('hex'), 'ad2e0a7c40d1660f61c579a393af62c02d30ebf1a624054f27a6e1d02867da39');
 });
