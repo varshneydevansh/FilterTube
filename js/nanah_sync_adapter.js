@@ -1470,15 +1470,35 @@
         throw new Error(`Unsupported scoped payload: ${scope}`);
     }
 
+    /**
+     * Profile JSON as content: keys with null or missing values are the same, so a store that drops
+     * nulls or writes defaults as absent doesn't read as a different profile.
+     */
+    function semanticProfileJson(value) {
+        if (Array.isArray(value)) return `[${value.map(semanticProfileJson).join(',')}]`;
+        if (value && typeof value === 'object') {
+            return `{${Object.keys(value).filter(key => value[key] !== null && value[key] !== undefined).sort()
+                .map(key => `${JSON.stringify(key)}:${semanticProfileJson(value[key])}`).join(',')}}`;
+        }
+        return JSON.stringify(value === undefined ? null : value);
+    }
+
     async function requirePersistedProfile(io, saved, profileId, expectedProfile) {
         // FilterTubeIO resolves storage failures instead of throwing. A transport
         // receipt must acknowledge persisted policy, never just a completed call.
         if (!saved || saved.ok !== true) throw new Error('Synced profile could not be saved');
         const persisted = safeObject(await io.loadProfilesV4());
         const actualProfile = safeObject(persisted.profiles)[profileId];
-        if (!actualProfile || stableManagedNanahJson(actualProfile) !== stableManagedNanahJson(expectedProfile)) {
-            throw new Error('Synced profile could not be verified after saving');
-        }
+        if (!actualProfile) throw new Error('Synced profile could not be verified after saving');
+        // A store that returns the tree it committed (Android's signed-receive lease verifies its own
+        // read-back) is the receipt: compare against that, not against this side's pre-save shape, which
+        // the store may normalise (field defaults, nulls). A committed write is never reported rejected.
+        const committedProfile = safeObject(safeObject(safeObject(saved.profilesV4).profiles)[profileId]);
+        const expected = Object.keys(committedProfile).length > 0 ? committedProfile : expectedProfile;
+        if (semanticProfileJson(actualProfile) === semanticProfileJson(expected)) return;
+        if (Object.keys(committedProfile).length > 0
+            && semanticProfileJson(committedProfile) === semanticProfileJson(expectedProfile)) return;
+        throw new Error('Synced profile could not be verified after saving');
     }
 
     /** Main's filters from a Main-scope transfer go to settings, which own them here (not main). */
