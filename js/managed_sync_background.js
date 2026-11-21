@@ -187,6 +187,8 @@
         const lastAnnounce = new Map();
         const lastRing = new Map();
         const jobs = new Map();
+        // Spec §13: one running courier per child; a re-announce from that child replaces it.
+        const hostingFor = new Map();
 
         // One writer for the outbox: every change goes through this chain.
         let outboxChain = Promise.resolve();
@@ -286,7 +288,7 @@
         async function runCourier(job) {
             if (courierHere()) {
                 return job.role === 'host'
-                    ? Courier.host({ code: job.code, items: job.items, deviceId: job.deviceHash, onHosting: job.onHosting })
+                    ? Courier.host({ code: job.code, items: job.items, deviceId: job.deviceHash, onHosting: job.onHosting, registerAbort: job.registerAbort })
                     : Courier.join({ code: job.code, deviceId: job.deviceHash, onItems: applyCourierItems });
             }
             const id = Doorbell.courierCode().slice(7);
@@ -303,6 +305,7 @@
                     resolve(result);
                 };
                 entry.finish = done;
+                job.registerAbort?.(() => done({ ok: false, reason: 'courier_replaced' }));
                 entry.timer = setTimeout(() => done({ ok: false, reason: entry.claimed ? 'timeout' : 'no_courier_host' }), 45 * 1000);
                 // An open dashboard takes it first; otherwise a hidden frame in a YouTube tab.
                 call(api.runtime, 'sendMessage', { action: 'FilterTube_CourierOffer', jobId: id }).catch(() => {});
@@ -473,7 +476,17 @@
             }));
             let answered = false;
             const answer = () => { if (!answered) { answered = true; reply(Doorbell.announceAnswer(code, queued.length)); } };
-            const result = await runCourier({ role: 'host', code, deviceHash, items: queued.map(entry => entry.item), onHosting: answer });
+            const previous = hostingFor.get(announce.fromDeviceId);
+            if (previous) {
+                log('courier_replaced', {});
+                previous.abort?.();
+            }
+            const slot = { abort: null };
+            hostingFor.set(announce.fromDeviceId, slot);
+            const result = await runCourier({ role: 'host', code, deviceHash, items: queued.map(entry => entry.item), onHosting: answer,
+                registerAbort: fn => { slot.abort = fn; } }).finally(() => {
+                if (hostingFor.get(announce.fromDeviceId) === slot) hostingFor.delete(announce.fromDeviceId);
+            });
             if (!answered) answer();
             if (!result?.ok) {
                 // The parent keeps the courier's reason on the waiting entries (still queued, retried).

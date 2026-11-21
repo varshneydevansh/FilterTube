@@ -76,7 +76,7 @@
     }
 
     function session({ code, mode, deviceId, nanah, timeoutMs, onReady, onData, onStarted, openTimeoutMs = OPEN_TIMEOUT_MS,
-        hostTimeoutMs = HOST_TIMEOUT_MS, log = defaultLog }) {
+        hostTimeoutMs = HOST_TIMEOUT_MS, log = defaultLog, registerAbort = null }) {
         return new Promise(resolve => {
             const Transport = transportClass(nanah);
             if (!Transport) { resolve({ ok: false, reason: 'webrtc_unavailable' }); return; }
@@ -91,6 +91,8 @@
                 resolve(result);
             };
             const timer = setTimeout(() => finish({ ok: false, reason: 'courier_timeout' }), timeoutMs || TIMEOUT_MS);
+            // Spec §13: a re-announce from the same child replaces this courier.
+            registerAbort?.(() => finish({ ok: false, reason: 'courier_replaced' }));
             const isClosed = () => finished;
             // Waits for the data channel, and retries once if the first send still fails.
             const send = async envelope => {
@@ -142,12 +144,12 @@
     }
 
     /** Parent: host `code`, send the sealed items, resolve with the child's ack records. */
-    async function host({ code, items, deviceId, nanah, timeoutMs, onHosting, openTimeoutMs, hostTimeoutMs, log = defaultLog } = {}) {
+    async function host({ code, items, deviceId, nanah, timeoutMs, onHosting, openTimeoutMs, hostTimeoutMs, log = defaultLog, registerAbort = null } = {}) {
         const sealed = sealedOnly(items);
         if (!sealed.length) return { ok: false, reason: 'no_items', acks: [] };
         const startedAt = Date.now();
         let hosted = false;
-        const attempt = () => hostOnce({ code, sealed, deviceId, nanah, timeoutMs, openTimeoutMs, hostTimeoutMs, log,
+        const attempt = () => hostOnce({ code, sealed, deviceId, nanah, timeoutMs, openTimeoutMs, hostTimeoutMs, log, registerAbort,
             onHosting: () => { if (!hosted) { hosted = true; onHosting?.(); } } });
         let result = await attempt();
         if (!result.ok && ['courier_host_timeout', 'courier_closed'].includes(result.reason)) {
@@ -158,9 +160,9 @@
         return result;
     }
 
-    function hostOnce({ code, sealed, deviceId, nanah, timeoutMs, onHosting, openTimeoutMs, hostTimeoutMs, log }) {
+    function hostOnce({ code, sealed, deviceId, nanah, timeoutMs, onHosting, openTimeoutMs, hostTimeoutMs, log, registerAbort }) {
         return session({
-            code, mode: 'host', deviceId, nanah, timeoutMs, onStarted: onHosting, openTimeoutMs, hostTimeoutMs, log,
+            code, mode: 'host', deviceId, nanah, timeoutMs, onStarted: onHosting, openTimeoutMs, hostTimeoutMs, log, registerAbort,
             onReady: ({ send }) => { log('courier_connected', {}); return send({ t: 'ft_courier_items', v: 1, items: sealed }); },
             onData: (envelope, { finish }) => {
                 if (envelope.t !== 'ft_courier_acks' || envelope.v !== 1) return;

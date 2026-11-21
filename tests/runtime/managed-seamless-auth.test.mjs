@@ -49,7 +49,8 @@ test('announces: only links whose MAC verifies count; none verifying or a stale 
     const halfForged = { ...signed, auth: { ...signed.auth, macs: { L1: signed.auth.macs.L1, L2: 'AAAA' } } };
     assert.deepEqual(await Auth.verifyAnnounce(halfForged, id => links[id], now), { status: 'ok', linkIds: ['L1'] });
     assert.equal((await Auth.verifyAnnounce({ ...signed, fromDeviceId: 'stranger' }, id => links[id], now)).status, 'bad');
-    assert.equal((await Auth.verifyAnnounce(signed, id => links[id], now + 121 * 1000)).status, 'bad');
+    assert.equal((await Auth.verifyAnnounce(signed, id => links[id], now + 9 * 60 * 1000)).status, 'ok', '§13: ±10 minutes');
+    assert.equal((await Auth.verifyAnnounce(signed, id => links[id], now - 11 * 60 * 1000)).status, 'bad');
     assert.deepEqual(await Auth.verifyAnnounce(payload, id => links[id], now), { status: 'missing', linkIds: ['L1', 'L2'] });
 });
 

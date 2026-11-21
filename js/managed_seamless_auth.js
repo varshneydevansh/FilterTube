@@ -11,7 +11,8 @@
     'use strict';
 
     const SALT = 'filtertube-seamless-auth-v1';
-    const ANNOUNCE_WINDOW_MS = 120 * 1000;
+    // Spec §13: emulator clocks drifted to -86 s, so announces share the acks' ±10 minutes.
+    const ANNOUNCE_WINDOW_MS = 10 * 60 * 1000;
     const ACK_WINDOW_MS = 10 * 60 * 1000;
     const str = value => (typeof value === 'string' ? value.trim() : '');
     const obj = value => (value && typeof value === 'object' && !Array.isArray(value) ? value : {});
