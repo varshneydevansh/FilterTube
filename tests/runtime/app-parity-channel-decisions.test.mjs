@@ -150,7 +150,9 @@ test('allow mode: a Short whose channel is unknown never shows on a topic match,
 
 test('a Kids-site direct watch link is checked during a Kids learning round (and only then)', () => {
     const source = fs.readFileSync('js/content/dom_fallback.js', 'utf8');
-    assert.match(source, /includes\('youtubekids\.com'\) && !isKidsLearningRound\(settings\)\) return;/);
+    // Updated on purpose: outside a learning round the Kids site now runs only its own playing-video
+    // check after a rules update (kids-current-watch-recheck.test.mjs), not the full direct-access check.
+    assert.match(source, /includes\('youtubekids\.com'\) && !isKidsLearningRound\(settings\)\) \{\n\s+enforceKidsCurrentWatch\(settings\);\n\s+return;\n\s+\}/);
     const block = source.slice(source.indexOf('function isKidsLearningRound('), source.indexOf('function getDirectAccessRuleRequirements('));
     const context = {};
     vm.createContext(context);

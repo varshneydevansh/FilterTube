@@ -2331,6 +2331,9 @@ function handleStorageChanges(changes, area) {
         const profilesOnly = changedKeys.length === 1 && changedKeys[0] === 'ftProfilesV4';
         const profilesChange = profilesOnly ? filterTubeProfilesChangeKind(changes.ftProfilesV4) : 'other';
         if (profilesChange === 'none') return;
+        // A rules update re-checks the playing YouTube Kids video (dom_fallback.js).
+        const metadataOnly = changedKeys.every(key => ['channelMap', 'videoChannelMap', 'videoMetaMap'].includes(key));
+        if (!metadataOnly && typeof filterTubeArmKidsCurrentWatchRecheck === 'function') filterTubeArmKidsCurrentWatchRecheck();
         const metadataMapsOnly = changedKeys.every(key => ['channelMap', 'videoChannelMap', 'videoMetaMap'].includes(key));
         if (!metadataMapsOnly && profilesChange !== 'lists') {
             managedContentPlaybackPermit.clear('managed_time_storage_changed');

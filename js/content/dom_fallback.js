@@ -2612,7 +2612,10 @@ function enforceCurrentWatchOwnerBlock(settings) {
         }
         // The Kids site keeps its own watch flow, except during a Kids learning round: then a direct
         // watch link is checked like any other (only the round's packs play), not only by the data filter.
-        if (String(document.location?.hostname || '').includes('youtubekids.com') && !isKidsLearningRound(settings)) return;
+        if (String(document.location?.hostname || '').includes('youtubekids.com') && !isKidsLearningRound(settings)) {
+            enforceKidsCurrentWatch(settings);
+            return;
+        }
         const listMode = (settings && settings.listMode === 'whitelist') ? 'whitelist' : 'blocklist';
 
         const routeVideoId = getCurrentWatchVideoId();
@@ -2959,6 +2962,57 @@ function scheduleWatchCategoryPendingRecheck() {
         } catch (e) {
         }
     }, FILTERTUBE_CATEGORY_PENDING_TTL_MS + 120);
+}
+
+// ---- YouTube Kids: the playing video after a rules update (kids_current_watch_decision.js) ----
+// Armed when the page loads, when the video changes and when a rules update arrives; checked on each
+// pass while armed until the decision is definite. "Unknown" (metadata still loading) keeps playing
+// and stays armed, so the video stops once its data shows it is blocked.
+const filterTubeKidsCurrentWatch = { armed: true, videoId: '', blockedByUs: '' };
+
+function filterTubeArmKidsCurrentWatchRecheck() {
+    filterTubeKidsCurrentWatch.armed = true;
+}
+
+function enforceKidsCurrentWatch(settings) {
+    try {
+        const state = filterTubeKidsCurrentWatch;
+        const videoId = getCurrentWatchVideoId();
+        if (videoId !== state.videoId) {
+            if (state.blockedByUs && state.blockedByUs !== videoId) {
+                releaseDirectAccessGuard(state.blockedByUs, false);
+                clearDirectAccessOverlay();
+                state.blockedByUs = '';
+            }
+            state.videoId = videoId;
+            state.armed = true;
+        }
+        if (!videoId || !state.armed) return;
+        const decider = (typeof window !== 'undefined' && window.FilterTubeKidsCurrentWatchDecision) || null;
+        if (!decider) return;
+        const decision = decider.decide({
+            videoId,
+            settings,
+            matches: (title, channelId) => shouldHideContent(title, '', settings, {
+                videoId,
+                channelMeta: channelId ? { id: channelId, handle: '', customUrl: '', name: '' } : {},
+                contentTag: 'kids-watch-current'
+            })
+        });
+        if (decision.state === 'unknown') return;
+        state.armed = false;
+        if (decision.state === 'blocked') {
+            // The same blocked card as youtube.com; the play guard keeps it from starting again.
+            pauseCurrentWatchForDirectAccess(videoId, 'blocked');
+            setDirectAccessOverlay('blocked', 'Blocked by FilterTube');
+            state.blockedByUs = videoId;
+        } else if (state.blockedByUs === videoId) {
+            releaseDirectAccessGuard(videoId, false);
+            clearDirectAccessOverlay();
+            state.blockedByUs = '';
+        }
+    } catch (e) {
+    }
 }
 
 function getCurrentWatchVideoId() {

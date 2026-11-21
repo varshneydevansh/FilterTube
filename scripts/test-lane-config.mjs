@@ -198,6 +198,7 @@ const AUTO_SYNC_TESTS = Object.freeze([
   'tests/runtime/nanah-persisted-verify.test.mjs',
   'tests/runtime/managed-emulator-loop-fixes.test.mjs',
   'tests/runtime/managed-pixel-run-fixes.test.mjs',
+  'tests/runtime/kids-current-watch-recheck.test.mjs',
 ]);
 const STUDY_TESTS = Object.freeze([
   'tests/runtime/nanah-keyword-merge-identity.test.mjs',
