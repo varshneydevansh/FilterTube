@@ -71,7 +71,12 @@ test('a profiles write that changes no rules leaves the page alone; list-only ch
     const tree = extra => ({ activeProfileId: 'kid', profiles: { kid: { name: 'Kid', settings: { hideAllShorts: true }, main: { mode: 'blocklist', keywords: [] }, kids: {}, ...extra } } });
     assert.equal(box.kind({ oldValue: tree(), newValue: tree({ managedActionHistory: [{ rowId: 'r' }], managedPolicyState: { x: 1 } }) }), 'none');
     assert.equal(box.kind({ oldValue: tree(), newValue: tree({ main: { mode: 'blocklist', keywords: [{ word: 'clown' }] } }) }), 'lists');
-    assert.equal(box.kind({ oldValue: tree(), newValue: tree({ settings: { hideAllShorts: false } }) }), 'other');
+    // Run 4 (d760d6c2a): a rules change keeps the player unless it touches whether a video may play.
+    assert.equal(box.kind({ oldValue: tree(), newValue: tree({ settings: { hideAllShorts: false } }) }), 'lists');
+    assert.equal(box.kind({ oldValue: tree(), newValue: tree({ main: { mode: 'whitelist', keywords: [] } }) }), 'lists');
+    assert.equal(box.kind({ oldValue: tree(), newValue: tree({ settings: { hideAllShorts: true, timeLimitPolicy: { dailyBudgetMinutes: 30 } } }) }), 'other');
+    assert.equal(box.kind({ oldValue: tree(), newValue: tree({ settings: { hideAllShorts: true, categoryFilters: { blocked: ['music'] } } }) }), 'other');
+    assert.equal(box.kind({ oldValue: tree(), newValue: { ...tree(), activeProfileId: 'other' } }), 'other');
     assert.equal(box.kind({ newValue: tree() }), 'other');
     assert.match(source, /if \(profilesChange === 'none'\) return;/);
     assert.match(source, /profilesChange !== 'lists'\) \{\n\s+managedContentPlaybackPermit\.clear/);

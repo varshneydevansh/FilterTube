@@ -2217,12 +2217,14 @@ function filterTubeIsMetadataOnlySettingsChange(changes) {
 // receipts) refreshes nothing; one that only adds or removes list entries re-filters the page but
 // leaves the running player alone: a now-blocked video is handled by the normal filter pass.
 const FILTERTUBE_PROFILE_RULE_KEYS = ['settings', 'main', 'kids', 'study', 'type', 'parentProfileId', 'locked', 'security'];
-const FILTERTUBE_LIST_KEYS = {
-    main: ['keywords', 'channels', 'whitelistKeywords', 'whitelistChannels', 'videoIds', 'blockedVideoIds', 'blockedKeywords', 'blockedChannels'],
-    kids: ['blockedKeywords', 'blockedChannels', 'whitelistKeywords', 'whitelistChannels', 'videoIds']
-};
+// Settings that decide whether the playing video may play at all (content-only playback admission,
+// time limits, category/language checks, viewing spaces). Run 4 (Android d760d6c2a): any other rules
+// change keeps the mounted player; the normal filter pass still ends a newly blocked video.
+const FILTERTUBE_PLAYBACK_SETTINGS_KEYS = ['enabled', 'contentOnlyPlayback', 'hideSponsoredCards', 'timeLimitPolicy',
+    'categoryFilters', 'languageFilters', 'allowMainViewing', 'allowKidsViewing', 'defaultLaunchTarget'];
 
-function filterTubeProfilesRuleProjection(root, withoutLists) {
+/** The rules of every profile; with `playbackOnly`, only what decides whether a video may play. */
+function filterTubeProfilesRuleProjection(root, playbackOnly) {
     const tree = root && typeof root === 'object' ? root : {};
     const profiles = tree.profiles && typeof tree.profiles === 'object' ? tree.profiles : {};
     const out = { activeProfileId: tree.activeProfileId ?? null, profiles: {} };
@@ -2231,9 +2233,10 @@ function filterTubeProfilesRuleProjection(root, withoutLists) {
         const row = {};
         for (const key of FILTERTUBE_PROFILE_RULE_KEYS) {
             let value = profile[key];
-            if (withoutLists && FILTERTUBE_LIST_KEYS[key] && value && typeof value === 'object') {
-                value = { ...value };
-                for (const listKey of FILTERTUBE_LIST_KEYS[key]) delete value[listKey];
+            if (playbackOnly && (key === 'main' || key === 'kids')) continue;
+            if (playbackOnly && key === 'settings') {
+                const settings = value && typeof value === 'object' ? value : {};
+                value = Object.fromEntries(FILTERTUBE_PLAYBACK_SETTINGS_KEYS.map(name => [name, settings[name] === undefined ? null : settings[name]]));
             }
             row[key] = value === undefined ? null : value;
         }
@@ -2248,7 +2251,7 @@ function filterTubeStableJson(value) {
     return JSON.stringify(value === undefined ? null : value);
 }
 
-/** 'none' (no rule changed), 'lists' (only list entries changed) or 'other' for an ftProfilesV4 change. */
+/** 'none' (no rule changed), 'lists' (rules changed, the playing video may keep playing) or 'other'. */
 function filterTubeProfilesChangeKind(change) {
     try {
         if (!change || !Object.prototype.hasOwnProperty.call(change, 'oldValue')) return 'other';
