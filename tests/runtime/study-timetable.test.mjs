@@ -267,12 +267,16 @@ test('the week grid shows 6 am to 11 pm grown to every period, and an empty hour
 });
 
 test('a block too narrow for its lane\'s name shows initials, never a cut-off name', () => {
-    const fits = width => text => text.length <= width;
-    assert.equal(Timetable.blockLabel('Khan Academy', fits(20)), 'Khan Academy');
-    assert.equal(Timetable.blockLabel('Khan Academy', fits(5)), 'KA');
-    assert.equal(Timetable.blockLabel('CBSE, class 6-8 + maths', fits(4)), 'CC6');
-    assert.equal(Timetable.blockLabel('GMAT', fits(3)), 'GMA');
+    // A small label holds one more letter than a normal one in this stand-in measure.
+    const fits = width => (text, small) => text.length <= width + (small ? 1 : 0);
+    assert.deepEqual(Timetable.blockLabel('Khan Academy', fits(20)), { text: 'Khan Academy', small: false });
+    assert.deepEqual(Timetable.blockLabel('GMAT', fits(3)), { text: 'GMAT', small: true });
+    assert.deepEqual(Timetable.blockLabel('Khan Academy', fits(5)), { text: 'KA', small: false });
+    assert.deepEqual(Timetable.blockLabel('CBSE, class 6-8 + maths', fits(4)), { text: 'CC6', small: false });
+    // One word that doesn't fit even small shows nothing, never "Pra".
+    assert.equal(Timetable.blockLabel('Praxis', fits(3)), null);
     assert.equal(Timetable.blockLabel('Khan Academy', fits(1)), null);
     // A bracketed note is left out of the initials, never "KA(".
-    assert.equal(Timetable.blockLabel('Khan Academy (any curriculum)', fits(5)), 'KA');
+    assert.deepEqual(Timetable.blockLabel('Khan Academy (any curriculum)', fits(5)), { text: 'KA', small: false });
+    assert.equal(Timetable.SMALL_LABEL, 0.8);
 });

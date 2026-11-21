@@ -324,20 +324,25 @@
         return end - start >= SNAP_MINUTES ? { startMinute: start, endMinute: end } : null;
     }
 
+    /** The smaller label size, as a share of the normal one. */
+    const SMALL_LABEL = 0.8;
+
     /**
-     * What fits inside a period's block: the lane's full name, else its initials ("Khan Academy" -> "KA",
-     * up to three letters, a bracketed note left out; one word keeps its first three), else nothing;
-     * never a cut-off "Khan…".
-     * fits(text) says whether a text fits. The full name stays the spoken label.
+     * What fits inside a period's block, never a cut-off word (Android 493eff989): the lane's full name,
+     * else the full name in the smaller label size, else its initials ("Khan Academy" -> "KA", up to
+     * three letters, only for names of two or more words; a bracketed note is left out), else nothing.
+     * fits(text, small) says whether a text fits at that size. Returns {text, small} or null; the
+     * spoken label stays the full name.
      */
     function blockLabel(name, fits) {
         const value = String(name || '');
-        if (fits(value)) return value;
-        // A bracketed note ("Khan Academy (any curriculum)") is left out; each word gives its first letter or digit.
+        if (fits(value, false)) return { text: value, small: false };
+        if (fits(value, true)) return { text: value, small: true };
         const base = value.replace(/\s*\([^)]*\)/g, '').trim() || value;
         const words = base.split(/[\s+/,&-]+/).map(word => (word.match(/[\p{L}\p{N}]/u) || [''])[0]).filter(Boolean);
-        const initials = words.length > 1 ? words.slice(0, 3).join('').toUpperCase() : Array.from(base).slice(0, 3).join('');
-        return initials.trim() && fits(initials) ? initials : null;
+        if (words.length < 2) return null;
+        const initials = words.slice(0, 3).join('').toUpperCase();
+        return fits(initials, false) ? { text: initials, small: false } : null;
     }
 
     // ---- Add to my calendar (Android StudyTimetableCalendar) ---------------------------------------
@@ -419,6 +424,6 @@
         normalize, create, lane, periodsOf, hasPeriods, packIds, withPeriod, withoutPeriod, copyDay, withLane,
         at, nextBoundary, dayKeyAt, minuteOf, timeOf, snap, validZone,
         ics, escape, fold, utcStamp, todayIn,
-        barRange, moveEdge, weekRange, slot, blockLabel
+        barRange, moveEdge, weekRange, slot, blockLabel, SMALL_LABEL
     });
 }));

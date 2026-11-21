@@ -719,7 +719,7 @@ body.ft-extension-surface .ft-dayplan__handle:focus-visible { outline: none !imp
 .ft-tt-week__head { margin-bottom: 6px; }
 .ft-tt-week__day { min-height: 36px; padding: 0 4px; border: 1px solid var(--pk-line, #dcd1c2); border-radius: 10px; background: transparent; color: var(--pk-ink); font: 600 13px/1.2 var(--pk-font-display, inherit); cursor: pointer; }
 .ft-tt-week__day.is-today { border-color: var(--pk-sage-ink); }
-.ft-tt-week__day.is-on { background: var(--pk-ink); border-color: var(--pk-ink); color: var(--pk-paper, #fffcf6); }
+.ft-tt-week__day.is-on { background: var(--pk-sage); border-color: var(--pk-sage-ink); color: var(--pk-sage-ink); }
 .ft-tt-week__axis { position: relative; }
 .ft-tt-week__hour { position: absolute; inset-inline-end: 6px; transform: translateY(-50%); font-size: 11px; color: var(--pk-muted); white-space: nowrap; }
 .ft-tt-week__col { position: relative; border-radius: 8px; background: repeating-linear-gradient(to bottom, transparent 0 31px, var(--pk-line, #dcd1c2) 31px 32px); cursor: copy; }
@@ -728,6 +728,7 @@ body.ft-extension-surface .ft-dayplan__handle:focus-visible { outline: none !imp
 .ft-tt-week__block.is-editing { outline: 3px solid var(--pk-ink); outline-offset: 1px; }
 .ft-tt-week__block:focus-visible, .ft-tt-week__day:focus-visible { outline: 3px solid var(--pk-ink); outline-offset: 2px; }
 .ft-tt-week__name { overflow: hidden; white-space: nowrap; text-overflow: clip; }
+.ft-tt-week__name.is-small, .ft-ttbar__name.is-small { font-size: 0.8em; }
 .ft-tt-week__now { position: absolute; inset-inline: 0; height: 2px; margin-top: -1px; background: var(--pk-ink); pointer-events: none; }
 
 /* Narrow windows (a phone-width popup tab, a split screen): the day bar gets the width, not the gutters. */

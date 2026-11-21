@@ -2493,8 +2493,8 @@
                 block.style.left = pct(Math.min(x, y));
                 block.style.width = pct(Math.abs(y - x));
                 const room = (Math.abs(y - x) / 100) * width - 8;
-                const label = T.blockLabel(name, text => textWidth(text) <= room);
-                if (label) block.appendChild(el('span', 'ft-ttbar__name', label));
+                const label = T.blockLabel(name, (text, small) => textWidth(text, small ? 12 * T.SMALL_LABEL : 12) <= room);
+                if (label) block.appendChild(el('span', `ft-ttbar__name${label.small ? ' is-small' : ''}`, label.text));
                 block.setAttribute('aria-label', spoken);
                 if (open) block.dataset.ftFocusKey = `tt-${day}-${item.startMinute}-block`;
                 else block.setAttribute('aria-hidden', edit ? 'true' : 'false');
@@ -2701,8 +2701,8 @@
                 block.style.height = `${height.toFixed(3)}%`;
                 // A column is about 80 px wide and an hour 32 px tall: a name needs a quarter hour's room.
                 const tall = ((period.endMinute - period.startMinute) / 60) * 32 >= 18;
-                const label = T.blockLabel(name, text => tall && textWidth(text) <= 72);
-                if (label) block.appendChild(el('span', 'ft-tt-week__name', label));
+                const label = T.blockLabel(name, (text, small) => tall && textWidth(text, small ? 12 * T.SMALL_LABEL : 12) <= 72);
+                if (label) block.appendChild(el('span', `ft-tt-week__name${label.small ? ' is-small' : ''}`, label.text));
                 block.setAttribute('aria-label', `${weekdayName(index, true)}, ${timeRange(period.startMinute, period.endMinute % T.DAY_MINUTES)}, ${name}`);
                 block.dataset.ftFocusKey = `tt-${day}-${period.startMinute}-grid`;
                 column.appendChild(block);
