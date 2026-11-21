@@ -179,3 +179,57 @@ test('the Study state follows the timetable: a period is a round of its lane, an
     assert.equal(after.applied, false);
     assert.equal(await controller.schedule(), at(23, 6));
 });
+
+// ---- Add to my calendar (Android b74369747) -----------------------------------------------------
+
+test('the calendar file repeats each period weekly in the timetable\'s zone', () => {
+    const ics = Timetable.ics(Timetable.copyDay(week(), 'mon', ['wed']), { year: 2026, month: 11, day: 18 }, '20261118T000000Z',
+        lane => lane.label || 'CBSE, class 6-8; maths');
+    assert.ok(ics.startsWith('BEGIN:VCALENDAR\r\n') && ics.trimEnd().endsWith('END:VCALENDAR'));
+    assert.equal(ics.match(/BEGIN:VEVENT/g).length, 4);
+    // Wednesday 18 Nov is today; Monday's periods start next Monday (23 Nov).
+    assert.ok(ics.includes('DTSTART;TZID=Asia/Kolkata:20261118T060000'));
+    assert.ok(ics.includes('DTSTART;TZID=Asia/Kolkata:20261123T070000'));
+    assert.ok(ics.includes('RRULE:FREQ=WEEKLY;BYDAY=MO') && ics.includes('RRULE:FREQ=WEEKLY;BYDAY=WE'));
+    assert.ok(ics.includes('SUMMARY:CBSE\\, class 6-8\\; maths'));
+    assert.ok(ics.includes('SUMMARY:UPSC'));
+    assert.ok(ics.split('\r\n').every(line => Buffer.byteLength(line, 'utf8') <= 75));
+    assert.equal(Timetable.escape('a,b;c\\d\ne'), 'a\\,b\\;c\\\\d\\ne');
+    // A long name folds onto continuation lines that start with a space.
+    const long = Timetable.ics(week(), { year: 2026, month: 11, day: 18 }, '20261118T000000Z', () => 'गणित '.repeat(30));
+    assert.ok(long.split('\r\n').some(line => line.startsWith(' ')));
+    assert.ok(long.split('\r\n').every(line => Buffer.byteLength(line, 'utf8') <= 75));
+    // A period to midnight ends on the next day at 00:00.
+    const late = Timetable.withPeriod(week(), 'tue', 23 * 60, 24 * 60, 'l1');
+    assert.ok(Timetable.ics(late, { year: 2026, month: 11, day: 17 }, 'x', () => 'x').includes('DTEND;TZID=Asia/Kolkata:20261118T000000'));
+    assert.equal(Timetable.utcStamp(Date.UTC(2026, 10, 18, 4, 5, 6)), '20261118T040506Z');
+});
+
+test('saving a timetable: the person\'s own is never a parent\'s, and a child can\'t edit one', async () => {
+    const { createStudyBackground } = require('../../js/study_background.js');
+    const make = type => {
+        const store = { ftNanahDeviceId: 'laptop-1', ftProfilesV4: { schemaVersion: 4, activeProfileId: 'p1', profiles: { p1: {
+            name: 'Riya', type, main: { mode: 'blocklist', channels: [], keywords: [], whitelistChannels: [] }, kids: { mode: 'blocklist', blockedKeywords: [] },
+            study: Model.createStudy({ activePackIds: ['in_upsc'] })
+        } } } };
+        const controller = createStudyBackground({
+            browserAPI: { storage: { local: {
+                get(keys, cb) { const out = {}; for (const key of [].concat(keys)) if (key in store) out[key] = structuredClone(store[key]); cb(out); },
+                set(items, cb) { Object.assign(store, structuredClone(items)); cb?.(); }
+            } }, alarms: { create() {}, clear() {} } },
+            Engine, Model, Packs, now: () => at(16, 12), zoneId: () => 'UTC', loadCatalog: async () => catalog,
+            writeProfile: async (id, profile) => { store.ftProfilesV4.profiles[id] = structuredClone(profile); return { ok: true }; }
+        });
+        return { controller, study: () => store.ftProfilesV4.profiles.p1.study };
+    };
+    const own = make('account');
+    assert.deepEqual(await own.controller.update({ timetable: { ...week(), setByParentId: 'someone' } }), { ok: true });
+    assert.equal(own.study().timetable.setByParentId, undefined);
+    assert.deepEqual(Timetable.packIds(own.study().timetable), ['cls_in_cbse_6_8', 'in_upsc']);
+    // The lane's pack gets a copy.
+    assert.ok(own.study().packCopies.cls_in_cbse_6_8);
+    assert.deepEqual(await own.controller.update({ timetable: null }), { ok: true });
+    assert.equal('timetable' in own.study(), false);
+    const child = make('child');
+    assert.deepEqual(await child.controller.update({ timetable: week() }), { ok: false, error: 'set_by_parent' });
+});

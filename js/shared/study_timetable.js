@@ -5,7 +5,8 @@
  *   {version, zone?, lanes: [{id, packIds, label?}], periods: {mon: [{start: "06:00", end: "07:00", lane}]},
  *    between, hideShortsAndComments, examDates?, setByParentId?}
  * Unknown keys at every level are kept. Pure, so the engine, the Study page and the tests share one
- * set of rules. */
+ * set of rules. Also "Add to my calendar": the timetable as an .ics of weekly repeating events
+ * (Android StudyTimetableCalendar, b74369747). */
 (function (root, factory) {
     const api = factory();
     if (typeof module === 'object' && module.exports) module.exports = api;
@@ -264,9 +265,84 @@
         return times.length ? Math.min(...times) : null;
     }
 
+    // ---- Add to my calendar (Android StudyTimetableCalendar) ---------------------------------------
+
+    const ICS_DAY = Object.freeze({ mon: 'MO', tue: 'TU', wed: 'WE', thu: 'TH', fri: 'FR', sat: 'SA', sun: 'SU' });
+
+    /** RFC 5545 text escaping. */
+    function escape(value) {
+        return String(value).replace(/\\/g, '\\\\').replace(/;/g, '\\;').replace(/,/g, '\\,').replace(/\n/g, '\\n');
+    }
+
+    const encoder = typeof TextEncoder === 'function' ? new TextEncoder() : null;
+    function octets(value) { return encoder ? encoder.encode(value).length : unescape(encodeURIComponent(value)).length; }
+
+    /** Lines longer than 75 octets fold onto continuation lines that start with a space. */
+    function fold(line) {
+        if (octets(line) <= 75) return line;
+        let out = '';
+        let count = 0;
+        let first = true;
+        for (const ch of line) {
+            const size = octets(ch);
+            if (count + size > (first ? 75 : 74)) { out += '\r\n '; count = 0; first = false; }
+            out += ch;
+            count += size;
+        }
+        return out;
+    }
+
+    function stamp(year, month, day, minute) {
+        const pad = (value, size = 2) => String(value).padStart(size, '0');
+        return `${pad(year, 4)}${pad(month)}${pad(day)}T${pad(Math.floor(minute / 60))}${pad(minute % 60)}00`;
+    }
+
+    /**
+     * The calendar text. Each period is a VEVENT starting on its next weekday from today ({year,
+     * month, day}), repeating weekly, in the timetable's zone (TZID). laneName names a lane.
+     */
+    function ics(timetable, today, stampUtc, laneName, deviceZone = null) {
+        const zone = zoneFor(timetable, deviceZone) || Intl.DateTimeFormat().resolvedOptions().timeZone || 'UTC';
+        const lines = ['BEGIN:VCALENDAR', 'VERSION:2.0', 'PRODID:-//FilterTube//Study timetable//EN', 'CALSCALE:GREGORIAN'];
+        const base = plusDays(today.year, today.month, today.day, 0);
+        DAYS.forEach((day, index) => {
+            for (const period of periodsOf(timetable, day)) {
+                const item = lane(timetable, period.laneId);
+                if (!item) continue;
+                const ahead = (index - DAYS.indexOf(base.dayKey) + 7) % 7;
+                const date = plusDays(base.year, base.month, base.day, ahead);
+                const end = period.endMinute >= DAY_MINUTES ? plusDays(date.year, date.month, date.day, 1) : date;
+                lines.push('BEGIN:VEVENT',
+                    `UID:filtertube-study-${day}-${period.startMinute}-${period.laneId}@filtertube.in`,
+                    `DTSTAMP:${stampUtc}`,
+                    `DTSTART;TZID=${zone}:${stamp(date.year, date.month, date.day, period.startMinute)}`,
+                    `DTEND;TZID=${zone}:${stamp(end.year, end.month, end.day, period.endMinute % DAY_MINUTES)}`,
+                    `RRULE:FREQ=WEEKLY;BYDAY=${ICS_DAY[day]}`,
+                    `SUMMARY:${escape(laneName(item))}`,
+                    'END:VEVENT');
+            }
+        });
+        lines.push('END:VCALENDAR');
+        return lines.map(line => `${fold(line)}\r\n`).join('');
+    }
+
+    /** "20261118T000000Z" for ms. */
+    function utcStamp(ms) {
+        const date = new Date(ms);
+        return `${stamp(date.getUTCFullYear(), date.getUTCMonth() + 1, date.getUTCDate(), date.getUTCHours() * 60 + date.getUTCMinutes())
+            .slice(0, -2)}${String(date.getUTCSeconds()).padStart(2, '0')}Z`;
+    }
+
+    /** Today's date in the timetable's zone, for ics(). */
+    function todayIn(timetable, now, deviceZone = null) {
+        const parts = partsAt(Number(now), zoneFor(timetable, deviceZone));
+        return { year: parts.year, month: parts.month, day: parts.day };
+    }
+
     return Object.freeze({
         VERSION, BETWEEN_DEFAULT, BETWEEN_NONE, SNAP_MINUTES, DAY_MINUTES, DAYS, KNOWN,
         normalize, create, lane, periodsOf, hasPeriods, packIds, withPeriod, withoutPeriod, copyDay, withLane,
-        at, nextBoundary, dayKeyAt, minuteOf, timeOf, snap, validZone
+        at, nextBoundary, dayKeyAt, minuteOf, timeOf, snap, validZone,
+        ics, escape, fold, utcStamp, todayIn
     });
 }));

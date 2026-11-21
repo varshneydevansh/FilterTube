@@ -2309,6 +2309,11 @@
         }
         if (plan || hasPack(study, ctx.catalog)) {
             card.appendChild(linkRow(t('study.link.packs', 'What you study'), packsValue(study, ctx.catalog), editable ? () => ctx.openSetup(card) : null));
+            // The timetable lives here, in settings: the Study home stays as it is (Android b74369747).
+            if (timetableApi()) {
+                card.appendChild(linkRow(t('study.timetable.title', 'Timetable'),
+                    timetableStatus(study.timetable, ctx.catalog) || t('study.timetable.off', 'Off'), () => ctx.setMode('timetable')));
+            }
         }
         if (plan) {
             const limit = minuteOf(plan.limit);
@@ -2335,6 +2340,229 @@
         const wrap = el('div', 'ft-home-section');
         wrap.append(sectionTitle(t('study.sessionChannels', 'Session and channels')), card);
         return wrap;
+    }
+
+    // ---- Timetable (Android StudyTimetableActivity, b74369747; docs/study/TIMETABLE_SPEC.md §4) ------
+
+    function timetableApi() { return root.FilterTubeStudyTimetable || null; }
+    function deviceZone() { try { return Intl.DateTimeFormat().resolvedOptions().timeZone || null; } catch (e) { return null; } }
+
+    /** "Russian", or the lane's packs by short name ("GMAT + IELTS"). */
+    function laneName(lane, catalog) {
+        if (!lane) return '?';
+        if (text(lane.label)) return text(lane.label);
+        const Packs = packsApi();
+        const names = array(lane.packIds).map(id => (catalog && Packs?.packById ? Packs.packById(catalog, id) : null))
+            .filter(Boolean).map(pack => text(pack.shortName) || localizedName(pack.names, pack.id));
+        return names.join(' + ') || '?';
+    }
+
+    /** "Now: Russian · until 9 pm", "Next: GMAT at 7 am", or null without a timetable. */
+    function timetableStatus(timetable, catalog, now = Date.now()) {
+        const T = timetableApi();
+        if (!T || !isObject(timetable)) return null;
+        const reading = T.at(timetable, now, deviceZone());
+        if (reading.lane) return t('study.timetable.now', 'Now: {lane} · until {time}', { lane: laneName(reading.lane, catalog), time: formatTime(reading.endsAt) });
+        if (reading.next) return t('study.timetable.next', 'Next: {lane} at {time}', { lane: laneName(reading.next, catalog), time: formatDayTime(reading.nextAt) });
+        return null;
+    }
+
+    /** Monday-first weekday names in the UI language ("Mon", or "Monday" with long). */
+    function weekdayName(index, long = false) {
+        try { return new Date(2026, 10, 16 + index).toLocaleDateString(language(), { weekday: long ? 'long' : 'short' }); } catch (e) { return ''; }
+    }
+
+    /** Hands the person an .ics file (a plain download; no calendar access, nothing read back). */
+    function downloadCalendar(timetable, catalog) {
+        const T = timetableApi();
+        if (!T) return;
+        const now = Date.now();
+        const body = T.ics(timetable, T.todayIn(timetable, now, deviceZone()), T.utcStamp(now), lane => laneName(lane, catalog), deviceZone());
+        try {
+            const url = URL.createObjectURL(new Blob([body], { type: 'text/calendar;charset=utf-8' }));
+            const link = el('a');
+            link.href = url;
+            link.download = 'study-timetable.ics';
+            link.hidden = true;
+            root.document.body.appendChild(link);
+            link.click();
+            setTimeout(() => { link.remove(); URL.revokeObjectURL(url); }, 1000);
+        } catch (e) { }
+    }
+
+    /**
+     * One day at a time (today first), its periods as rows, "Add a period", then Between periods,
+     * Hide Shorts and comments, Copy this day to... and Add to my calendar. A period opens in place:
+     * what to study (the plan's packs and lanes used before, or search), From and To in 15-minute
+     * steps, Save or Remove. Every change saves at once. options: {study, catalog, editable,
+     * readOnlyLabel, ui, onSave(change) -> Promise, redraw()}.
+     */
+    function renderTimetablePage(host, options) {
+        const T = timetableApi();
+        const ui = options.ui;
+        const catalog = options.catalog;
+        const study = object(options.study);
+        const timetable = isObject(study.timetable) ? study.timetable : T.create({});
+        const editable = options.editable;
+        if (!T.DAYS.includes(ui.day)) ui.day = T.dayKeyAt(Date.now(), deviceZone());
+        const card = el('section', 'ft-home-card ft-tt');
+        if (options.readOnlyLabel) card.appendChild(el('p', 'ft-study-muted', options.readOnlyLabel));
+        if (ui.editing !== null && editable) {
+            renderTimetableEditor(card, timetable, options);
+            host.appendChild(card);
+            return;
+        }
+        card.appendChild(el('p', 'ft-study-muted', t('study.timetable.intro', 'Give parts of your day their own subject. Outside these times, your plan works as usual.')));
+        const days = el('div', 'ft-setup-flow ft-tt__days');
+        T.DAYS.forEach((key, index) => {
+            const count = T.periodsOf(timetable, key).length;
+            days.appendChild(setupChip(weekdayName(index), key === ui.day, () => { ui.day = key; ui.copyOpen = false; options.redraw(); },
+                { description: `${weekdayName(index, true)}${count ? ` · ${count}` : ''}` }));
+        });
+        card.appendChild(days);
+        const periods = T.periodsOf(timetable, ui.day);
+        const list = el('div', 'ft-tt__periods');
+        if (!periods.length) {
+            list.appendChild(el('p', 'ft-study-muted ft-tt__empty', t('study.timetable.emptyDay', 'Nothing on {day} yet.', { day: weekdayName(T.DAYS.indexOf(ui.day), true) })));
+        }
+        for (const period of periods) {
+            const name = laneName(T.lane(timetable, period.laneId), catalog);
+            const range = timeRange(period.startMinute, period.endMinute % T.DAY_MINUTES);
+            const open = editable ? () => {
+                const lane = T.lane(timetable, period.laneId);
+                Object.assign(ui, { editing: period.startMinute, start: period.startMinute, end: period.endMinute, lane: array(lane?.packIds).slice(), query: '' });
+                options.redraw();
+            } : null;
+            const row = linkRow(name, range, open);
+            row.classList.add('ft-tt__period');
+            row.setAttribute('aria-label', `${range}, ${name}`);
+            list.appendChild(row);
+        }
+        card.appendChild(list);
+        if (editable) {
+            card.appendChild(button(t('study.timetable.add', 'Add a period'), periods.length ? 'btn-secondary' : 'btn-primary', () => {
+                const last = periods.length ? periods[periods.length - 1].endMinute : 16 * 60;
+                const start = Math.min(last, 23 * 60);
+                const lastLane = array(timetable.lanes).slice(-1)[0];
+                Object.assign(ui, { editing: -1, start, end: Math.min(start + 60, T.DAY_MINUTES),
+                    lane: lastLane ? lastLane.packIds.slice() : array(study.activePackIds).slice(0, 1), query: '' });
+                options.redraw();
+            }));
+        }
+        if (T.hasPeriods(timetable)) {
+            card.appendChild(el('p', 'ft-setup-h2', t('study.timetable.between', 'Between periods')));
+            card.appendChild(choiceRow([[T.BETWEEN_DEFAULT, t('study.timetable.betweenPlan', 'Your plan')], [T.BETWEEN_NONE, t('study.timetable.betweenNone', 'Nothing')]],
+                timetable.between, value => options.onSave(current => ({ ...current, between: value })), t('study.timetable.between', 'Between periods'), editable));
+            card.appendChild(switchRow(t('study.timetable.hideShorts', 'Hide Clips and comments during periods'), timetable.hideShortsAndComments !== false, editable,
+                on => options.onSave(current => ({ ...current, hideShortsAndComments: on }))));
+            const actions = el('div', 'ft-study-actions ft-tt__actions');
+            if (editable && periods.length) {
+                actions.appendChild(button(t('study.timetable.copy', 'Copy this day to…'), 'btn-secondary', () => {
+                    // Weekdays by default when copying from a weekday; the weekend from a weekend day.
+                    const from = T.DAYS.indexOf(ui.day);
+                    ui.copyOpen = !ui.copyOpen;
+                    ui.copyTo = T.DAYS.filter((_, index) => index !== from && (from < 5) === (index < 5));
+                    options.redraw();
+                }));
+            }
+            actions.appendChild(button(t('study.timetable.calendar', 'Add to my calendar'), 'btn-secondary', () => downloadCalendar(timetable, catalog)));
+            card.appendChild(actions);
+            if (ui.copyOpen && editable && periods.length) {
+                const pick = el('div', 'ft-tt__copy');
+                pick.setAttribute('role', 'group');
+                pick.setAttribute('aria-label', t('study.timetable.copy', 'Copy this day to…'));
+                const flow = el('div', 'ft-setup-flow');
+                T.DAYS.forEach((key, index) => {
+                    if (key === ui.day) return;
+                    flow.appendChild(setupChip(weekdayName(index), ui.copyTo.includes(key), () => {
+                        ui.copyTo = ui.copyTo.includes(key) ? ui.copyTo.filter(item => item !== key) : [...ui.copyTo, key];
+                        options.redraw();
+                    }, { description: weekdayName(index, true) }));
+                });
+                pick.append(flow, button(t('askParent.ok', 'OK'), 'btn-primary', async () => {
+                    const to = ui.copyTo.slice();
+                    ui.copyOpen = false;
+                    await options.onSave(current => T.copyDay(current, ui.day, to));
+                }));
+                card.appendChild(pick);
+            }
+        }
+        host.appendChild(card);
+    }
+
+    function renderTimetableEditor(card, timetable, options) {
+        const T = timetableApi();
+        const Packs = packsApi();
+        const ui = options.ui;
+        const catalog = options.catalog;
+        const study = object(options.study);
+        const same = (a, b) => JSON.stringify(a) === JSON.stringify(b);
+        card.appendChild(el('h3', 'ft-setup-h1', t('study.timetable.what', 'What to study')));
+        // The plan's packs and the lanes used before: one tap each.
+        const known = ids => ids.every(id => catalog && Packs?.packById?.(catalog, id));
+        const choices = [...array(timetable.lanes).map(lane => array(lane.packIds)), ...array(study.activePackIds).map(id => [id])]
+            .filter((ids, index, all) => ids.length && known(ids) && all.findIndex(other => same(other, ids)) === index).slice(0, 8);
+        if (ui.lane.length && known(ui.lane) && !choices.some(ids => same(ids, ui.lane))) choices.push(ui.lane);
+        const chips = el('div', 'ft-setup-flow');
+        choices.forEach(ids => chips.appendChild(setupChip(laneName({ packIds: ids }, catalog), same(ids, ui.lane), () => { ui.lane = ids.slice(); options.redraw(); })));
+        card.appendChild(chips);
+        // Anything else: search every pack.
+        const search = el('input', 'text-input ft-setup-search');
+        search.type = 'search';
+        search.value = ui.query;
+        search.placeholder = t('study.timetable.search', 'Find another subject or exam');
+        search.setAttribute('aria-label', search.placeholder);
+        search.dataset.ftFocusKey = 'timetable-search';
+        const hits = el('div', 'ft-setup-flow ft-tt__hits');
+        const drawHits = () => {
+            hits.replaceChildren();
+            const words = text(ui.query).toLowerCase();
+            const Setup = setupApi();
+            if (words.length < 2 || !catalog || !Setup) return;
+            array(catalog.packs).filter(pack => array(Packs.STUDY_KINDS).includes(pack.kind) && array(pack.channels).length >= 3
+                && Setup.StudyExamList.matches(pack, words)).slice(0, 6).forEach(pack => {
+                hits.appendChild(setupChip(Setup.StudyExamList.chipLabel(pack, language()), same(ui.lane, [pack.id]), () => {
+                    ui.lane = [pack.id]; ui.query = ''; options.redraw();
+                }));
+            });
+        };
+        search.addEventListener('input', () => { ui.query = search.value; drawHits(); });
+        card.append(search, hits);
+        drawHits();
+        const step = T.SNAP_MINUTES;
+        const label = minute => clockLabel(minute % T.DAY_MINUTES);
+        card.appendChild(stepperRow(t('study.timetable.from', 'From'), label(ui.start), {
+            onLess: () => { ui.start = Math.max(0, ui.start - step); options.redraw(); },
+            onMore: () => { ui.start = Math.min(ui.end - step, ui.start + step); options.redraw(); },
+            lessOk: ui.start > 0, moreOk: ui.start + step < ui.end
+        }));
+        card.appendChild(stepperRow(t('study.timetable.to', 'To'), label(ui.end), {
+            onLess: () => { ui.end = Math.max(ui.start + step, ui.end - step); options.redraw(); },
+            onMore: () => { ui.end = Math.min(T.DAY_MINUTES, ui.end + step); options.redraw(); },
+            lessOk: ui.end - step > ui.start, moreOk: ui.end < T.DAY_MINUTES
+        }));
+        const actions = el('div', 'ft-study-actions ft-tt__actions');
+        const editing = ui.editing;
+        const day = ui.day;
+        const save = button(t('study.timetable.save', 'Save'), 'btn-primary', async () => {
+            if (!ui.lane.length) return;
+            const { lane, start, end } = ui;
+            ui.editing = null; ui.query = '';
+            await options.onSave(current => {
+                const base = editing >= 0 ? T.withoutPeriod(current, day, editing) : current;
+                const added = T.withLane(base, lane);
+                return T.withPeriod(added.timetable, day, start, end, added.laneId);
+            });
+        });
+        save.disabled = !ui.lane.length;
+        actions.appendChild(save);
+        if (editing >= 0) {
+            actions.appendChild(button(t('study.timetable.delete', 'Remove this period'), 'btn-secondary', async () => {
+                ui.editing = null;
+                await options.onSave(current => T.withoutPeriod(current, day, editing));
+            }));
+        }
+        card.appendChild(actions);
     }
 
     function switchRow(label, on, enabled, onChange) {
@@ -2821,18 +3049,19 @@
     /** The page header (buildScaffold): back on the plan page, the title, and the pack tag. */
     function pageHeader(data, ctx) {
         const head = el('div', 'ft-study-head');
-        if (ctx.mode === 'plan') {
+        if (ctx.mode === 'plan' || ctx.mode === 'timetable') {
             const back = button('', 'ft-study-head__back', () => ctx.setMode('home'));
             back.appendChild(icon('back'));
             back.setAttribute('aria-label', t('askParent.back', 'Back'));
             head.appendChild(back);
         }
         // Home's title is the page header's own ("Study and focus"); the plan page names itself.
-        const title = el('h3', 'ft-study-head__title', ctx.mode === 'plan' ? t('study.dash.changePlan', 'Change plan') : '');
-        if (ctx.mode !== 'plan') title.setAttribute('aria-hidden', 'true');
+        const title = el('h3', 'ft-study-head__title', ctx.mode === 'plan' ? t('study.dash.changePlan', 'Change plan')
+            : ctx.mode === 'timetable' ? t('study.timetable.title', 'Timetable') : '');
+        if (ctx.mode === 'home') title.setAttribute('aria-hidden', 'true');
         head.appendChild(title);
         const tag = packsLabel(data.state);
-        if (tag && ctx.mode !== 'plan') head.appendChild(el('span', 'ft-study-head__tag', tag));
+        if (tag && ctx.mode === 'home') head.appendChild(el('span', 'ft-study-head__tag', tag));
         return head;
     }
 
@@ -2895,6 +3124,30 @@
                 study, state, editable, parentName: data.parentName, toastHost: host,
                 readOnlyLabel: role === 'child' || parentPlan ? setByLabel(data.parentName) : '',
                 onPatch: async patch => { const result = await send({ action: 'FilterTube_StudyUpdate', patch }); await ctx.refresh(); return result; }
+            });
+            replaceKeepingFocus(host, view);
+            return;
+        }
+        if (ctx.mode === 'timetable' && timetableApi()) {
+            const holder = el('div', 'ft-study-plan-host');
+            view.appendChild(holder);
+            const parentTimetable = text(object(study.timetable).setByParentId);
+            renderTimetablePage(holder, {
+                study, catalog: ctx.catalog, ui: ctx.timetableUi, editable: role === 'self' && !parentTimetable,
+                readOnlyLabel: role === 'child' || parentTimetable ? setByLabel(data.parentName) : '',
+                redraw: () => ctx.redrawHome(),
+                onSave: async change => {
+                    const T = timetableApi();
+                    const zone = deviceZone();
+                    let next = change(isObject(study.timetable) ? study.timetable : T.create(zone ? { zone } : {}));
+                    if (next) next = { ...next, ...(next.zone || !zone ? {} : { zone }) };
+                    // An empty timetable is none.
+                    if (next && !T.hasPeriods(next) && !Object.keys(object(next.examDates)).length) next = null;
+                    const result = await send({ action: 'FilterTube_StudyUpdate', patch: { timetable: next } });
+                    if (result?.ok === false) ctx.toast(t('study.saveRefused', 'Can\'t change the plan while a lock is running.'));
+                    await ctx.refresh();
+                    return result;
+                }
             });
             replaceKeepingFocus(host, view);
             return;
@@ -3064,8 +3317,17 @@
             redraw: false,
             refresh: () => refresh(),
             redrawHome: () => draw(true),
+            // The Timetable page's own state: the day shown and the period being edited (null: the day).
+            timetableUi: { day: null, editing: null, start: 16 * 60, end: 17 * 60, lane: [], query: '', copyOpen: false, copyTo: [] },
             setMode: next => {
-                mode = next === 'plan' ? 'plan' : 'home';
+                // Back from a period being edited returns to its day first.
+                if (mode === 'timetable' && next === 'home' && ctx.timetableUi.editing !== null) {
+                    ctx.timetableUi.editing = null; ctx.timetableUi.query = '';
+                    draw(false);
+                    return;
+                }
+                if (next === 'timetable' && mode !== 'timetable') Object.assign(ctx.timetableUi, { day: null, editing: null, copyOpen: false, query: '' });
+                mode = next === 'plan' || next === 'timetable' ? next : 'home';
                 draw(false);
                 try { host.closest('.ft-study-card')?.scrollIntoView({ block: 'start', behavior: motionAllowed() ? 'smooth' : 'auto' }); } catch (e) { }
             },
@@ -3367,7 +3629,8 @@
 
     root.FilterTubeStudyUi = Object.freeze({
         t, phaseInfo, planSegments, segmentWords, setByLabel, packLabel, renderStrip, mountStrip,
-        renderPlanPage, renderDashboard, mountDashboard, mountLengthSlider, showLooseningNotice, lengthLabel, dayRing, ringState, heroLines, renderParentPlans, searchExplainerCard, askForTime, applyCountryAccent, openSetup
+        renderPlanPage, renderDashboard, mountDashboard, mountLengthSlider, showLooseningNotice, lengthLabel, dayRing, ringState, heroLines, renderParentPlans, searchExplainerCard, askForTime, applyCountryAccent, openSetup,
+        renderTimetablePage, timetableStatus
     });
 
     // Any page that loads this file shows the sheet when the background puts a loosening back.

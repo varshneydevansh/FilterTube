@@ -880,14 +880,24 @@
         /** Phase 5 edits: packs, packEdits, focus, plan, breakMode, weekView. Never the lock or progress. */
         async function update(patch = {}) {
             if (await deps.getSelfControlSession?.()) return { ok: false, error: 'locked' };
-            const allowed = ['activePackIds', 'packEdits', 'focus', 'plan', 'breakMode', 'weekView', 'packChannelsOnly'];
+            const allowed = ['activePackIds', 'packEdits', 'focus', 'plan', 'breakMode', 'weekView', 'packChannelsOnly', 'timetable'];
             const { profileId, profile, runtime } = await readAll();
             const current = Model.profileStudy(profile);
             const apply = study => {
                 const next = { ...study };
                 for (const key of allowed) if (Object.prototype.hasOwnProperty.call(object(patch), key)) next[key] = clone(patch[key]);
+                // The person's own timetable (Android b74369747): never marked as a parent's; null removes it.
+                if (Object.prototype.hasOwnProperty.call(object(patch), 'timetable')) {
+                    if (isObject(next.timetable)) { next.timetable = { ...next.timetable }; delete next.timetable.setByParentId; }
+                    else delete next.timetable;
+                }
                 return next;
             };
+            // A parent's timetable is a parent plan: a child sees it, only that parent edits it (from Family).
+            if (Object.prototype.hasOwnProperty.call(object(patch), 'timetable')
+                && (text(profile.type) === 'child' || text(object(current?.timetable).setByParentId))) {
+                return { ok: false, error: 'set_by_parent' };
+            }
             // A child never sets study up for itself (Android StudySetupActivity); a parent does that from
             // Family control. It may only make what it has stricter.
             const isChild = text(profile.type) === 'child';
@@ -954,12 +964,20 @@
             if ((owner(current.plan) && owner(current.plan) !== context.parentId) || (owner(current.lock) && owner(current.lock) !== context.parentId)) {
                 return { ok: false, error: 'set_by_other_parent' };
             }
-            const allowed = ['activePackIds', 'packEdits', 'focus', 'plan', 'breakMode', 'weekView', 'packChannelsOnly'];
+            const allowed = ['activePackIds', 'packEdits', 'focus', 'plan', 'breakMode', 'weekView', 'packChannelsOnly', 'timetable'];
             const value = object(patch);
+            if (owner(current.timetable) && owner(current.timetable) !== context.parentId && Object.prototype.hasOwnProperty.call(value, 'timetable')) {
+                return { ok: false, error: 'set_by_other_parent' };
+            }
             const result = await updateProfileStudy(context.childId, study => {
                 const next = { ...study };
                 for (const key of allowed) if (Object.prototype.hasOwnProperty.call(value, key)) next[key] = clone(value[key]);
                 if (next.plan) next.plan = { ...next.plan, setByParentId: context.parentId };
+                // A parent's timetable for a child is marked as theirs (Set by you); null removes it.
+                if (Object.prototype.hasOwnProperty.call(value, 'timetable')) {
+                    if (isObject(next.timetable)) next.timetable = { ...next.timetable, setByParentId: context.parentId };
+                    else delete next.timetable;
+                }
                 return next;
             });
             if (result?.ok === false) return result;

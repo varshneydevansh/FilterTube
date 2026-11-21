@@ -695,3 +695,13 @@ body.ft-extension-surface .ft-dayplan__handle:focus-visible { outline: none !imp
     .ft-day-ring .is-rippling, .ft-hero__ring.is-exhaling { animation: none; }
     .ft-day-ring__scribble { display: none; }
 }
+
+/* Timetable (Android b74369747): one day at a time, its periods as rows, the choices below. */
+.ft-tt { display: flex; flex-direction: column; gap: 12px; }
+.ft-tt__days { flex-wrap: wrap; }
+.ft-tt__periods { display: flex; flex-direction: column; border: 1.5px solid var(--pk-line, #dcd1c2); border-radius: 16px; overflow: hidden; }
+.ft-tt__periods > .ft-link-row + .ft-link-row { border-top: 1px solid var(--pk-line, #dcd1c2); }
+.ft-tt__empty { margin: 0; padding: 16px; }
+.ft-tt__actions { flex-wrap: wrap; }
+.ft-tt__copy { display: flex; flex-direction: column; gap: 10px; align-items: flex-start; }
+.ft-tt__hits:empty { display: none; }

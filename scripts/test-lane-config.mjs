@@ -204,6 +204,8 @@ const STUDY_TESTS = Object.freeze([
   'tests/runtime/study-ui.test.mjs',
   'tests/runtime/study-topic-synonyms.test.mjs',
   'tests/runtime/study-branch-kids-parity.test.mjs',
+  'tests/runtime/study-timetable.test.mjs',
+  'tests/runtime/study-timetable-ui.test.mjs',
 ]);
 // Parity with the Android app: filtering decisions, Ask a parent, live chat (docs/design/PARITY_PASS4.md).
 const APP_PARITY_TESTS = Object.freeze([
