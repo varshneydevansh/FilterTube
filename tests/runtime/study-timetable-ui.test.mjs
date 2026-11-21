@@ -107,7 +107,10 @@ test('the day on the bar, and Clips, Copy and the calendar behind More choices',
     assert.ok(!words.some(word => /Shorts/.test(word)));
     // The day bar's block opens the period; the day chips share one row.
     assert.ok(byKey(host, 'tt-mon-420-block'));
-    assert.equal(all(host).find(node => node.className.includes('ft-tt__days')).children.length, 7);
+    const chips = all(host).find(node => node.className.includes('ft-tt__days')).children;
+    assert.equal(chips.length, 7);
+    // A chip that would clip falls back to the narrow weekday; the full name stays its label.
+    assert.deepEqual([chips[2].dataset.ftShort, chips[2].dataset.ftNarrow, chips[2].attributes['aria-label']], ['Wed', 'W', 'Wednesday']);
     byKey(host, 'tt-more').fire('click');
     host = make('div');
     Ui.renderTimetablePage(host, options);

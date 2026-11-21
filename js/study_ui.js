@@ -2403,7 +2403,27 @@
 
     /** Monday-first weekday names in the UI language ("Mon", or "Monday" with long). */
     function weekdayName(index, long = false) {
-        try { return new Date(2026, 10, 16 + index).toLocaleDateString(language(), { weekday: long ? 'long' : 'short' }); } catch (e) { return ''; }
+        const style = long === 'narrow' ? 'narrow' : long ? 'long' : 'short';
+        try { return new Date(2026, 10, 16 + index).toLocaleDateString(language(), { weekday: style }); } catch (e) { return ''; }
+    }
+
+    /**
+     * When a day chip's short name would clip ("الأربعاء" at 360 px) the row shows the narrow weekdays
+     * instead (Intl weekday "narrow"); the full name stays the accessible label. Rechecked on resize.
+     */
+    function fitDayChips(row) {
+        // One style for the whole row: if any short name would clip, every chip takes its narrow name.
+        const fit = () => {
+            const chips = Array.from(row.children || []).filter(chip => chip.dataset?.ftShort);
+            chips.forEach(chip => { chip.textContent = chip.dataset.ftShort; });
+            const clips = chips.some(chip => chip.clientWidth > 0 && chip.scrollWidth > chip.clientWidth + 1);
+            if (clips) chips.forEach(chip => { chip.textContent = chip.dataset.ftNarrow || chip.dataset.ftShort; });
+        };
+        if (typeof root.ResizeObserver === 'function') {
+            const watcher = new root.ResizeObserver(() => { if (!row.isConnected) { watcher.disconnect(); return; } fit(); });
+            watcher.observe(row);
+        }
+        return fit;
     }
 
     /** Hands the person an .ics file (a plain download; no calendar access, nothing read back). */
@@ -2766,12 +2786,15 @@
             const count = T.periodsOf(timetable, key).length;
             // A plain day chip (no check mark) so seven share one row at 360 px, as on the plan page.
             const chip = button(weekdayName(index), `ft-tt__day${key === ui.day ? ' is-on' : ''}`, () => { Object.assign(ui, { day: key, copyOpen: false }); options.redraw(); });
+            chip.dataset.ftShort = weekdayName(index);
+            chip.dataset.ftNarrow = weekdayName(index, 'narrow');
             chip.setAttribute('aria-pressed', key === ui.day ? 'true' : 'false');
             chip.setAttribute('aria-label', `${weekdayName(index, true)}${count ? ` · ${count}` : ''}`);
             chip.dataset.ftFocusKey = `tt-${key}-day-chip`;
             days.appendChild(chip);
         });
         card.appendChild(days);
+        fitDayChips(days);
         const periods = T.periodsOf(timetable, ui.day);
         const openPeriod = period => {
             const lane = T.lane(timetable, period.laneId);
