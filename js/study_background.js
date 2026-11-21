@@ -358,7 +358,10 @@
                     && Engine.breakSkipPreview ? Engine.breakSkipPreview(clock.segments,
                         (Array.isArray(clock.segments) ? clock.segments : []).find(item => item.kind === Engine.BREAK && item.end === clock.until)?.start) : null,
                 next: clock.next,
+                // During a timetable period these are the lane's packs (Android 7d655a511: status lists them).
                 packIds,
+                // The timetable period running now ({id, packIds, label?}), or null: the Study page names it.
+                timetableLane: clock.lane || null,
                 phase: applied.phase || 'normal',
                 failClosed: applied.failClosed === true,
                 setByParentId: clock.setByParentId || null,

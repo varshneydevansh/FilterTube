@@ -146,3 +146,36 @@ test('the timetable\'s lanes get pack copies like the active packs', () => {
     const stamped = Engine.stampPackCopies(Model.createStudy({ activePackIds: ['in_upsc'], timetable: week() }), catalog);
     assert.deepEqual(new Set(Object.keys(stamped.packCopies)), new Set(['in_upsc', 'cls_in_cbse_6_8']));
 });
+
+test('the Study state follows the timetable: a period is a round of its lane, and an alarm waits at its end', async () => {
+    const { createStudyBackground } = require('../../js/study_background.js');
+    const store = { ftNanahDeviceId: 'laptop-1', ftProfilesV4: { schemaVersion: 4, activeProfileId: 'p1', profiles: { p1: {
+        name: 'Riya', type: 'account',
+        main: { mode: 'blocklist', channels: [], keywords: [], whitelistChannels: [] }, kids: { mode: 'blocklist', blockedKeywords: [] },
+        study: Model.createStudy({ activePackIds: ['in_upsc'], timetable: week() })
+    } } } };
+    const alarms = new Map();
+    const clock = { now: at(16, 6, 30) };
+    const controller = createStudyBackground({
+        browserAPI: {
+            storage: { local: {
+                get(keys, cb) { const out = {}; for (const key of [].concat(keys)) if (key in store) out[key] = structuredClone(store[key]); cb(out); },
+                set(items, cb) { Object.assign(store, structuredClone(items)); cb?.(); }
+            } },
+            alarms: { create(name, info) { alarms.set(name, info.when); }, clear(name) { alarms.delete(name); } }
+        },
+        Engine, Model, Packs, now: () => clock.now, zoneId: () => 'UTC', loadCatalog: async () => catalog,
+        writeProfile: async (id, profile) => { store.ftProfilesV4.profiles[id] = structuredClone(profile); return { ok: true }; }
+    });
+    const during = controller.apply('p1', store.ftProfilesV4.profiles.p1, await controller.prepare());
+    assert.equal(during.applied, true);
+    assert.equal(during.state.state, 'STUDY');
+    assert.deepEqual(during.state.packIds, ['cls_in_cbse_6_8']);
+    assert.equal(during.state.timetableLane.id, 'l1');
+    assert.equal(during.state.until, at(16, 7));
+    assert.equal(await controller.schedule(), at(16, 7));
+    clock.now = at(16, 9);
+    const after = controller.apply('p1', store.ftProfilesV4.profiles.p1, await controller.prepare());
+    assert.equal(after.applied, false);
+    assert.equal(await controller.schedule(), at(23, 6));
+});
