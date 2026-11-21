@@ -3474,5 +3474,7 @@
   "dashboard.sync.outbox.notAppliedOn": "{device} no apply dis update ({reason})",
   "dashboard.sync.toast.sourceUnbound": "Dis link no get source profile. Pair again from di profile wey you wan send im rules.",
   "dashboard.sync.toast.sourceMismatch": "Dis link dey send another profile rules. Choose dat profile, or pair again from dis one.",
-  "dashboard.sync.toast.sourceMissing": "Di profile wey dis link dey send from no dey dis device again. Pair again from di profile wey you wan send im rules."
+  "dashboard.sync.toast.sourceMissing": "Di profile wey dis link dey send from no dey dis device again. Pair again from di profile wey you wan send im rules.",
+  "dashboard.sync.trust.reservedRepair": "Di old link to {device} still get updates wey dey wait for Internet Pickup or Home Pickup. Set up dat Internet Pickup or Home Pickup again make dem fit comot, then pair again.",
+  "dashboard.sync.trust.saveRefused": "We no fit save di link to {device} ({reason})"
 }

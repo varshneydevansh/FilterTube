@@ -3472,5 +3472,7 @@
   "dashboard.sync.outbox.notAppliedOn": "{device} ora nrapake pembaruan iki ({reason})",
   "dashboard.sync.toast.sourceUnbound": "Tautan iki ora duwe profil sumber. Pasangna maneh saka profil sing aturane arep dikirim.",
   "dashboard.sync.toast.sourceMismatch": "Tautan iki ngirim aturan profil liya. Pilih profil kuwi, utawa pasangna maneh saka iki.",
-  "dashboard.sync.toast.sourceMissing": "Profil sumber tautan iki wis ora ana ing piranti iki. Pasangna maneh saka profil sing aturane arep dikirim."
+  "dashboard.sync.toast.sourceMissing": "Profil sumber tautan iki wis ora ana ing piranti iki. Pasangna maneh saka profil sing aturane arep dikirim.",
+  "dashboard.sync.trust.reservedRepair": "Tautan lawas menyang {device} isih duwe pembaruan sing nunggu ing Internet Pickup utawa Home Pickup. Atur maneh Internet Pickup utawa Home Pickup kuwi supaya bisa dibusak, banjur pasangna maneh.",
+  "dashboard.sync.trust.saveRefused": "Ora bisa nyimpen tautan menyang {device} ({reason})"
 }

@@ -3474,5 +3474,7 @@
   "dashboard.sync.outbox.notAppliedOn": "Hindi inilapat ng {device} ang update na ito ({reason})",
   "dashboard.sync.toast.sourceUnbound": "Walang source profile ang link na ito. Mag-pair muli mula sa profile na ang mga patakaran ay gusto mong ipadala.",
   "dashboard.sync.toast.sourceMismatch": "Ang link na ito ay nagpapadala ng mga patakaran ng ibang profile. Piliin ang profile na iyon, o mag-pair muli mula rito.",
-  "dashboard.sync.toast.sourceMissing": "Wala na sa device na ito ang profile na pinagpapadalhan ng link. Mag-pair muli mula sa profile na ang mga patakaran ay gusto mong ipadala."
+  "dashboard.sync.toast.sourceMissing": "Wala na sa device na ito ang profile na pinagpapadalhan ng link. Mag-pair muli mula sa profile na ang mga patakaran ay gusto mong ipadala.",
+  "dashboard.sync.trust.reservedRepair": "May mga update pa ring naghihintay sa Internet Pickup o Home Pickup ang lumang link sa {device}. I-set up muli ang Internet Pickup o Home Pickup na iyon para maalis ang mga ito, saka mag-pair muli.",
+  "dashboard.sync.trust.saveRefused": "Hindi ma-save ang link sa {device} ({reason})"
 }

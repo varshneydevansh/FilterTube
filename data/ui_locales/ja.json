@@ -3472,5 +3472,7 @@
   "dashboard.sync.outbox.notAppliedOn": "{device} はこの更新を適用しませんでした（{reason}）",
   "dashboard.sync.toast.sourceUnbound": "このリンクには送信元プロフィールがありません。ルールを送りたいプロフィールからペアリングし直してください。",
   "dashboard.sync.toast.sourceMismatch": "このリンクは別のプロフィールのルールを送ります。そのプロフィールを選ぶか、このプロフィールからペアリングし直してください。",
-  "dashboard.sync.toast.sourceMissing": "このリンクの送信元プロフィールはこのデバイスにもうありません。ルールを送りたいプロフィールからペアリングし直してください。"
+  "dashboard.sync.toast.sourceMissing": "このリンクの送信元プロフィールはこのデバイスにもうありません。ルールを送りたいプロフィールからペアリングし直してください。",
+  "dashboard.sync.trust.reservedRepair": "{device} との古いリンクの更新が Internet Pickup または Home Pickup にまだ残っています。それらを削除できるよう同じ Internet Pickup または Home Pickup を再設定してから、もう一度ペアリングしてください。",
+  "dashboard.sync.trust.saveRefused": "{device} とのリンクを保存できませんでした（{reason}）"
 }

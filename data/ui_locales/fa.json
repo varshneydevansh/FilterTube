@@ -3474,5 +3474,7 @@
   "dashboard.sync.outbox.notAppliedOn": "{device} این به‌روزرسانی را اعمال نکرد ({reason})",
   "dashboard.sync.toast.sourceUnbound": "این پیوند نمایه مبدأ ندارد. از نمایه‌ای که می‌خواهید قوانینش را بفرستید دوباره جفت کنید.",
   "dashboard.sync.toast.sourceMismatch": "این پیوند قوانین نمایه دیگری را می‌فرستد. آن نمایه را انتخاب کنید یا از این نمایه دوباره جفت کنید.",
-  "dashboard.sync.toast.sourceMissing": "نمایه‌ای که این پیوند از آن می‌فرستد دیگر روی این دستگاه نیست. از نمایه‌ای که می‌خواهید قوانینش را بفرستید دوباره جفت کنید."
+  "dashboard.sync.toast.sourceMissing": "نمایه‌ای که این پیوند از آن می‌فرستد دیگر روی این دستگاه نیست. از نمایه‌ای که می‌خواهید قوانینش را بفرستید دوباره جفت کنید.",
+  "dashboard.sync.trust.reservedRepair": "پیوند قدیمی با {device} هنوز به‌روزرسانی‌های در انتظار در Internet Pickup یا Home Pickup دارد. همان Internet Pickup یا Home Pickup را دوباره راه‌اندازی کنید تا حذف شوند، سپس دوباره جفت کنید.",
+  "dashboard.sync.trust.saveRefused": "ذخیره پیوند با {device} ممکن نشد ({reason})"
 }

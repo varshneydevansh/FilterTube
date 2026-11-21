@@ -3472,5 +3472,7 @@
   "dashboard.sync.outbox.notAppliedOn": "{device} 呒没用上搿只更新（{reason}）",
   "dashboard.sync.toast.sourceUnbound": "搿只连接呒没来源配置。请从侬想发规则个配置重新配对。",
   "dashboard.sync.toast.sourceMismatch": "搿只连接发个是另一只配置个规则。请选搿只配置，或者从搿只重新配对。",
-  "dashboard.sync.toast.sourceMissing": "搿只连接个来源配置已经勿辣搿只设备上了。请从侬想发规则个配置重新配对。"
+  "dashboard.sync.toast.sourceMissing": "搿只连接个来源配置已经勿辣搿只设备上了。请从侬想发规则个配置重新配对。",
+  "dashboard.sync.trust.reservedRepair": "搭 {device} 个老连接辣 Internet Pickup 或者 Home Pickup 里还有更新辣等。请重新设置搿只 Internet Pickup 或者 Home Pickup，让伊拉好清脱，然后再配对。",
+  "dashboard.sync.trust.saveRefused": "搭 {device} 个连接存勿牢（{reason}）"
 }

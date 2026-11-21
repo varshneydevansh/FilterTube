@@ -3474,5 +3474,7 @@
   "dashboard.sync.outbox.notAppliedOn": "{device} bai aiwatar da wannan sabuntawa ba ({reason})",
   "dashboard.sync.toast.sourceUnbound": "Wannan haɗin ba shi da bayanan tushe. Sake haɗawa daga bayanan da kake son aika dokokinsa.",
   "dashboard.sync.toast.sourceMismatch": "Wannan haɗin yana aika dokokin wani bayani. Zaɓi wannan bayanin, ko sake haɗawa daga wannan.",
-  "dashboard.sync.toast.sourceMissing": "Bayanan da wannan haɗin yake aikawa daga gare shi ba ya kan wannan na'ura yanzu. Sake haɗawa daga bayanan da kake son aika dokokinsa."
+  "dashboard.sync.toast.sourceMissing": "Bayanan da wannan haɗin yake aikawa daga gare shi ba ya kan wannan na'ura yanzu. Sake haɗawa daga bayanan da kake son aika dokokinsa.",
+  "dashboard.sync.trust.reservedRepair": "Tsohon haɗin {device} har yanzu yana da sabuntawa a jira a Internet Pickup ko Home Pickup. Sake saita wannan Internet Pickup ko Home Pickup don a cire su, sannan ka sake haɗawa.",
+  "dashboard.sync.trust.saveRefused": "Ba a iya ajiye haɗin {device} ba ({reason})"
 }

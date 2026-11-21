@@ -3472,5 +3472,7 @@
   "dashboard.sync.outbox.notAppliedOn": "{device} 冇套用呢個更新（{reason}）",
   "dashboard.sync.toast.sourceUnbound": "呢個連結冇來源設定檔。請由你想傳送規則嘅設定檔重新配對。",
   "dashboard.sync.toast.sourceMismatch": "呢個連結傳送緊另一個設定檔嘅規則。請揀返嗰個設定檔，或者由呢個重新配對。",
-  "dashboard.sync.toast.sourceMissing": "呢個連結嘅來源設定檔已經唔喺呢部裝置。請由你想傳送規則嘅設定檔重新配對。"
+  "dashboard.sync.toast.sourceMissing": "呢個連結嘅來源設定檔已經唔喺呢部裝置。請由你想傳送規則嘅設定檔重新配對。",
+  "dashboard.sync.trust.reservedRepair": "同 {device} 嘅舊連結喺 Internet Pickup 或 Home Pickup 仲有更新等緊。請重新設定嗰個 Internet Pickup 或 Home Pickup 等佢哋可以清走，然後再配對。",
+  "dashboard.sync.trust.saveRefused": "儲存唔到同 {device} 嘅連結（{reason}）"
 }

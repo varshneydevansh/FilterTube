@@ -3472,5 +3472,7 @@
   "dashboard.sync.outbox.notAppliedOn": "{device} kò lo àtúnṣe yìí ({reason})",
   "dashboard.sync.toast.sourceUnbound": "Ìsopọ̀ yìí kò ní profaili orísun. Tún so pọ̀ láti profaili tí o fẹ́ fi àwọn òfin rẹ̀ ránṣẹ́.",
   "dashboard.sync.toast.sourceMismatch": "Ìsopọ̀ yìí ń fi àwọn òfin profaili mìíràn ránṣẹ́. Yan profaili yẹn, tàbí tún so pọ̀ láti èyí.",
-  "dashboard.sync.toast.sourceMissing": "Profaili tí ìsopọ̀ yìí ń fi ránṣẹ́ láti ọ̀dọ̀ rẹ̀ kò sí lórí ẹ̀rọ yìí mọ́. Tún so pọ̀ láti profaili tí o fẹ́ fi àwọn òfin rẹ̀ ránṣẹ́."
+  "dashboard.sync.toast.sourceMissing": "Profaili tí ìsopọ̀ yìí ń fi ránṣẹ́ láti ọ̀dọ̀ rẹ̀ kò sí lórí ẹ̀rọ yìí mọ́. Tún so pọ̀ láti profaili tí o fẹ́ fi àwọn òfin rẹ̀ ránṣẹ́.",
+  "dashboard.sync.trust.reservedRepair": "Ìsopọ̀ àtijọ́ sí {device} ṣì ní àwọn àtúnṣe tó ń dúró ní Internet Pickup tàbí Home Pickup. Tún ṣètò Internet Pickup tàbí Home Pickup yẹn kí wọ́n lè yọ kúrò, lẹ́yìn náà tún so pọ̀.",
+  "dashboard.sync.trust.saveRefused": "A kò lè fi ìsopọ̀ sí {device} pamọ́ ({reason})"
 }

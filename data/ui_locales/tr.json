@@ -3474,5 +3474,7 @@
   "dashboard.sync.outbox.notAppliedOn": "{device} bu güncellemeyi uygulamadı ({reason})",
   "dashboard.sync.toast.sourceUnbound": "Bu bağlantının kaynak profili yok. Kurallarını göndermek istediğin profilden yeniden eşleştir.",
   "dashboard.sync.toast.sourceMismatch": "Bu bağlantı başka bir profilin kurallarını gönderiyor. O profili seç ya da bu profilden yeniden eşleştir.",
-  "dashboard.sync.toast.sourceMissing": "Bu bağlantının gönderdiği profil artık bu cihazda yok. Kurallarını göndermek istediğin profilden yeniden eşleştir."
+  "dashboard.sync.toast.sourceMissing": "Bu bağlantının gönderdiği profil artık bu cihazda yok. Kurallarını göndermek istediğin profilden yeniden eşleştir.",
+  "dashboard.sync.trust.reservedRepair": "{device} ile eski bağlantının Internet Pickup veya Home Pickup'ta bekleyen güncellemeleri var. Kaldırılabilmeleri için o Internet Pickup veya Home Pickup'ı yeniden kur, sonra tekrar eşleştir.",
+  "dashboard.sync.trust.saveRefused": "{device} bağlantısı kaydedilemedi ({reason})"
 }

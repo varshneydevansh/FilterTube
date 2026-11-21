@@ -4745,6 +4745,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     const NANAH_NEARBY_DISCOVERY_MAX_MS = 2 * 60 * 1000;
     const NANAH_LOCAL_DISCOVERY_COMPANION_ENDPOINT = 'http://127.0.0.1:8787/filtertube';
     let nanahClient = null;
+    let nanahInboundGate = null;
     let nanahTrustedLinks = [];
     let nanahStableDeviceId = '';
     let nanahStableDeviceIdPromise = null;
@@ -18336,7 +18337,9 @@ document.addEventListener('DOMContentLoaded', async () => {
         return window.FilterTubeNanahStorageLock.run(async () => {
             const detached = JSON.parse(JSON.stringify(candidate));
             if (await writeNanahStorage(NANAH_TRUSTED_LINKS_KEY, detached) !== true) {
-                throw new Error('Device trust could not be saved. Try again before continuing.');
+                const error = new Error('Device trust could not be saved. Try again before continuing.');
+                error.code = 'storage_write_failed';
+                throw error;
             }
         }, activeToken);
     }
@@ -18374,7 +18377,9 @@ document.addEventListener('DOMContentLoaded', async () => {
             if (!change) return false;
             const assertAllowed = () => {
                 if (safeArray(change.requireAllowedLinkIds).some(id => getNanahTrustedLinkMutationState().denied.has(id))) {
-                    throw new Error('This device link was revoked before the change completed. Reload this page, then pair these devices again.');
+                    const error = new Error('This device link was revoked before the change completed. Reload this page, then pair these devices again.');
+                    error.code = 'link_revoked_during_save';
+                    throw error;
                 }
             };
             assertAllowed();
@@ -23291,6 +23296,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                     targetDelivered += liveSent;
                 }
                 if (sendLocal && typeof sendOperation.deliverLocalNetworkPolicyBatch === 'function') {
+                    await markNanahProviderExposure(savedUpdateLinks, 'local_network');
                     const localResult = await sendOperation.deliverLocalNetworkPolicyBatch(
                         policy,
                         savedUpdateLinks,
@@ -23307,6 +23313,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                     failureReason = failureReason || normalizeString(localResult?.reason);
                 }
                 if (sendMailbox && typeof sendOperation.uploadMailboxPolicyBatch === 'function') {
+                    await markNanahProviderExposure(savedUpdateLinks, 'mailbox');
                     const mailboxResult = await sendOperation.uploadMailboxPolicyBatch(
                         policy,
                         savedUpdateLinks,
@@ -23323,6 +23330,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                     failureReason = failureReason || normalizeString(mailboxResult?.reason);
                 }
                 if (sendOutbox && typeof sendOperation.uploadMailboxPolicyBatch === 'function') {
+                    await markNanahProviderExposure(savedUpdateLinks, 'courier');
                     const createdAtMs = Date.now();
                     const outboxResult = await sendOperation.uploadMailboxPolicyBatch(
                         policy,
@@ -23411,11 +23419,26 @@ document.addEventListener('DOMContentLoaded', async () => {
         return summary;
     }
 
-    async function saveNanahTrustedLink(entry, { beforeSave = null } = {}) {
+    async function saveNanahTrustedLink(entry, options = {}) {
+        try {
+            const saved = await saveNanahTrustedLinkChecked(entry, options);
+            if (!saved) refuseNanahTrustWrite('readback_missing');
+            return saved;
+        } catch (error) {
+            const code = normalizeString(error?.code) || 'trust_write_failed';
+            console.warn(`FilterTube: nanah_trust_write_refused reason=${code}`);
+            if (error?.nanahTrustRefusal === true) throw error;
+            throw nanahTrustWriteRefusal(code, error?.message || code);
+        }
+    }
+
+    async function saveNanahTrustedLinkChecked(entry, { beforeSave = null } = {}) {
         const detached = JSON.parse(JSON.stringify(safeObject(entry)));
-        return commitNanahTrustedLinkMutation(async rows => {
+        let repair = null;
+        let trackNewSourceLink = '';
+        const saved = await commitNanahTrustedLinkMutation(async rows => {
         const deviceId = normalizeString(detached.remoteDeviceId);
-        if (!deviceId) return null;
+        if (!deviceId) refuseNanahTrustWrite('missing_remote_device');
         const bindingKey = nanahManagedLinkBindingKey(detached);
         const existingBinding = bindingKey ? rows.map(normalizeNanahTrustedLink)
             .find(current => current && current.localRole === detached.localRole
@@ -23428,7 +23451,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 ? bindingKey !== currentBinding || current.localRole !== detached.localRole || current.remoteRole !== detached.remoteRole
                 : getNanahTrustedLinkIdentityKey(current) !== getNanahTrustedLinkIdentityKey(detached);
         }) : null;
-        if (requestedCollision) throw new Error('This saved link ID belongs to another device or profile. Re-pair these devices.');
+        if (requestedCollision) refuseNanahTrustWrite('link_id_collision', 'This saved link ID belongs to another device or profile. Re-pair these devices.');
         const linkId = existingBinding?.linkId || (bindingKey && (!requestedId || requestedId === `nanah-${deviceId}`)
             ? await buildNanahManagedSharedLinkId(detached) : requestedId || `nanah-${deviceId}`);
         const nextEntry = normalizeNanahTrustedLink({
@@ -23437,7 +23460,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             app: 'filtertube', createdAt: normalizeString(detached.createdAt) || new Date().toISOString(),
             lastUsedAt: new Date().toISOString()
         });
-        if (!nextEntry) return null;
+        if (!nextEntry) refuseNanahTrustWrite('entry_invalid');
         const nextIdentityKey = normalizeString(nextEntry.trustedLinkIdentityKey || nextEntry.identityKey);
         const nextLinkId = normalizeString(nextEntry.linkId);
         const sameLogicalLink = current => {
@@ -23449,7 +23472,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         };
         const collision = rows.map(normalizeNanahTrustedLink)
             .find(current => current && normalizeString(current.linkId) === nextLinkId && !sameLogicalLink(current));
-        if (collision) throw new Error('This saved link ID belongs to another device or profile. Re-pair these devices.');
+        if (collision) refuseNanahTrustWrite('link_id_collision', 'This saved link ID belongs to another device or profile. Re-pair these devices.');
         const existingIndex = rows.findIndex(item => {
             const current = normalizeNanahTrustedLink(item);
             return current && sameLogicalLink(current);
@@ -23458,20 +23481,95 @@ document.addEventListener('DOMContentLoaded', async () => {
             const current = rows[existingIndex];
             // Existing protocol identities, revision assertions and local grants
             // stay with their existing row; re-saving is not a silent migration.
-            if (normalizeString(current.linkId) !== nextLinkId) throw new Error('Remove the old link on both devices and pair again.');
+            if (normalizeString(current.linkId) !== nextLinkId) refuseNanahTrustWrite('existing_link_id_changed', 'Remove the old link on both devices and pair again.');
             rows.splice(existingIndex, 1, { ...current, ...nextEntry,
                 policy: { ...safeObject(current.policy), ...safeObject(nextEntry.policy) } });
         } else {
             rows.unshift(nextEntry);
+            const reservations = nanahLinkReservations();
+            if (reservations && nextEntry.linkType === 'managed_link' && nextEntry.localRole === 'source') {
+                trackNewSourceLink = nextLinkId;
+                // §11: a removed link's reservation holds unless this fresh, confirmed pairing may release it.
+                const removed = safeObject(await readNanahStorage(reservations.REMOVED_KEY));
+                const record = removed[nextLinkId];
+                if (record) {
+                    if (!nanahSessionState.sasConfirmed) refuseNanahTrustWrite('repair_requires_confirmed_phrase');
+                    const decision = reservations.evaluateRepair({ record, ledger: await readNanahStorage(reservations.EXPOSURE_KEY),
+                        currentDigests: currentNanahProviderDigests() });
+                    if (!decision.allowed) refuseNanahTrustWrite(decision.reason);
+                    repair = { record, released: decision.released };
+                    getNanahTrustedLinkMutationState().denied.delete(nextLinkId);
+                }
+            }
         }
         if (getNanahTrustedLinkMutationState().denied.has(nextLinkId)) {
-            throw new Error('This link is blocked on this page. Reload this page, then pair these devices again.');
+            refuseNanahTrustWrite('link_blocked_in_page', 'This link is blocked on this page. Reload this page, then pair these devices again.');
         }
         if (typeof beforeSave === 'function' && await beforeSave(nextEntry) !== true) {
-            throw new Error('The profile or paired device changed before saving parent trust.');
+            refuseNanahTrustWrite('before_save_refused', 'The profile or paired device changed before saving parent trust.');
         }
         return { rows, requireAllowedLinkIds: [nextLinkId], result: committed => committed.find(item => normalizeString(item.linkId) === nextLinkId) || null };
         });
+        const reservations = nanahLinkReservations();
+        if (saved && reservations && trackNewSourceLink) {
+            await writeNanahStorage(reservations.EXPOSURE_KEY,
+                reservations.markTracked(await readNanahStorage(reservations.EXPOSURE_KEY), trackNewSourceLink));
+            if (repair) {
+                const removed = { ...safeObject(await readNanahStorage(reservations.REMOVED_KEY)) };
+                removed[trackNewSourceLink] = reservations.releaseRecord(repair.record, repair.released);
+                await writeNanahStorage(reservations.REMOVED_KEY, removed);
+                console.info(`FilterTube: nanah_repair_released link=${trackNewSourceLink} transports=${repair.released.join(',') || 'none'}`);
+            }
+        }
+        return saved;
+    }
+
+    // Spec §11: every refusal in the trusted-link write has a reason code, logged as
+    // nanah_trust_write_refused, and the pairing screen never shows Trusted or Paired after one.
+    function nanahTrustWriteRefusal(code, message = '') {
+        const error = new Error(message || code);
+        error.code = code;
+        error.nanahTrustRefusal = true;
+        return error;
+    }
+
+    function refuseNanahTrustWrite(code, message = '') {
+        throw nanahTrustWriteRefusal(code, message);
+    }
+
+    function nanahLinkReservations() {
+        return window.FilterTubeManagedLinkReservations || null;
+    }
+
+    function currentNanahProviderDigests() {
+        const reservations = nanahLinkReservations();
+        if (!reservations) return {};
+        const mailbox = safeObject(getNanahManagedMailboxProvider());
+        const local = safeObject(getNanahManagedLocalNetworkProvider());
+        return {
+            mailbox: reservations.configDigest(mailbox.configured === true, mailbox.endpointHost),
+            local_network: reservations.configDigest(local.configured === true, local.endpointHost),
+            courier: reservations.configDigest(true, 'outbox')
+        };
+    }
+
+    /** Records, before any send is prepared, that these links' updates went to `transport` (§11). */
+    async function markNanahProviderExposure(links, transport) {
+        const reservations = nanahLinkReservations();
+        if (!reservations) return;
+        let ledger = await readNanahStorage(reservations.EXPOSURE_KEY);
+        for (const link of safeArray(links)) ledger = reservations.markExposed(ledger, normalizeString(link?.linkId), transport);
+        if (await writeNanahStorage(reservations.EXPOSURE_KEY, ledger) !== true) {
+            throw new Error('Delivery bookkeeping could not be saved. Try again.');
+        }
+    }
+
+    function showNanahTrustWriteRefusal(error, deviceLabel = '') {
+        const code = normalizeString(error?.code) || 'trust_write_failed';
+        const device = normalizeString(deviceLabel) || getNanahRemoteLabel();
+        UIComponents.showToast(code.startsWith('source_link_reserved_')
+            ? tabViewUiText('dashboard.sync.trust.reservedRepair', "The old link to {device} still has updates waiting in Internet or Home Pickup. Set up that Internet or Home Pickup again so they can be removed, then pair again.", { device })
+            : tabViewUiText('dashboard.sync.trust.saveRefused', "Couldn't save the link to {device} ({reason})", { device, reason: code }), 'error');
     }
 
     async function removeNanahTrustedLink(linkId) {
@@ -23484,12 +23582,40 @@ document.addEventListener('DOMContentLoaded', async () => {
             rows: rows.filter(entry => normalizeString(entry?.linkId) !== normalized),
             result: normalizeNanahTrustedLink(rows.find(entry => normalizeString(entry?.linkId) === normalized))
         }));
+        const digestsAtRemoval = typeof currentNanahProviderDigests === 'function' ? currentNanahProviderDigests() : {};
         const mailboxPurgeResult = await purgeNanahManagedMailboxQueueForTrustedLink(removedLink);
         const localNetworkPurgeResult = await purgeNanahManagedLocalNetworkQueueForTrustedLink(removedLink);
         await purgeNanahManagedPolicyStateForTrustedLink(normalized);
         await purgeNanahManagedOpenSyncStateForTrustedLink(normalized);
         await purgeNanahManagedLocalNetworkSyncStateForTrustedLink(normalized);
+        await recordNanahRemovedSourceLink(removedLink, { mailboxPurgeResult, localNetworkPurgeResult, digestsAtRemoval });
         return { mailboxPurgeResult, localNetworkPurgeResult };
+    }
+
+    /** §11: what each transport still holds for a removed source link (the reservation record). */
+    async function recordNanahRemovedSourceLink(link, { mailboxPurgeResult, localNetworkPurgeResult, digestsAtRemoval }) {
+        const reservations = typeof nanahLinkReservations === 'function' ? nanahLinkReservations() : null;
+        const trusted = normalizeNanahTrustedLink(link);
+        if (!reservations || !trusted || trusted.linkType !== 'managed_link' || trusted.localRole !== 'source') return;
+        const linkId = normalizeString(trusted.linkId);
+        // The parent's own outbox: its queued items for this link go now.
+        const dropped = await askNanahBackgroundWorker({ action: 'FilterTube_ManagedOutboxDropLink', linkId });
+        const configured = digest => normalizeString(digest).startsWith('configured:');
+        const purged = result => safeObject(result).ok !== false && !!result;
+        const record = reservations.removalRecord({
+            linkId,
+            removedAt: Date.now(),
+            transports: {
+                mailbox: { configured: configured(digestsAtRemoval.mailbox), ok: configured(digestsAtRemoval.mailbox) && purged(mailboxPurgeResult),
+                    digest: digestsAtRemoval.mailbox, reason: normalizeString(safeObject(mailboxPurgeResult).reason) },
+                local_network: { configured: configured(digestsAtRemoval.local_network),
+                    ok: configured(digestsAtRemoval.local_network) && purged(localNetworkPurgeResult),
+                    digest: digestsAtRemoval.local_network, reason: normalizeString(safeObject(localNetworkPurgeResult).reason) },
+                courier: { configured: true, ok: dropped?.ok === true, digest: digestsAtRemoval.courier }
+            }
+        });
+        const removed = { ...safeObject(await readNanahStorage(reservations.REMOVED_KEY)), [linkId]: record };
+        await writeNanahStorage(reservations.REMOVED_KEY, removed);
     }
 
     function isActiveNanahSourceManagedLink(link) {
@@ -24083,16 +24209,33 @@ document.addEventListener('DOMContentLoaded', async () => {
         deviceAutoSync.schedule();
     }
 
-    function askNanahBackgroundWorker(message) {
+    // The worker is this page's sync engine. If it never answers (stopped, or still starting), each
+    // ask gives up after 15 s and is tried once more, then the caller recovers (the in-page pickup,
+    // or a visible error) instead of waiting forever (Android 997ac7c74 engine watchdog).
+    const NANAH_WORKER_ASK_TIMEOUT_MS = 15000;
+    function askNanahBackgroundWorkerOnce(message, timeoutMs) {
         return new Promise(resolve => {
+            let settled = false;
+            const done = value => { if (!settled) { settled = true; clearTimeout(timer); resolve(value); } };
+            const timer = setTimeout(() => done(undefined), timeoutMs);
             try {
                 if (typeof browser !== 'undefined' && browser.runtime?.sendMessage) {
-                    browser.runtime.sendMessage(message).then(resolve, () => resolve(null));
+                    browser.runtime.sendMessage(message).then(value => done(value ?? null), () => done(null));
                     return;
                 }
-                chrome.runtime.sendMessage(message, result => resolve(chrome.runtime.lastError ? null : result));
-            } catch (_) { resolve(null); }
+                chrome.runtime.sendMessage(message, result => done(chrome.runtime.lastError ? null : (result ?? null)));
+            } catch (_) { done(null); }
         });
+    }
+
+    async function askNanahBackgroundWorker(message, { timeoutMs = NANAH_WORKER_ASK_TIMEOUT_MS } = {}) {
+        const first = await askNanahBackgroundWorkerOnce(message, timeoutMs);
+        if (first !== undefined) return first;
+        console.warn(`FilterTube: sync worker did not answer ${normalizeString(message?.action)}; retrying once`);
+        const second = await askNanahBackgroundWorkerOnce(message, timeoutMs);
+        if (second !== undefined) return second;
+        console.warn(`FilterTube: sync worker unavailable for ${normalizeString(message?.action)}`);
+        return null;
     }
 
     // The pickup itself runs in the background worker (managed_sync_background.js), so it also
@@ -26344,6 +26487,9 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 
     async function resetNanahSession(closeClient = false, options = {}) {
+        // Held peer data belongs to the session being reset (§11 pairing order).
+        nanahInboundGate?.reset();
+        nanahInboundGate = null;
         // A closed link never leaves a live "Connecting…" or "Connected" on the session bar.
         try { reportParentSessionSync(null); } catch (e) { }
         if (closeClient && nanahClient) {
@@ -27937,14 +28083,27 @@ document.addEventListener('DOMContentLoaded', async () => {
             if (nanahClient !== currentClient) return;
             nanahSessionState.connected = true;
             updateNanahUi();
+            nanahInboundGate?.drain();
             try {
                 await sendNanahHelloEnvelope();
             } catch (error) {
                 console.warn('FilterTube: failed to send Nanah hello', error);
             }
         });
+        // §11 pairing order: hold peer data until this side is connected and confirmed the phrase.
+        const inbound = window.FilterTubeNanahInboundGate?.create({
+            isOpen: () => nanahClient === currentClient && nanahSessionState.connected === true && nanahSessionState.sasConfirmed === true,
+            handle: envelope => handleNanahIncomingEnvelope(envelope),
+            onError: (error) => {
+                console.error('FilterTube: failed to handle Nanah envelope', error);
+                if (error?.nanahTrustRefusal === true) { showNanahTrustWriteRefusal(error); updateNanahUi(); return; }
+                UIComponents.showToast(tabViewUiText('dashboard.sync.toast.incomingNanahSyncFailed', 'Failed to process incoming Nanah sync'), 'error');
+            }
+        });
+        nanahInboundGate = inbound || null;
         client.on('data', (envelope) => {
             if (nanahClient !== currentClient) return;
+            if (inbound) { inbound.push(envelope); return; }
             Promise.resolve(handleNanahIncomingEnvelope(envelope)).catch((error) => {
                 console.error('FilterTube: failed to handle Nanah envelope', error);
                 UIComponents.showToast(tabViewUiText('dashboard.sync.toast.incomingNanahSyncFailed', 'Failed to process incoming Nanah sync'), 'error');
@@ -28187,6 +28346,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             }
             return isCurrentNanahManagedTrustSession(trustSession);
         } });
+        // A refused save throws above, so "Paired" or "Managed link saved" never shows for it (§11).
         // Pairing ends with Kriti's jump (Android 4ff67ce1b); a peer link reads "Paired. Plans now sync both ways."
         UIComponents.showToast(linkType === 'managed_link' ? 'Managed link saved' : tabViewUiText('people.paired', 'Paired. Plans now sync both ways.'), 'success');
         { const toast = document.querySelector('.ft-toast'); if (toast) toast.dataset.ftMascot = 'jump'; }
@@ -31756,6 +31916,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                     if (confirmed !== 'confirm') return;
                     await nanahClient.confirmSas();
                     nanahSessionState.sasConfirmed = true;
+                    nanahInboundGate?.drain();
                     reportParentSessionSync(window.FilterTubeParentMode?.SYNC.CONNECTED);
                     void sendNanahHelloEnvelope(true).then(() => sendNanahAutoSyncReadiness()).catch(() => {});
                     void deviceAutoSync?.run({ wake: true }).catch(() => {});
@@ -31928,7 +32089,10 @@ document.addEventListener('DOMContentLoaded', async () => {
                     await trustConnectedNanahDevice();
                 } catch (error) {
                     console.error('FilterTube: failed to trust Nanah device', error);
-                    UIComponents.showToast(error?.message || tabViewUiText('dashboard.sync.toast.trustDeviceFailed', 'Failed to trust device'), 'error');
+                    // §11: a refused trust save says why (a reserved old link, or the reason code).
+                    if (error?.nanahTrustRefusal === true) showNanahTrustWriteRefusal(error);
+                    else UIComponents.showToast(error?.message || tabViewUiText('dashboard.sync.toast.trustDeviceFailed', 'Failed to trust device'), 'error');
+                    updateNanahUi();
                 }
             });
         }

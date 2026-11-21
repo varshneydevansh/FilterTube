@@ -3486,5 +3486,7 @@
   "dashboard.sync.outbox.notAppliedOn": "{device} не применило это обновление ({reason})",
   "dashboard.sync.toast.sourceUnbound": "У этой связи нет исходного профиля. Подключите заново из профиля, правила которого хотите отправлять.",
   "dashboard.sync.toast.sourceMismatch": "Эта связь отправляет правила другого профиля. Выберите тот профиль или подключите заново из этого.",
-  "dashboard.sync.toast.sourceMissing": "Профиля, из которого отправляет эта связь, больше нет на устройстве. Подключите заново из профиля, правила которого хотите отправлять."
+  "dashboard.sync.toast.sourceMissing": "Профиля, из которого отправляет эта связь, больше нет на устройстве. Подключите заново из профиля, правила которого хотите отправлять.",
+  "dashboard.sync.trust.reservedRepair": "У старой связи с {device} ещё остались ожидающие обновления в Internet Pickup или Home Pickup. Снова настройте этот Internet Pickup или Home Pickup, чтобы их удалить, затем подключите заново.",
+  "dashboard.sync.trust.saveRefused": "Не удалось сохранить связь с {device} ({reason})"
 }

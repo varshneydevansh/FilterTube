@@ -3474,5 +3474,7 @@
   "dashboard.sync.outbox.notAppliedOn": "{device} hat dieses Update nicht angewendet ({reason})",
   "dashboard.sync.toast.sourceUnbound": "Diese Verknüpfung hat kein Quellprofil. Kopple erneut vom Profil, dessen Regeln du senden willst.",
   "dashboard.sync.toast.sourceMismatch": "Diese Verknüpfung sendet die Regeln eines anderen Profils. Wähle dieses Profil oder kopple erneut von diesem.",
-  "dashboard.sync.toast.sourceMissing": "Das Profil, von dem diese Verknüpfung sendet, gibt es auf diesem Gerät nicht mehr. Kopple erneut vom Profil, dessen Regeln du senden willst."
+  "dashboard.sync.toast.sourceMissing": "Das Profil, von dem diese Verknüpfung sendet, gibt es auf diesem Gerät nicht mehr. Kopple erneut vom Profil, dessen Regeln du senden willst.",
+  "dashboard.sync.trust.reservedRepair": "Die alte Verknüpfung mit {device} hat noch wartende Updates in Internet Pickup oder Home Pickup. Richte dieses Internet Pickup oder Home Pickup erneut ein, damit sie entfernt werden können, und kopple dann erneut.",
+  "dashboard.sync.trust.saveRefused": "Die Verknüpfung mit {device} konnte nicht gespeichert werden ({reason})"
 }

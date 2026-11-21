@@ -3474,5 +3474,7 @@
   "dashboard.sync.outbox.notAppliedOn": "{device} એ આ અપડેટ લાગુ કર્યું નથી ({reason})",
   "dashboard.sync.toast.sourceUnbound": "આ લિંકમાં કોઈ સ્રોત પ્રોફાઇલ નથી. જે પ્રોફાઇલના નિયમો મોકલવા છે ત્યાંથી ફરી જોડો.",
   "dashboard.sync.toast.sourceMismatch": "આ લિંક બીજી પ્રોફાઇલના નિયમો મોકલે છે. તે પ્રોફાઇલ પસંદ કરો, અથવા આ પ્રોફાઇલથી ફરી જોડો.",
-  "dashboard.sync.toast.sourceMissing": "આ લિંક જે પ્રોફાઇલમાંથી મોકલે છે તે હવે આ ડિવાઇસ પર નથી. જે પ્રોફાઇલના નિયમો મોકલવા છે ત્યાંથી ફરી જોડો."
+  "dashboard.sync.toast.sourceMissing": "આ લિંક જે પ્રોફાઇલમાંથી મોકલે છે તે હવે આ ડિવાઇસ પર નથી. જે પ્રોફાઇલના નિયમો મોકલવા છે ત્યાંથી ફરી જોડો.",
+  "dashboard.sync.trust.reservedRepair": "{device} સાથેની જૂની લિંકના અપડેટ હજી Internet Pickup અથવા Home Pickup માં રાહ જુએ છે. તેમને દૂર કરવા તે જ Internet Pickup અથવા Home Pickup ફરી સેટ કરો, પછી ફરી જોડો.",
+  "dashboard.sync.trust.saveRefused": "{device} સાથેની લિંક સાચવી શકાઈ નહીં ({reason})"
 }

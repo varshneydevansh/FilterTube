@@ -3474,5 +3474,7 @@
   "dashboard.sync.outbox.notAppliedOn": "{device} ಈ ಅಪ್‌ಡೇಟ್ ಅನ್ವಯಿಸಲಿಲ್ಲ ({reason})",
   "dashboard.sync.toast.sourceUnbound": "ಈ ಲಿಂಕ್‌ಗೆ ಮೂಲ ಪ್ರೊಫೈಲ್ ಇಲ್ಲ. ಯಾವ ಪ್ರೊಫೈಲ್‌ನ ನಿಯಮಗಳನ್ನು ಕಳುಹಿಸಬೇಕೋ ಅದರಿಂದ ಮತ್ತೆ ಜೋಡಿಸಿ.",
   "dashboard.sync.toast.sourceMismatch": "ಈ ಲಿಂಕ್ ಬೇರೆ ಪ್ರೊಫೈಲ್‌ನ ನಿಯಮಗಳನ್ನು ಕಳುಹಿಸುತ್ತದೆ. ಆ ಪ್ರೊಫೈಲ್ ಆಯ್ಕೆಮಾಡಿ, ಅಥವಾ ಇದರಿಂದ ಮತ್ತೆ ಜೋಡಿಸಿ.",
-  "dashboard.sync.toast.sourceMissing": "ಈ ಲಿಂಕ್ ಕಳುಹಿಸುವ ಪ್ರೊಫೈಲ್ ಈ ಸಾಧನದಲ್ಲಿ ಈಗ ಇಲ್ಲ. ಯಾವ ಪ್ರೊಫೈಲ್‌ನ ನಿಯಮಗಳನ್ನು ಕಳುಹಿಸಬೇಕೋ ಅದರಿಂದ ಮತ್ತೆ ಜೋಡಿಸಿ."
+  "dashboard.sync.toast.sourceMissing": "ಈ ಲಿಂಕ್ ಕಳುಹಿಸುವ ಪ್ರೊಫೈಲ್ ಈ ಸಾಧನದಲ್ಲಿ ಈಗ ಇಲ್ಲ. ಯಾವ ಪ್ರೊಫೈಲ್‌ನ ನಿಯಮಗಳನ್ನು ಕಳುಹಿಸಬೇಕೋ ಅದರಿಂದ ಮತ್ತೆ ಜೋಡಿಸಿ.",
+  "dashboard.sync.trust.reservedRepair": "{device} ಜೊತೆಗಿನ ಹಳೆಯ ಲಿಂಕ್‌ನ ಅಪ್‌ಡೇಟ್‌ಗಳು ಇನ್ನೂ Internet Pickup ಅಥವಾ Home Pickup ನಲ್ಲಿ ಕಾಯುತ್ತಿವೆ. ಅವುಗಳನ್ನು ತೆಗೆದುಹಾಕಲು ಅದೇ Internet Pickup ಅಥವಾ Home Pickup ಅನ್ನು ಮತ್ತೆ ಹೊಂದಿಸಿ, ನಂತರ ಮತ್ತೆ ಜೋಡಿಸಿ.",
+  "dashboard.sync.trust.saveRefused": "{device} ಲಿಂಕ್ ಉಳಿಸಲು ಆಗಲಿಲ್ಲ ({reason})"
 }

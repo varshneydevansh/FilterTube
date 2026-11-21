@@ -3474,5 +3474,7 @@
   "dashboard.sync.outbox.notAppliedOn": "{device} didn't apply this update ({reason})",
   "dashboard.sync.toast.sourceUnbound": "This link has no source profile. Pair again from the profile whose rules you want to send.",
   "dashboard.sync.toast.sourceMismatch": "This link sends another profile's rules. Choose that profile, or pair again from this one.",
-  "dashboard.sync.toast.sourceMissing": "The profile this link sends from no longer exists on this device. Pair again from the profile whose rules you want to send."
+  "dashboard.sync.toast.sourceMissing": "The profile this link sends from no longer exists on this device. Pair again from the profile whose rules you want to send.",
+  "dashboard.sync.trust.reservedRepair": "The old link to {device} still has updates waiting in Internet or Home Pickup. Set up that Internet or Home Pickup again so they can be removed, then pair again.",
+  "dashboard.sync.trust.saveRefused": "Couldn't save the link to {device} ({reason})"
 }

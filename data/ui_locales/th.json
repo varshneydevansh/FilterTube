@@ -3472,5 +3472,7 @@
   "dashboard.sync.outbox.notAppliedOn": "{device} ไม่ได้ใช้การอัปเดตนี้ ({reason})",
   "dashboard.sync.toast.sourceUnbound": "ลิงก์นี้ไม่มีโปรไฟล์ต้นทาง โปรดจับคู่ใหม่จากโปรไฟล์ที่ต้องการส่งกฎ",
   "dashboard.sync.toast.sourceMismatch": "ลิงก์นี้ส่งกฎของโปรไฟล์อื่น โปรดเลือกโปรไฟล์นั้น หรือจับคู่ใหม่จากโปรไฟล์นี้",
-  "dashboard.sync.toast.sourceMissing": "โปรไฟล์ที่ลิงก์นี้ส่งจากไม่มีในอุปกรณ์นี้แล้ว โปรดจับคู่ใหม่จากโปรไฟล์ที่ต้องการส่งกฎ"
+  "dashboard.sync.toast.sourceMissing": "โปรไฟล์ที่ลิงก์นี้ส่งจากไม่มีในอุปกรณ์นี้แล้ว โปรดจับคู่ใหม่จากโปรไฟล์ที่ต้องการส่งกฎ",
+  "dashboard.sync.trust.reservedRepair": "ลิงก์เก่ากับ {device} ยังมีอัปเดตรออยู่ใน Internet Pickup หรือ Home Pickup โปรดตั้งค่า Internet Pickup หรือ Home Pickup นั้นใหม่เพื่อให้ลบออกได้ แล้วจับคู่อีกครั้ง",
+  "dashboard.sync.trust.saveRefused": "บันทึกลิงก์กับ {device} ไม่ได้ ({reason})"
 }

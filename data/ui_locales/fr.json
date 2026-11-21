@@ -3474,5 +3474,7 @@
   "dashboard.sync.outbox.notAppliedOn": "{device} n’a pas appliqué cette mise à jour ({reason})",
   "dashboard.sync.toast.sourceUnbound": "Ce lien n’a pas de profil source. Associe à nouveau depuis le profil dont tu veux envoyer les règles.",
   "dashboard.sync.toast.sourceMismatch": "Ce lien envoie les règles d’un autre profil. Choisis ce profil, ou associe à nouveau depuis celui-ci.",
-  "dashboard.sync.toast.sourceMissing": "Le profil d’où ce lien envoie n’existe plus sur cet appareil. Associe à nouveau depuis le profil dont tu veux envoyer les règles."
+  "dashboard.sync.toast.sourceMissing": "Le profil d’où ce lien envoie n’existe plus sur cet appareil. Associe à nouveau depuis le profil dont tu veux envoyer les règles.",
+  "dashboard.sync.trust.reservedRepair": "L’ancien lien avec {device} a encore des mises à jour en attente dans Internet Pickup ou Home Pickup. Configure de nouveau cet Internet Pickup ou Home Pickup pour pouvoir les supprimer, puis associe à nouveau.",
+  "dashboard.sync.trust.saveRefused": "Impossible d’enregistrer le lien avec {device} ({reason})"
 }

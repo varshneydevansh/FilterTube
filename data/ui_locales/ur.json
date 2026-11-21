@@ -3474,5 +3474,7 @@
   "dashboard.sync.outbox.notAppliedOn": "{device} نے یہ اپ ڈیٹ لاگو نہیں کی ({reason})",
   "dashboard.sync.toast.sourceUnbound": "اس لنک کی کوئی ماخذ پروفائل نہیں۔ جس پروفائل کے اصول بھیجنے ہیں اس سے دوبارہ جوڑیں۔",
   "dashboard.sync.toast.sourceMismatch": "یہ لنک کسی اور پروفائل کے اصول بھیجتا ہے۔ وہ پروفائل منتخب کریں، یا اس پروفائل سے دوبارہ جوڑیں۔",
-  "dashboard.sync.toast.sourceMissing": "جس پروفائل سے یہ لنک بھیجتا ہے وہ اب اس ڈیوائس پر نہیں۔ جس پروفائل کے اصول بھیجنے ہیں اس سے دوبارہ جوڑیں۔"
+  "dashboard.sync.toast.sourceMissing": "جس پروفائل سے یہ لنک بھیجتا ہے وہ اب اس ڈیوائس پر نہیں۔ جس پروفائل کے اصول بھیجنے ہیں اس سے دوبارہ جوڑیں۔",
+  "dashboard.sync.trust.reservedRepair": "{device} کے پرانے لنک کی اپ ڈیٹس ابھی Internet Pickup یا Home Pickup میں رکی ہیں۔ انہیں ہٹانے کے لیے وہی Internet Pickup یا Home Pickup دوبارہ سیٹ اپ کریں، پھر دوبارہ جوڑیں۔",
+  "dashboard.sync.trust.saveRefused": "{device} کا لنک محفوظ نہیں ہو سکا ({reason})"
 }

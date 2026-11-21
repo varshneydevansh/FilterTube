@@ -3474,5 +3474,7 @@
   "dashboard.sync.outbox.notAppliedOn": "{device} não aplicou esta atualização ({reason})",
   "dashboard.sync.toast.sourceUnbound": "Esta ligação não tem perfil de origem. Emparelha de novo a partir do perfil cujas regras queres enviar.",
   "dashboard.sync.toast.sourceMismatch": "Esta ligação envia as regras de outro perfil. Escolhe esse perfil ou emparelha de novo a partir deste.",
-  "dashboard.sync.toast.sourceMissing": "O perfil de onde esta ligação envia já não existe neste dispositivo. Emparelha de novo a partir do perfil cujas regras queres enviar."
+  "dashboard.sync.toast.sourceMissing": "O perfil de onde esta ligação envia já não existe neste dispositivo. Emparelha de novo a partir do perfil cujas regras queres enviar.",
+  "dashboard.sync.trust.reservedRepair": "A ligação antiga com {device} ainda tem atualizações à espera no Internet Pickup ou Home Pickup. Configura de novo esse Internet Pickup ou Home Pickup para as poder remover e depois emparelha outra vez.",
+  "dashboard.sync.trust.saveRefused": "Não foi possível guardar a ligação com {device} ({reason})"
 }

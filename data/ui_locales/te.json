@@ -3474,5 +3474,7 @@
   "dashboard.sync.outbox.notAppliedOn": "{device} ఈ అప్‌డేట్‌ను వర్తింపజేయలేదు ({reason})",
   "dashboard.sync.toast.sourceUnbound": "ఈ లింక్‌కు మూల ప్రొఫైల్ లేదు. ఏ ప్రొఫైల్ నియమాలు పంపాలో ఆ ప్రొఫైల్ నుండి మళ్లీ జత చేయండి.",
   "dashboard.sync.toast.sourceMismatch": "ఈ లింక్ మరో ప్రొఫైల్ నియమాలను పంపుతుంది. ఆ ప్రొఫైల్‌ను ఎంచుకోండి, లేదా దీని నుండి మళ్లీ జత చేయండి.",
-  "dashboard.sync.toast.sourceMissing": "ఈ లింక్ పంపే ప్రొఫైల్ ఇప్పుడు ఈ పరికరంలో లేదు. ఏ ప్రొఫైల్ నియమాలు పంపాలో ఆ ప్రొఫైల్ నుండి మళ్లీ జత చేయండి."
+  "dashboard.sync.toast.sourceMissing": "ఈ లింక్ పంపే ప్రొఫైల్ ఇప్పుడు ఈ పరికరంలో లేదు. ఏ ప్రొఫైల్ నియమాలు పంపాలో ఆ ప్రొఫైల్ నుండి మళ్లీ జత చేయండి.",
+  "dashboard.sync.trust.reservedRepair": "{device}తో పాత లింక్ అప్‌డేట్‌లు ఇంకా Internet Pickup లేదా Home Pickupలో వేచి ఉన్నాయి. వాటిని తొలగించేందుకు అదే Internet Pickup లేదా Home Pickupను మళ్లీ సెటప్ చేసి, ఆపై మళ్లీ జత చేయండి.",
+  "dashboard.sync.trust.saveRefused": "{device} లింక్‌ను సేవ్ చేయలేకపోయాం ({reason})"
 }

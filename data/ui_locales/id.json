@@ -3472,5 +3472,7 @@
   "dashboard.sync.outbox.notAppliedOn": "{device} tidak menerapkan pembaruan ini ({reason})",
   "dashboard.sync.toast.sourceUnbound": "Tautan ini tidak punya profil sumber. Pasangkan ulang dari profil yang aturannya ingin kamu kirim.",
   "dashboard.sync.toast.sourceMismatch": "Tautan ini mengirim aturan profil lain. Pilih profil itu, atau pasangkan ulang dari profil ini.",
-  "dashboard.sync.toast.sourceMissing": "Profil sumber tautan ini sudah tidak ada di perangkat ini. Pasangkan ulang dari profil yang aturannya ingin kamu kirim."
+  "dashboard.sync.toast.sourceMissing": "Profil sumber tautan ini sudah tidak ada di perangkat ini. Pasangkan ulang dari profil yang aturannya ingin kamu kirim.",
+  "dashboard.sync.trust.reservedRepair": "Tautan lama ke {device} masih punya pembaruan yang menunggu di Internet Pickup atau Home Pickup. Siapkan lagi Internet Pickup atau Home Pickup itu agar bisa dihapus, lalu pasangkan ulang.",
+  "dashboard.sync.trust.saveRefused": "Tidak bisa menyimpan tautan ke {device} ({reason})"
 }

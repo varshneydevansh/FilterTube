@@ -3474,5 +3474,7 @@
   "dashboard.sync.outbox.notAppliedOn": "{device} ने यह अपडेट लागू नहीं किया ({reason})",
   "dashboard.sync.toast.sourceUnbound": "इस लिंक का कोई स्रोत प्रोफ़ाइल नहीं है। जिस प्रोफ़ाइल के नियम भेजने हैं, उससे फिर से पेयर करें।",
   "dashboard.sync.toast.sourceMismatch": "यह लिंक किसी दूसरी प्रोफ़ाइल के नियम भेजता है। वह प्रोफ़ाइल चुनें, या इस प्रोफ़ाइल से फिर से पेयर करें।",
-  "dashboard.sync.toast.sourceMissing": "जिस प्रोफ़ाइल से यह लिंक भेजता है, वह अब इस डिवाइस पर नहीं है। जिस प्रोफ़ाइल के नियम भेजने हैं, उससे फिर से पेयर करें।"
+  "dashboard.sync.toast.sourceMissing": "जिस प्रोफ़ाइल से यह लिंक भेजता है, वह अब इस डिवाइस पर नहीं है। जिस प्रोफ़ाइल के नियम भेजने हैं, उससे फिर से पेयर करें।",
+  "dashboard.sync.trust.reservedRepair": "{device} के पुराने लिंक के अपडेट अभी भी Internet Pickup या Home Pickup में रुके हैं। उन्हें हटाने के लिए वही Internet Pickup या Home Pickup फिर से सेट अप करें, फिर दोबारा पेयर करें।",
+  "dashboard.sync.trust.saveRefused": "{device} का लिंक सेव नहीं हो सका ({reason})"
 }

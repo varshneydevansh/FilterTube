@@ -3474,5 +3474,7 @@
   "dashboard.sync.outbox.notAppliedOn": "{device} এই আপডেট প্রয়োগ করেনি ({reason})",
   "dashboard.sync.toast.sourceUnbound": "এই লিংকের কোনো উৎস প্রোফাইল নেই। যে প্রোফাইলের নিয়ম পাঠাতে চান, সেখান থেকে আবার পেয়ার করুন।",
   "dashboard.sync.toast.sourceMismatch": "এই লিংক অন্য একটি প্রোফাইলের নিয়ম পাঠায়। সেই প্রোফাইল বেছে নিন, অথবা এটি থেকে আবার পেয়ার করুন।",
-  "dashboard.sync.toast.sourceMissing": "এই লিংক যে প্রোফাইল থেকে পাঠায় সেটি আর এই ডিভাইসে নেই। যে প্রোফাইলের নিয়ম পাঠাতে চান, সেখান থেকে আবার পেয়ার করুন।"
+  "dashboard.sync.toast.sourceMissing": "এই লিংক যে প্রোফাইল থেকে পাঠায় সেটি আর এই ডিভাইসে নেই। যে প্রোফাইলের নিয়ম পাঠাতে চান, সেখান থেকে আবার পেয়ার করুন।",
+  "dashboard.sync.trust.reservedRepair": "{device}-এর পুরোনো লিংকের আপডেট এখনও Internet Pickup বা Home Pickup-এ অপেক্ষায় আছে। সেগুলো মুছতে সেই Internet Pickup বা Home Pickup আবার সেট আপ করুন, তারপর আবার পেয়ার করুন।",
+  "dashboard.sync.trust.saveRefused": "{device}-এর লিংক সংরক্ষণ করা যায়নি ({reason})"
 }

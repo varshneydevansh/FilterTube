@@ -3474,5 +3474,7 @@
   "dashboard.sync.outbox.notAppliedOn": "{device} ይህን ዝማኔ አልተገበረም ({reason})",
   "dashboard.sync.toast.sourceUnbound": "ይህ ግንኙነት የምንጭ መገለጫ የለውም። ደንቦቹን መላክ ከሚፈልጉት መገለጫ እንደገና ያጣምሩ።",
   "dashboard.sync.toast.sourceMismatch": "ይህ ግንኙነት የሌላ መገለጫ ደንቦችን ይልካል። ያንን መገለጫ ይምረጡ፣ ወይም ከዚህ እንደገና ያጣምሩ።",
-  "dashboard.sync.toast.sourceMissing": "ይህ ግንኙነት የሚልክበት መገለጫ በዚህ መሣሪያ ላይ የለም። ደንቦቹን መላክ ከሚፈልጉት መገለጫ እንደገና ያጣምሩ።"
+  "dashboard.sync.toast.sourceMissing": "ይህ ግንኙነት የሚልክበት መገለጫ በዚህ መሣሪያ ላይ የለም። ደንቦቹን መላክ ከሚፈልጉት መገለጫ እንደገና ያጣምሩ።",
+  "dashboard.sync.trust.reservedRepair": "ከ{device} ጋር ያለው የቀድሞ ግንኙነት በInternet Pickup ወይም Home Pickup ውስጥ የሚጠብቁ ዝማኔዎች አሉት። እንዲወገዱ ያንን Internet Pickup ወይም Home Pickup እንደገና ያዋቅሩ፣ ከዚያ እንደገና ያጣምሩ።",
+  "dashboard.sync.trust.saveRefused": "ከ{device} ጋር ያለውን ግንኙነት ማስቀመጥ አልተቻለም ({reason})"
 }

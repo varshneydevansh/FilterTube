@@ -3474,5 +3474,7 @@
   "dashboard.sync.outbox.notAppliedOn": "{device} no aplicó esta actualización ({reason})",
   "dashboard.sync.toast.sourceUnbound": "Este vínculo no tiene perfil de origen. Vuelve a vincular desde el perfil cuyas reglas quieres enviar.",
   "dashboard.sync.toast.sourceMismatch": "Este vínculo envía las reglas de otro perfil. Elige ese perfil o vuelve a vincular desde este.",
-  "dashboard.sync.toast.sourceMissing": "El perfil desde el que envía este vínculo ya no existe en este dispositivo. Vuelve a vincular desde el perfil cuyas reglas quieres enviar."
+  "dashboard.sync.toast.sourceMissing": "El perfil desde el que envía este vínculo ya no existe en este dispositivo. Vuelve a vincular desde el perfil cuyas reglas quieres enviar.",
+  "dashboard.sync.trust.reservedRepair": "El vínculo anterior con {device} aún tiene actualizaciones en espera en Internet Pickup o Home Pickup. Vuelve a configurar ese Internet Pickup o Home Pickup para poder eliminarlas y luego vincula de nuevo.",
+  "dashboard.sync.trust.saveRefused": "No se pudo guardar el vínculo con {device} ({reason})"
 }

@@ -3498,5 +3498,7 @@
   "dashboard.sync.outbox.notAppliedOn": "لم يطبّق {device} هذا التحديث ({reason})",
   "dashboard.sync.toast.sourceUnbound": "لا يوجد ملف مصدر لهذا الربط. أعد الإقران من الملف الذي تريد إرسال قواعده.",
   "dashboard.sync.toast.sourceMismatch": "يرسل هذا الربط قواعد ملف آخر. اختر ذلك الملف، أو أعد الإقران من هذا الملف.",
-  "dashboard.sync.toast.sourceMissing": "لم يعد الملف الذي يرسل منه هذا الربط موجودًا على هذا الجهاز. أعد الإقران من الملف الذي تريد إرسال قواعده."
+  "dashboard.sync.toast.sourceMissing": "لم يعد الملف الذي يرسل منه هذا الربط موجودًا على هذا الجهاز. أعد الإقران من الملف الذي تريد إرسال قواعده.",
+  "dashboard.sync.trust.reservedRepair": "لا يزال للربط القديم مع {device} تحديثات منتظرة في Internet Pickup أو Home Pickup. أعد إعداد Internet Pickup أو Home Pickup ذلك لإزالتها، ثم أعد الإقران.",
+  "dashboard.sync.trust.saveRefused": "تعذّر حفظ الربط مع {device} ({reason})"
 }

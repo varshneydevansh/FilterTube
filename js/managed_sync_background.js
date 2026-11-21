@@ -543,6 +543,13 @@
                 void reconcile('outbox').then(() => ringQueued({ linkIds: rows.map(row => row.linkId), force: true })).catch(() => null);
                 return { ok: true, uploadedMailboxItemIds: rows.map(row => row.entryId) };
             }
+            if (action === 'FilterTube_ManagedOutboxDropLink' && trusted) {
+                // A removed link's queued items go, so a later pairing can never deliver them (§11).
+                const linkId = str(request.linkId);
+                if (!linkId) return { ok: false };
+                await mutateOutbox(box => ({ outbox: { version: 1, entries: box.entries.filter(entry => entry.linkId !== linkId) } }));
+                return { ok: true };
+            }
             if (action === 'FilterTube_CourierClaim' && trusted) {
                 const job = jobs.get(str(request.jobId));
                 if (!job || job.claimed) return { ok: false };
@@ -573,7 +580,7 @@
             event.addListener(fn);
             listeners.push([event, fn]);
         }
-        const ACTIONS = new Set(['FilterTube_ManagedPickupNow', 'FilterTube_ManagedOutboxEnqueue', 'FilterTube_CourierClaim',
+        const ACTIONS = new Set(['FilterTube_ManagedPickupNow', 'FilterTube_ManagedOutboxEnqueue', 'FilterTube_ManagedOutboxDropLink', 'FilterTube_CourierClaim',
             'FilterTube_CourierHosting', 'FilterTube_CourierItems', 'FilterTube_CourierDone']);
         listen(api.runtime.onMessage, (request, sender, sendResponse) => {
             // Exactly these actions; every other message stays with background.js's own listeners.

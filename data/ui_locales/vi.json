@@ -3472,5 +3472,7 @@
   "dashboard.sync.outbox.notAppliedOn": "{device} không áp dụng bản cập nhật này ({reason})",
   "dashboard.sync.toast.sourceUnbound": "Liên kết này không có hồ sơ nguồn. Hãy ghép nối lại từ hồ sơ có quy tắc bạn muốn gửi.",
   "dashboard.sync.toast.sourceMismatch": "Liên kết này gửi quy tắc của hồ sơ khác. Hãy chọn hồ sơ đó, hoặc ghép nối lại từ hồ sơ này.",
-  "dashboard.sync.toast.sourceMissing": "Hồ sơ mà liên kết này gửi từ đó không còn trên thiết bị. Hãy ghép nối lại từ hồ sơ có quy tắc bạn muốn gửi."
+  "dashboard.sync.toast.sourceMissing": "Hồ sơ mà liên kết này gửi từ đó không còn trên thiết bị. Hãy ghép nối lại từ hồ sơ có quy tắc bạn muốn gửi.",
+  "dashboard.sync.trust.reservedRepair": "Liên kết cũ với {device} vẫn còn bản cập nhật đang chờ trong Internet Pickup hoặc Home Pickup. Hãy thiết lập lại Internet Pickup hoặc Home Pickup đó để có thể xóa chúng, rồi ghép nối lại.",
+  "dashboard.sync.trust.saveRefused": "Không thể lưu liên kết với {device} ({reason})"
 }

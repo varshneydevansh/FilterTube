@@ -3472,5 +3472,7 @@
   "dashboard.sync.outbox.notAppliedOn": "{device} 没有应用此更新（{reason}）",
   "dashboard.sync.toast.sourceUnbound": "此连接没有来源配置文件。请从要发送其规则的配置文件重新配对。",
   "dashboard.sync.toast.sourceMismatch": "此连接发送的是另一个配置文件的规则。请选择那个配置文件，或从当前配置文件重新配对。",
-  "dashboard.sync.toast.sourceMissing": "此连接的来源配置文件已不在这台设备上。请从要发送其规则的配置文件重新配对。"
+  "dashboard.sync.toast.sourceMissing": "此连接的来源配置文件已不在这台设备上。请从要发送其规则的配置文件重新配对。",
+  "dashboard.sync.trust.reservedRepair": "与 {device} 的旧连接在 Internet Pickup 或 Home Pickup 中仍有待处理的更新。请重新设置该 Internet Pickup 或 Home Pickup，以便清除它们，然后再次配对。",
+  "dashboard.sync.trust.saveRefused": "无法保存与 {device} 的连接（{reason}）"
 }

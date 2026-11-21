@@ -3498,5 +3498,7 @@
   "dashboard.sync.outbox.notAppliedOn": "{device} ما طبّق التحديث ده ({reason})",
   "dashboard.sync.toast.sourceUnbound": "الربط ده ما عندو ملف مصدر. اربط تاني من الملف الدايرة تبعت قواعدو.",
   "dashboard.sync.toast.sourceMismatch": "الربط ده بيبعت قواعد ملف تاني. اختار الملف داك، أو اربط تاني من ده.",
-  "dashboard.sync.toast.sourceMissing": "الملف البيبعت منو الربط ده ما بقى موجود في الجهاز ده. اربط تاني من الملف الدايرة تبعت قواعدو."
+  "dashboard.sync.toast.sourceMissing": "الملف البيبعت منو الربط ده ما بقى موجود في الجهاز ده. اربط تاني من الملف الدايرة تبعت قواعدو.",
+  "dashboard.sync.trust.reservedRepair": "الربط القديم مع {device} لسه عندو تحديثات مستنية في Internet Pickup أو Home Pickup. جهّز Internet Pickup أو Home Pickup داك تاني عشان تتشال، وبعدين اربط تاني.",
+  "dashboard.sync.trust.saveRefused": "ما قدرنا نحفظ الربط مع {device} ({reason})"
 }

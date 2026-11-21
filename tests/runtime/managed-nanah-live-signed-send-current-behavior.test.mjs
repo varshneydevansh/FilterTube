@@ -291,7 +291,8 @@ test('managed trusted links are profile scoped and connected target fanout is bo
   assert.match(tabView, /const existingIndex = rows\.findIndex\(item => \{/);
   assert.match(tabView, /return current && sameLogicalLink\(current\)/);
   assert.match(tabView, /nanahManagedLinkBindingKey\(current\) === bindingKey/);
-  assert.match(tabView, /if \(requestedCollision\) throw new Error/);
+  // Spec §11 (updated on purpose): the collision is still refused, now with a reason code.
+  assert.match(tabView, /if \(requestedCollision\) refuseNanahTrustWrite\('link_id_collision'/);
   assert.match(tabView, /function getNanahManagedDuplicateDeviceIds\(sourceDeviceId, trustedLinkId, targetProfileId = '', sourceProfileId = ''\)/);
   assert.match(tabView, /if \(candidateTargetProfileId !== currentTargetProfileId\) return false/);
   assert.match(tabView, /pinnedParentId === candidateParentId/);

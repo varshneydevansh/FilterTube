@@ -3474,5 +3474,7 @@
   "dashboard.sync.outbox.notAppliedOn": "{device} نے ایہ اپڈیٹ لاگو نئیں کیتی ({reason})",
   "dashboard.sync.toast.sourceUnbound": "ایس لنک دی کوئی سرچشمہ پروفائل نئیں۔ جس پروفائل دے اصول گھلنے نیں اوس توں فیر جوڑو۔",
   "dashboard.sync.toast.sourceMismatch": "ایہ لنک کسے ہور پروفائل دے اصول گھلدا اے۔ اوہ پروفائل چنو، یا ایس توں فیر جوڑو۔",
-  "dashboard.sync.toast.sourceMissing": "جس پروفائل توں ایہ لنک گھلدا اے اوہ ہن ایس ڈیوائس تے نئیں۔ جس پروفائل دے اصول گھلنے نیں اوس توں فیر جوڑو۔"
+  "dashboard.sync.toast.sourceMissing": "جس پروفائل توں ایہ لنک گھلدا اے اوہ ہن ایس ڈیوائس تے نئیں۔ جس پروفائل دے اصول گھلنے نیں اوس توں فیر جوڑو۔",
+  "dashboard.sync.trust.reservedRepair": "{device} نال پرانے لنک دیاں اپڈیٹاں حالے Internet Pickup یا Home Pickup وچ اڈیک رہیاں نیں۔ اوہناں نوں ہٹان لئی اوہی Internet Pickup یا Home Pickup فیر سیٹ کرو، فیر دوبارہ جوڑو۔",
+  "dashboard.sync.trust.saveRefused": "{device} دا لنک محفوظ نئیں ہو سکیا ({reason})"
 }

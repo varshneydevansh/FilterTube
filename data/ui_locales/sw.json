@@ -3474,5 +3474,7 @@
   "dashboard.sync.outbox.notAppliedOn": "{device} haikutumia sasisho hili ({reason})",
   "dashboard.sync.toast.sourceUnbound": "Kiungo hiki hakina wasifu wa chanzo. Unganisha upya kutoka kwenye wasifu ambao sheria zake unataka kutuma.",
   "dashboard.sync.toast.sourceMismatch": "Kiungo hiki kinatuma sheria za wasifu mwingine. Chagua wasifu huo, au unganisha upya kutoka kwenye huu.",
-  "dashboard.sync.toast.sourceMissing": "Wasifu ambao kiungo hiki kinatuma kutoka kwake haupo tena kwenye kifaa hiki. Unganisha upya kutoka kwenye wasifu ambao sheria zake unataka kutuma."
+  "dashboard.sync.toast.sourceMissing": "Wasifu ambao kiungo hiki kinatuma kutoka kwake haupo tena kwenye kifaa hiki. Unganisha upya kutoka kwenye wasifu ambao sheria zake unataka kutuma.",
+  "dashboard.sync.trust.reservedRepair": "Kiungo cha zamani cha {device} bado kina masasisho yanayosubiri kwenye Internet Pickup au Home Pickup. Weka upya Internet Pickup au Home Pickup hiyo ili yaondolewe, kisha unganisha tena.",
+  "dashboard.sync.trust.saveRefused": "Imeshindwa kuhifadhi kiungo cha {device} ({reason})"
 }
