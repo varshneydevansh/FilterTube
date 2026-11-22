@@ -162,9 +162,9 @@
         return Number.isFinite(until) ? Math.max(0, Math.ceil((until - at) / MINUTE)) : null;
     }
 
-    function openOptions() {
+    function openOptions(path = 'html/tab-view.html#study') {
         const api = runtime();
-        const url = api?.runtime?.getURL ? api.runtime.getURL('html/tab-view.html#study') : 'html/tab-view.html#study';
+        const url = api?.runtime?.getURL ? api.runtime.getURL(path) : path;
         try {
             const tabs = api?.tabs;
             if (tabs?.create) {
@@ -254,6 +254,39 @@
         host.append(copy, actions);
     }
 
+    /** The dashboard's plan editor (tab-view reads view=study; the Study page opens its plan for section=plan). */
+    const PLAN_EDITOR_PATH = 'html/tab-view.html?view=study&section=plan';
+
+    /**
+     * The popup's "Study today": today's plan as a read-only day bar, and "Edit in dashboard", which opens
+     * the one editor (DESIGN_PASS_2026-11-21 §4 decision 3). A child sees the bar without Edit (the
+     * dashboard needs a parent's PIN). Drawn again only when the plan or the minute changes.
+     */
+    function renderPopupPlan(host, state) {
+        if (!host) return;
+        const value = object(state);
+        const study = object(value.study);
+        const plan = study.plan && typeof study.plan === 'object' ? study.plan : null;
+        const minute = Math.floor(Date.now() / 60000);
+        const key = plan ? JSON.stringify([plan, study.focus || {}, study.breakMode || '', !!value.isChild, minute, root.FilterTubeUiLocalization?.locale || '']) : '';
+        if (host.dataset.ftPlanKey === key) return;
+        host.dataset.ftPlanKey = key;
+        host.hidden = !plan;
+        host.replaceChildren();
+        if (!plan) return;
+        const head = el('div', 'ft-study-popup-plan__head');
+        head.appendChild(el('span', 'ft-study-popup-plan__title', t('home.study.title', 'Study today')));
+        if (!value.isChild) {
+            const edit = button(t('study.popup.editInDashboard', 'Edit in dashboard'), 'ft-link-button ft-study-popup-plan__edit', () => openOptions(PLAN_EDITOR_PATH));
+            edit.dataset.ftFocusKey = 'popup-plan-edit';
+            head.appendChild(edit);
+        }
+        host.appendChild(head);
+        try {
+            host.appendChild(planBar(plan, object(study.focus), study.breakMode === 'normal' ? 'normal' : 'rest', { editable: false }));
+        } catch (e) { }
+    }
+
     function mountStrip(host) {
         if (!host) return null;
         let state = null;
@@ -306,6 +339,7 @@
         try { runtime()?.storage?.onChanged?.addListener((changes, area) => { if (area === 'local' && changes.ftAskParentV1) refresh(); }); } catch (e) { }
         function draw() {
             renderStrip(host, state, { onChange: refresh, parentName });
+            renderPopupPlan(root.document?.getElementById?.('ftStudyPlanPopup'), state);
             clearTimeout(timer);
             const ending = Number.isFinite(state?.endRequestedAt);
             const until = Number(state?.validUntil);
@@ -725,10 +759,11 @@
         const deviceCountry = Packs.countryFromLocale(root.navigator?.language || '') || Packs.countryFromLocale(language()) || null;
         const start = Setup.reopenAt(array(study.activePackIds), catalog, deviceCountry);
         const s = {
-            step: start.step, mode: start.mode, country: start.country, query: '', alsoOpen: false, board: null,
+            step: start.step, mode: start.mode, country: start.country, query: '', filtersOpen: false, examFilter: null, board: null,
             selected: array(study.activePackIds).filter(id => Packs.packById(catalog, id)),
             edits: clone(object(study.packEdits)) || {},
-            opened: {}, showAll: new Set(), keptOwn: {}, grade: {}, lockMode: 'gentle', direction: 0, addFor: null
+            opened: {}, showAll: new Set(), keptOwn: {}, grade: {}, lockMode: 'gentle', direction: 0, addFor: null,
+            careerField: null, careerFieldLoaded: false
         };
         // The card's own styles set display, so the hidden attribute alone wouldn't hide it.
         const hidden = Array.from(holder.children).map(node => [node, node.style.display]);
@@ -754,8 +789,27 @@
             render();
             try { panel.scrollIntoView({ block: 'start', behavior: 'smooth' }); } catch (e) { }
         };
-        const back = () => go(Setup.StudySetupPath.back(s.step, needsStream()), false);
+        const back = () => {
+            // Skills and careers: Back from a field's tracks returns to the field list (SETUP_SIMPLICITY.md).
+            if (s.step === 'list' && s.mode === 'skill' && s.careerField && !text(s.query)) {
+                s.careerField = null;
+                s.direction = -1;
+                render();
+                return;
+            }
+            go(Setup.StudySetupPath.back(s.step, needsStream()), false);
+        };
         const goNext = () => go(Setup.StudySetupPath.next(s.step, needsStream()));
+        /** Saves the plan (the default branch for any pack without one) and, when asked, starts a round. */
+        const savePlan = async startNowToo => {
+            const result = await options.onPatch?.({ activePackIds: s.selected.slice(), packEdits: Setup.savedEdits(s.selected, s.edits, catalog) });
+            if (result?.ok === false) { notify(panel, errorText(result.error), null); return; }
+            if (startNowToo) {
+                const started = await options.onStart?.(50, s.lockMode);
+                if (started?.ok === false) { notify(panel, errorText(started.error), null); return; }
+            }
+            close();
+        };
         const toggle = id => { s.selected = s.selected.includes(id) ? s.selected.filter(item => item !== id) : [...s.selected, id]; render(); };
         const chipLabel = pack => Setup.StudyExamList.chipLabel(pack, language());
 
@@ -763,7 +817,8 @@
             if (s.step === 'kind') return t('study.setup.title', 'Set up study');
             if (s.step === 'list') {
                 if (s.mode === 'exam') return s.country ? t('study.setup.examsIn', 'Exams in {country}', { country: countryName(s.country) }) : t('study.setup.examsTitle', 'Exams');
-                return s.mode === 'school' ? t('study.setup.kindSchool', 'School') : t('study.setup.kindSkill', 'Learn a skill');
+                if (s.mode === 'school') return t('study.setup.kindSchool', 'School');
+                return s.careerField ? careerFieldName(s.careerField) : t('study.setup.kindSkill', 'Skills and careers');
             }
             if (s.step === 'stream') {
                 const list = packs().filter(pack => array(pack.variants).length && pack.kind !== 'class');
@@ -799,6 +854,24 @@
             go.disabled = !enabled;
             node.appendChild(go);
             if (!label) node.classList.add('is-wide');
+            return node;
+        }
+
+        /**
+         * One tap to start (Android 34afba385): on the list steps, someone studying for themselves gets
+         * Start, which saves the plan with its defaults (the default branch, every channel and topic on,
+         * a gentle lock) and starts a round; "Review channels" walks the rest of setup. A parent setting
+         * a plan for someone else keeps next, since nothing starts on this device.
+         */
+        function startBar(label, next) {
+            if (!isSelf) return bar(label, next, goNext);
+            const node = el('div', 'ft-setup__bar is-start');
+            if (label) node.appendChild(el('span', 'ft-setup__bar-label', label));
+            // One obvious action (Android 420df66be): Start; "Review channels" is a quiet link beside it.
+            const row = el('div', 'ft-setup__bar-row');
+            row.append(setupChip(t('study.setup.reviewFirst', 'Review channels'), false, goNext, { quiet: true }),
+                button(t('study.setup.startNow', 'Start now'), 'btn-primary ft-setup__bar-action', () => { s.lockMode = 'gentle'; savePlan(true); }));
+            node.appendChild(row);
             return node;
         }
 
@@ -853,7 +926,7 @@
                     const current = (code || null) === (s.country || null);
                     const row = button('', `ft-sheet__row${current ? ' is-current' : ''}`, () => {
                         close();
-                        if ((code || null) !== (s.country || null)) { s.country = code || null; s.board = null; s.alsoOpen = false; render(); }
+                        if ((code || null) !== (s.country || null)) { s.country = code || null; s.board = null; s.filtersOpen = false; s.examFilter = null; render(); }
                     });
                     row.setAttribute('role', 'option');
                     row.setAttribute('aria-selected', current ? 'true' : 'false');
@@ -898,21 +971,22 @@
             if (kriti) question.appendChild(kriti);
             body.appendChild(question);
 
-            const own = Setup.StudyExamList.of(catalog, s.country, '', Setup.MIN_CHANNELS).own.flatMap(section => section.packs);
+            const own = Setup.StudyExamList.of(catalog, s.country, '', Setup.MIN_CHANNELS, language()).own.flatMap(section => section.packs);
             const examLine = !s.country || !own.length ? t('study.setup.kindExamAnywhere', 'Exams people take anywhere, like IELTS and GRE')
                 : t('study.setup.kindExamples', '{names} and more', { names: [...new Set([...own].sort((a, b) => (a.shortName ? 0 : 1) - (b.shortName ? 0 : 1))
                     .map(chipLabel).filter(label => label.length <= 12))].slice(0, 5).join(', ') });
             const boards = Setup.StudySchool.boards(catalog, s.country, Setup.MIN_CHANNELS);
             const schoolLine = !boards.length ? t('study.setup.kindSchoolNone', 'Lessons that fit any curriculum')
                 : t('study.setup.kindExamples', '{names} and more', { names: boards.map(board => board.label).filter(label => label.length <= 16).slice(0, 3).join(', ') || boards[0].label });
+            // Three tiles (Android 8a7671cc3): interviews and degrees live under Skills and careers.
             const tiles = el('div', 'ft-setup-tiles');
             for (const [mode, name, line, doodle] of [
                 ['exam', t('study.setup.kindExam', 'An exam'), examLine, 'seal'],
                 ['school', t('study.setup.kindSchool', 'School'), schoolLine, 'note'],
-                ['skill', t('study.setup.kindSkill', 'Learn a skill'), t('study.setup.kindSkillBody', 'Coding, maths and science. Add your own channels too.'), 'crayon']
+                ['skill', t('study.setup.kindSkill', 'Skills and careers'), t('study.setup.kindSkillBody', 'Degrees, job interviews and lessons for anyone'), 'crayon']
             ]) {
                 const tile = button('', `ft-setup-tile is-${mode}`, () => {
-                    if (s.mode !== mode) { s.query = ''; s.alsoOpen = false; }
+                    if (s.mode !== mode) { s.query = ''; s.filtersOpen = false; s.examFilter = null; }
                     s.mode = mode;
                     go('list');
                 });
@@ -930,12 +1004,12 @@
 
         function listBar() {
             if (!s.selected.length) return null;
-            return bar(packsShortLabel(s.selected, catalog), t('study.setup.next', 'Next'), goNext);
+            return startBar(packsShortLabel(s.selected, catalog), t('study.setup.next', 'Next'));
         }
 
         // ---- Step 2a: exams
         function renderExams(body) {
-            const model = Setup.StudyExamList.of(catalog, s.country, '', Setup.MIN_CHANNELS);
+            const model = Setup.StudyExamList.of(catalog, s.country, '', Setup.MIN_CHANNELS, language());
             const example = model.own.flatMap(section => section.packs).find(pack => pack.shortName);
             const search = el('input', 'text-input ft-setup-search');
             search.type = 'search';
@@ -943,14 +1017,62 @@
             search.placeholder = t('study.setup.examsSearch', 'Search exams, like {example}', { example: example ? chipLabel(example) : 'IELTS' });
             search.setAttribute('aria-label', search.placeholder);
             const host = el('div', 'ft-setup-list');
+            const filters = el('div', 'ft-setup-filters');
             search.addEventListener('input', () => { s.query = search.value; drawExamList(host); });
-            body.append(search, host);
+            body.append(search, filters, host);
+            const redraw = () => { drawExamFilters(filters, redraw); drawExamList(host); };
+            drawExamFilters(filters, redraw);
             drawExamList(host);
             return listBar();
         }
 
+        /**
+         * Country -> level -> category (Android 420df66be), behind one quiet "More choices". Level chips
+         * (All, National, State or province) only where the country has state or province exams; State
+         * opens on the area whose exams teach in the UI language. Category chips list only categories
+         * the country has. Opening it also shows the "Also taken from {country}" exams.
+         */
+        function drawExamFilters(host, redraw) {
+            host.replaceChildren();
+            const filter = s.examFilter || Setup.StudyExamFilter.of();
+            const areas = Setup.StudyExamList.areas(catalog, s.country, Setup.MIN_CHANNELS);
+            const categories = Setup.StudyExamList.categories(catalog, s.country, Setup.MIN_CHANNELS);
+            const hasAlso = Setup.StudyExamList.of(catalog, s.country, '', Setup.MIN_CHANNELS).also.length > 0;
+            if (!areas.length && categories.length <= 1 && !hasAlso) return;
+            const set = patch => { s.examFilter = { ...filter, ...patch }; redraw(); };
+            if (!s.filtersOpen && Setup.StudyExamFilter.isDefault(filter)) {
+                const more = setupChip(t('study.setup.examsMore', 'More choices'), false, () => { s.filtersOpen = true; redraw(); }, { quiet: true });
+                more.setAttribute('aria-expanded', 'false');
+                host.appendChild(more);
+                return;
+            }
+            const all = t('study.home.all', 'All');
+            const { ALL, NATIONAL, REGIONAL } = Setup.StudyExamFilter.LEVELS;
+            if (areas.length) {
+                const levels = el('div', 'ft-setup-flow');
+                for (const [level, name] of [[ALL, all], [NATIONAL, t('study.setup.level.national', 'National')], [REGIONAL, t('study.setup.level.regional', 'State or province')]]) {
+                    levels.appendChild(setupChip(name, filter.level === level, () => set({ level,
+                        area: level === REGIONAL ? filter.area || Setup.StudyExamList.defaultArea(catalog, s.country, language(), Setup.MIN_CHANNELS) : null })));
+                }
+                host.appendChild(levels);
+                if (filter.level === REGIONAL && areas.length > 1) {
+                    const names = new Map(Setup.StudyExamList.exams(catalog, s.country, Setup.MIN_CHANNELS).filter(Setup.isRegional)
+                        .map(pack => [Setup.areaName(pack, 'en'), Setup.areaName(pack, language())]));
+                    const flow = el('div', 'ft-setup-flow');
+                    areas.forEach(area => flow.appendChild(setupChip(names.get(area) || area, filter.area === area, () => set({ area }))));
+                    host.appendChild(flow);
+                }
+            } else if (filter.level !== ALL) s.examFilter = { ...filter, level: ALL, area: null };
+            if (categories.length > 1) {
+                const flow = el('div', 'ft-setup-flow');
+                flow.appendChild(setupChip(all, !filter.category, () => set({ category: null })));
+                categories.forEach(category => flow.appendChild(setupChip(t(`study.setup.category.${category}`, category), filter.category === category, () => set({ category }))));
+                host.appendChild(flow);
+            } else if (filter.category) s.examFilter = { ...(s.examFilter || filter), category: null };
+        }
+
         function drawExamList(host) {
-            const model = Setup.StudyExamList.of(catalog, s.country, s.query, Setup.MIN_CHANNELS);
+            const model = Setup.StudyExamList.of(catalog, s.country, s.query, Setup.MIN_CHANNELS, language(), s.examFilter);
             host.replaceChildren();
             if (model.isEmpty) { host.appendChild(el('p', 'ft-study-muted ft-setup-center', t('study.setup.empty', 'Nothing matches. Try another country or word.'))); return; }
             const section = (name, list, { withCountry = false, quiet = false } = {}) => {
@@ -970,20 +1092,12 @@
             const fieldName = field => t(`study.setup.field.${field}`, field);
             model.own.forEach(group => section(fieldName(group.field), group.packs));
             const searching = !!text(s.query);
-            if (model.also.length) {
-                // A chosen exam is never hidden inside the fold.
-                const open = s.alsoOpen || searching || model.alsoPacks.some(pack => s.selected.includes(pack.id));
-                const names = model.alsoPacks.slice(0, 3).map(chipLabel).join(', ');
-                const line = model.alsoPacks.length > 3 ? pluralWith('study.setup.andMore', model.alsoPacks.length - 3, { names }, '{names} and {count} more') : names;
-                const fold = button('', `ft-setup-fold${open ? ' is-open' : ''}`, () => { if (!searching) { s.alsoOpen = !s.alsoOpen; drawExamList(host); } });
-                fold.setAttribute('aria-expanded', open ? 'true' : 'false');
-                const words = el('span', 'ft-setup-fold__words');
-                words.appendChild(el('span', 'ft-setup-fold__title', t('study.setup.examsAlso', 'Also taken from {country}', { country: countryName(s.country) })));
-                if (!open) words.appendChild(el('span', 'ft-study-muted', line));
-                fold.append(words, el('span', 'ft-setup-fold__chevron', '⌄'));
+            // One disclosure (Android 420df66be): the neighbours' and global exams sit behind "More choices";
+            // a chosen exam is never hidden, and search always shows them.
+            if (model.also.length && (s.filtersOpen || searching || model.alsoPacks.some(pack => s.selected.includes(pack.id)))) {
                 host.appendChild(el('hr', 'ft-setup-dashed'));
-                host.appendChild(fold);
-                if (open) model.also.forEach(group => section(fieldName(group.field), group.packs, { quiet: true }));
+                host.appendChild(el('p', 'ft-setup-h2', t('study.setup.examsAlso', 'Also taken from {country}', { country: countryName(s.country) })));
+                model.also.forEach(group => section(fieldName(group.field), group.packs, { quiet: true }));
             }
             if (model.elsewhere.length) section(t('study.setup.examsElsewhere', 'From other countries'), model.elsewhere, { withCountry: true, quiet: true });
             // The bar follows the choice without redrawing the list.
@@ -1011,7 +1125,8 @@
                     el('p', 'ft-study-muted', t('study.setup.schoolNoneBody', 'These work with any curriculum. You can also add your own channels.')),
                     button(t('study.setup.schoolCheckExams', 'Check exams'), 'btn-secondary', () => { s.mode = 'exam'; s.query = ''; go('list'); }));
                 addGlobals(body, globals);
-                return s.selected.length ? bar(null, t('study.setup.nextChannels', 'Next: check channels'), goNext) : null;
+                addKidsPacks(body);
+                return s.selected.length ? startBar(packsShortLabel(s.selected, catalog), t('study.setup.nextChannels', 'Next: check channels')) : null;
             }
             const located = Setup.StudySchool.locate(boards, s.selected);
             const current = boards.find(board => board.key === s.board) || located?.board || boards[0];
@@ -1068,8 +1183,19 @@
                 body.appendChild(el('p', 'ft-study-muted', t('study.setup.covers', '{who} covers {topics}.', { who, topics: topicLine(chips) })));
             }
             addGlobals(body, globals);
+            addKidsPacks(body);
             body.appendChild(el('p', 'ft-study-muted', t('study.setup.schoolOtherCountry', 'Studying another country\'s board? Change the country first.')));
-            return s.selected.length ? bar(null, t('study.setup.nextChannels', 'Next: check channels'), goNext) : null;
+            return s.selected.length ? startBar(packsShortLabel(s.selected, catalog), t('study.setup.nextChannels', 'Next: check channels')) : null;
+        }
+
+        /** Kids learning by age, under School (Android 420df66be: parents look there); these packs fill the Kids space during study. */
+        function addKidsPacks(body) {
+            const kids = Packs.forTab(catalog, '', 'kids');
+            if (!kids.length) return;
+            const list = el('div', 'ft-setup-picks');
+            list.appendChild(el('p', 'ft-setup-h2', t('study.setup.skillKidsHeading', 'Kids learning')));
+            kids.forEach(pack => list.appendChild(pickRow(pack)));
+            body.appendChild(list);
         }
 
         function addGlobals(body, globals) {
@@ -1085,6 +1211,14 @@
         // ---- Step 2c: a skill
         function skillDoodle(pack) {
             const words = new Set(Setup.StudyExamFields.words(pack.id));
+            // Interview packs (Android skillDoodle: bridge, gear, atom, coins, bolt, peak, leaf), in the doodles we have.
+            if (words.has('system')) return 'scribble_circle';
+            if (words.has('devops') || words.has('cloud')) return 'cloud';
+            if (words.has('data')) return 'sparkle';
+            if (words.has('finance')) return 'stamp';
+            if (words.has('product')) return 'star';
+            if (words.has('consulting')) return 'magnifier';
+            if (words.has('hr')) return 'heart';
             if (words.has('coding')) return 'note';
             if (words.has('maths')) return 'crayon';
             if (words.has('science')) return 'sparkle';
@@ -1106,19 +1240,90 @@
             return row;
         }
 
+        /** Where Skills and careers remembers the field picked last, per profile. */
+        const careerPrefKey = () => `careerField:${options.profileId || 'self'}`;
+
+        /**
+         * Skills and careers (Android 8a7671cc3): one row per field, with search across every track. A
+         * field pushes, inside this step, to its tracks: job interviews first, then degree tracks under
+         * their specializations. A chosen pack opens its own field; else the field picked last time.
+         */
         function renderSkills(body) {
-            body.append(el('h3', 'ft-setup-h1', t('study.setup.skillQuestion', 'What do you want to learn?')),
-                el('p', 'ft-study-muted', t('study.setup.skillBody', 'Pick one or more. You can add your own channels next.')));
-            const list = el('div', 'ft-setup-picks');
-            Setup.StudySkills.of(catalog, Setup.MIN_CHANNELS).forEach(pack => list.appendChild(pickRow(pack)));
-            // Kids learning by age: these packs fill the Kids space during study.
-            const kids = Packs.forTab(catalog, '', 'kids');
-            if (kids.length) {
-                list.appendChild(el('p', 'ft-setup-h2', t('study.setup.skillKidsHeading', 'Kids learning')));
-                kids.forEach(pack => list.appendChild(pickRow(pack)));
+            if (!s.careerFieldLoaded) {
+                s.careerFieldLoaded = true;
+                const fields = Setup.StudyCareers.fields(catalog, Setup.MIN_CHANNELS).map(([field]) => field);
+                const saved = homePrefs()[careerPrefKey()];
+                s.careerField = packs().map(Setup.StudyCareers.fieldOf).find(Boolean) || (fields.includes(saved) ? saved : null);
             }
-            body.appendChild(list);
+            const example = Setup.StudyCareers.packs(catalog, Setup.MIN_CHANNELS).find(pack => pack.kind === Setup.KIND_DEGREE && pack.shortName)?.shortName
+                || Setup.StudyInterviews.examples(catalog, Setup.MIN_CHANNELS, 1)[0] || 'DSA';
+            const search = el('input', 'text-input ft-setup-search');
+            search.type = 'search';
+            search.value = s.query;
+            search.placeholder = t('study.setup.careerSearch', 'Search, like {example}', { example });
+            search.setAttribute('aria-label', search.placeholder);
+            const host = el('div', 'ft-setup-picks');
+            search.addEventListener('input', () => { s.query = search.value; drawCareerList(host); });
+            body.append(search, host);
+            drawCareerList(host);
             return listBar();
+        }
+
+        function drawCareerList(host) {
+            host.replaceChildren();
+            if (text(s.query)) {
+                const hits = Setup.StudyCareers.search(catalog, s.query, Setup.MIN_CHANNELS);
+                if (!hits.length) host.appendChild(el('p', 'ft-study-muted ft-setup-center', t('study.setup.empty', 'Nothing matches. Try another country or word.')));
+                hits.forEach(pack => host.appendChild(pickRow(pack)));
+                return;
+            }
+            const fields = Setup.StudyCareers.fields(catalog, Setup.MIN_CHANNELS);
+            const open = s.careerField ? fields.find(([field]) => field === s.careerField) : null;
+            if (!open) {
+                // One row per field, never chips.
+                fields.forEach(([field, list]) => host.appendChild(fieldRow(field, list)));
+                return;
+            }
+            setHomePref(careerPrefKey(), open[0]);
+            const sections = Setup.StudyCareers.sections(open[1]);
+            for (const [key, list] of sections) {
+                const heading = key === 'interviews' ? t('study.setup.careerInterviews', 'Job interviews')
+                    : key === '' ? null : Setup.specializationName(list[0], language()) || key;
+                if (heading && sections.length > 1) host.appendChild(el('p', 'ft-setup-h2', heading));
+                list.forEach(pack => host.appendChild(pickRow(pack)));
+            }
+        }
+
+        /** A field on paper: its name and a few of its tracks; a click opens the field's tracks. */
+        function fieldRow(field, list) {
+            const picked = list.some(pack => s.selected.includes(pack.id));
+            const name = careerFieldName(field);
+            const names = [...new Set(list.map(pack => pack.shortName || chipLabel(pack)).filter(Boolean))].slice(0, 3).join(', ');
+            const line = t('study.setup.kindExamples', '{names} and more', { names });
+            const row = button('', `ft-setup-field${picked ? ' is-on' : ''}`, () => { s.careerField = field; s.direction = 1; render(); });
+            const words = el('span', 'ft-setup-field__words');
+            words.append(el('strong', 'ft-setup-field__name', name), el('span', 'ft-study-muted ft-setup-field__line', line));
+            const chevron = icon('chevron');
+            chevron.classList.add('ft-setup-field__chevron');
+            row.append(words, chevron);
+            row.setAttribute('aria-label', `${name}. ${line}`);
+            return row;
+        }
+
+        function careerFieldName(field) {
+            const names = {
+                software: ['study.setup.interviewGroup.software', 'Computer science and software'],
+                engineering: ['study.setup.careerField.engineering', 'Engineering'],
+                science: ['study.setup.careerField.science', 'Science'],
+                health: ['study.setup.interviewGroup.health', 'Healthcare'],
+                management: ['study.setup.interviewGroup.management', 'MBA and management'],
+                law: ['study.setup.interviewGroup.law', 'Law'],
+                design: ['study.setup.careerField.design', 'Design and arts'],
+                public: ['study.setup.interviewGroup.public', 'Government and defence'],
+                lessons: ['study.setup.careerLessons', 'Lessons for anyone']
+            };
+            const [key, fallback] = names[field] || ['study.setup.interviewGroup.other', 'Other careers'];
+            return t(key, fallback);
         }
 
         // ---- Step 3: stream
@@ -1416,15 +1621,7 @@
                     : t('study.setup.lockGentleBody', 'You can end early after a 30-second pause.')));
                 actions.appendChild(lockCard);
             }
-            const save = async startNowToo => {
-                const result = await options.onPatch?.({ activePackIds: s.selected.slice(), packEdits: Setup.savedEdits(s.selected, s.edits, catalog) });
-                if (result?.ok === false) { notify(panel, errorText(result.error), null); return; }
-                if (startNowToo) {
-                    const started = await options.onStart?.(50, s.lockMode);
-                    if (started?.ok === false) { notify(panel, errorText(started.error), null); return; }
-                }
-                close();
-            };
+            const save = savePlan;
             actions.appendChild(button(t('study.setup.savePlan', 'Save plan'), isSelf ? 'btn-secondary' : 'btn-primary', () => save(false)));
             if (isSelf) actions.appendChild(button(t('study.setup.startNow', 'Start now'), 'btn-primary', () => save(true)));
             body.appendChild(actions);
@@ -2146,6 +2343,11 @@
         }
         if (plan || hasPack(study, ctx.catalog)) {
             card.appendChild(linkRow(t('study.link.packs', 'What you study'), packsValue(study, ctx.catalog), editable ? () => ctx.openSetup(card) : null));
+            // The timetable lives here, in settings: the Study home stays as it is (Android b74369747).
+            if (timetableApi()) {
+                card.appendChild(linkRow(t('study.timetable.title', 'Timetable'),
+                    timetableStatus(study.timetable, ctx.catalog) || t('study.timetable.off', 'Off'), () => ctx.setMode('timetable')));
+            }
         }
         if (plan) {
             const limit = minuteOf(plan.limit);
@@ -2172,6 +2374,598 @@
         const wrap = el('div', 'ft-home-section');
         wrap.append(sectionTitle(t('study.sessionChannels', 'Session and channels')), card);
         return wrap;
+    }
+
+    // ---- Timetable (Android StudyTimetableActivity, b74369747; docs/study/TIMETABLE_SPEC.md §4) ------
+
+    function timetableApi() { return root.FilterTubeStudyTimetable || null; }
+    function deviceZone() { try { return Intl.DateTimeFormat().resolvedOptions().timeZone || null; } catch (e) { return null; } }
+
+    /** "Russian", or the lane's packs by short name ("GMAT + IELTS"). */
+    function laneName(lane, catalog) {
+        if (!lane) return '?';
+        if (text(lane.label)) return text(lane.label);
+        const Packs = packsApi();
+        const names = array(lane.packIds).map(id => (catalog && Packs?.packById ? Packs.packById(catalog, id) : null))
+            .filter(Boolean).map(pack => text(pack.shortName) || localizedName(pack.names, pack.id));
+        return names.join(' + ') || '?';
+    }
+
+    /** "Now: Russian · until 9 pm", "Next: GMAT at 7 am", or null without a timetable. */
+    function timetableStatus(timetable, catalog, now = Date.now()) {
+        const T = timetableApi();
+        if (!T || !isObject(timetable)) return null;
+        const reading = T.at(timetable, now, deviceZone());
+        if (reading.lane) return t('study.timetable.now', 'Now: {lane} · until {time}', { lane: laneName(reading.lane, catalog), time: formatTime(reading.endsAt) });
+        if (reading.next) return t('study.timetable.next', 'Next: {lane} at {time}', { lane: laneName(reading.next, catalog), time: formatDayTime(reading.nextAt) });
+        return null;
+    }
+
+    /** Monday-first weekday names in the UI language ("Mon", or "Monday" with long). */
+    function weekdayName(index, long = false) {
+        const style = long === 'narrow' ? 'narrow' : long ? 'long' : 'short';
+        try { return new Date(2026, 10, 16 + index).toLocaleDateString(language(), { weekday: style }); } catch (e) { return ''; }
+    }
+
+    /**
+     * When a day chip's short name would clip ("الأربعاء" at 360 px) the row shows the narrow weekdays
+     * instead (Intl weekday "narrow"); the full name stays the accessible label. Rechecked on resize.
+     */
+    function fitDayChips(row) {
+        // One style for the whole row: if any short name would clip, every chip takes its narrow name.
+        const fit = () => {
+            const chips = Array.from(row.children || []).filter(chip => chip.dataset?.ftShort);
+            chips.forEach(chip => { chip.textContent = chip.dataset.ftShort; });
+            const clips = chips.some(chip => chip.clientWidth > 0 && chip.scrollWidth > chip.clientWidth + 1);
+            if (clips) chips.forEach(chip => { chip.textContent = chip.dataset.ftNarrow || chip.dataset.ftShort; });
+        };
+        if (typeof root.ResizeObserver === 'function') {
+            const watcher = new root.ResizeObserver(() => { if (!row.isConnected) { watcher.disconnect(); return; } fit(); });
+            watcher.observe(row);
+        }
+        return fit;
+    }
+
+    /** Hands the person an .ics file (a plain download; no calendar access, nothing read back). */
+    function downloadCalendar(timetable, catalog) {
+        const T = timetableApi();
+        if (!T) return;
+        const now = Date.now();
+        const body = T.ics(timetable, T.todayIn(timetable, now, deviceZone()), T.utcStamp(now), lane => laneName(lane, catalog), deviceZone());
+        try {
+            const url = URL.createObjectURL(new Blob([body], { type: 'text/calendar;charset=utf-8' }));
+            const link = el('a');
+            link.href = url;
+            link.download = 'study-timetable.ics';
+            link.hidden = true;
+            root.document.body.appendChild(link);
+            link.click();
+            setTimeout(() => { link.remove(); URL.revokeObjectURL(url); }, 1000);
+        } catch (e) { }
+    }
+
+    /** Width of text in the bar's block font, for blockLabel (a rough count without a canvas). */
+    let measureCanvas = null;
+    function textWidth(value, px = 12) {
+        try {
+            measureCanvas = measureCanvas || root.document?.createElement?.('canvas');
+            const context = measureCanvas?.getContext?.('2d');
+            if (context) { context.font = `700 ${px}px system-ui, sans-serif`; return context.measureText(value).width; }
+        } catch (e) { }
+        return Array.from(String(value)).length * px * 0.62;
+    }
+
+    function rtlOf(node) {
+        try { if (node?.isConnected && root.getComputedStyle) return root.getComputedStyle(node).direction === 'rtl'; } catch (e) { }
+        const dir = node?.closest?.('[dir]')?.getAttribute?.('dir') || root.document?.documentElement?.getAttribute?.('dir');
+        return dir === 'rtl';
+    }
+
+    /**
+     * The timetable's day on the bar (Android StudyTimetableDayBarView, bfbe09df0/6af91cdbf): the plan
+     * page's paper bar with each period a sage block named for its lane (initials when the name won't
+     * fit, never a cut-off name; the full name is the spoken label); click one to edit it. Editing
+     * (options.edited = {startMinute, endMinute}): the other periods fade and the edited one gets START
+     * and END handles with 44 px targets: drag them (15-minute snap, a cancelled drag puts it back) or
+     * use the keys as on the plan bar (arrows 15 min, Shift+arrow and Page Up/Down 1 h, Home/End, Escape
+     * puts back what the keys moved since focus). The hours fit the day's periods (6 am-11 pm on a bar
+     * 600 px or wider), it never scrolls sideways and mirrors under dir="rtl". END wins a tie.
+     */
+    function timetableBar(timetable, day, { catalog, ui, edited = null, editId = 'new', onOpen, onEdit } = {}) {
+        const T = timetableApi();
+        const wrap = el('div', 'ft-dayplan ft-ttbar');
+        const track = el('div', 'ft-dayplan__track');
+        const layer = el('div', 'ft-dayplan__segs');
+        const scale = el('div', 'ft-dayplan__scale');
+        track.appendChild(layer);
+        wrap.append(track, scale);
+        const others = T.periodsOf(timetable, day).filter(item => !(edited && item.startMinute === ui.editing));
+        let current = edited ? { ...edited } : null;
+        const trackWidth = () => { try { return track.getBoundingClientRect?.().width || 0; } catch (e) { return 0; } };
+        let wide = (trackWidth() || 0) >= 600;
+        let range = T.barRange(others, current, wide);
+        let dragging = null;
+        let mirrored = false;
+        const spot = minute => {
+            const value = ((Math.max(range.start, Math.min(range.end, minute)) - range.start) / Math.max(1, range.end - range.start)) * 100;
+            return mirrored ? 100 - value : value;
+        };
+        const pct = value => `${value.toFixed(3)}%`;
+        const handles = {};
+        const editName = current ? laneName({ packIds: ui.lane }, catalog) : '';
+        const today = T.dayKeyAt(Date.now(), deviceZone()) === day;
+        const layout = () => {
+            mirrored = rtlOf(wrap);
+            if (!dragging) range = T.barRange(others, current, wide);
+            const width = trackWidth() || 340;
+            layer.replaceChildren();
+            const blocks = [...others.map(item => ({ item, edit: false })), ...(current ? [{ item: current, edit: true }] : [])]
+                .sort((x, y) => x.item.startMinute - y.item.startMinute);
+            for (const { item, edit } of blocks) {
+                const from = Math.max(range.start, item.startMinute);
+                const to = Math.min(range.end, item.endMinute);
+                if (to <= from) continue;
+                const name = edit ? editName : laneName(T.lane(timetable, item.laneId), catalog);
+                const spoken = `${timeRange(item.startMinute, item.endMinute % T.DAY_MINUTES)}, ${name}`;
+                const open = !edit && !current && onOpen ? () => onOpen(item) : null;
+                const block = open ? button('', `ft-ttbar__block${current ? ' is-faded' : ''}`, open) : el('span', `ft-ttbar__block${edit ? ' is-editing' : current ? ' is-faded' : ''}`);
+                const x = spot(from); const y = spot(to);
+                block.style.left = pct(Math.min(x, y));
+                block.style.width = pct(Math.abs(y - x));
+                const room = (Math.abs(y - x) / 100) * width - 8;
+                const label = T.blockLabel(name, (text, small) => textWidth(text, small ? 12 * T.SMALL_LABEL : 12) <= room);
+                if (label) block.appendChild(el('span', `ft-ttbar__name${label.small ? ' is-small' : ''}`, label.text));
+                block.setAttribute('aria-label', spoken);
+                if (open) block.dataset.ftFocusKey = `tt-${day}-${item.startMinute}-block`;
+                else block.setAttribute('aria-hidden', edit ? 'true' : 'false');
+                layer.appendChild(block);
+            }
+            if (today) {
+                const now = new Date();
+                const minute = now.getHours() * 60 + now.getMinutes();
+                if (minute >= range.start && minute <= range.end) {
+                    const marker = el('span', 'ft-dayplan__now');
+                    marker.setAttribute('aria-hidden', 'true');
+                    marker.style.left = pct(spot(minute));
+                    layer.appendChild(marker);
+                }
+            }
+            scale.replaceChildren();
+            const perHour = (width * 60) / Math.max(60, range.end - range.start);
+            const every = [1, 2, 3, 4, 6].find(hours => hours * perHour >= 56) || 6;
+            for (let hour = Math.ceil(range.start / 60); hour * 60 <= range.end; hour += 1) {
+                if (hour % every !== 0 || hour >= 24) continue;
+                const x = (spot(hour * 60) / 100) * width;
+                if (x < 22 || x > width - 22) continue;
+                const tick = el('span', 'ft-dayplan__hour', clockLabel(hour * 60).replace(/:00/, ''));
+                tick.style.left = pct(spot(hour * 60));
+                scale.appendChild(tick);
+            }
+            for (const which of Object.keys(handles)) {
+                const handle = handles[which];
+                const at = which === 'start' ? current.startMinute : current.endMinute;
+                const time = clockLabel(at % T.DAY_MINUTES);
+                handle.style.left = pct(spot(at));
+                handle.setAttribute('aria-valuenow', String(at));
+                handle.setAttribute('aria-valuetext', time);
+                handle.setAttribute('aria-valuemin', String(which === 'start' ? 0 : current.startMinute + T.SNAP_MINUTES));
+                handle.setAttribute('aria-valuemax', String(which === 'start' ? current.endMinute - T.SNAP_MINUTES : T.DAY_MINUTES));
+                handle.querySelector('.ft-dayplan__pill').textContent = time;
+            }
+        };
+        if (current && onEdit) {
+            const live = done => { layout(); onEdit({ ...current }, done); };
+            let keyTimer = null;
+            for (const which of ['start', 'end']) {
+                const handle = el('span', `ft-dayplan__handle is-${which}`);
+                handle.appendChild(el('span', 'ft-dayplan__pill'));
+                handle.dataset.ftFocusKey = `tt-${day}-${editId}-${which}`;
+                handle.setAttribute('role', 'slider');
+                handle.setAttribute('aria-orientation', 'horizontal');
+                handle.setAttribute('aria-label', which === 'start' ? t('study.timetable.from', 'From') : t('study.timetable.to', 'To'));
+                handle.tabIndex = 0;
+                handle.addEventListener('focus', () => { if (!(ui.keyStart && ui.keyStart.which === which)) ui.keyStart = { which, period: { ...current } }; });
+                handle.addEventListener('blur', () => {
+                    handle.classList.remove('is-active');
+                    setTimeout(() => {
+                        if (root.document?.activeElement?.dataset?.ftFocusKey !== handle.dataset.ftFocusKey && ui.keyStart?.which === which) ui.keyStart = null;
+                    }, 0);
+                });
+                handle.addEventListener('keydown', event => {
+                    if (event.key === 'Escape') {
+                        if (dragging) { event.preventDefault(); dragging.cancel(); return; }
+                        const start = ui.keyStart?.which === which ? ui.keyStart.period : null;
+                        if (!start || (start.startMinute === current.startMinute && start.endMinute === current.endMinute)) return;
+                        event.preventDefault();
+                        current = { ...start };
+                        clearTimeout(keyTimer);
+                        live(true);
+                        return;
+                    }
+                    const flip = rtlOf(wrap) ? -1 : 1;
+                    const hour = event.shiftKey ? 60 : 15;
+                    const steps = { ArrowLeft: -hour * flip, ArrowRight: hour * flip, ArrowDown: -hour, ArrowUp: hour, PageDown: -60, PageUp: 60 };
+                    const at = which === 'start' ? current.startMinute : current.endMinute;
+                    let next;
+                    if (event.key === 'Home' || event.key === 'End') next = T.moveEdge(current, which === 'start', event.key === 'End' ? T.DAY_MINUTES : 0);
+                    else if (steps[event.key]) next = T.moveEdge(current, which === 'start', at + steps[event.key]);
+                    else return;
+                    event.preventDefault();
+                    current = next;
+                    handle.classList.add('is-active');
+                    live(false);
+                    // A run of key presses settles once, a moment after the last one.
+                    clearTimeout(keyTimer);
+                    keyTimer = setTimeout(() => { handle.classList.remove('is-active'); live(true); }, 700);
+                });
+                handles[which] = handle;
+                track.appendChild(handle);
+            }
+            track.addEventListener('pointerdown', event => {
+                if (event.button !== 0 || dragging) return;
+                const box = track.getBoundingClientRect();
+                const flipped = rtlOf(wrap);
+                const minuteAtX = x => range.start + (((flipped ? box.right - x : x - box.left) / Math.max(1, box.width)) * (range.end - range.start));
+                const xOf = minute => { const share = (minute - range.start) / Math.max(1, range.end - range.start); return flipped ? box.right - share * box.width : box.left + share * box.width; };
+                // A 44 px target around each handle; END wins a tie.
+                const ds = Math.abs(xOf(current.startMinute) - event.clientX);
+                const de = Math.abs(xOf(current.endMinute) - event.clientX);
+                const which = de <= 22 && de <= ds ? 'end' : ds <= 22 ? 'start' : null;
+                if (!which) return;
+                event.preventDefault();
+                const before = { ...current };
+                const handle = handles[which];
+                try { track.setPointerCapture(event.pointerId); } catch (e) { }
+                handle.classList.add('is-dragging');
+                try { handle.focus({ preventScroll: true }); } catch (e) { }
+                const move = ev => {
+                    const next = T.moveEdge(current, which === 'start', minuteAtX(ev.clientX));
+                    if (next.startMinute === current.startMinute && next.endMinute === current.endMinute) return;
+                    current = next;
+                    live(false);
+                };
+                const finish = cancelled => {
+                    track.removeEventListener('pointermove', move);
+                    track.removeEventListener('pointerup', onUp);
+                    track.removeEventListener('pointercancel', onCancel);
+                    handle.classList.remove('is-dragging');
+                    dragging = null;
+                    if (cancelled) current = before;
+                    live(true);
+                };
+                const onUp = () => finish(false);
+                const onCancel = () => finish(true);
+                dragging = { cancel: () => finish(true) };
+                track.addEventListener('pointermove', move);
+                track.addEventListener('pointerup', onUp);
+                track.addEventListener('pointercancel', onCancel);
+            });
+        }
+        layout();
+        if (typeof root.ResizeObserver === 'function') {
+            const watcher = new root.ResizeObserver(() => {
+                const width = trackWidth();
+                if (!width) return;
+                if (!wrap.isConnected) { watcher.disconnect(); return; }
+                wide = width >= 600;
+                layout();
+            });
+            watcher.observe(track);
+        }
+        return wrap;
+    }
+
+    /**
+     * The week grid (Android StudyTimetableWeekView, 9413ee20f): seven day columns over 6 am-11 pm, grown
+     * to every period, each period a sage block named for its lane. Click a period to open it in the
+     * inspector, an empty hour to add a period there (up to the next one), a day header to show that
+     * day. The selected day's header is filled, the edited period outlined; today's column is washed and
+     * has the now line. The columns mirror under dir="rtl".
+     */
+    function timetableWeek(timetable, options) {
+        const T = timetableApi();
+        const ui = options.ui;
+        const range = T.weekRange(timetable);
+        const hours = Math.max(1, (range.end - range.start) / 60);
+        const today = T.dayKeyAt(Date.now(), deviceZone());
+        const card = el('section', 'ft-home-card ft-tt-week');
+        card.setAttribute('aria-label', t('study.timetable.title', 'Timetable'));
+        const head = el('div', 'ft-tt-week__row ft-tt-week__head');
+        head.appendChild(el('span', 'ft-tt-week__axis'));
+        const body = el('div', 'ft-tt-week__row ft-tt-week__body');
+        body.style.height = `${hours * 32}px`;
+        const axis = el('div', 'ft-tt-week__axis');
+        for (let hour = Math.ceil(range.start / 60); hour * 60 < range.end; hour += 1) {
+            const label = el('span', 'ft-tt-week__hour', clockLabel(hour * 60).replace(/:00/, ''));
+            label.style.top = `${(((hour * 60 - range.start) / (range.end - range.start)) * 100).toFixed(3)}%`;
+            axis.appendChild(label);
+        }
+        body.appendChild(axis);
+        T.DAYS.forEach((day, index) => {
+            const selected = day === ui.day;
+            const count = T.periodsOf(timetable, day).length;
+            const name = button(weekdayName(index), `ft-tt-week__day${selected ? ' is-on' : ''}${day === today ? ' is-today' : ''}`, () => {
+                Object.assign(ui, { day, editing: null, query: '', copyOpen: false });
+                options.redraw();
+            });
+            name.setAttribute('aria-pressed', selected ? 'true' : 'false');
+            name.setAttribute('aria-label', `${weekdayName(index, true)}${count ? ` · ${count}` : ''}`);
+            name.dataset.ftFocusKey = `tt-${day}-day-head`;
+            head.appendChild(name);
+            const column = el('div', `ft-tt-week__col${day === today ? ' is-today' : ''}${selected ? ' is-selected' : ''}`);
+            column.addEventListener('click', event => {
+                if (event.target !== column || !options.editable) return;
+                const box = column.getBoundingClientRect();
+                const minute = range.start + ((event.clientY - box.top) / Math.max(1, box.height)) * (range.end - range.start);
+                const open = T.slot(timetable, day, minute);
+                Object.assign(ui, { day, editing: null, query: '', copyOpen: false });
+                if (open) {
+                    const lastLane = array(timetable.lanes).slice(-1)[0];
+                    Object.assign(ui, { editing: -1, start: open.startMinute, end: open.endMinute,
+                        lane: lastLane ? lastLane.packIds.slice() : array(object(options.study).activePackIds).slice(0, 1) });
+                }
+                options.redraw();
+            });
+            for (const period of T.periodsOf(timetable, day)) {
+                const lane = T.lane(timetable, period.laneId);
+                const name = laneName(lane, options.catalog);
+                const top = ((period.startMinute - range.start) / (range.end - range.start)) * 100;
+                const height = ((period.endMinute - period.startMinute) / (range.end - range.start)) * 100;
+                const editingThis = selected && ui.editing === period.startMinute;
+                const block = button('', `ft-tt-week__block${editingThis ? ' is-editing' : ''}`, () => {
+                    Object.assign(ui, { day, editing: null, query: '', copyOpen: false });
+                    if (options.editable) Object.assign(ui, { editing: period.startMinute, start: period.startMinute, end: period.endMinute, lane: array(lane?.packIds).slice() });
+                    options.redraw();
+                });
+                block.style.top = `${top.toFixed(3)}%`;
+                block.style.height = `${height.toFixed(3)}%`;
+                // A column is about 80 px wide and an hour 32 px tall: a name needs a quarter hour's room.
+                const tall = ((period.endMinute - period.startMinute) / 60) * 32 >= 18;
+                const label = T.blockLabel(name, (text, small) => tall && textWidth(text, small ? 12 * T.SMALL_LABEL : 12) <= 72);
+                if (label) block.appendChild(el('span', `ft-tt-week__name${label.small ? ' is-small' : ''}`, label.text));
+                block.setAttribute('aria-label', `${weekdayName(index, true)}, ${timeRange(period.startMinute, period.endMinute % T.DAY_MINUTES)}, ${name}`);
+                block.dataset.ftFocusKey = `tt-${day}-${period.startMinute}-grid`;
+                column.appendChild(block);
+            }
+            if (day === today) {
+                const now = new Date();
+                const minute = now.getHours() * 60 + now.getMinutes();
+                if (minute >= range.start && minute <= range.end) {
+                    const line = el('span', 'ft-tt-week__now');
+                    line.setAttribute('aria-hidden', 'true');
+                    line.style.top = `${(((minute - range.start) / (range.end - range.start)) * 100).toFixed(3)}%`;
+                    column.appendChild(line);
+                }
+            }
+            body.appendChild(column);
+        });
+        card.append(head, body);
+        return card;
+    }
+
+    /**
+     * The Timetable page (Android StudyTimetableActivity, DESIGN_PASS_2026-11-21 §4 decision 4). 900 px
+     * and wider: the week grid with the inspector beside it (the day view or the period editor).
+     * Narrower it stacks: the day chips in one row and the day on the bar. A period opens in place:
+     * its ends on the bar, what to study (the plan's packs and lanes used before, or search), From and
+     * To steppers, Save or Remove. Clips, Copy and the calendar wait behind one quiet "More choices".
+     * Every change saves at once. options: {study, catalog, editable, readOnlyLabel, ui, onSave(change)
+     * -> Promise, redraw()}.
+     */
+    function renderTimetablePage(host, options) {
+        const T = timetableApi();
+        const ui = options.ui;
+        const study = object(options.study);
+        const timetable = isObject(study.timetable) ? study.timetable : T.create({});
+        if (!T.DAYS.includes(ui.day)) ui.day = T.dayKeyAt(Date.now(), deviceZone());
+        const wrap = el('div', 'ft-tt-wrap');
+        const layout = el('div', 'ft-tt-layout');
+        const inspector = el('section', 'ft-home-card ft-tt');
+        if (options.readOnlyLabel) inspector.appendChild(el('p', 'ft-study-muted', options.readOnlyLabel));
+        if (ui.editing !== null && options.editable) renderTimetableEditor(inspector, timetable, options);
+        else renderTimetableDay(inspector, timetable, options);
+        layout.append(timetableWeek(timetable, options), inspector);
+        wrap.appendChild(layout);
+        host.appendChild(wrap);
+    }
+
+    function renderTimetableDay(card, timetable, options) {
+        const T = timetableApi();
+        const ui = options.ui;
+        const catalog = options.catalog;
+        const study = object(options.study);
+        const editable = options.editable;
+        card.appendChild(el('p', 'ft-study-muted', t('study.timetable.intro', 'Give parts of your day their own subject. Outside these times, your plan works as usual.')));
+        const dayIndex = T.DAYS.indexOf(ui.day);
+        // Beside the week grid the inspector names the day; stacked, seven chips share one row.
+        card.appendChild(el('h3', 'ft-setup-h1 ft-tt-wide', weekdayName(dayIndex, true)));
+        const days = el('div', 'ft-tt__days ft-tt-narrow');
+        days.setAttribute('role', 'group');
+        days.setAttribute('aria-label', t('study.planner.days', 'Days'));
+        T.DAYS.forEach((key, index) => {
+            const count = T.periodsOf(timetable, key).length;
+            // A plain day chip (no check mark) so seven share one row at 360 px, as on the plan page.
+            const chip = button(weekdayName(index), `ft-tt__day${key === ui.day ? ' is-on' : ''}`, () => { Object.assign(ui, { day: key, copyOpen: false }); options.redraw(); });
+            chip.dataset.ftShort = weekdayName(index);
+            chip.dataset.ftNarrow = weekdayName(index, 'narrow');
+            chip.setAttribute('aria-pressed', key === ui.day ? 'true' : 'false');
+            chip.setAttribute('aria-label', `${weekdayName(index, true)}${count ? ` · ${count}` : ''}`);
+            chip.dataset.ftFocusKey = `tt-${key}-day-chip`;
+            days.appendChild(chip);
+        });
+        card.appendChild(days);
+        fitDayChips(days);
+        const periods = T.periodsOf(timetable, ui.day);
+        const openPeriod = period => {
+            const lane = T.lane(timetable, period.laneId);
+            Object.assign(ui, { editing: period.startMinute, start: period.startMinute, end: period.endMinute, lane: array(lane?.packIds).slice(), query: '' });
+            options.redraw();
+        };
+        if (periods.length) {
+            const bar = timetableBar(timetable, ui.day, { catalog, ui, onOpen: editable ? openPeriod : null });
+            bar.classList.add('ft-tt-narrow');
+            card.appendChild(bar);
+        }
+        const list = el('div', 'ft-tt__periods');
+        if (!periods.length) {
+            list.appendChild(el('p', 'ft-study-muted ft-tt__empty', t('study.timetable.emptyDay', 'Nothing on {day} yet.', { day: weekdayName(dayIndex, true) })));
+        }
+        for (const period of periods) {
+            const name = laneName(T.lane(timetable, period.laneId), catalog);
+            const range = timeRange(period.startMinute, period.endMinute % T.DAY_MINUTES);
+            const row = linkRow(name, range, editable ? () => openPeriod(period) : null);
+            row.classList.add('ft-tt__period');
+            row.setAttribute('aria-label', `${range}, ${name}`);
+            row.dataset.ftFocusKey = `tt-${ui.day}-${period.startMinute}-row`;
+            list.appendChild(row);
+        }
+        card.appendChild(list);
+        if (editable) {
+            card.appendChild(button(t('study.timetable.add', 'Add a period'), periods.length ? 'btn-secondary' : 'btn-primary', () => {
+                const last = periods.length ? periods[periods.length - 1].endMinute : 16 * 60;
+                const start = Math.min(last, 23 * 60);
+                const lastLane = array(timetable.lanes).slice(-1)[0];
+                Object.assign(ui, { editing: -1, start, end: Math.min(start + 60, T.DAY_MINUTES),
+                    lane: lastLane ? lastLane.packIds.slice() : array(study.activePackIds).slice(0, 1), query: '' });
+                options.redraw();
+            }));
+        }
+        if (!T.hasPeriods(timetable)) return;
+        card.appendChild(el('p', 'ft-setup-h2', t('study.timetable.between', 'Between periods')));
+        card.appendChild(choiceRow([[T.BETWEEN_DEFAULT, t('study.timetable.betweenPlan', 'Your plan')], [T.BETWEEN_NONE, t('study.timetable.betweenNone', 'Nothing')]],
+            timetable.between, value => options.onSave(current => ({ ...current, between: value })), t('study.timetable.between', 'Between periods'), editable));
+        // Clips, Copy and the calendar wait behind one quiet "More choices" (§4 decision 4).
+        if (!ui.moreOpen) {
+            const more = setupChip(t('study.setup.examsMore', 'More choices'), false, () => { ui.moreOpen = true; options.redraw(); }, { quiet: true });
+            more.setAttribute('aria-expanded', 'false');
+            more.dataset.ftFocusKey = 'tt-more';
+            card.appendChild(more);
+            return;
+        }
+        card.appendChild(switchRow(t('study.timetable.hideShorts', 'Hide Clips and comments during periods'), timetable.hideShortsAndComments !== false, editable,
+            on => options.onSave(current => ({ ...current, hideShortsAndComments: on }))));
+        const actions = el('div', 'ft-study-actions ft-tt__actions');
+        if (editable && periods.length) {
+            actions.appendChild(button(t('study.timetable.copy', 'Copy this day to…'), 'btn-secondary', () => {
+                // Weekdays by default when copying from a weekday; the weekend from a weekend day.
+                ui.copyOpen = !ui.copyOpen;
+                ui.copyTo = T.DAYS.filter((_, index) => index !== dayIndex && (dayIndex < 5) === (index < 5));
+                options.redraw();
+            }));
+        }
+        actions.appendChild(button(t('study.timetable.calendar', 'Add to my calendar'), 'btn-secondary', () => downloadCalendar(timetable, catalog)));
+        card.appendChild(actions);
+        if (ui.copyOpen && editable && periods.length) {
+            const pick = el('div', 'ft-tt__copy');
+            pick.setAttribute('role', 'group');
+            pick.setAttribute('aria-label', t('study.timetable.copy', 'Copy this day to…'));
+            const flow = el('div', 'ft-setup-flow');
+            T.DAYS.forEach((key, index) => {
+                if (key === ui.day) return;
+                flow.appendChild(setupChip(weekdayName(index), ui.copyTo.includes(key), () => {
+                    ui.copyTo = ui.copyTo.includes(key) ? ui.copyTo.filter(item => item !== key) : [...ui.copyTo, key];
+                    options.redraw();
+                }, { description: weekdayName(index, true) }));
+            });
+            pick.append(flow, button(t('askParent.ok', 'OK'), 'btn-primary', async () => {
+                const to = ui.copyTo.slice();
+                ui.copyOpen = false;
+                await options.onSave(current => T.copyDay(current, ui.day, to));
+            }));
+            card.appendChild(pick);
+        }
+    }
+
+    function renderTimetableEditor(card, timetable, options) {
+        const T = timetableApi();
+        const Packs = packsApi();
+        const ui = options.ui;
+        const catalog = options.catalog;
+        const study = object(options.study);
+        const same = (a, b) => JSON.stringify(a) === JSON.stringify(b);
+        const editing = ui.editing;
+        const day = ui.day;
+        card.appendChild(el('h3', 'ft-setup-h1 ft-tt-wide', weekdayName(T.DAYS.indexOf(day), true)));
+        // The period on its day's bar: drag its ends, or use the steppers below. The steppers follow live.
+        const outputs = {};
+        card.appendChild(timetableBar(timetable, day, {
+            catalog, ui, edited: { startMinute: ui.start, endMinute: ui.end, laneId: '' }, editId: editing >= 0 ? String(editing) : 'new',
+            onEdit: (period, done) => {
+                ui.start = period.startMinute;
+                ui.end = period.endMinute;
+                if (outputs.from) outputs.from.textContent = clockLabel(ui.start % T.DAY_MINUTES);
+                if (outputs.to) outputs.to.textContent = clockLabel(ui.end % T.DAY_MINUTES);
+                if (done) options.redraw();
+            }
+        }));
+        card.appendChild(el('h3', 'ft-setup-h1', t('study.timetable.what', 'What to study')));
+        // The plan's packs and the lanes used before: one tap each.
+        const known = ids => ids.every(id => catalog && Packs?.packById?.(catalog, id));
+        const choices = [...array(timetable.lanes).map(lane => array(lane.packIds)), ...array(study.activePackIds).map(id => [id])]
+            .filter((ids, index, all) => ids.length && known(ids) && all.findIndex(other => same(other, ids)) === index).slice(0, 8);
+        if (ui.lane.length && known(ui.lane) && !choices.some(ids => same(ids, ui.lane))) choices.push(ui.lane);
+        const chips = el('div', 'ft-setup-flow');
+        choices.forEach(ids => chips.appendChild(setupChip(laneName({ packIds: ids }, catalog), same(ids, ui.lane), () => { ui.lane = ids.slice(); options.redraw(); })));
+        card.appendChild(chips);
+        // Anything else: search every pack.
+        const search = el('input', 'text-input ft-setup-search');
+        search.type = 'search';
+        search.value = ui.query;
+        search.placeholder = t('study.timetable.search', 'Find another subject or exam');
+        search.setAttribute('aria-label', search.placeholder);
+        search.dataset.ftFocusKey = 'timetable-search';
+        const hits = el('div', 'ft-setup-flow ft-tt__hits');
+        const drawHits = () => {
+            hits.replaceChildren();
+            const words = text(ui.query).toLowerCase();
+            const Setup = setupApi();
+            if (words.length < 2 || !catalog || !Setup) return;
+            array(catalog.packs).filter(pack => array(Packs.STUDY_KINDS).includes(pack.kind) && array(pack.channels).length >= 3
+                && Setup.StudyExamList.matches(pack, words)).slice(0, 6).forEach(pack => {
+                hits.appendChild(setupChip(Setup.StudyExamList.chipLabel(pack, language()), same(ui.lane, [pack.id]), () => {
+                    ui.lane = [pack.id]; ui.query = ''; options.redraw();
+                }));
+            });
+        };
+        search.addEventListener('input', () => { ui.query = search.value; drawHits(); });
+        card.append(search, hits);
+        drawHits();
+        // The plan page's steppers (a real minus and plus), each saying its 15-minute step.
+        const step = T.SNAP_MINUTES;
+        const label = minute => clockLabel(minute % T.DAY_MINUTES);
+        const fromRow = stepperRow(t('study.timetable.from', 'From'), label(ui.start), {
+            onLess: () => { ui.start = Math.max(0, ui.start - step); options.redraw(); },
+            onMore: () => { ui.start = Math.min(ui.end - step, ui.start + step); options.redraw(); },
+            lessOk: ui.start > 0, moreOk: ui.start + step < ui.end
+        });
+        const toRow = stepperRow(t('study.timetable.to', 'To'), label(ui.end), {
+            onLess: () => { ui.end = Math.max(ui.start + step, ui.end - step); options.redraw(); },
+            onMore: () => { ui.end = Math.min(T.DAY_MINUTES, ui.end + step); options.redraw(); },
+            lessOk: ui.end - step > ui.start, moreOk: ui.end < T.DAY_MINUTES
+        });
+        outputs.from = fromRow.querySelector('output');
+        outputs.to = toRow.querySelector('output');
+        card.append(fromRow, toRow);
+        const actions = el('div', 'ft-study-actions ft-tt__actions');
+        const save = button(t('study.timetable.save', 'Save'), 'btn-primary', async () => {
+            if (!ui.lane.length) return;
+            const { lane, start, end } = ui;
+            ui.editing = null; ui.query = ''; ui.keyStart = null;
+            await options.onSave(current => {
+                const base = editing >= 0 ? T.withoutPeriod(current, day, editing) : current;
+                const added = T.withLane(base, lane);
+                return T.withPeriod(added.timetable, day, start, end, added.laneId);
+            });
+        });
+        save.disabled = !ui.lane.length;
+        actions.appendChild(save);
+        if (editing >= 0) {
+            actions.appendChild(button(t('study.timetable.delete', 'Remove this period'), 'btn-secondary', async () => {
+                ui.editing = null; ui.keyStart = null;
+                await options.onSave(current => T.withoutPeriod(current, day, editing));
+            }));
+        }
+        card.appendChild(actions);
     }
 
     function switchRow(label, on, enabled, onChange) {
@@ -2220,19 +3014,25 @@
 
     // ---- The plan page (renderPlan: the day planner card, then the daily limit) -----------------
 
-    /** A ±step row: label, a round − button, the rolling value, a round + button (stepperRow). */
-    function stepperRow(label, value, { onLess, onMore, lessOk = true, moreOk = true, enabled = true }) {
+    /**
+     * A ±step row: label, a round − button, the rolling value, a round + button (stepperRow). Each button
+     * says its own step (Android study_step_earlier/later, study_step_shorter/longer): a time ("15
+     * minutes earlier") or a length ("5 minutes shorter").
+     */
+    function stepperRow(label, value, { onLess, onMore, lessOk = true, moreOk = true, enabled = true, length = false }) {
         const row = el('div', 'ft-stepper');
         row.appendChild(el('span', 'ft-stepper__label', label));
         const less = button('', 'ft-stepper__btn', () => onLess());
         less.appendChild(icon('minus'));
-        less.setAttribute('aria-label', t('study.planner.earlier', '{label}: 15 minutes earlier', { label }));
+        less.setAttribute('aria-label', length ? t('study.planner.shorter', '{label} 5 minutes shorter', { label })
+            : t('study.planner.earlier', '{label}: 15 minutes earlier', { label }));
         less.disabled = !enabled || !lessOk;
         const shown = el('output', 'ft-stepper__value', value);
         shown.setAttribute('aria-live', 'polite');
         const more = button('', 'ft-stepper__btn', () => onMore());
         more.appendChild(icon('plus'));
-        more.setAttribute('aria-label', t('study.planner.later', '{label}: 15 minutes later', { label }));
+        more.setAttribute('aria-label', length ? t('study.planner.longer', '{label} 5 minutes longer', { label })
+            : t('study.planner.later', '{label}: 15 minutes later', { label }));
         more.disabled = !enabled || !moreOk;
         row.append(less, shown, more);
         return row;
@@ -2252,149 +3052,263 @@
     }
 
     /**
-     * The day bar (StudyDayPlannerView): hour ticks, the plan's segments, now, and the START, END and LIMIT
-     * handles. Each handle is a slider: drag it (pointer capture, 15-minute snap, a pill shows the time),
-     * or focus it and use the arrows (15 min), Page Up / Page Down (1 h), Home / End. Escape or a cancelled
-     * pointer puts it back. onLive(draft, which) runs while it moves; onCommit(before, after) once it lands.
+     * The day bar (Android StudyDayPlannerView, 3d92defa7): hour ticks, the plan's segments, now, and the
+     * START, END and LIMIT handles. It never scrolls sideways (DESIGN_PASS_2026-11-21 §4.0): below 600 px
+     * it shows the plan's own hours (2 h before study to 1 h after the limit, at least 6 h), wider it
+     * shows 6 am to 11 pm grown to take in the plan. Handles moved outside pull the hours out; a handle
+     * held against an edge widens that edge an hour every 350 ms; mid-drag the bar holds still.
+     * Each handle is a slider with a 44 px target: drag it (15-minute snap, a pill shows the time), or
+     * focus it: arrows 15 min, Shift+arrow and Page Up / Page Down 1 h, Home / End as far as its rules
+     * allow, Escape puts back what the keys moved since it got focus. A cancelled pointer or Escape
+     * mid-drag puts the handle back. On a tie END takes the press, not LIMIT. It mirrors under
+     * dir="rtl", arrows too. A read-only bar draws no handles.
+     * options: {editable, onSelect, onLive(draft, which), onCommit(before, after), memory}. memory ({range,
+     * wide, keys}) is kept by the page across re-renders, so the hours don't jump after a save.
      */
-    function planBar(plan, focus, breakMode, { editable, onSelect, onLive, onCommit } = {}) {
+    function planBar(plan, focus, breakMode, { editable, onSelect, onLive, onCommit, memory = {} } = {}) {
         const Drag = planDrag();
-        const segments = planSegments(plan, focus, { from: 6 * 60, to: 23 * 60 });
-        const from = segments[0]?.start ?? 0;
-        const to = segments[segments.length - 1]?.end ?? 1440;
-        const span = Math.max(1, to - from);
-        const pct = minute => `${(((Math.max(from, Math.min(to, minute)) - from) / span) * 100).toFixed(3)}%`;
         const wrap = el('div', 'ft-dayplan');
         const track = el('div', 'ft-dayplan__track');
-        for (const segment of segments) {
-            if (segment.kind === 'normal') continue;
-            const part = button('', `ft-dayplan__seg is-${segment.kind}`, () => onSelect?.(segment));
-            part.style.left = pct(segment.start);
-            part.style.width = `${(((segment.end - segment.start) / span) * 100).toFixed(3)}%`;
-            part.setAttribute('aria-label', `${segmentName(segment.kind)}, ${clockLabel(segment.start)} – ${clockLabel(segment.end)}`);
-            track.appendChild(part);
-        }
-        const now = new Date();
-        const minutesNow = now.getHours() * 60 + now.getMinutes();
-        if (minutesNow >= from && minutesNow <= to) {
-            const marker = el('span', 'ft-dayplan__now');
-            marker.setAttribute('aria-hidden', 'true');
-            marker.style.left = pct(minutesNow);
-            track.appendChild(marker);
-        }
-        if (!Drag || minuteOf(plan.start) === null || minuteOf(plan.end) === null) {
-            wrap.append(track);
-            return wrap;
-        }
-        const saved = Drag.draftOf(plan);
-        let draft = { ...saved };
+        const layer = el('div', 'ft-dayplan__segs');
+        const scale = el('div', 'ft-dayplan__scale');
+        track.appendChild(layer);
+        wrap.append(track, scale);
+        const hasPlan = !!Drag && minuteOf(plan.start) !== null && minuteOf(plan.end) !== null;
+        const saved = hasPlan ? Drag.draftOf(plan) : null;
+        let draft = saved ? { ...saved } : null;
+        const canEdit = hasPlan && !!editable && !!onCommit;
+        const rtl = () => {
+            try { if (wrap.isConnected && root.getComputedStyle) return root.getComputedStyle(wrap).direction === 'rtl'; } catch (e) { }
+            const dir = wrap.closest?.('[dir]')?.getAttribute?.('dir') || root.document?.documentElement?.getAttribute?.('dir');
+            return dir === 'rtl';
+        };
+        const trackWidth = () => { try { return track.getBoundingClientRect?.().width || 0; } catch (e) { return 0; } };
+        // Until the bar has a width, the window's guesses which range it gets; a measured width corrects it.
+        let wide = typeof memory.wide === 'boolean' ? memory.wide : (Number(root.innerWidth) || 0) >= (Drag?.WIDE_MIN_PX || 600);
+        let range = !hasPlan ? { start: 6 * 60, end: 23 * 60 }
+            : memory.range ? Drag.including(memory.range, draft) : Drag.range(draft, wide);
+        const keep = next => { range = next; memory.range = next; memory.wide = wide; };
+        keep(range);
+        let dragging = null;
+        let mirrored = false;
+        /** Where a minute sits on the bar, 0-100 from the left (mirrored in right-to-left). */
+        const spot = minute => {
+            const value = ((Math.max(range.start, Math.min(range.end, minute)) - range.start) / Math.max(1, range.end - range.start)) * 100;
+            return mirrored ? 100 - value : value;
+        };
+        const pct = value => `${value.toFixed(3)}%`;
+        const paintSegments = () => {
+            layer.replaceChildren();
+            const shown = draft ? Drag.applyToPlan(plan, draft) : plan;
+            for (const segment of planSegments(shown, focus, { from: 0, to: 1440 })) {
+                if (segment.kind === 'normal') continue;
+                const from = Math.max(range.start, segment.start);
+                const to = Math.min(range.end, segment.end);
+                if (to <= from) continue;
+                const label = `${segmentName(segment.kind)}, ${clockLabel(segment.start % 1440)} – ${clockLabel(segment.end % 1440)}`;
+                const part = onSelect ? button('', `ft-dayplan__seg is-${segment.kind}`, () => onSelect(segment)) : el('span', `ft-dayplan__seg is-${segment.kind}`);
+                const a = spot(from); const b = spot(to);
+                part.style.left = pct(Math.min(a, b));
+                part.style.width = pct(Math.abs(b - a));
+                part.setAttribute('aria-label', label);
+                layer.appendChild(part);
+            }
+            const now = new Date();
+            const minutesNow = now.getHours() * 60 + now.getMinutes();
+            if (minutesNow >= range.start && minutesNow <= range.end) {
+                const marker = el('span', 'ft-dayplan__now');
+                marker.setAttribute('aria-hidden', 'true');
+                marker.style.left = pct(spot(minutesNow));
+                layer.appendChild(marker);
+            }
+        };
+        const paintScale = () => {
+            scale.replaceChildren();
+            const width = trackWidth() || (wide ? 720 : 340);
+            const perHour = (width * 60) / Math.max(60, range.end - range.start);
+            // As often as the labels fit (every 1, 2, 3, 4 or 6 hours); one the bar's end would cut is left out.
+            const every = [1, 2, 3, 4, 6].find(hours => hours * perHour >= 56) || 6;
+            for (let hour = Math.ceil(range.start / 60); hour * 60 <= range.end; hour += 1) {
+                if (hour % every !== 0 || hour >= 24) continue;
+                const x = (spot(hour * 60) / 100) * width;
+                if (x < 22 || x > width - 22) continue;
+                const tick = el('span', 'ft-dayplan__hour', clockLabel(hour * 60).replace(/:00/, ''));
+                tick.style.left = pct(spot(hour * 60));
+                scale.appendChild(tick);
+            }
+        };
         const handles = {};
-        const spotOf = which => (which === 'limit' ? (draft.limit ?? Drag.NO_LIMIT) : draft[which]);
-        const paint = () => {
-            for (const which of Drag.HANDLES) {
+        // No limit is midnight; on a bar that stops earlier the limit handle waits at the bar's late end
+        // (Android's shownMinute): drag it in to set a limit, hold it at the edge for no limit again.
+        const spotOf = which => (which === 'limit' ? (draft.limit ?? Math.min(range.end, Drag.NO_LIMIT)) : draft[which]);
+        const paintHandles = () => {
+            for (const which of Object.keys(handles)) {
                 const handle = handles[which];
                 const at = spotOf(which);
-                handle.style.left = pct(at);
+                handle.style.left = pct(spot(at));
                 const value = handleValue(which, which === 'limit' ? draft.limit : at);
-                handle.setAttribute('aria-valuenow', String(which === 'limit' ? (draft.limit ?? Drag.NO_LIMIT) : at));
+                handle.setAttribute('aria-valuenow', String(at));
                 handle.setAttribute('aria-valuetext', value.time);
                 handle.setAttribute('aria-label', value.name);
                 handle.querySelector('.ft-dayplan__pill').textContent = value.time;
-                const range = which === 'start' ? [0, draft.end - Drag.MIN_STUDY_MINUTES]
+                const bounds = which === 'start' ? [0, draft.end - Drag.MIN_STUDY_MINUTES]
                     : which === 'end' ? [draft.start + Drag.MIN_STUDY_MINUTES, Drag.LAST_END] : [draft.end, Drag.NO_LIMIT];
-                handle.setAttribute('aria-valuemin', String(range[0]));
-                handle.setAttribute('aria-valuemax', String(range[1]));
+                handle.setAttribute('aria-valuemin', String(bounds[0]));
+                handle.setAttribute('aria-valuemax', String(bounds[1]));
+                if (which === 'limit') handle.classList.toggle('is-unset', draft.limit === null);
             }
         };
-        const live = which => { paint(); onLive?.({ ...draft }, which); };
-        const commit = () => {
-            if (draft.start === saved.start && draft.end === saved.end && (draft.limit ?? null) === (saved.limit ?? null)) return;
-            onCommit?.({ ...saved }, { ...draft });
+        const layout = () => { mirrored = rtl(); paintSegments(); paintScale(); if (draft) paintHandles(); };
+        if (!canEdit) {
+            layout();
+            observeWidth();
+            return wrap;
+        }
+        const same = (a, b) => a.start === b.start && a.end === b.end && (a.limit ?? null) === (b.limit ?? null);
+        const live = which => {
+            // Mid-drag the hours hold still under the pointer; otherwise they take in the handles.
+            if (!dragging) keep(Drag.including(range, draft));
+            layout();
+            onLive?.({ ...draft }, which);
         };
-        const revert = which => { draft = { ...saved }; live(which); };
+        const commit = () => { if (!same(draft, saved)) onCommit({ ...saved }, { ...draft }); };
+        let keyTimer = null;
         for (const which of Drag.HANDLES) {
             const handle = el('span', `ft-dayplan__handle is-${which}`);
             handle.appendChild(el('span', 'ft-dayplan__pill'));
             handle.dataset.ftFocusKey = `dayplan-${which}`;
-            if (editable && onCommit) {
-                handle.setAttribute('role', 'slider');
-                handle.setAttribute('aria-orientation', 'horizontal');
-                handle.tabIndex = 0;
-                let keyTimer = null;
-                handle.addEventListener('keydown', event => {
-                    const steps = { ArrowLeft: -15, ArrowDown: -15, ArrowRight: 15, ArrowUp: 15, PageDown: -60, PageUp: 60 };
-                    if (event.key === 'Escape') { revert(which); return; }
-                    if (event.key === 'Home' || event.key === 'End') {
-                        event.preventDefault();
-                        draft = Drag.move(draft, which, event.key === 'Home' ? 0 : Drag.DAY_MINUTES);
-                    } else if (steps[event.key]) {
-                        event.preventDefault();
-                        draft = Drag.step(draft, which, steps[event.key]);
-                    } else return;
-                    handle.classList.add('is-active');
+            handle.setAttribute('role', 'slider');
+            handle.setAttribute('aria-orientation', 'horizontal');
+            handle.tabIndex = 0;
+            // What the keys moved since this handle got focus (kept across the re-render a save causes).
+            handle.addEventListener('focus', () => {
+                if (!(memory.keys && memory.keys.which === which)) memory.keys = { which, draft: { ...draft } };
+            });
+            handle.addEventListener('blur', () => {
+                handle.classList.remove('is-active');
+                setTimeout(() => {
+                    const active = root.document?.activeElement;
+                    if (active?.dataset?.ftFocusKey !== `dayplan-${which}` && memory.keys?.which === which) memory.keys = null;
+                }, 0);
+            });
+            handle.addEventListener('keydown', event => {
+                if (event.key === 'Escape') {
+                    if (dragging) { event.preventDefault(); dragging.cancel(); return; }
+                    const start = memory.keys?.which === which ? memory.keys.draft : null;
+                    if (!start || same(start, draft)) return;
+                    event.preventDefault();
+                    draft = { ...start };
                     live(which);
-                    // A run of key presses saves once, a moment after the last one.
                     clearTimeout(keyTimer);
-                    keyTimer = setTimeout(() => { handle.classList.remove('is-active'); commit(); }, 700);
-                });
-                handle.addEventListener('blur', () => handle.classList.remove('is-active'));
-            } else {
-                handle.setAttribute('aria-hidden', 'true');
-            }
+                    handle.classList.remove('is-active');
+                    commit();
+                    return;
+                }
+                const flip = rtl() ? -1 : 1;
+                const hour = event.shiftKey ? 60 : 15;
+                const steps = { ArrowLeft: -hour * flip, ArrowRight: hour * flip, ArrowDown: -hour, ArrowUp: hour, PageDown: -60, PageUp: 60 };
+                if (event.key === 'Home' || event.key === 'End') draft = Drag.extreme(draft, which, event.key === 'End');
+                else if (steps[event.key]) draft = Drag.step(draft, which, steps[event.key]);
+                else return;
+                event.preventDefault();
+                handle.classList.add('is-active');
+                live(which);
+                // A run of key presses saves once, a moment after the last one.
+                clearTimeout(keyTimer);
+                keyTimer = setTimeout(() => { handle.classList.remove('is-active'); commit(); }, 700);
+            });
             handles[which] = handle;
             track.appendChild(handle);
         }
-        if (draft.limit === null) handles.limit.classList.add('is-unset');
-        if (editable && onCommit) {
-            let justDragged = false;
-            track.addEventListener('click', event => { if (justDragged) { event.stopPropagation(); event.preventDefault(); } }, { capture: true });
-            // Presses anywhere near a handle take it (±26 px, the nearest; LIMIT loses ties), as on the app.
-            track.addEventListener('pointerdown', event => {
-                if (event.button !== 0) return;
-                const box = track.getBoundingClientRect();
-                const at = Drag.minuteAt(event.clientX, box.left, box.width, from, to);
-                const reach = (26 / Math.max(1, box.width)) * span;
-                const which = Drag.nearestHandle(draft, at, reach);
-                if (!which) return;
-                event.preventDefault();
-                const handle = handles[which];
-                try { track.setPointerCapture(event.pointerId); } catch (e) { }
-                handle.classList.add('is-dragging');
-                try { handle.focus({ preventScroll: true }); } catch (e) { }
-                const move = ev => {
-                    const next = Drag.move(draft, which, Drag.minuteAt(ev.clientX, box.left, box.width, from, to));
-                    if (next.start === draft.start && next.end === draft.end && next.limit === draft.limit) return;
-                    draft = next;
-                    live(which);
-                };
-                const finish = cancelled => {
-                    track.removeEventListener('pointermove', move);
-                    track.removeEventListener('pointerup', onUp);
-                    track.removeEventListener('pointercancel', onCancel);
-                    handle.classList.remove('is-dragging');
-                    if (cancelled) revert(which); else commit();
-                };
-                const onUp = () => {
-                    finish(false);
-                    // The press was a drag, not a tap on a segment: the click that follows it is swallowed.
-                    justDragged = true;
-                    setTimeout(() => { justDragged = false; }, 0);
-                };
-                const onCancel = () => finish(true);
-                track.addEventListener('pointermove', move);
-                track.addEventListener('pointerup', onUp);
-                track.addEventListener('pointercancel', onCancel);
-            });
-        }
-        paint();
-        const scale = el('div', 'ft-dayplan__scale');
-        for (let hour = Math.ceil(from / 180) * 180; hour <= to - 60; hour += 180) {
-            const tick = el('span', 'ft-dayplan__hour', clockLabel(hour % 1440).replace(/:00/, ''));
-            tick.style.left = pct(hour);
-            scale.appendChild(tick);
-        }
-        wrap.append(track, scale);
+        let justDragged = false;
+        track.addEventListener('click', event => { if (justDragged) { event.stopPropagation(); event.preventDefault(); } }, { capture: true });
+        // A press within 22 px of a handle takes it (a 44 px target; the nearest; END before LIMIT on a tie).
+        track.addEventListener('pointerdown', event => {
+            if (event.button !== 0 || dragging) return;
+            const box = track.getBoundingClientRect();
+            const flipped = rtl();
+            const minuteAtX = x => {
+                const offset = flipped ? box.right - x : x - box.left;
+                return Math.max(range.start, Math.min(range.end, range.start + (offset / Math.max(1, box.width)) * (range.end - range.start)));
+            };
+            const reach = (22 / Math.max(1, box.width)) * (range.end - range.start);
+            const which = Drag.nearestHandle(draft, minuteAtX(event.clientX), reach, Math.min(range.end, Drag.NO_LIMIT));
+            if (!which) return;
+            event.preventDefault();
+            const handle = handles[which];
+            const before = { ...draft };
+            let lastX = event.clientX;
+            let edgeTimer = null;
+            let edge = null;
+            try { track.setPointerCapture(event.pointerId); } catch (e) { }
+            handle.classList.add('is-dragging');
+            try { handle.focus({ preventScroll: true }); } catch (e) { }
+            const dragTo = x => {
+                const next = Drag.move(draft, which, minuteAtX(x));
+                if (same(next, draft)) return;
+                draft = next;
+                live(which);
+            };
+            const stopEdge = () => { clearInterval(edgeTimer); edgeTimer = null; edge = null; };
+            // Held against an edge: that edge gives an hour every 350 ms, so the whole day is reachable.
+            const edgeAt = x => (x <= box.left + 16 ? !flipped : x >= box.right - 16 ? flipped : null);
+            const move = ev => {
+                lastX = ev.clientX;
+                dragTo(lastX);
+                const at = edgeAt(lastX);
+                if (at === null) { stopEdge(); return; }
+                if (edge === at) return;
+                stopEdge();
+                edge = at;
+                edgeTimer = setInterval(() => {
+                    const grown = Drag.widen(range, edge);
+                    if (Drag.sameRange(grown, range)) { stopEdge(); return; }
+                    keep(grown);
+                    layout();
+                    dragTo(lastX);
+                }, 350);
+            };
+            const finish = cancelled => {
+                stopEdge();
+                track.removeEventListener('pointermove', move);
+                track.removeEventListener('pointerup', onUp);
+                track.removeEventListener('pointercancel', onCancel);
+                handle.classList.remove('is-dragging');
+                dragging = null;
+                if (cancelled) { draft = before; live(which); } else { live(which); commit(); }
+            };
+            const onUp = () => {
+                finish(false);
+                // The press was a drag, not a tap on a segment: the click that follows it is swallowed.
+                justDragged = true;
+                setTimeout(() => { justDragged = false; }, 0);
+            };
+            const onCancel = () => finish(true);
+            dragging = { cancel: () => finish(true) };
+            track.addEventListener('pointermove', move);
+            track.addEventListener('pointerup', onUp);
+            track.addEventListener('pointercancel', onCancel);
+        });
+        layout();
+        observeWidth();
         return wrap;
+
+        /** Fits the bar to its width: the range class (narrow or wide) and the hour ticks follow it. */
+        function observeWidth() {
+            if (!Drag || typeof root.ResizeObserver !== 'function') return;
+            const watcher = new root.ResizeObserver(() => {
+                const width = trackWidth();
+                if (!width) return;
+                if (!wrap.isConnected) { watcher.disconnect(); return; }
+                const nextWide = width >= Drag.WIDE_MIN_PX;
+                if (hasPlan && nextWide !== wide && !dragging) {
+                    wide = nextWide;
+                    keep(Drag.range(draft, wide));
+                }
+                layout();
+            });
+            watcher.observe(track);
+        }
     }
 
     /**
@@ -2434,22 +3348,22 @@
                 : `${segmentName(segment.kind)} · ${clockLabel(segment.start)} – ${clockLabel(segment.end)}`;
             detail.replaceChildren(el('strong', 'ft-plan-card__detail-title', titleText), el('span', 'ft-study-muted', segmentWords(segment, breakMode)));
         };
-        const start = minuteOf(plan.start) ?? 16 * 60;
-        const end = minuteOf(plan.end) ?? 18 * 60;
-        const limit = minuteOf(plan.limit);
-        const setStart = value => planPatch({ ...plan, start: hhmm(value), end: hhmm(Math.max(end, value + MIN_STUDY)) });
-        const setEnd = value => {
-            const next = Math.max(value, start + MIN_STUDY);
-            const changed = { ...plan, end: hhmm(next) };
-            if (limit !== null && limit < next) changed.limit = hhmm(next);
-            planPatch(changed);
-        };
         const Drag = planDrag();
+        // The steppers follow Android's StudyPlannerModel (step, stepRound, stepBreak): START never pushes
+        // END, END pushes the limit along, the limit steps from the end of study; rounds 15-120 min and
+        // breaks 0-60 min in 5-minute steps.
+        const current = Drag ? Drag.draftOf(plan) : { start: minuteOf(plan.start) ?? 16 * 60, end: minuteOf(plan.end) ?? 18 * 60, limit: minuteOf(plan.limit) };
+        const start = current.start;
+        const end = current.end;
+        const limit = current.limit;
+        const stepTo = next => planPatch(Drag.applyToPlan(plan, next));
         // While a handle moves: its time in the detail card ("Study starts, 4:00 PM") and the steppers below
         // follow it (StudyFocusActivity.onLiveDraft); it saves once, where it lands, with Undo.
         const liveOutputs = {};
         card.appendChild(planBar(plan, focus, breakMode, {
             editable,
+            // The hours the bar showed before this re-render, so a save never shifts it.
+            memory: options.barMemory || {},
             onSelect: segment => showDetail(segment, false),
             onLive: (draft, which) => {
                 const value = handleValue(which, which === 'limit' ? draft.limit : draft[which]);
@@ -2481,12 +3395,12 @@
             days.appendChild(chip);
         });
         card.appendChild(days);
-        const startRow = stepperRow(t('study.startLabel', 'Start'), clockLabel(start), { enabled: editable,
-            lessOk: start >= STEP, moreOk: start + STEP <= 1440 - MIN_STUDY - STEP,
-            onLess: () => setStart(start - STEP), onMore: () => setStart(start + STEP) });
-        const endRow = stepperRow(t('study.endLabel', 'End'), clockLabel(end % 1440), { enabled: editable,
+        const startRow = stepperRow(t('study.startLabel', 'Start'), clockLabel(start), { enabled: editable && !!Drag,
+            lessOk: start >= STEP, moreOk: start + STEP <= end - MIN_STUDY,
+            onLess: () => stepTo(Drag.step(current, 'start', -STEP)), onMore: () => stepTo(Drag.step(current, 'start', STEP)) });
+        const endRow = stepperRow(t('study.endLabel', 'End'), clockLabel(end % 1440), { enabled: editable && !!Drag,
             lessOk: end - STEP >= start + MIN_STUDY, moreOk: end + STEP <= 1440 - STEP,
-            onLess: () => setEnd(end - STEP), onMore: () => setEnd(end + STEP) });
+            onLess: () => stepTo(Drag.step(current, 'end', -STEP)), onMore: () => stepTo(Drag.step(current, 'end', STEP)) });
         liveOutputs.start = startRow.querySelector('output');
         liveOutputs.end = endRow.querySelector('output');
         card.append(startRow, endRow);
@@ -2504,12 +3418,12 @@
         const preset = round === 25 && rest === 5 ? 25 : round === 50 && rest === 10 ? 50 : 0;
         card.appendChild(choiceRow([[25, t('study.planner.round25', '25 / 5 min')], [50, t('study.planner.round50', '50 / 10 min')]], preset,
             value => focusPatch({ roundMinutes: value, breakMinutes: value === 50 ? 10 : 5 }), t('study.planner.rounds', 'Rounds'), editable));
-        card.appendChild(stepperRow(t('study.roundLength', 'Study round'), t('study.minutes', '{minutes} min', { minutes: round }), { enabled: editable,
-            lessOk: round > 10, moreOk: round < 120,
-            onLess: () => focusPatch({ roundMinutes: Math.max(10, round - 5) }), onMore: () => focusPatch({ roundMinutes: Math.min(120, round + 5) }) }));
-        card.appendChild(stepperRow(t('study.breakLength', 'Break'), rest === 0 ? t('study.noBreak', 'No break') : t('study.minutes', '{minutes} min', { minutes: rest }), { enabled: editable,
-            lessOk: rest > 0, moreOk: rest < 30,
-            onLess: () => focusPatch({ breakMinutes: Math.max(0, rest - 5) }), onMore: () => focusPatch({ breakMinutes: Math.min(30, rest + 5) }) }));
+        card.appendChild(stepperRow(t('study.roundLength', 'Study round'), t('study.minutes', '{minutes} min', { minutes: round }), { enabled: editable && !!Drag, length: true,
+            lessOk: round > (Drag?.MIN_ROUND_MINUTES ?? 15), moreOk: round < (Drag?.MAX_ROUND_MINUTES ?? 120),
+            onLess: () => focusPatch({ roundMinutes: Drag.stepRound(round, -1) }), onMore: () => focusPatch({ roundMinutes: Drag.stepRound(round, 1) }) }));
+        card.appendChild(stepperRow(t('study.breakLength', 'Break'), rest === 0 ? t('study.noBreak', 'No break') : t('study.minutes', '{minutes} min', { minutes: rest }), { enabled: editable && !!Drag, length: true,
+            lessOk: rest > 0, moreOk: rest < (Drag?.MAX_BREAK_MINUTES ?? 60),
+            onLess: () => focusPatch({ breakMinutes: Drag.stepBreak(rest, -1) }), onMore: () => focusPatch({ breakMinutes: Drag.stepBreak(rest, 1) }) }));
         page.appendChild(card);
 
         // The daily limit (addLimit).
@@ -2519,15 +3433,12 @@
             limitCard.appendChild(el('p', 'ft-plan-card__hint', limit === null
                 ? t('study.limit.bodyNone', 'Tap + to choose a time. After it, nothing plays until midnight.')
                 : t('study.limit.body', 'Drag the grey limit handle on the plan, or step it here. After the limit, nothing plays until midnight.')));
-            const endOfStudy = end % 1440;
+            // From "No limit", + starts at the end of study and − at 23:45; never before the end of study;
+            // + past 23:45 is "No limit" again.
             const limitRow = stepperRow(t('study.section.limit', 'Daily limit'), limit === null ? t('study.limit.noLimit', 'No limit') : clockLabel(limit), {
-                lessOk: limit !== null, moreOk: limit === null || limit + STEP <= 1440 - STEP,
-                onLess: () => {
-                    const next = { ...plan };
-                    if (limit - STEP < Math.max(endOfStudy, 0)) delete next.limit; else next.limit = hhmm(limit - STEP);
-                    planPatch(next);
-                },
-                onMore: () => planPatch({ ...plan, limit: hhmm(limit === null ? Math.max(endOfStudy, 20 * 60) : limit + STEP) })
+                enabled: !!Drag, lessOk: limit === null || limit > end,
+                onLess: () => stepTo(Drag.stepLimit(current, -1)),
+                onMore: () => stepTo(Drag.stepLimit(current, 1))
             });
             liveOutputs.limit = limitRow.querySelector('output');
             limitCard.appendChild(limitRow);
@@ -2658,18 +3569,19 @@
     /** The page header (buildScaffold): back on the plan page, the title, and the pack tag. */
     function pageHeader(data, ctx) {
         const head = el('div', 'ft-study-head');
-        if (ctx.mode === 'plan') {
+        if (ctx.mode === 'plan' || ctx.mode === 'timetable') {
             const back = button('', 'ft-study-head__back', () => ctx.setMode('home'));
             back.appendChild(icon('back'));
             back.setAttribute('aria-label', t('askParent.back', 'Back'));
             head.appendChild(back);
         }
         // Home's title is the page header's own ("Study and focus"); the plan page names itself.
-        const title = el('h3', 'ft-study-head__title', ctx.mode === 'plan' ? t('study.dash.changePlan', 'Change plan') : '');
-        if (ctx.mode !== 'plan') title.setAttribute('aria-hidden', 'true');
+        const title = el('h3', 'ft-study-head__title', ctx.mode === 'plan' ? t('study.dash.changePlan', 'Change plan')
+            : ctx.mode === 'timetable' ? t('study.timetable.title', 'Timetable') : '');
+        if (ctx.mode === 'home') title.setAttribute('aria-hidden', 'true');
         head.appendChild(title);
         const tag = packsLabel(data.state);
-        if (tag && ctx.mode !== 'plan') head.appendChild(el('span', 'ft-study-head__tag', tag));
+        if (tag && ctx.mode === 'home') head.appendChild(el('span', 'ft-study-head__tag', tag));
         return head;
     }
 
@@ -2729,24 +3641,38 @@
             const parentPlan = text(object(study.plan).setByParentId) || state.setByParentId;
             const editable = role === 'self' && !parentPlan && !text(object(study.lock).setByParentId) && state.lockMode !== 'locked' && !state.lock;
             renderPlanPage(holder, {
-                study, state, editable, parentName: data.parentName, toastHost: host,
+                study, state, editable, parentName: data.parentName, toastHost: host, barMemory: ctx.planBarMemory,
                 readOnlyLabel: role === 'child' || parentPlan ? setByLabel(data.parentName) : '',
                 onPatch: async patch => { const result = await send({ action: 'FilterTube_StudyUpdate', patch }); await ctx.refresh(); return result; }
             });
             replaceKeepingFocus(host, view);
             return;
         }
-        view.appendChild(heroCard(data, local));
-        if (isObject(study.plan) && !ended) {
-            // Study length: today's plan as one slider, right under the hero (owner, 2026-11-17).
-            const lengthCard = el('section', 'ft-home-card ft-length-card');
-            mountLengthSlider(lengthCard, { study, state: { ...state, parentName: data.parentName }, onPatch: async patch => {
-                const result = await send({ action: 'FilterTube_StudyUpdate', patch });
-                if (result?.ok !== false) ctx.refresh();
-                return result;
-            } });
-            view.appendChild(lengthCard);
+        if (ctx.mode === 'timetable' && timetableApi()) {
+            const holder = el('div', 'ft-study-plan-host');
+            view.appendChild(holder);
+            const parentTimetable = text(object(study.timetable).setByParentId);
+            renderTimetablePage(holder, {
+                study, catalog: ctx.catalog, ui: ctx.timetableUi, editable: role === 'self' && !parentTimetable,
+                readOnlyLabel: role === 'child' || parentTimetable ? setByLabel(data.parentName) : '',
+                redraw: () => ctx.redrawHome(),
+                onSave: async change => {
+                    const T = timetableApi();
+                    const zone = deviceZone();
+                    let next = change(isObject(study.timetable) ? study.timetable : T.create(zone ? { zone } : {}));
+                    if (next) next = { ...next, ...(next.zone || !zone ? {} : { zone }) };
+                    // An empty timetable is none.
+                    if (next && !T.hasPeriods(next) && !Object.keys(object(next.examDates)).length) next = null;
+                    const result = await send({ action: 'FilterTube_StudyUpdate', patch: { timetable: next } });
+                    if (result?.ok === false) ctx.toast(t('study.saveRefused', 'Can\'t change the plan while a lock is running.'));
+                    await ctx.refresh();
+                    return result;
+                }
+            });
+            replaceKeepingFocus(host, view);
+            return;
         }
+        view.appendChild(heroCard(data, local));
         const resume = continueRow(state);
         if (resume) view.appendChild(resume);
         if (state.weekView) view.appendChild(weekCard(state));
@@ -2901,8 +3827,20 @@
             redraw: false,
             refresh: () => refresh(),
             redrawHome: () => draw(true),
+            // The Timetable page's own state: the day shown and the period being edited (null: the day).
+            planBarMemory: {},
+            timetableUi: { day: null, editing: null, start: 16 * 60, end: 17 * 60, lane: [], query: '', copyOpen: false, copyTo: [], moreOpen: false, keyStart: null },
             setMode: next => {
-                mode = next === 'plan' ? 'plan' : 'home';
+                // Back from a period being edited returns to its day first.
+                if (mode === 'timetable' && next === 'home' && ctx.timetableUi.editing !== null) {
+                    ctx.timetableUi.editing = null; ctx.timetableUi.query = '';
+                    draw(false);
+                    return;
+                }
+                if (next === 'timetable' && mode !== 'timetable') Object.assign(ctx.timetableUi, { day: null, editing: null, copyOpen: false, query: '', moreOpen: false, keyStart: null });
+                // The plan page's day bar starts from its own hours each time it opens.
+                if (next === 'plan' && mode !== 'plan') ctx.planBarMemory = {};
+                mode = next === 'plan' || next === 'timetable' ? next : 'home';
                 draw(false);
                 try { host.closest('.ft-study-card')?.scrollIntoView({ block: 'start', behavior: motionAllowed() ? 'smooth' : 'auto' }); } catch (e) { }
             },
@@ -3081,130 +4019,19 @@
         return t('study.hoursMinutes', '{hours} h {minutes} min', { hours: Math.floor(minutes / 60), minutes: minutes % 60 });
     }
 
-    /** Whether this person may change the plan here (a parent's plan or lock, or a locked session, may not). */
-    function planEditable(state) {
-        const value = object(state);
-        const study = object(value.study);
-        return value.isChild !== true && !value.setByParentId && !text(object(study.plan).setByParentId)
-            && !text(object(study.lock).setByParentId) && value.lockMode !== 'locked' && !value.lock;
-    }
-
-    /**
-     * Study length (owner, 2026-11-17: "where is the slider to make study longer or shorter?"): today's plan as
-     * one slider. The start stays; dragging moves the end in 15-minute steps (30 min at least, 23:45 at
-     * most) and pushes the daily limit along, as the plan page's END handle does. −/+ step 15 minutes.
-     * It saves once the slider rests, with the same FilterTube_StudyUpdate the plan page sends.
-     *
-     * mountLengthSlider(host, {study, state, compact, onPatch, onSetup, onChange}) -> {refresh, destroy}
-     * - study/state: FilterTube_StudyGetState's `study` (and the whole state); omitted, it asks for them.
-     * - compact: a card-sized version without the hint line.
-     * - onPatch(patch) -> Promise<{ok}>: defaults to FilterTube_StudyUpdate.
-     * - onSetup(): "Set up study" when there is no plan (default: the Study page).
-     * - onChange({start, end, minutes}): after a save.
-     */
-    function mountLengthSlider(host, options = {}) {
-        const Drag = planDrag();
-        let alive = true;
-        let saveTimer = null;
-        const onPatch = options.onPatch || (patch => send({ action: 'FilterTube_StudyUpdate', patch }));
-        const openStudy = options.onSetup || (() => {
-            const nav = root.document?.querySelector?.('.nav-item[data-tab="study"]');
-            if (nav) { nav.click(); return; }
-            try { root.open(runtime()?.runtime?.getURL?.('html/tab-view.html#study') || '#study', '_blank'); } catch (e) { }
-        });
-        function draw(study, state) {
-            if (!alive || !host) return;
-            const box = el('div', `ft-length${options.compact ? ' is-compact' : ''}`);
-            const plan = object(study).plan;
-            const head = el('div', 'ft-length__head');
-            const title = el('span', 'ft-length__title', t('study.length.title', 'Study length'));
-            title.id = `ftLengthTitle${Math.random().toString(36).slice(2, 8)}`;
-            head.appendChild(title);
-            box.appendChild(head);
-            if (!Drag || !isObject(plan) || minuteOf(plan.start) === null) {
-                box.appendChild(button(t('study.setup.title', 'Set up study'), 'btn-secondary ft-length__setup', () => openStudy()));
-                host.replaceChildren(box);
-                return;
-            }
-            let draft = Drag.draftOf(plan);
-            const saved = { ...draft };
-            const editable = planEditable(state ? { ...state, study } : { study });
-            const value = el('strong', 'ft-length__value');
-            const range = el('span', 'ft-length__range');
-            head.append(value);
-            box.appendChild(range);
-            const row = el('div', 'ft-length__row');
-            const less = button('', 'ft-stepper__btn ft-length__step', () => set(Drag.lengthOf(draft) - Drag.SNAP_MINUTES, true));
-            less.appendChild(icon('minus'));
-            less.setAttribute('aria-label', t('study.planner.earlier', '{label}: 15 minutes earlier', { label: t('study.handle.end', 'Study ends') }));
-            const more = button('', 'ft-stepper__btn ft-length__step', () => set(Drag.lengthOf(draft) + Drag.SNAP_MINUTES, true));
-            more.appendChild(icon('plus'));
-            more.setAttribute('aria-label', t('study.planner.later', '{label}: 15 minutes later', { label: t('study.handle.end', 'Study ends') }));
-            const input = el('input', 'ft-length__input');
-            input.type = 'range';
-            input.min = String(Drag.MIN_STUDY_MINUTES);
-            input.max = String(Drag.maxLength(draft));
-            input.step = String(Drag.SNAP_MINUTES);
-            input.setAttribute('aria-labelledby', title.id);
-            input.dataset.ftFocusKey = 'study-length';
-            row.append(less, input, more);
-            box.appendChild(row);
-            if (!options.compact) box.appendChild(el('p', 'ft-length__hint', editable
-                ? t('study.length.hint', 'Drag to make study longer or shorter. It starts at the same time.')
-                : setByLabel(state?.parentName)));
-            const paint = () => {
-                const minutes = Drag.lengthOf(draft);
-                value.textContent = lengthLabel(minutes);
-                range.textContent = timeRange(draft.start, draft.end);
-                input.value = String(minutes);
-                input.setAttribute('aria-valuetext', `${lengthLabel(minutes)}, ${timeRange(draft.start, draft.end)}`);
-                input.style.setProperty('--ft-length-fill', `${(((minutes - Drag.MIN_STUDY_MINUTES) / Math.max(1, Drag.maxLength(draft) - Drag.MIN_STUDY_MINUTES)) * 100).toFixed(2)}%`);
-                less.disabled = !editable || minutes <= Drag.MIN_STUDY_MINUTES;
-                more.disabled = !editable || minutes >= Drag.maxLength(draft);
-            };
-            const save = async () => {
-                if (draft.end === saved.end && draft.limit === saved.limit) return;
-                const before = Drag.applyToPlan(plan, saved);
-                const result = await onPatch({ plan: Drag.applyToPlan(plan, draft) });
-                if (result?.ok === false) {
-                    draft = { ...saved };
-                    paint();
-                    notify(host, errorText(result.error), null);
-                    return;
-                }
-                saved.end = draft.end;
-                saved.limit = draft.limit;
-                notify(host, t('study.planner.saved', 'Saved'), async () => { await onPatch({ plan: before }); refresh(); });
-                options.onChange?.({ start: draft.start, end: draft.end, minutes: Drag.lengthOf(draft) });
-            };
-            const set = (minutes, soon) => {
-                draft = Drag.withLength(draft, minutes);
-                paint();
-                clearTimeout(saveTimer);
-                saveTimer = setTimeout(save, soon ? 500 : 0);
-            };
-            input.disabled = !editable;
-            input.addEventListener('input', () => { draft = Drag.withLength(draft, Number(input.value)); paint(); });
-            // A pointer drag saves where it rests; arrow keys save a moment after the last press.
-            input.addEventListener('change', () => set(Number(input.value), true));
-            paint();
-            host.replaceChildren(box);
-        }
-        async function refresh() {
-            if (options.study) { draw(options.study, options.state || null); return; }
-            const state = await send({ action: 'FilterTube_StudyGetState' });
-            draw(object(state?.study), state);
-        }
-        refresh();
-        return {
-            refresh,
-            destroy() { alive = false; clearTimeout(saveTimer); host?.replaceChildren?.(); }
-        };
+    /** The Study page mounted on this page, so Home's Edit can open the plan editor itself. */
+    let mountedDashboard = null;
+    /** Opens the Study page's plan editor (the one day-bar editor); false when there is no Study page here. */
+    function openPlanEditor() {
+        if (!mountedDashboard?.setMode) return false;
+        mountedDashboard.setMode('plan');
+        return true;
     }
 
     root.FilterTubeStudyUi = Object.freeze({
         t, phaseInfo, planSegments, segmentWords, setByLabel, packLabel, renderStrip, mountStrip,
-        renderPlanPage, renderDashboard, mountDashboard, mountLengthSlider, showLooseningNotice, lengthLabel, dayRing, ringState, heroLines, renderParentPlans, searchExplainerCard, askForTime, applyCountryAccent, openSetup
+        renderPlanPage, renderDashboard, mountDashboard, showLooseningNotice, lengthLabel, dayRing, ringState, heroLines, renderParentPlans, searchExplainerCard, askForTime, applyCountryAccent, openSetup,
+        renderTimetablePage, timetableStatus, planBar, openPlanEditor, renderPopupPlan, PLAN_EDITOR_PATH
     });
 
     // Any page that loads this file shows the sheet when the background puts a loosening back.
@@ -3226,10 +4053,20 @@
             strip.className = 'ft-study-strip';
             strip.hidden = true;
             timeStatus.insertAdjacentElement('afterend', strip);
+            const plan = doc.createElement('section');
+            plan.id = 'ftStudyPlanPopup';
+            plan.className = 'ft-study-popup-plan';
+            plan.hidden = true;
+            strip.insertAdjacentElement('afterend', plan);
             mountStrip(strip);
         }
         const dashboard = doc.getElementById('ftStudyDashboard');
-        if (dashboard) mountDashboard(dashboard);
+        if (dashboard) mountedDashboard = mountDashboard(dashboard);
+        // The popup's "Edit in dashboard" opens the plan editor straight away.
+        try {
+            const query = new URLSearchParams(root.location?.search || '');
+            if (dashboard && query.get('view') === 'study' && query.get('section') === 'plan') openPlanEditor();
+        } catch (e) { }
     }
     if (root.document) {
         if (root.document.readyState === 'loading') root.document.addEventListener('DOMContentLoaded', autoMount, { once: true });

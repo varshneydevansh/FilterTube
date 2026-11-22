@@ -193,7 +193,7 @@ test('normal, embedded and Google preview paths retain explicit browser-specific
       assert.deepEqual(entry.css || [],[]);
     }
     if (firefox) {
-      assert.deepEqual(manifest.background.scripts,["js/shared/identity.js","js/content/admission_overlay.js","js/imported_channel_enrichment.js","js/shared/saved_video_notes.js","js/shared/local_playlists.js","js/shared/study_model.js","js/shared/study_packs.js","js/shared/study_engine.js","js/shared/study_clock_guard.js","js/study_background.js","js/shared/kids_youtube_profiles.js","js/video_notes_store.js","js/video_notes_background.js","js/local_playlists_store.js","js/kids_youtube_profiles_background.js","js/personal_sync.js","js/device_auto_sync.js","js/auto_sync_wakeup.js","js/background.js"]);
+      assert.deepEqual(manifest.background.scripts,["js/shared/identity.js","js/content/admission_overlay.js","js/imported_channel_enrichment.js","js/shared/saved_video_notes.js","js/shared/local_playlists.js","js/shared/study_timetable.js","js/shared/study_model.js","js/shared/study_packs.js","js/shared/study_engine.js","js/shared/study_clock_guard.js","js/study_background.js","js/shared/kids_youtube_profiles.js","js/video_notes_store.js","js/video_notes_background.js","js/local_playlists_store.js","js/kids_youtube_profiles_background.js","js/personal_sync.js","js/device_auto_sync.js","js/auto_sync_wakeup.js","js/background.js"]);
       assert.equal(manifest.browser_specific_settings.gecko.id,'filtertube@devanshvarshney.com');
       assert.deepEqual(manifest.browser_specific_settings.gecko.data_collection_permissions.required,['none']);
       assert.equal(manifest.browser_specific_settings.gecko_android.strict_min_version,'109.0');

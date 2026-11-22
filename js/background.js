@@ -1251,7 +1251,7 @@ const browserAPI = IS_FIREFOX ? browser : chrome;
 // Private Notes modules are browser-only; never forwarded to MAIN or native assets.
 try {
     if (typeof importScripts === 'function' && !globalThis.FilterTubeVideoNotesBackground) {
-        importScripts('shared/saved_video_notes.js', 'shared/local_playlists.js', 'shared/study_model.js', 'shared/study_packs.js', 'shared/study_engine.js', 'shared/study_clock_guard.js', 'study_background.js', 'shared/kids_youtube_profiles.js', 'video_notes_store.js', 'video_notes_background.js', 'local_playlists_store.js', 'kids_youtube_profiles_background.js', 'personal_sync.js', 'device_auto_sync.js', 'auto_sync_wakeup.js', 'shared/ask_parent.js', 'ask_parent_background.js');
+        importScripts('shared/saved_video_notes.js', 'shared/local_playlists.js', 'shared/study_timetable.js', 'shared/study_model.js', 'shared/study_packs.js', 'shared/study_engine.js', 'shared/study_clock_guard.js', 'study_background.js', 'shared/kids_youtube_profiles.js', 'video_notes_store.js', 'video_notes_background.js', 'local_playlists_store.js', 'kids_youtube_profiles_background.js', 'personal_sync.js', 'device_auto_sync.js', 'auto_sync_wakeup.js', 'shared/ask_parent.js', 'ask_parent_background.js');
     }
     globalThis.FilterTubeVideoNotesBackground?.install({
         api: browserAPI,

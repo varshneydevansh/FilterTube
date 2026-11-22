@@ -5,9 +5,9 @@
  * - Greeting: a time-of-day hello and what was kept out today (the hidden count tab-view.js writes
  *   into #statHiddenToday), the profile card, and Kriti sieving Uljhan (FilterTubeMascots.mountLoop:
  *   Lively loops, Quiet plays once, reduced motion and Companion Off as the mascots module decides).
- * - Study today: planned minutes, the next round, today's progress, Start now / Change plan and the
- *   study length slider (FilterTubeStudyUi.mountLengthSlider when it is loaded); "Set up study" with
- *   no plan.
+ * - Study today: planned minutes, the next round, today's progress, Start now, and today's plan as a
+ *   read-only day bar (FilterTubeStudyUi.planBar when it is loaded) with Edit, which opens the Study
+ *   page: the plan has one editor (DESIGN_PASS_2026-11-21 §4 decision 3). "Set up study" with no plan.
  * - What Uljhan tried today: the last few hides on this device (js/shared/hidden_log.js,
  *   ftHiddenLogV1), each with what hid it and Allow: a precise exception for that one video (the
  *   profile's allowedVideoIds), or Change for a content control. A control row names its control
@@ -137,7 +137,8 @@
         return {
             kind: 'plan', planned, today, studying,
             until: studying && Number(value.until) > now ? Number(value.until) : null,
-            nextAt, studied,
+            // Only a study round is "Next round"; the next change may be the daily limit or a break.
+            nextAt, nextIsStudy: String(value.next?.state || '').toUpperCase() === 'STUDY', studied,
             progress: planned > 0 ? Math.min(1, studied / planned) : 0
         };
     }
@@ -320,7 +321,6 @@
     function mountStudy() {
         const body = doc.getElementById('ftHomeStudyBody');
         if (!body) return null;
-        let slider = null;
         let setupArt = null;
         let busy = false;
         const openStudy = () => openNav('.nav-item[data-nav-id="timeLimits"]');
@@ -333,8 +333,6 @@
         const draw = async () => {
             const state = await studyState();
             const view = studyToday(state);
-            slider?.destroy?.();
-            slider = null;
             body.replaceChildren();
             if (view.kind === 'setup') {
                 // Kriti reads beside the words (kept across redraws, so she doesn't re-enter every minute).
@@ -355,7 +353,7 @@
             big.append(el('span', 'ft-home-study__minutes', formatCount(view.planned)), el('span', 'ft-home-study__unit', t('study.ring.planned', 'min planned')));
             let lineText = '';
             if (view.studying && view.until) lineText = t('home.study.now', 'Studying now, until {time}', { time: formatTime(view.until) });
-            else if (view.nextAt) lineText = t('home.study.next', 'Next round at {time}', { time: formatTime(view.nextAt) });
+            else if (view.nextAt && view.nextIsStudy) lineText = t('home.study.next', 'Next round at {time}', { time: formatTime(view.nextAt) });
             else if (!view.today) lineText = t('home.study.offToday', 'No study planned today.');
             const line = el('p', 'ft-home-study__line', lineText);
             const bar = el('div', 'ft-home-study__bar');
@@ -385,14 +383,20 @@
                     studyState(true);
                 }));
             }
-            actions.append(button(t('study.dash.changePlan', 'Change plan'), 'btn-secondary', openStudy));
-            const sliderHost = el('div', 'ft-home-study__slider');
-            sliderHost.dataset.ftHomeSlider = 'true';
-            body.append(big, line, bar, studied, sliderHost, actions);
+            // Today's plan, read-only: the Study page's day bar is the one editor; Edit opens it.
+            const study = state?.study && typeof state.study === 'object' ? state.study : {};
+            let plan = null;
             try {
-                slider = root.FilterTubeStudyUi?.mountLengthSlider?.(sliderHost, { study: state?.study, compact: true, onSetup: openStudy, onChange: () => studyState(true) }) || null;
-            } catch (e) { slider = null; }
-            if (!slider) sliderHost.remove();
+                if (study.plan) plan = root.FilterTubeStudyUi?.planBar?.(study.plan, study.focus || {}, study.breakMode === 'normal' ? 'normal' : 'rest', { editable: false }) || null;
+            } catch (e) { plan = null; }
+            // The bar takes the card's full width; Edit sits with the other actions and opens the plan editor.
+            const planRow = el('div', 'ft-home-study__plan');
+            if (plan) planRow.appendChild(plan);
+            if (plan) actions.appendChild(button(t('home.study.edit', 'Edit'), 'btn-secondary ft-home-study__edit', () => {
+                openStudy();
+                root.FilterTubeStudyUi?.openPlanEditor?.();
+            }));
+            body.append(big, line, bar, studied, ...(plan ? [planRow] : []), actions);
         };
         draw();
         let drawing = false;

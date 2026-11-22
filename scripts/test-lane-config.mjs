@@ -221,6 +221,8 @@ const STUDY_TESTS = Object.freeze([
   'tests/runtime/study-ui.test.mjs',
   'tests/runtime/study-topic-synonyms.test.mjs',
   'tests/runtime/study-branch-kids-parity.test.mjs',
+  'tests/runtime/study-timetable.test.mjs',
+  'tests/runtime/study-timetable-ui.test.mjs',
 ]);
 // Parity with the Android app: filtering decisions, Ask a parent, live chat (docs/design/PARITY_PASS4.md).
 const APP_PARITY_TESTS = Object.freeze([
@@ -244,6 +246,7 @@ const APP_PARITY_TESTS = Object.freeze([
   'tests/runtime/app-parity-study-day-ring.test.mjs',
   'tests/runtime/app-parity-parent-mode.test.mjs',
   'tests/runtime/app-parity-people-motion.test.mjs',
+  'tests/runtime/app-parity-study-day-bar.test.mjs',
   // The Android -> extension port ledger's own checks (docs/parity/HOW_TO_PORT.md).
   'tools/parity/ledger.test.mjs',
 ]);

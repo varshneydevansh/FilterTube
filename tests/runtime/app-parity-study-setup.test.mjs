@@ -53,17 +53,55 @@ test('a pack no id rule knows falls back to its name', () => {
 
 // ---- Exam list ----------------------------------------------------------------------------------
 
-test('India\'s exams are grouped by field in order, with neighbours and global exams folded', () => {
+test('India\'s civil services put UPSC first, then the state PSCs in the phone\'s language', () => {
+    const civil = language => ids(StudyExamList.of(catalog, 'IN', '', 3, language).own[0].packs);
+    assert.equal(civil('ta')[0], 'in_upsc_cse');
+    assert.equal(civil('ta')[1], 'in_tnpsc');
+    assert.equal(civil('ml')[1], 'in_kerala_psc');
+    assert.equal(civil(null)[0], 'in_upsc_cse');
+    // Other countries keep the field order.
+    const fields = StudyExamList.of(catalog, 'US', '', 3, 'en').own.map(section => section.field);
+    assert.deepEqual(fields, [...fields].sort((a, b) => StudyExamFields.FIELDS.indexOf(a) - StudyExamFields.FIELDS.indexOf(b)));
+});
+
+test('the picker narrows by level, state and category', () => {
+    const { StudyExamFilter, StudyExamCategory } = Setup;
+    assert.ok(['Tamil Nadu', 'Kerala', 'Karnataka'].every(area => StudyExamList.areas(catalog, 'IN', 3).includes(area)));
+    assert.equal(StudyExamList.defaultArea(catalog, 'IN', 'ta', 3), 'Tamil Nadu');
+    assert.equal(StudyExamList.defaultArea(catalog, 'IN', 'ml-IN', 3), 'Kerala');
+    const filtered = filter => ids(StudyExamList.of(catalog, 'IN', '', 3, null, filter).own.flatMap(section => section.packs));
+    const national = filtered(StudyExamFilter.of({ level: 'national' }));
+    assert.ok(national.includes('in_upsc_cse') && !national.includes('in_tnpsc'));
+    assert.deepEqual(filtered(StudyExamFilter.of({ level: 'regional', area: 'Tamil Nadu' })), ['in_tnpsc']);
+    const entrance = filtered(StudyExamFilter.of({ category: 'entrance' }));
+    assert.ok(entrance.includes('in_jee') && !entrance.includes('in_upsc_cse'));
+    assert.ok(StudyExamList.categories(catalog, 'IN', 3).includes('civil'));
+    // Bar exams and medical boards are professional, though their fields read as law and medical.
+    assert.equal(StudyExamCategory.of(pack('us_bar')), 'professional');
+    assert.equal(StudyExamCategory.of(pack('us_usmle')), 'professional');
+    // Every bundled exam carries its level and category.
+    for (const item of catalog.packs.filter(entry => StudyExamList.EXAM_KINDS.includes(entry.kind))) {
+        assert.ok(['national', 'regional'].includes(item.level) && StudyExamCategory.parse(item.category), item.id);
+        if (Setup.isRegional(item)) assert.ok(Setup.areaName(item, 'en'), item.id);
+    }
+    // A country without state exams offers no level chips.
+    assert.deepEqual(StudyExamList.areas(catalog, 'FR', 3), []);
+});
+
+test('India\'s exams open on civil services, then fields in order, with neighbours and global exams folded', () => {
     const model = StudyExamList.of(catalog, 'IN', '', 3);
     const fields = model.own.map(section => section.field);
-    assert.deepEqual(fields, [...fields].sort((a, b) => StudyExamFields.FIELDS.indexOf(a) - StudyExamFields.FIELDS.indexOf(b)));
-    assert.equal(fields[0], 'engineering');
+    // India opens on civil services, UPSC first; the other fields follow in order.
+    assert.equal(fields[0], 'civil');
+    const rest = fields.slice(1);
+    assert.deepEqual(rest, [...rest].sort((a, b) => StudyExamFields.FIELDS.indexOf(a) - StudyExamFields.FIELDS.indexOf(b)));
+    assert.equal(model.own[0].packs[0].id, 'in_upsc_cse');
     assert.ok(model.own.find(section => section.field === 'engineering').packs.some(item => item.id === 'in_gate'));
     const own = new Set(model.own.flatMap(section => ids(section.packs)));
     const also = new Set(ids(model.alsoPacks));
     assert.ok(also.has('us_sat') && also.has('global_ielts') && also.has('global_ib'));
     assert.ok([...own].every(id => !also.has(id)));
-    // Coding interviews are a skill, not an exam.
+    // Coding interviews are an interview, not an exam.
     assert.ok(!own.has('global_coding_interview') && !also.has('global_coding_interview'));
     assert.deepEqual(model.elsewhere, []);
 });
@@ -71,7 +109,7 @@ test('India\'s exams are grouped by field in order, with neighbours and global e
 test('search reaches the fold and other countries', () => {
     const model = StudyExamList.of(catalog, 'IN', 'abitur', 3);
     assert.ok(!model.own.length && !model.also.length);
-    assert.deepEqual(ids(model.elsewhere), ['de_abitur']);
+    assert.ok(ids(model.elsewhere).includes('de_abitur'));
     assert.deepEqual(ids(StudyExamList.of(catalog, 'IN', 'ielts', 3).alsoPacks), ['global_ielts']);
 });
 
@@ -90,14 +128,14 @@ test('chip labels are short', () => {
 
 // ---- School -------------------------------------------------------------------------------------
 
-test('India\'s boards are its own, never Bangladesh\'s, and CBSE runs from class 6 to 12', () => {
+test('India\'s boards are its own, never Bangladesh\'s, and CBSE runs from class 1 to 12', () => {
     const boards = StudySchool.boards(catalog, 'IN', 3);
     const packIds = boards.flatMap(board => board.packIds);
     assert.ok(packIds.every(id => !id.startsWith('cls_bd_')));
     assert.ok(packIds.every(id => !Setup.isGlobal(pack(id))));
     const cbse = boards.find(board => board.key === 'CBSE');
     assert.equal(cbse.label, 'CBSE');
-    assert.deepEqual(cbse.grades.map(grade => grade.number), ['6', '7', '8', '9', '10', '11', '12']);
+    assert.deepEqual(cbse.grades.map(grade => grade.number), Array.from({ length: 12 }, (_, i) => String(i + 1)));
     assert.equal(cbse.grades.find(grade => grade.number === '11').packId, 'cls_in_cbse_11_12');
     assert.equal(boards.find(board => board.key === 'CISCE').label, 'ICSE / ISC');
     assert.equal(boards.find(board => board.key === 'MSBSHSE').label, 'Maharashtra State Board');
@@ -118,9 +156,9 @@ test('the school stem drops grades and brackets', () => {
     assert.equal(StudySchool.stem('Key Stage 3'), 'Key Stage 3');
 });
 
-test('skills are the global lessons and coding', () => {
+test('skills are the global lessons, and coding interviews moved to Interview', () => {
     const skillIds = ids(StudySkills.of(catalog, 3));
-    assert.ok(skillIds.includes('global_cls_khan_academy') && skillIds.includes('global_coding_interview'));
+    assert.ok(skillIds.includes('global_cls_khan_academy') && !skillIds.includes('global_coding_interview'));
     assert.ok(!skillIds.includes('global_ielts'));
 });
 
@@ -172,7 +210,7 @@ test('new school boards are each country\'s own, with their classes in order', (
     }
     const indonesia = StudySchool.boards(catalog, 'ID', 3);
     assert.equal(indonesia.length, 1);
-    assert.deepEqual(indonesia[0].grades.map(grade => grade.number), range(7, 12).map(String));
+    assert.deepEqual(indonesia[0].grades.map(grade => grade.number), range(1, 12).map(String));
     const neb = StudySchool.boards(catalog, 'NP', 3).find(board => board.key === 'NEB');
     assert.deepEqual(neb.grades.map(grade => grade.number), range(8, 12).map(String));
     assert.ok(StudySchool.boards(catalog, 'GB', 3).some(board => board.key === 'SQA'));

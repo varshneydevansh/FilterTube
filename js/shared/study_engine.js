@@ -42,6 +42,10 @@
 }(typeof globalThis !== 'undefined' ? globalThis : this, function () {
     'use strict';
 
+    /** The timetable's rules (js/shared/study_timetable.js); without the module a timetable is ignored. */
+    const Timetable = (typeof module === 'object' && module.exports)
+        ? require('./study_timetable.js') : (typeof globalThis !== 'undefined' ? globalThis.FilterTubeStudyTimetable : null);
+
     const NORMAL = 'NORMAL';
     const STUDY = 'STUDY';
     const BREAK = 'BREAK';
@@ -91,8 +95,31 @@
         in_gate: ['previous year questions', 'engineering mathematics'],
         'in_jee:main': ['projectile motion', 'mole concept'],
         'in_jee:advanced': ['rotational motion', 'irodov'],
-        in_jee: ['projectile motion', 'mole concept']
+        in_jee: ['projectile motion', 'mole concept'],
+        global_coding_interview: ['two sum', 'dynamic programming'],
+        interview_system_design: ['url shortener', 'rate limiter'],
+        interview_devops_cloud: ['kubernetes', 'ci/cd pipeline'],
+        interview_data_science: ['sql interview questions', 'a/b testing'],
+        interview_product: ['product sense', 'prioritization'],
+        interview_consulting: ['market sizing', 'profitability case'],
+        interview_investment_banking: ['dcf', 'walk me through'],
+        interview_equity_research: ['stock pitch', 'valuation'],
+        interview_corporate_finance: ['fp&a', 'budgeting'],
+        interview_accounting: ['three statements', 'deferred revenue'],
+        interview_mba_admissions: ['why mba', 'group discussion'],
+        interview_ux_design: ['portfolio review', 'design challenge'],
+        interview_hr: ['tell me about yourself', 'star method']
     });
+    /**
+     * Android StudyInterviewTopics: every interview pack is studied with these, so a search for "mock
+     * interview" goes to its channels, such titles pass, and they rank first on an interview plan's Home.
+     */
+    const INTERVIEW_TOPICS = Object.freeze(['interview', 'interview questions', 'mock interview', 'interview preparation', 'interview prep']);
+    /** The interview packs' ids: "interview_*" and the coding pack that kept its id from the Skill days. */
+    function isInterviewPackId(id) {
+        const value = typeof id === 'string' ? id.trim() : '';
+        return value.startsWith('interview_') || value === 'global_coding_interview';
+    }
     const TOPIC_SYNONYMS = Object.freeze({
         // GATE Civil
         'building materials': ['cement', 'concrete', 'aggregate', 'aggregates', 'bricks', 'brick', 'mortar', 'lime',
@@ -204,6 +231,31 @@
         // SMA (Indonesia)
         trigonometri: ['sin cos tan', 'identitas trigonometri', 'aturan sinus', 'aturan cosinus'],
         stoikiometri: ['konsep mol', 'persamaan reaksi', 'mol'],
+        // Interviews (coding, system design, cloud, data, product, consulting, finance, HR)
+        'dynamic programming': ['dp', 'memoization', 'knapsack', 'longest common subsequence', 'tabulation'],
+        graphs: ['bfs', 'dfs', 'dijkstra', 'topological sort', 'union find', 'graph algorithms'],
+        'system design': ['load balancer', 'caching', 'sharding', 'rate limiter', 'url shortener', 'message queue',
+            'consistent hashing', 'high level design', 'low level design', 'hld', 'lld', 'scalability'],
+        'low level design': ['lld', 'design patterns', 'solid principles', 'object oriented design', 'class diagram'],
+        kubernetes: ['k8s', 'pods', 'helm', 'kubectl', 'deployments'],
+        docker: ['containers', 'dockerfile', 'docker compose'],
+        'ci/cd': ['jenkins', 'github actions', 'pipelines', 'continuous integration', 'continuous delivery'],
+        aws: ['ec2', 's3', 'iam', 'vpc', 'lambda', 'solutions architect'],
+        sql: ['joins', 'window functions', 'group by', 'subqueries', 'sql interview questions'],
+        'machine learning': ['ml', 'regression', 'classification', 'overfitting', 'bias variance', 'gradient descent'],
+        statistics: ['probability', 'hypothesis testing', 'p value', 'a/b testing', 'confidence interval'],
+        'product sense': ['product design', 'favorite product', 'improve a product', 'product design question'],
+        'product metrics': ['north star metric', 'kpi', 'metrics question', 'root cause analysis', 'metric drop'],
+        'case interview': ['case study', 'case interview framework', 'market sizing', 'profitability', 'market entry',
+            'guesstimate', 'mece'],
+        guesstimate: ['market sizing', 'estimation question', 'guesstimates'],
+        valuation: ['dcf', 'discounted cash flow', 'comparable companies', 'precedent transactions', 'lbo', 'wacc'],
+        accounting: ['three statements', 'financial statements', 'balance sheet', 'cash flow statement', 'income statement',
+            'walk me through the three statements'],
+        'behavioral interview': ['behavioural interview', 'star method', 'tell me about yourself', 'strengths and weaknesses',
+            'why should we hire you', 'hr interview questions'],
+        'hr interview': ['hr round', 'tell me about yourself', 'salary negotiation', 'why should we hire you',
+            'hr interview questions'],
         // O/L (Sri Lanka)
         'o/l': ['ordinary level', 'gce o/l', 'සාමාන්‍ය පෙළ', 'சாதாரண தரம்']
     });
@@ -631,31 +683,58 @@
     }
 
     /**
+     * The timetable over the plan's state at t (Android StudyRuntime.timetableClock, a614cc44e/7d655a511):
+     * during a period its lane is a study round to the period's end; between periods the plan
+     * (between "default") or the normal rules (between "none"). Breaks, the limit and a clock hold keep
+     * their rules.
+     */
+    function withTimetable(state, timetable, t, zone) {
+        if (!Timetable || !isObject(timetable) || state.state === BREAK || state.state === LIMIT) return state;
+        const now = Timetable.at(timetable, t, zone);
+        if (now.lane) {
+            const segment = { kind: STUDY, round: 1, rounds: 1, start: now.startsAt, end: now.endsAt };
+            return {
+                state: STUDY, round: 1, rounds: 1, until: now.endsAt, sessionStart: now.startsAt, sessionEnd: now.endsAt,
+                source: 'timetable', setByParentId: text(timetable.setByParentId) || null, segments: [segment], skippedBreak: null,
+                lane: now.lane, lanePackIds: array(now.lane.packIds).slice()
+            };
+        }
+        if (timetable.between === 'none' && state.state === STUDY) return { state: NORMAL, until: null };
+        return state;
+    }
+
+    /**
      * The study state at `now`:
      *   {state, round, rounds, until, sessionStart, sessionEnd, source, breakMode, segments,
      *    next: {state, at} | null, breakNoticeAt}
      * Input: {plan, focus, breakMode, now, session?, endedUntil?, limitReached?, parentLock?, clockHold?,
-     *         skippedBreaks?: [breakStart]} (skipped breaks fold into study, Android StudyClock.withSkips).
+     *         skippedBreaks?: [breakStart], timetable?, zone?} (skipped breaks fold into study, Android
+     *         StudyClock.withSkips; a timetable's period is a round of its lane's packs: lanePackIds).
      */
     function studyClock(input = {}) {
         const now = toMs(input.now);
         const occurrences = occurrencesAround(input, now);
-        const current = stateAt(input, now, occurrences);
+        const timetable = isObject(input.timetable) ? input.timetable : null;
+        const reading = t => withTimetable(stateAt(input, t, occurrences), timetable, t, input.zone);
+        const current = reading(now);
         const boundaries = [];
         if (current.until) boundaries.push(current.until);
         for (const occurrence of occurrences) {
             if (occurrence.start > now) boundaries.push(occurrence.start);
             if (occurrence.limitAt !== null && occurrence.limitAt > now) boundaries.push(occurrence.limitAt);
         }
+        // Every period boundary is a rules transition, so caches and alarms re-decide there.
+        const periodEdge = timetable && Timetable ? Timetable.nextBoundary(timetable, now, input.zone) : null;
+        if (Number.isFinite(periodEdge)) boundaries.push(periodEdge);
         const nextAt = boundaries.filter(at => at > now).sort((a, b) => a - b)[0];
         let next = null;
         if (Number.isFinite(nextAt)) {
-            const after = stateAt(input, nextAt, occurrences);
+            const after = reading(nextAt);
             next = { state: after.state, at: nextAt, round: after.round || null };
         }
         const breakMode = text(input.breakMode) === 'normal' ? 'normal' : 'rest';
         const result = { round: null, rounds: null, sessionStart: null, sessionEnd: null, source: null, setByParentId: null,
-            clockHold: false, segments: [], skippedBreak: null, ...current, breakMode, next };
+            clockHold: false, segments: [], skippedBreak: null, lane: null, lanePackIds: null, ...current, breakMode, next };
         // Within a skipped break's own time the round runs on; the UI still says the break was skipped.
         result.breakSkipped = !!result.skippedBreak;
         result.breakNoticeAt = result.state === STUDY && next && next.state === BREAK ? Math.max(now, next.at - BREAK_NOTICE_MS) : null;
@@ -709,7 +788,10 @@
         const key = wordKey(seed);
         let found = null;
         if (kind === SUGGESTION_KINDS.TOPIC_SYNONYMS) found = own(TOPIC_SYNONYMS, key);
-        else if (kind === SUGGESTION_KINDS.PACK_TOPICS) found = own(PACK_TOPIC_SUGGESTIONS, key) || own(PACK_TOPIC_SUGGESTIONS, key.split(':')[0]);
+        else if (kind === SUGGESTION_KINDS.PACK_TOPICS) {
+            found = own(PACK_TOPIC_SUGGESTIONS, key) || own(PACK_TOPIC_SUGGESTIONS, key.split(':')[0])
+                || (isInterviewPackId(key.split(':')[0]) ? INTERVIEW_TOPICS : null);
+        }
         else if (kind === SUGGESTION_KINDS.SEARCH_EXAMPLES) found = own(SEARCH_EXAMPLE_SUGGESTIONS, key) || own(SEARCH_EXAMPLE_SUGGESTIONS, key.split(':')[0]);
         return array(found).slice();
     }
@@ -1062,12 +1144,36 @@
         return kidsPackIds(selected, catalog).length ? 'kids_learning' : 'kids_hold';
     }
 
-    function packLayer(pack, edits) {
+    /**
+     * Local first, then global (Android StudyHomeFeed.localRank, 420df66be): a channel for the user's own
+     * country, then global ones, then other countries' channels; untagged channels count as global.
+     */
+    function localRank(channel, country) {
+        const code = text(channel?.country).toUpperCase();
+        if (country && code === text(country).toUpperCase()) return 0;
+        if (!code || code === 'GLOBAL') return 1;
+        return 2;
+    }
+
+    /** The browser's region ("en-IN" -> "IN"), for localRank; null when the locale has none. */
+    function deviceCountry() {
+        const parts = text(globalThis.navigator?.language).split(/[-_]/);
+        const region = parts.slice(1).find(part => /^[A-Za-z]{2}$/.test(part));
+        return region ? region.toUpperCase() : null;
+    }
+
+    /** A pack's channels for a branch, the device country's first, then global, then other countries' (stable). */
+    function localOrder(channels, country) {
+        return array(channels).map((channel, index) => [localRank(channel, country), index, channel])
+            .sort((a, b) => a[0] - b[0] || a[1] - b[1]).map(item => item[2]);
+    }
+
+    function packLayer(pack, edits, country = deviceCountry()) {
         const change = object(edits);
         const removedChannels = array(change.channelsRemoved);
         const removedTopics = new Set(array(change.topicsRemoved).map(wordKey));
         const channels = [];
-        for (const channel of [...packChannelsFor(pack, change.variant), ...array(change.channelsAdded)]) {
+        for (const channel of [...localOrder(packChannelsFor(pack, change.variant), country), ...array(change.channelsAdded)]) {
             if (removedChannels.some(removed => sameChannel(channel, removed))) continue;
             if (channels.some(existing => sameChannel(existing, channel))) continue;
             channels.push({ channelId: text(channel.channelId) || null, handle: text(channel.handle) || null, name: text(channel.name) });
@@ -1122,7 +1228,9 @@
         if (!packs.length) return study;
         const current = object(value.packCopies);
         const copies = {};
-        for (const id of array(value.activePackIds)) {
+        // The timetable's lanes are packs too: their copies keep a period working when the catalog lacks the pack.
+        const lanePacks = Timetable ? Timetable.packIds(value.timetable) : [];
+        for (const id of [...new Set([...array(value.activePackIds), ...lanePacks])]) {
             const pack = packs.find(item => item.id === id);
             if (pack) {
                 // The chosen branch's channels and topics (Android StudyPackCopy.of).
@@ -1267,7 +1375,9 @@
             };
         }
         const packChannelsOnly = !!text(object(clock).setByParentId) && value.packChannelsOnly !== false;
-        const layers = activePackLayers(value, catalog);
+        // During a timetable period its lane's packs apply instead of the plan's (Android a614cc44e).
+        const lanePacks = phase === 'study' && Array.isArray(object(clock).lanePackIds) ? object(clock).lanePackIds : null;
+        const layers = activePackLayers(lanePacks ? { ...value, activePackIds: lanePacks } : value, catalog);
         if (!layers.length) {
             // Fail closed (audit H3): the person's own allowed channels, or rest. Never the normal rules.
             const own = !packChannelsOnly && (ownAllowedChannels(source.main) || ownAllowedChannels(source.kids));
@@ -1357,12 +1467,12 @@
         NORMAL, STUDY, BREAK, LIMIT, BREAK_NOTICE_MS, BREAK_WAIT_MAX_MS, GENTLE_END_PAUSE_MS,
         SELF_LOCK_MAX_MINUTES, PARENT_LOCK_MAX_MINUTES, STUDY_SOURCE, TOPIC_SOURCE,
         parseTime, localDateKey, splitRounds, planOccurrences, studyClock, studyRulesApply, studyPhase,
-        SUGGESTION_KINDS, suggest, suggestionSeed, studyTopics, studyAllowPhrases, topicTerms, topicPatterns,
+        SUGGESTION_KINDS, INTERVIEW_TOPICS, isInterviewPackId, suggest, suggestionSeed, studyTopics, studyAllowPhrases, topicTerms, topicPatterns,
         topicsForQuery, planSearchTerms, channelSearchGroups, exampleSearches, searchExplainer, topicLabel, breakSkipPreview, SKIP_UNDO_MS,
         dayRing, ringBoundaries, currentBreak,
         PAGE_STATES, PAGE_BAND_PX, PAGE_LAST_FIVE_MS, PAGE_CROSSFADE_MS, pageState, pageEvening, pagePalette, mixColor,
         studySubjects, subjectOf, withSkips, sessionSeal, sessionEndStep, pendingSessionEnd, SESSION_END_STALE_MS, SESSION_CLOSE_SLACK_MS,
-        packVariant, packLayer, activePackLayers, stampPackCopies, studyEffectiveProfile,
+        packVariant, packLayer, activePackLayers, localRank, localOrder, stampPackCopies, studyEffectiveProfile,
         BRANCH_SOURCE, KIDS_KINDS, KIDS_SPACE, AMBIGUOUS_BRANCH_WORDS,
         packChannelsFor, packTopicsFor, hasSeparateBranches, branchTopics, otherBranchTopics,
         studyBranchFilter, branchFilterDrops, branchFilterRow,

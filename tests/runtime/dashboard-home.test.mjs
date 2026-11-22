@@ -162,6 +162,9 @@ test('the greeting follows the time of day, and Study today reads the plan', () 
   assert.equal(view.today, true, '17 November 2026 is a Tuesday');
   assert.equal(view.nextAt, at(16));
   assert.equal(view.progress, 50 / 150);
+  // "Next round" only for a study round: a next change to the daily limit isn't a round.
+  assert.equal(view.nextIsStudy, false);
+  assert.equal(Home.studyToday({ ...plan, next: { at: at(16), state: 'STUDY' } }, now).nextIsStudy, true);
   assert.equal(Home.studyToday({ ...plan, study: { plan: { ...plan.study.plan, days: ['sat'] } } }, now).today, false);
   const running = Home.studyToday({ ...plan, state: 'STUDY', until: at(16, 30) }, now);
   assert.equal(running.studying, true);

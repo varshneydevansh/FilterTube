@@ -5,7 +5,8 @@
  * - StudyExamList: a country's exams grouped by field, with neighbours' and global exams folded under
  *   "Also taken from {country}", and search across all of it.
  * - StudySchool: a country's boards, the classes each board covers, and the global class packs.
- * - StudySkills: the "Learn a skill" packs (global lessons, coding).
+ * - StudySkills: the "Learn a skill" packs (global lessons).
+ * - StudyInterviews: the "A job interview" packs (coding, system design, finance, HR, ...).
  * - StudyReviewGroups: Review's channel and topic groups ("For {stream}", "Everyone taking {exam}",
  *   "Your own"), the edits a switch or an added channel makes, and the bar's counts.
  * - StudyChannelInput: what someone typed into "Add a channel" (a name, an @handle, a UC id or a link).
@@ -20,6 +21,10 @@
 
     const GLOBAL_PREFIX = 'global_';
     const KIND_CLASS = 'class';
+    /** Job-interview prep (Android StudyPackCatalog.KIND_INTERVIEW): global packs, their own setup tile. */
+    const KIND_INTERVIEW = 'interview';
+    /** University lectures for one specialization track (Android KIND_DEGREE, 8a7671cc3). */
+    const KIND_DEGREE = 'degree';
     const EXAM_KINDS = Object.freeze(['study', 'exam']);
     /** Android StudySetupActivity.MIN_CHANNELS: a pack shows in setup with at least this many channels. */
     const MIN_CHANNELS = 3;
@@ -119,7 +124,18 @@
 
     // ---- Steps (Android StudySetupPath) ----------------------------------------------------------
 
+    /** Three tiles (Android 8a7671cc3): interviews and degrees live under Skills and careers. */
     const MODES = Object.freeze({ EXAM: 'exam', SCHOOL: 'school', SKILL: 'skill' });
+
+    /** The tile a chosen pack lives under (Android StudySetupMode.of), so changing a plan reopens on its list. */
+    function modeOf(pack) {
+        // Kids learning by age lives under School (Android 420df66be: parents look there).
+        if (pack?.kind === 'kids_age' || pack?.kind === 'kids_classic') return MODES.SCHOOL;
+        if (pack?.kind === KIND_INTERVIEW || pack?.kind === KIND_DEGREE) return MODES.SKILL;
+        if (isGlobal(pack) && (pack?.kind === KIND_CLASS || StudyExamFields.of(pack) === 'skills')) return MODES.SKILL;
+        if (pack?.kind === KIND_CLASS) return MODES.SCHOOL;
+        return MODES.EXAM;
+    }
     const STEPS = Object.freeze(['kind', 'list', 'stream', 'review', 'ready']);
 
     const StudySetupPath = Object.freeze({
@@ -153,21 +169,24 @@
      */
     const RULES = Object.freeze([
         ['skills', ['coding', 'programming', 'interview']],
-        ['defence', ['nda', 'cds', 'afcat', 'agniveer', 'ssb']],
-        ['engineering', ['gate', 'jee', 'ioe', 'bitsat', 'ecat', 'engineering']],
-        ['medical', ['neet', 'mbbs', 'mdcat', 'mcat', 'usmle', 'ucat', 'plab', 'nclex', 'mecee', 'gamsat', 'medical']],
+        ['defence', ['nda', 'cds', 'afcat', 'agniveer', 'ssb', 'capf']],
+        ['engineering', ['gate', 'jee', 'ioe', 'bitsat', 'ecat', 'engineering', 'fe', 'passport', 'ese']],
+        ['medical', ['neet', 'mbbs', 'mdcat', 'mcat', 'usmle', 'ucat', 'plab', 'nclex', 'mecee', 'gamsat', 'medical',
+            'tus', 'medicina', 'enarm', 'residencia', 'mccqe', 'tms', 'pass', 'las']],
         ['civil', ['upsc', 'psc', 'lok', 'sewa', 'css', 'bcs', 'wbcs', 'tnpsc', 'kpsc', 'mpsc', 'appsc',
-            'tspsc', 'cpns', 'kpss', 'civil', 'concursos', 'oposiciones']],
-        ['jobs', ['banking', 'ssc', 'rrb', 'police', 'ibps', 'sbi']],
-        ['law', ['clat', 'cat', 'lsat', 'bar', 'gmat', 'judiciary', 'ailet', 'law', 'oab']],
-        ['finance', ['ca', 'icai', 'cs', 'icsi', 'cma', 'icmai', 'cfa', 'frm', 'acca', 'cima', 'cpa']],
-        ['teaching', ['ctet', 'tet', 'ugc', 'net', 'kvs', 'praxis']],
-        ['languages', ['ielts', 'toefl', 'gre', 'pte', 'det', 'jlpt', 'hsk', 'topik', 'eiken', 'duolingo']],
+            'tspsc', 'cpns', 'kpss', 'civil', 'concursos', 'oposiciones', 'concorsi', 'kedinasan', 'ppsc', 'fpsc', 'uppsc', 'bpsc', 'rpsc', 'ras', 'mppsc', 'hpsc', 'hcs', 'ukpsc', 'cgpsc', 'jpsc', 'opsc', 'gpsc', 'hppsc', 'apsc', 'jkpsc', 'epfo']],
+        ['jobs', ['banking', 'ssc', 'rrb', 'police', 'ibps', 'sbi', 'bank', 'bumn', 'rbi', 'nabard', 'sebi']],
+        ['law', ['clat', 'cat', 'lsat', 'bar', 'gmat', 'judiciary', 'ailet', 'law', 'oab', 'jura', 'sqe', 'lnat', 'takken']],
+        ['finance', ['ca', 'icai', 'cs', 'icsi', 'cma', 'icmai', 'cfa', 'frm', 'acca', 'cima', 'cpa', 'boki', 'ican', 'kasneb', 'finra', 'icap']],
+        ['teaching', ['ctet', 'tet', 'ugc', 'net', 'kvs', 'praxis', 'docente', 'crpe', 'teacher', 'tsc']],
+        ['languages', ['ielts', 'toefl', 'gre', 'pte', 'det', 'jlpt', 'hsk', 'topik', 'eiken', 'duolingo', 'yds', 'step', 'toeic']],
         ['school', ['sat', 'act', 'ap', 'common', 'suneung', 'abitur', 'baccalaureat', 'bac', 'pau',
             'enem', 'admision', 'admission', 'saber11', 'paes', 'utbk', 'snbt', 'upcat', 'thpt', 'tcas', 'spm', 'yks', 'konkur',
             'thanaweya', 'qudurat', 'tahsili', 'ege', 'nmt', 'matura', 'maturita', 'vestibular', 'ingreso', 'cpge', 'provincial',
             'hsc', 'vce', 'atar', 'ncea', 'national', 'gcse', 'level', 'ib', 'cbse', 'waec', 'wassce', 'jamb', 'utme', 'kcse',
-            'nsc', 'matric', 'uneb', 'gce', 'al', 'eju', 'gaokao', 'lgs', 'brevet', 'comipems', 'koukou', 'juken']]
+            'nsc', 'matric', 'uneb', 'gce', 'al', 'eju', 'gaokao', 'lgs', 'brevet', 'comipems', 'koukou', 'juken',
+            'prep', 'certificate', 'osmoklasisty', 'oge', 'dgnl', 'vao10', 'tka', 'bece', 'neco', 'kjsea', 'ged', 'ales', 'dgs', 'exit',
+            'cuet', 'plus', 'scholarship', 'zimsec', 'ecz', 'nesa', 'msce', 'necta', 'bachillerato', 'centraal', 'leaving', 'junior', 'exames', 'panhellenic', 'bacalaureat', 'evaluare', 'erettsegi', 'bem', 'tawjihi', 'preparatory', 'dse', 'gsat', 'unt', 'dtm', 'cet', 'kcet', 'wbjee', 'eamcet', 'keam', 'ojee', 'dcece', 'polytechnic', 'regents', 'staar', 'tsi', 'qce', 'epreuves']]
     ]);
 
     /** Name words for packs no id rule knows (a pack added later): the same fields, by the English name. */
@@ -206,14 +225,84 @@
         return code.length === 2 ? code : null;
     }
 
-    function groupByField(packs) {
+    // ---- Exam picker filters (Android StudyExamCategory, StudyExamLevel, StudyExamFilter) ----------
+
+    /** The picker's categories, in the chips' order: country -> level -> category -> exam. */
+    const CATEGORIES = Object.freeze(['school', 'entrance', 'civil', 'professional', 'language']);
+    const LEVELS = Object.freeze({ ALL: 'all', NATIONAL: 'national', REGIONAL: 'regional' });
+
+    function isRegional(pack) { return pack?.level === 'regional'; }
+
+    /** The state or province, in language when the catalog has it. */
+    function areaName(pack, language) {
+        const area = object(pack?.area);
+        const lang = text(language).toLowerCase().split(/[-_]/)[0];
+        return (lang && area[lang]) || area.en || Object.values(area)[0] || null;
+    }
+
+    const StudyExamCategory = Object.freeze({
+        CATEGORIES,
+        parse(key) { return CATEGORIES.includes(key) ? key : null; },
+        /** The pack's own category, else one from its field (bar exams and medical boards carry their own). */
+        of(pack) {
+            const own = StudyExamCategory.parse(pack?.category);
+            if (own) return own;
+            const field = StudyExamFields.of(pack);
+            if (field === 'school') return 'school';
+            if (field === 'engineering' || field === 'medical' || field === 'law') return 'entrance';
+            if (field === 'civil' || field === 'jobs' || field === 'defence') return 'civil';
+            if (field === 'languages') return 'language';
+            return 'professional';
+        }
+    });
+
+    const StudyExamFilter = Object.freeze({
+        LEVELS,
+        /** What the exam list is narrowed to: {level, area (its English name), category}; the default keeps everything. */
+        of({ level = LEVELS.ALL, area = null, category = null } = {}) { return { level, area, category }; },
+        isDefault(filter) { const f = object(filter); return (f.level || LEVELS.ALL) === LEVELS.ALL && !f.area && !f.category; },
+        keeps(filter, pack) {
+            const f = object(filter);
+            const level = f.level || LEVELS.ALL;
+            if (level === LEVELS.NATIONAL && isRegional(pack)) return false;
+            if (level === LEVELS.REGIONAL && !isRegional(pack)) return false;
+            if (level === LEVELS.REGIONAL && f.area && areaName(pack, 'en') !== f.area) return false;
+            return !f.category || StudyExamCategory.of(pack) === f.category;
+        }
+    });
+
+    /**
+     * Countries where one field leads the list (Android 3e7ce41e6): India opens on civil services,
+     * UPSC first, then the state PSCs taught in the person's language.
+     */
+    const LEADING_FIELD = Object.freeze({ IN: 'civil' });
+
+    function groupByField(packs, lead = null, language = null) {
         const groups = new Map();
         for (const pack of packs) {
             const field = StudyExamFields.of(pack);
             if (!groups.has(field)) groups.set(field, []);
             groups.get(field).push(pack);
         }
-        return FIELDS.filter(field => groups.has(field)).map(field => ({ field, packs: groups.get(field) }));
+        const order = lead && groups.has(lead) ? [lead, ...FIELDS.filter(field => field !== lead)] : FIELDS;
+        return order.filter(field => groups.has(field))
+            .map(field => ({ field, packs: field === lead ? leadOrder(groups.get(field), language) : groups.get(field) }));
+    }
+
+    /**
+     * The leading field's order: the national exam first (id words "upsc" and "cse"), then exams taught
+     * first in language (a Tamil phone sees TNPSC, a Hindi one the Hindi-belt PSCs), then the rest in
+     * catalog order.
+     */
+    function leadOrder(packs, language) {
+        const lang = text(language).toLowerCase().split(/[-_]/)[0] || null;
+        const rank = pack => {
+            const words = StudyExamFields.words(pack.id);
+            if (words.includes('upsc') && words.includes('cse')) return 0;
+            if (lang && text(array(pack.languages)[0]).toLowerCase() === lang && pack.id !== 'in_state_psc') return 1;
+            return 2;
+        };
+        return array(packs).map((pack, index) => [rank(pack), index, pack]).sort((a, b) => a[0] - b[0] || a[1] - b[1]).map(item => item[2]);
     }
 
     /** Search: the name in any language, the short name, keywords and subjects. */
@@ -232,17 +321,18 @@
          * exams people there take (folded, quiet); `elsewhere` only while searching, every other exam that
          * matches. With no country, `own` holds the global exams.
          */
-        of(catalog, country, query = '', minChannels = 0) {
+        of(catalog, country, query = '', minChannels = 0, language = null, filter = null) {
             const code = countryCode(country);
+            const lead = code ? LEADING_FIELD[code] || null : null;
             const exams = array(catalog?.packs).filter(pack => EXAM_KINDS.includes(pack.kind)
-                && array(pack.channels).length >= minChannels && StudyExamFields.of(pack) !== 'skills');
+                && array(pack.channels).length >= minChannels && StudyExamFields.of(pack) !== 'skills' && StudyExamFilter.keeps(filter, pack));
             const own = code === null ? exams.filter(isGlobal) : exams.filter(pack => array(pack.countries).includes(code));
             const ownIds = new Set(own.map(pack => pack.id));
             const also = code === null ? [] : exams.filter(pack => !ownIds.has(pack.id) && (array(pack.nearby).includes(code) || isGlobal(pack)));
             const words = text(query).toLowerCase();
             const model = (ownList, alsoList, elsewhere) => {
-                const alsoGroups = groupByField(alsoList);
-                const ownGroups = groupByField(ownList);
+                const alsoGroups = groupByField(alsoList, lead, language);
+                const ownGroups = groupByField(ownList, lead, language);
                 return {
                     own: ownGroups, also: alsoGroups, elsewhere,
                     alsoPacks: alsoGroups.flatMap(group => group.packs),
@@ -254,7 +344,30 @@
             const elsewhere = exams.filter(pack => !seen.has(pack.id) && matches(pack, words));
             return model(own.filter(pack => matches(pack, words)), also.filter(pack => matches(pack, words)), elsewhere);
         },
+        /** The country's exams before any filter: what the level, area and category chips offer. */
+        exams(catalog, country, minChannels = 0) {
+            const code = countryCode(country);
+            return array(catalog?.packs).filter(pack => EXAM_KINDS.includes(pack.kind) && array(pack.channels).length >= minChannels
+                && StudyExamFields.of(pack) !== 'skills' && (code === null ? isGlobal(pack) : array(pack.countries).includes(code)));
+        },
+        /** The states and provinces with exams in country (English names), in catalog order. */
+        areas(catalog, country, minChannels = 0) {
+            return [...new Set(StudyExamList.exams(catalog, country, minChannels).filter(isRegional).map(pack => areaName(pack, 'en')).filter(Boolean))];
+        },
+        /** The categories country's exams fall in, in the chips' order. */
+        categories(catalog, country, minChannels = 0) {
+            const present = new Set(StudyExamList.exams(catalog, country, minChannels).map(StudyExamCategory.of));
+            return CATEGORIES.filter(category => present.has(category));
+        },
+        /** The state or province to open on: the first whose exams teach in language first (Tamil -> Tamil Nadu), else the first. */
+        defaultArea(catalog, country, language, minChannels = 0) {
+            const lang = text(language).toLowerCase().split(/[-_]/)[0] || null;
+            const regional = StudyExamList.exams(catalog, country, minChannels).filter(pack => isRegional(pack) && areaName(pack, 'en'));
+            const pick = regional.find(pack => lang && text(array(pack.languages)[0]).toLowerCase() === lang) || regional[0];
+            return pick ? areaName(pick, 'en') : null;
+        },
         matches,
+        leadOrder,
         /**
          * The short label on an exam chip: the pack's short name, else its name without a leading
          * "Country: " and without the bracketed detail ("CAT (MBA entrance)" -> "CAT").
@@ -355,6 +468,99 @@
                 return { board, grade: board.grades.find(grade => grade.packId === packId) || null };
             }
             return null;
+        }
+    });
+
+    const StudyInterviews = Object.freeze({
+        /** Interview packs in catalog order: coding first, then system design, cloud, data, product, consulting, finance, HR. */
+        of(catalog, minChannels = 0) {
+            return array(catalog?.packs).filter(pack => pack.kind === KIND_INTERVIEW && array(pack.channels).length >= minChannels);
+        },
+        /** Career groups in the order the Interview list shows them; packs without a known group go last ("other"). */
+        GROUPS: Object.freeze(['software', 'management', 'law', 'public', 'health', 'other']),
+        /** The interview packs under their career groups as [group, packs] pairs, in GROUPS order, catalog order inside each. */
+        grouped(catalog, minChannels = 0) {
+            const groups = new Map();
+            for (const pack of StudyInterviews.of(catalog, minChannels)) {
+                const group = StudyInterviews.GROUPS.includes(pack.group) ? pack.group : 'other';
+                if (!groups.has(group)) groups.set(group, []);
+                groups.get(group).push(pack);
+            }
+            return StudyInterviews.GROUPS.filter(group => groups.has(group)).map(group => [group, groups.get(group)]);
+        },
+        /** "DSA, System design, Finance": the tile's examples, from the packs' short names. */
+        examples(catalog, minChannels = 0, count = 3) {
+            return [...new Set(StudyInterviews.of(catalog, minChannels).map(pack => text(pack.shortName)).filter(Boolean))].slice(0, count);
+        }
+    });
+
+    /**
+     * "Skills and careers" (Android StudyCareers, 8a7671cc3; docs/study/SETUP_SIMPLICITY.md): interview
+     * tracks, degree tracks and the lessons for anyone, filed under one row per field. A field opens on
+     * its tracks: interviews first, then degree tracks under their specializations.
+     */
+    const CAREER_FIELDS = Object.freeze(['software', 'engineering', 'science', 'health', 'management', 'law', 'design', 'public', 'other', 'lessons']);
+    /** Data groups that fold into the list's fields. */
+    const CAREER_FOLDS = Object.freeze({ commerce: 'management', arts: 'design', education: 'other' });
+
+    function specializationName(pack, language) {
+        const labels = object(pack?.specialization);
+        const lang = text(language).toLowerCase().split(/[-_]/)[0];
+        return (lang && labels[lang]) || labels.en || Object.values(labels)[0] || null;
+    }
+
+    const StudyCareers = Object.freeze({
+        FIELDS: CAREER_FIELDS,
+        /** The field a pack lives under, or null for packs outside Skills and careers. */
+        fieldOf(pack) {
+            if (pack?.kind === KIND_CLASS && isGlobal(pack)) return 'lessons';
+            if (pack?.kind === KIND_INTERVIEW || pack?.kind === KIND_DEGREE) {
+                const group = text(pack.group);
+                if (CAREER_FOLDS[group]) return CAREER_FOLDS[group];
+                return CAREER_FIELDS.includes(group) ? group : 'other';
+            }
+            if (EXAM_KINDS.includes(pack?.kind) && isGlobal(pack) && StudyExamFields.of(pack) === 'skills') return 'software';
+            return null;
+        },
+        packs(catalog, minChannels = 0) {
+            return array(catalog?.packs).filter(pack => array(pack.channels).length >= minChannels && StudyCareers.fieldOf(pack) !== null);
+        },
+        /** The fields that have packs, in FIELDS order, as [field, packs] pairs. */
+        fields(catalog, minChannels = 0) {
+            const groups = new Map();
+            for (const pack of StudyCareers.packs(catalog, minChannels)) {
+                const field = StudyCareers.fieldOf(pack);
+                if (!groups.has(field)) groups.set(field, []);
+                groups.get(field).push(pack);
+            }
+            return CAREER_FIELDS.filter(field => groups.has(field)).map(field => [field, groups.get(field)]);
+        },
+        /**
+         * One field's tracks in sections: interview tracks first (key "interviews"), then degree tracks by
+         * specialization (key = its English name), then anything else (key "").
+         */
+        sections(packs) {
+            const list = array(packs);
+            const interviews = list.filter(pack => pack.kind === KIND_INTERVIEW);
+            const degrees = new Map();
+            for (const pack of list.filter(item => item.kind === KIND_DEGREE)) {
+                const key = specializationName(pack, 'en') || '';
+                if (!degrees.has(key)) degrees.set(key, []);
+                degrees.get(key).push(pack);
+            }
+            const rest = list.filter(pack => pack.kind !== KIND_INTERVIEW && pack.kind !== KIND_DEGREE);
+            return [
+                ...(interviews.length ? [['interviews', interviews]] : []),
+                ...degrees.entries(),
+                ...(rest.length ? [['', rest]] : [])
+            ];
+        },
+        /** Search across every field: name, short name, specialization, keywords and subjects. */
+        search(catalog, query, minChannels = 0) {
+            const words = text(query).toLowerCase();
+            if (!words) return [];
+            return StudyCareers.packs(catalog, minChannels).filter(pack => matches(pack, words)
+                || Object.values(object(pack.specialization)).some(label => text(label).toLowerCase().includes(words)));
         }
     });
 
@@ -608,10 +814,7 @@
     function reopenAt(selected, catalog, deviceCountry) {
         const chosen = array(selected).map(id => array(catalog?.packs).find(pack => pack.id === id)).find(Boolean);
         if (!chosen) return { step: 'kind', mode: MODES.EXAM, country: countryCode(deviceCountry) };
-        let mode = MODES.EXAM;
-        if (chosen.kind === 'kids_age' || chosen.kind === 'kids_classic') mode = MODES.SKILL;
-        else if (isGlobal(chosen) && (chosen.kind === KIND_CLASS || StudyExamFields.of(chosen) === 'skills')) mode = MODES.SKILL;
-        else if (chosen.kind === KIND_CLASS) mode = MODES.SCHOOL;
+        const mode = modeOf(chosen);
         const device = countryCode(deviceCountry);
         const country = isGlobal(chosen) ? device : (array(chosen.countries).find(code => code === device) || array(chosen.countries)[0] || null);
         return { step: 'list', mode, country };
@@ -628,9 +831,10 @@
     }
 
     return Object.freeze({
-        MIN_CHANNELS, ROWS_FOLDED, TOPICS_FOLDED, MAX_TOPICS, MODES, STEPS,
-        StudySetupPath, StudyExamFields, StudyExamList, StudySchool, StudySkills, StudyReviewGroups, StudyChannelInput,
+        MIN_CHANNELS, ROWS_FOLDED, TOPICS_FOLDED, MAX_TOPICS, MODES, STEPS, KIND_INTERVIEW, KIND_DEGREE, modeOf,
+        StudySetupPath, StudyExamFields, StudyExamList, StudySchool, StudySkills, StudyInterviews, StudyReviewGroups, StudyChannelInput,
         channelsFor, topicsFor, normalizeKey, refKey, topicKey, isGlobal, packName, variant, variantName,
-        savedEdits, planLabel, reopenAt, countries
+        savedEdits, planLabel, reopenAt, countries,
+        StudyExamCategory, StudyExamFilter, isRegional, areaName, StudyCareers, specializationName
     });
 }));

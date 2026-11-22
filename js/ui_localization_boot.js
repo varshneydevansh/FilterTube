@@ -10,6 +10,8 @@
     const selector = root.document?.getElementById?.('ftInterfaceLanguage');
     let activationRevision = 0;
     let preferenceWriteQueue = Promise.resolve();
+    /** The preference this page last applied, so its own write doesn't apply it twice. */
+    let appliedPreference = null;
 
     function storageCall(method, payload, fallback) {
         return new Promise(resolve => {
@@ -64,6 +66,7 @@
     }
 
     async function activate(preference, revision = ++activationRevision) {
+        appliedPreference = preference;
         const requested = preference === 'auto' ? root.navigator?.language || 'en' : preference;
         await ui.select(requested, { allowStaged: preference !== 'auto' });
         if (revision !== activationRevision) return;
@@ -105,6 +108,21 @@
             if (revision !== activationRevision) return;
             await activate(next, revision);
         });
+    }
+
+    // Another page (the popup, another options tab) changing the language: this page follows it at
+    // once instead of staying in the old language until a reload. Every surface redraws on the
+    // filtertube-ui-locale-changed event that activate() sends.
+    try {
+        api?.storage?.onChanged?.addListener?.((changes, area) => {
+            if (area !== 'local' || !changes?.[preferenceKey]) return;
+            const next = typeof changes[preferenceKey].newValue === 'string' ? changes[preferenceKey].newValue : 'auto';
+            if (next === appliedPreference) return;
+            if (selector) selector.value = [...selector.options].some(option => option.value === next) ? next : 'auto';
+            activate(next).catch(() => {});
+        });
+    } catch (_) {
+        // Pages without storage events keep the language they opened with.
     }
 
     start().catch(() => ui.select('en').then(() => ui.apply(root.document)).catch(() => {}));

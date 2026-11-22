@@ -12,8 +12,11 @@
     const SCHEMA = 'filtertube_study_packs';
     const VERSION = 1;
     const GLOBAL_PREFIX = 'global_';
-    /** Study-picker kinds; "exam" and "class" are the v2 names. Kids packs are "kids_age" and "kids_classic". */
-    const STUDY_KINDS = Object.freeze(['study', 'exam', 'class']);
+    /**
+     * Study-picker kinds; "exam" and "class" are the v2 names, "interview" is job-interview prep (global
+     * packs with their own setup tile). Kids packs are "kids_age" and "kids_classic".
+     */
+    const STUDY_KINDS = Object.freeze(['study', 'exam', 'class', 'interview', 'degree']);
     const KIDS_KINDS = Object.freeze(['kids_age', 'kids_classic']);
     const PACK_ID = /^[A-Za-z0-9_.-]{1,64}$/;
     let cached = null;
@@ -29,7 +32,16 @@
         const handle = text(row.handle) || null;
         const name = text(row.name);
         if ((!channelId && !handle) || !name) return null;
-        return { channelId, handle, name, language: text(row.language) || null };
+        // country: the channel's audience, an ISO country ("IN"), "global", or null when the curators didn't say.
+        return { channelId, handle, name, language: text(row.language) || null, country: text(row.country) || null };
+    }
+
+    /** {"en": "Tamil Nadu", "ta": "..."}: a label per language, keys lowercased, blanks dropped. */
+    function parseLabels(value) {
+        const out = {};
+        if (!value || typeof value !== 'object' || Array.isArray(value)) return out;
+        for (const [lang, label] of Object.entries(value)) if (text(lang) && text(label)) out[text(lang).toLowerCase()] = text(label);
+        return out;
     }
 
     function parseGradeKeywords(value) {
@@ -93,6 +105,15 @@
                 blockedWords: strings(json.blockedWords),
                 // The exam's short label ("GATE"), the study Home's subject chips and the branches.
                 shortName: text(json.shortName) || null,
+                // Interview packs: the career group setup lists them under ("software", "management", "law", ...).
+                group: text(json.group) || null,
+                // Exam packs: "regional" for a state or province exam (area names it), else national;
+                // category is the picker's (school, entrance, civil, professional, language).
+                level: text(json.level) || null,
+                area: parseLabels(json.area),
+                category: text(json.category) || null,
+                // Degree packs: the specialization their track sits under ({"en": "Mechanical engineering"}).
+                specialization: parseLabels(json.specialization),
                 chips: strings(json.chips),
                 variants: parseVariants(json.variants),
                 // True when the variants are levels of one syllabus (JEE Main and Advanced), not branches.

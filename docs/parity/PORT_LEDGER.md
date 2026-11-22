@@ -3,14 +3,14 @@
 Generated from `PORT_LEDGER.tsv` by `node tools/parity/ledger.mjs render`. Edit the TSV, never this file.
 Rules: [HOW_TO_PORT.md](HOW_TO_PORT.md). Sync point: Android `ec9d91080` (Release Android 3.6.1), in the app repository.
 
-**189 rows:** 99 ported, 1 partial, 0 todo, 89 n/a. **99.0%** of 100 applicable rows ported (99.5% counting partial as half).
+**197 rows:** 106 ported, 2 partial, 0 todo, 89 n/a. **98.1%** of 108 applicable rows ported (99.1% counting partial as half).
 
 | Area | ported | partial | todo | n/a | share |
 |---|---|---|---|---|---|
 | brand-visual | 31 | 0 | 0 | 10 | 100.0% |
 | home-viewer | 1 | 0 | 0 | 15 | 100.0% |
 | watch | 0 | 0 | 0 | 1 | - |
-| study | 39 | 0 | 0 | 7 | 100.0% |
+| study | 46 | 1 | 0 | 7 | 98.9% |
 | kids | 0 | 0 | 0 | 3 | - |
 | profiles-family | 9 | 0 | 0 | 2 | 100.0% |
 | settings-controls | 8 | 0 | 0 | 3 | 100.0% |
@@ -101,6 +101,7 @@ Rules: [HOW_TO_PORT.md](HOW_TO_PORT.md). Sync point: Android `ec9d91080` (Releas
 
 | Android | Date | Subject | Status | Extension | Reason / note |
 |---|---|---|---|---|---|
+| `b74369747` | 2026-11-21 | feat(android-study): Timetable screen in Study settings, and Add to my calendar | partial | `138b95b4` | Timetable row in Session and channels and the Timetable page (day chips, periods, in-place editor, Between periods, Hide Clips and comments, Copy this day, Add to my calendar as a plain .ics download with the same weekly RRULE, TZID, escaping and folding); the background accepts a parent's edit for a child, but no parent screen edits a child's timetable yet |
 | `678188f11` | 2026-11-15 | fix(android-study): stamp spring crash, Kriti fits per pose, break drain, sounds, preview safety | ported | `5a539088`, `e5f91eec`, `c5d15ae6` | the seal stamps once per session end with the stamp cue (e5f91eec); on a break a thin sun arc inside the Day Ring drains with it (c5d15ae6). The spring crash, per-pose art fitting and debug preview safety are Android-only |
 | `17a81affe` | 2026-11-15 | fix(study-setup): keep acronyms upper case in topic chips (DBMS, GATE CSE) | ported | `0a7e56ee` | StudyTopicLabel as study_engine.js topicLabel, used by the search explainer; StudyTopicLabelTest ported |
 | `79a3d892c` | 2026-11-15 | feat(android-study): Study v3 home renders in place, colours the page by state, sage-led crayon ring | ported | `06b3bf31`, `5a953666`, `f54d3cb3`, `c5d15ae6` | page colour by state: StudyStateTheme (pageState, pagePalette, pageEvening, mixColor) on the study card, both themes as custom properties, a 450 ms cross-fade; the sage-led Day Ring with the current break's sun arc and notches (c5d15ae6); StudyV3Test colour cases ported. The app's render-in-place, rolling steppers, Kriti's per-state stance and debug previews belong to its own home screen |
@@ -140,6 +141,13 @@ Rules: [HOW_TO_PORT.md](HOW_TO_PORT.md). Sync point: Android `ec9d91080` (Releas
 | `0c08ba48b` | 2026-11-16 | feat(android-study): a light country accent on study setup | ported | `1d4a1011` | CountryAccent table, mark and 6 % wash in study_packs.js; the CrayonStripe and motif on the row that lists the country's packs; CountryAccentTest ported. The setup's step dots and squiggle have no extension counterpart (no step flow) |
 | `bd6b6adb4` | 2026-11-16 | feat(android-study): study packs for more countries | ported | `a99f051b`, `5f476d8f` | data/study/packs-v1.json byte-identical to the Android asset (ledger.mjs shared) |
 | `028e59c94` | 2026-11-16 | fix(android-study): study search finds lessons in the plan's own channels | ported | `ddf3ecb0`, `0a7e56ee` | "How search works while studying" with its topics through topicLabel, on the card and in setup's Review (c8117191). Searching the plan's own channels is the app's native search; the extension filters the site's search page, which it can't extend |
+| `a614cc44e` | 2026-11-21 | feat(android-study): timetable model and runtime | ported | `c8cf6f25` | study_timetable.js has the timetable model (lanes, periods, between, hideShortsAndComments, examDates, setByParentId; lossless); study.timetable is a known study key; the engine runs a period as a round of its lane and between periods the plan or the normal rules, breaks and the limit unchanged, every boundary a transition; lane packs get pack copies; StudyTimetableTest ported. Family sync of study.timetable waits, as on Android |
+| `7d655a511` | 2026-11-21 | fix(android-study): Study status, the mode pill and captions follow the timetable | ported | `aeebb64a` | the Study state reads the timetable-aware clock: STUDY during a period, the lane packs and timetableLane; the extension has no captions or mode pill |
+| `3d92defa7` | 2026-11-21 | feat(android-study): day bar fits its width, no sideways scroll | ported | `611f3fbc` | planBar fits its width (narrow: the plan's own hours, at least 6 h; 600 px and wider: 6 am-11 pm grown to the plan), takes in moved handles, widens a held edge an hour every 350 ms, 44 px targets, END beats LIMIT, cancel and Escape revert, Shift/Page/Home/End/Escape keys, RTL mirror; StudyPlannerModelTest cases ported. DESIGN_PASS §4 decision 3 followed in b1126ebc (length slider removed, read-only bar with Edit on Home) and b8ff3938 (steppers follow Android) |
+| `bfbe09df0` | 2026-11-21 | feat(android-study): the timetable's day on the bar | ported | `1e59ae19` | the day on the plan-style bar (sage blocks named for their lane, a block opens its period), the editor bar with START/END handles (44 px, keys, cancel reverts, END wins a tie, RTL), day chips in one row, Clips, Copy and the calendar behind More choices; barRange and moveEdge with Android's tests |
+| `9413ee20f` | 2026-11-21 | feat(android-study): timetable week grid on tablet, today on TV, widget names the day | ported | `1e59ae19` | the week grid (seven columns over 6 am-11 pm grown to every period, today washed with the now line) with the inspector beside it at 900 px and wider; an empty hour adds a period up to the next; weekRange and slot with Android's tests. The TV remote and the home-screen widget are n/a; the next period off today already names its day (formatDayTime) |
+| `6af91cdbf` | 2026-11-21 | fix(android-study): timetable says Clips; initials in narrow blocks; real minus | ported | `1e59ae19`, `138b95b4` | Hide Clips and comments (138b95b4, every locale its own Clips word); initials in narrow blocks, never a cut-off name (blockLabel, with Android's test plus a bracketed-note case); the editor steppers are the plan page's minus and plus icons, spoken 15 minutes earlier/later |
+| `493eff989` | 2026-11-21 | fix(android-study): block labels never cut a word | ported | `cdee70e4` | blockLabel tries the full name, then the full name at 0.8 size ({text, small}), then initials only for names of two or more words, else nothing (never 'GMA' or 'Pra'); the day bar and the week grid draw the small size; Android's test updated the same way |
 | `49a8ba846` | 2026-11-15 | fix(android-study): keep the planner's scroll only once it has been laid out | n/a |  | Android platform plumbing (planner scroll restore) |
 | `c2fcb8b71` | 2026-11-15 | fix(android-study): no focus wash over the page (the slate dark mode); chip check sits with its words | n/a |  | Android platform plumbing (focus highlight over the native page) |
 | `4a27d8595` | 2026-11-15 | fix(android-study): cream switch thumbs in dark setup | n/a |  | Android platform plumbing (Material switch tint) |

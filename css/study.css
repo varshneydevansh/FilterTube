@@ -263,6 +263,7 @@
 .ft-setup-tile.is-exam { background: var(--pk-rose, #fae8e6); transform: rotate(-0.5deg); }
 .ft-setup-tile.is-school { background: var(--pk-sky, #e9f4fb); transform: rotate(0.4deg); }
 .ft-setup-tile.is-skill { background: var(--pk-sage, #edf4e7); transform: rotate(-0.3deg); }
+.ft-setup-tile.is-interview { background: var(--pk-lilac, #efe6f7); transform: rotate(0.3deg); }
 .ft-setup-tile:hover { transform: rotate(0deg) translateY(-1px); }
 .ft-setup-tile__copy { display: flex; flex-direction: column; gap: 4px; flex: 1; min-width: 0; order: 2; }
 .ft-setup-tile__name { font-family: var(--pk-font-display, inherit); font-size: 1.375rem; font-weight: 600; }
@@ -299,6 +300,13 @@
 .ft-setup-pick.is-on .ft-setup-pick__name { color: var(--pk-brick, #a93e31); }
 .ft-setup-pick__check { display: grid; place-items: center; width: 28px; height: 28px; border: 2px solid var(--pk-line, #dcd1c2); border-radius: 50%; font-weight: 700; }
 .ft-setup-pick.is-on .ft-setup-pick__check { border-color: var(--pk-brick, #a93e31); background: var(--pk-brick, #a93e31); color: var(--pk-on-brick, #fffcf6); }
+/* Skills and careers (Android 8a7671cc3): one row per field; a click opens its tracks. */
+.ft-setup-field { display: flex; align-items: center; gap: 12px; width: 100%; min-height: 68px; padding: 12px 14px 14px 16px; border: 1.5px solid var(--pk-line, #dcd1c2); border-radius: 20px; background: var(--pk-paper, #fffcf6); box-shadow: 3px 3px 0 var(--pk-ledge, rgba(27, 26, 24, 0.14)); color: inherit; font: inherit; text-align: start; cursor: pointer; }
+.ft-setup-field.is-on { border-color: var(--pk-brick, #a93e31); background: var(--pk-rose, #fae8e6); }
+.ft-setup-field__words { display: flex; flex-direction: column; flex: 1; min-width: 0; gap: 3px; }
+.ft-setup-field__name { font-size: 1.06rem; }
+.ft-setup-field__line { overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+.ft-setup-field__chevron { flex: 0 0 auto; width: 20px; height: 20px; }
 .ft-setup-streams { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; margin-top: 8px; }
 .ft-setup-stream { display: flex; flex-direction: column; gap: 2px; padding: 12px 16px 16px 14px; border: 1.5px solid var(--pk-line, #dcd1c2); border-radius: 20px; background: var(--pk-paper, #fffcf6); box-shadow: 3px 3px 0 var(--pk-ledge, rgba(27, 26, 24, 0.14)); color: inherit; font: inherit; text-align: start; cursor: pointer; }
 .ft-setup-stream strong { font-family: var(--pk-font-display, inherit); font-size: 1.25rem; font-weight: 600; }
@@ -336,6 +344,15 @@
 .ft-setup__bar-label { flex: 1; min-width: 0; font-size: 1rem; }
 .ft-setup__bar-action { min-width: 128px; }
 .ft-setup__bar.is-wide .ft-setup__bar-action { flex: 1; }
+/* Start bar (Android 34afba385): what's chosen on top, then "Review channels" and Start side by side. */
+.ft-setup__bar.is-start { flex-direction: column; align-items: stretch; gap: 8px; }
+.ft-setup__bar.is-start .ft-setup__bar-label { overflow: hidden; white-space: nowrap; text-overflow: ellipsis; font-size: 0.95rem; }
+.ft-setup__bar-row { display: flex; align-items: center; gap: 10px; }
+/* One obvious action (Android 420df66be): Start; "Review channels" is a quiet chip beside it. */
+.ft-setup__bar-row .ft-setup-chip { flex: 1 1 auto; min-width: 0; justify-content: center; }
+.ft-setup__bar-row .ft-setup__bar-action { flex: 0 0 auto; min-width: 140px; }
+.ft-setup-filters { display: flex; flex-direction: column; gap: 4px; margin-top: 6px; }
+.ft-setup-filters:empty { display: none; }
 
 @media (prefers-reduced-motion: reduce) {
     .ft-setup__body.is-forward, .ft-setup__body.is-back { animation: none; }
@@ -581,8 +598,11 @@ body.ft-extension-surface .ft-study-card[data-study-page],
 .ft-dayplan__track { position: relative; height: 40px; border-radius: 4px; background: var(--pk-track); }
 .ft-dayplan__seg { position: absolute; top: 0; bottom: 0; padding: 0; border: 0; cursor: pointer; }
 .ft-dayplan__seg.is-study { background: var(--pk-sage-ink); }
-.ft-dayplan__seg.is-break { background: var(--pk-sun); top: 8px; bottom: 8px; border-radius: 3px; }
-.ft-dayplan__seg.is-limit { background: repeating-linear-gradient(45deg, var(--pk-faint) 0 3px, transparent 3px 7px); }
+/* As on Android: the plan is one sage block; each break is a sun notch rising from the bottom edge, with a
+   paper rim, so 25/5 rounds never turn the bar into a barcode. The limit is the track a step deeper. */
+.ft-dayplan__seg.is-break { background: var(--pk-sage-ink); }
+.ft-dayplan__seg.is-break::after { content: ''; position: absolute; left: 50%; top: 45%; bottom: -2px; width: 3.5px; margin-left: -1.75px; border-radius: 2px; background: var(--pk-sun); box-shadow: 0 0 0 1px var(--pk-paper); }
+.ft-dayplan__seg.is-limit { background: color-mix(in srgb, var(--pk-track) 65%, var(--pk-muted)); border-start-end-radius: 4px; border-end-end-radius: 4px; }
 .ft-dayplan__now { position: absolute; top: -14px; width: 0; height: 0; margin-left: -6px; border: 6px solid transparent; border-top: 9px solid var(--pk-ink); }
 .ft-dayplan__now::after { content: ''; position: absolute; left: -1px; top: 0; width: 2px; height: 46px; background: var(--pk-ink); }
 /* The handles (StudyDayPlannerView): a 2 px line through the bar and a 24 px paper knob on its bottom edge,
@@ -590,6 +610,12 @@ body.ft-extension-surface .ft-study-card[data-study-page],
 .ft-dayplan__track { touch-action: none; }
 .ft-dayplan__handle { position: absolute; top: 0; bottom: 0; width: 2px; margin-left: -1px; background: var(--pk-ink); z-index: 2; cursor: ew-resize; outline: none; }
 .ft-dayplan__handle::after { content: ''; position: absolute; left: 50%; bottom: -12px; width: 24px; height: 24px; margin-left: -12px; box-sizing: border-box; border-radius: 50%; border: 2px solid var(--pk-ink); background: var(--pk-paper); transition: transform 140ms ease-out; }
+/* Android 3d92defa7: the bar fits its width; each handle has a 44 px target around its knob. */
+.ft-dayplan__segs { position: absolute; inset: 0; }
+/* Touching segments overlap by a pixel: no hairline seam between rounds at fractional widths. */
+.ft-dayplan__seg.is-study, .ft-dayplan__seg.is-break { box-shadow: 1px 0 0 var(--pk-sage-ink); }
+.ft-dayplan__handle::before { content: ''; position: absolute; left: 50%; top: -2px; width: 44px; height: 44px; margin-left: -22px; }
+.ft-dayplan__handle:focus { outline: none; }
 .ft-dayplan__handle.is-limit { background: var(--pk-muted); }
 .ft-dayplan__handle.is-limit::after { border-color: var(--pk-muted); }
 .ft-dayplan__handle.is-limit.is-unset { background: transparent; }
@@ -606,31 +632,8 @@ body.ft-extension-surface .ft-dayplan__handle:focus-visible { outline: none !imp
 .ft-dayplan { padding-top: 40px; }
 
 /* Study length: today's plan as one slider under the hero (and on the Home "Study today" card). */
-.ft-length { display: grid; gap: 6px; }
-.ft-length__head { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; }
-.ft-length__title { font-family: var(--pk-font-hand); font-size: 19px; color: var(--pk-ink); }
-.ft-length__value { font-family: var(--pk-font-hand); font-weight: 400; font-size: 22px; color: var(--pk-sage-ink); font-variant-numeric: tabular-nums; }
-.ft-length__range { color: var(--pk-muted); font-size: 14px; }
-.ft-length__row { display: flex; align-items: center; gap: 10px; margin-top: 4px; }
-.ft-length__hint { margin: 2px 0 0; color: var(--pk-muted); font-size: 13px; }
-.ft-length.is-compact .ft-length__title { font-size: 16px; }
-.ft-length.is-compact .ft-length__value { font-size: 19px; }
-.ft-length__input { --ft-length-fill: 50%; flex: 1; min-width: 0; height: 28px; margin: 0; background: transparent; appearance: none; -webkit-appearance: none; cursor: ew-resize; }
-.ft-length__input:disabled { cursor: not-allowed; opacity: 0.55; }
-.ft-length__input::-webkit-slider-runnable-track { height: 10px; border-radius: 6px; border: 1.5px solid color-mix(in srgb, var(--pk-ink) 30%, transparent);
-  background: linear-gradient(90deg, var(--pk-sage-ink) 0 var(--ft-length-fill), var(--pk-track) var(--ft-length-fill) 100%); }
-.ft-length__input::-moz-range-track { height: 10px; border-radius: 6px; border: 1.5px solid color-mix(in srgb, var(--pk-ink) 30%, transparent); background: var(--pk-track); }
-.ft-length__input::-moz-range-progress { height: 10px; border-radius: 6px; background: var(--pk-sage-ink); }
-.ft-length__input::-webkit-slider-thumb { -webkit-appearance: none; width: 26px; height: 26px; margin-top: -9.5px; border-radius: 50%; border: 2px solid var(--pk-ink); background: var(--pk-paper); box-shadow: 0 2px 0 var(--pk-ledge); transition: transform 140ms ease-out; }
-.ft-length__input::-moz-range-thumb { width: 22px; height: 22px; border-radius: 50%; border: 2px solid var(--pk-ink); background: var(--pk-paper); }
-.ft-length__input:hover:not(:disabled)::-webkit-slider-thumb { transform: scale(1.1); }
-.ft-length__input:active:not(:disabled)::-webkit-slider-thumb { transform: scale(1.15); }
-.ft-length__input:focus-visible { outline: none; }
-.ft-length__input:focus-visible::-webkit-slider-thumb { outline: 2px solid var(--pk-ink); outline-offset: 2px; }
-.ft-length__input:focus-visible::-moz-range-thumb { outline: 2px solid var(--pk-ink); outline-offset: 2px; }
-.ft-length__step { flex: none; }
 @media (prefers-reduced-motion: reduce) {
-  .ft-dayplan__handle::after, .ft-dayplan__pill, .ft-length__input::-webkit-slider-thumb { transition: none; }
+  .ft-dayplan__handle::after, .ft-dayplan__pill { transition: none; }
 }
 .ft-dayplan__scale { position: relative; height: 22px; margin-top: 16px; }
 .ft-dayplan__hour { position: absolute; transform: translateX(-50%); font-size: 0.72rem; color: var(--pk-muted); white-space: nowrap; }
@@ -678,3 +681,68 @@ body.ft-extension-surface .ft-dayplan__handle:focus-visible { outline: none !imp
     .ft-day-ring .is-rippling, .ft-hero__ring.is-exhaling { animation: none; }
     .ft-day-ring__scribble { display: none; }
 }
+
+/* Timetable (Android b74369747; DESIGN_PASS_2026-11-21 §4 decision 4, bfbe09df0/9413ee20f/6af91cdbf).
+ * Flat, as the dashboard (52d11d77): hairline edges, no ledge or gradient. A window 900 px and wider:
+ * the week grid with the inspector beside it; narrower it stacks (day chips in one row, the day on the bar). */
+#studyView .ft-study-page:has(.ft-study-home[data-mode="timetable"]) { max-width: 1180px; }
+.ft-tt-layout { display: grid; grid-template-columns: minmax(0, 1fr); gap: 16px; align-items: start; }
+.ft-tt-wrap .ft-home-card { box-shadow: none; border: 1px solid var(--pk-line, #dcd1c2); border-radius: 16px; }
+.ft-tt { display: flex; flex-direction: column; gap: 12px; }
+.ft-tt-week, .ft-tt-wide { display: none; }
+@media (min-width: 900px) {
+  .ft-tt-layout { grid-template-columns: minmax(0, 1fr) minmax(280px, 320px); }
+  .ft-tt-week { display: block; }
+  .ft-tt-wide { display: block; }
+  .ft-tt-narrow { display: none !important; }
+}
+.ft-tt__days { display: flex; gap: 4px; }
+.ft-tt__day { flex: 1 1 0; min-width: 0; min-height: 44px; padding: 0 2px; border: 1px solid var(--pk-line, #dcd1c2); border-radius: 12px; background: transparent; color: var(--pk-ink); font: 600 min(13px, 2.8vw)/1.1 var(--pk-font-display, inherit); white-space: nowrap; overflow: hidden; cursor: pointer; }
+.ft-tt__day.is-on { background: var(--pk-ink); border-color: var(--pk-ink); color: var(--pk-paper, #fffcf6); }
+.ft-tt__day:focus-visible { outline: 3px solid var(--pk-ink); outline-offset: 2px; }
+.ft-tt__periods { display: flex; flex-direction: column; border: 1px solid var(--pk-line, #dcd1c2); border-radius: 12px; overflow: hidden; }
+.ft-tt__periods > .ft-link-row + .ft-link-row { border-top: 1px solid var(--pk-line, #dcd1c2); }
+.ft-tt__empty { margin: 0; padding: 16px; }
+.ft-tt__actions { flex-wrap: wrap; }
+.ft-tt__copy { display: flex; flex-direction: column; gap: 10px; align-items: flex-start; }
+.ft-tt__hits:empty { display: none; }
+/* The day on the bar: the plan bar's track, periods as sage blocks; editing, the others fade. */
+.ft-ttbar { padding-top: 40px; }
+.ft-ttbar__block { position: absolute; top: 0; bottom: 0; display: flex; align-items: center; justify-content: center; padding: 0 2px; border: 0; border-inline: 1px solid var(--pk-paper, #fffcf6); background: var(--pk-sage-ink); color: var(--pk-paper, #fffcf6); font: 700 12px/1 system-ui, sans-serif; overflow: hidden; white-space: nowrap; cursor: pointer; }
+.ft-ttbar__block.is-faded { background: color-mix(in srgb, var(--pk-sage-ink) 35%, var(--pk-track)); color: var(--pk-ink); cursor: default; }
+.ft-ttbar__block.is-editing { cursor: default; }
+.ft-ttbar__block:focus-visible { outline: 3px solid var(--pk-ink); outline-offset: 2px; }
+.ft-ttbar__name { overflow: hidden; }
+/* The week grid: seven day columns over the day's hours (32 px an hour). */
+.ft-tt-week { padding: 12px; }
+.ft-tt-week__row { display: grid; grid-template-columns: 44px repeat(7, minmax(0, 1fr)); gap: 4px; }
+.ft-tt-week__head { margin-bottom: 6px; }
+.ft-tt-week__day { min-height: 36px; padding: 0 4px; border: 1px solid var(--pk-line, #dcd1c2); border-radius: 10px; background: transparent; color: var(--pk-ink); font: 600 13px/1.2 var(--pk-font-display, inherit); cursor: pointer; }
+.ft-tt-week__day.is-today { border-color: var(--pk-sage-ink); }
+.ft-tt-week__day.is-on { background: var(--pk-sage); border-color: var(--pk-sage-ink); color: var(--pk-sage-ink); }
+.ft-tt-week__axis { position: relative; }
+.ft-tt-week__hour { position: absolute; inset-inline-end: 6px; transform: translateY(-50%); font-size: 11px; color: var(--pk-muted); white-space: nowrap; }
+.ft-tt-week__col { position: relative; border-radius: 8px; background: repeating-linear-gradient(to bottom, transparent 0 31px, var(--pk-line, #dcd1c2) 31px 32px); cursor: copy; }
+.ft-tt-week__col.is-today { background-color: color-mix(in srgb, var(--pk-sage-ink) 9%, transparent); }
+.ft-tt-week__block { position: absolute; inset-inline: 2px; display: flex; align-items: flex-start; justify-content: center; padding: 3px 2px 0; border: 0; border-block: 1px solid var(--pk-paper, #fffcf6); border-radius: 6px; background: var(--pk-sage-ink); color: var(--pk-paper, #fffcf6); font: 700 12px/1.2 system-ui, sans-serif; overflow: hidden; cursor: pointer; }
+.ft-tt-week__block.is-editing { outline: 3px solid var(--pk-ink); outline-offset: 1px; }
+.ft-tt-week__block:focus-visible, .ft-tt-week__day:focus-visible { outline: 3px solid var(--pk-ink); outline-offset: 2px; }
+.ft-tt-week__name { overflow: hidden; white-space: nowrap; text-overflow: clip; }
+.ft-tt-week__name.is-small, .ft-ttbar__name.is-small { font-size: 0.8em; }
+.ft-tt-week__now { position: absolute; inset-inline: 0; height: 2px; margin-top: -1px; background: var(--pk-ink); pointer-events: none; }
+
+/* Narrow windows (a phone-width popup tab, a split screen): the day bar gets the width, not the gutters. */
+@media (max-width: 480px) {
+    #studyView .ft-study-page { padding-left: 8px; padding-right: 8px; }
+    #studyView .ft-plan-card { padding-left: 12px; padding-right: 12px; }
+    .ft-dayplan { padding-left: 8px; padding-right: 8px; }
+}
+
+/* The popup's "Study today": a read-only day bar under the strip, and "Edit in dashboard" (the one editor). */
+.ft-study-popup-plan { margin: 0.5rem 0.12rem 0; padding: 0.6rem 0.75rem 0.35rem; border: 1px solid var(--ft-tone-stroke, var(--pk-line)); border-radius: 12px; background: var(--pk-paper); }
+.ft-study-popup-plan[hidden] { display: none; }
+.ft-study-popup-plan__head { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+.ft-study-popup-plan__title { font-family: var(--pk-font-hand); font-size: 1.05rem; color: var(--pk-ink); }
+.ft-study-popup-plan__edit { min-height: 32px; padding: 4px 6px; font-size: 0.85rem; }
+.ft-study-popup-plan > .ft-dayplan { padding: 24px 0 0; }
+.ft-study-popup-plan .ft-dayplan__track { height: 28px; }
