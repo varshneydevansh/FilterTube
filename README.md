@@ -185,7 +185,7 @@ An unmanaged browser or device owner can disable or uninstall the extension, and
 
 This repository contains the **extension runtime and the website**. The apps have their own implementations and release checks; a passing extension test or build is not proof that the apps match.
 
-![Extension source version](https://img.shields.io/badge/version-3.6.3-blue.svg)
+![Extension source version](https://img.shields.io/badge/version-3.6.4-blue.svg)
 
 ```bash
 npm install
