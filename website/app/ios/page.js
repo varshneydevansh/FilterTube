@@ -281,6 +281,42 @@ function InstallGuide() {
 
               <details className="ft-disclosure mt-6 rounded-[1.2rem] border border-[color:var(--color-line)] p-5">
                 <summary className="cursor-pointer font-medium text-[var(--color-ink)]">
+                  Download stuck in SideStore? Install from the file instead
+                </summary>
+                <div className="mt-3 space-y-3 text-sm leading-7 text-[var(--color-muted)]">
+                  <p>
+                    If FilterTube&apos;s download in SideStore stops partway or
+                    ends with error -1001, get the file yourself and hand it to
+                    SideStore. It installs the same app and still refreshes it
+                    every week.
+                  </p>
+                  <ol className="list-decimal space-y-2 pl-5">
+                    <li>
+                      Download <code className="font-mono text-[var(--color-ink)]">FilterTube-Direct-x.y.z.ipa</code>{" "}
+                      from the <TextLink href="https://github.com/varshneydevansh/FilterTube/releases/latest">latest release</TextLink>.
+                      On the phone, use Safari and keep the screen on until it
+                      finishes; it saves to Files &gt; Downloads. On a computer,
+                      download it there and send it to the phone: AirDrop from a
+                      Mac, or Finder (Mac) or iTunes (Windows) file sharing, or any
+                      cloud drive you can open in Files.
+                    </li>
+                    <li>
+                      With LocalDevVPN on, open SideStore, go to My Apps, tap +
+                      at the top and choose the .ipa file.
+                    </li>
+                  </ol>
+                  <p>
+                    Still at the computer with the phone plugged in? iloader&apos;s
+                    Import IPA installs the file directly too. An app installed
+                    that way is refreshed with iloader on the computer each week,
+                    not by SideStore, so the SideStore route above is easier to
+                    live with.
+                  </p>
+                </div>
+              </details>
+
+              <details className="ft-disclosure mt-6 rounded-[1.2rem] border border-[color:var(--color-line)] p-5">
+                <summary className="cursor-pointer font-medium text-[var(--color-ink)]">
                   Prefer AltStore?
                 </summary>
                 <p className="mt-3 text-sm leading-7 text-[var(--color-muted)]">

@@ -41,7 +41,7 @@ export const iosStuck = [
   },
   {
     q: "\"The operation couldn't be completed\" (kCFErrorDomainCFNetwork error -1001)",
-    a: "The download timed out. FilterTube is a large download (around 100 MB), and SideStore gives up if it stalls. Try again on a fast Wi-Fi network with LocalDevVPN on. Still failing? On your phone or computer, download the .ipa file from the latest release on GitHub (https://github.com/varshneydevansh/FilterTube/releases/latest), save it to the Files app (AirDrop works from a Mac), then in SideStore open My Apps, tap + and choose that file. SideStore still refreshes it every week.",
+    a: "The download timed out. FilterTube is a large download (around 100 MB), and SideStore gives up if it stalls. Try again on a fast Wi-Fi network with LocalDevVPN on. Still failing? Install from the file instead: download the .ipa from the latest release on GitHub (https://github.com/varshneydevansh/FilterTube/releases/latest) in Safari on the phone (keep the screen on), or on a computer and send it to the phone (AirDrop, Finder or iTunes file sharing, or a cloud drive). Then, with LocalDevVPN on, open SideStore > My Apps, tap + and choose the file. SideStore still refreshes it every week. iloader's Import IPA also installs the file from a computer, but then iloader, not SideStore, has to refresh it each week.",
   },
   {
     q: "SideStore can't connect, or install and refresh fail",
