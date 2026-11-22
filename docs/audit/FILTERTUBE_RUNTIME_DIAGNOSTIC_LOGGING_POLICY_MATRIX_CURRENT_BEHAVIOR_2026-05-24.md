@@ -951,7 +951,7 @@ The first textual routine background console site is now at line 3564 (YouTube K
 
 ## Controls hardening playback fingerprints
 
-| `js/content/content_playback.js` | 374 | 21770 | `728b8df9f41d39f86774f550788f22317dfd4edfe6f64b766905da6611b70b80` |
+| `js/content/content_playback.js` | 404 | 23801 | `e891edbe2067116d8f692976a5a95710982a7e266d2f2bf315d928f828a211ff` |
 | `js/content/content_playback_admission.js` | 131 | 7500 | `71ee13a96de07fdf988dc25300b1b09e0379e687047b5a5b7c21605bcbe68763` |
 | `js/content/content_playback_captions.js` | 138 | 8244 | `c5768f3bb7836321b030009492fe2ae703bb3e785352eabf8b2f383ca203c196` |
 | `js/content/content_playback_native.js` | 280 | 19192 | `3bc1852f55e0a3238ecb42dd42bb3c360760d98bfcd5de2504a3a1462da99d6c` |

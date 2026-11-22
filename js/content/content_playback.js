@@ -17,6 +17,28 @@
     let contextKey = '';
     let attemptedKey = '';
     let preflightCount = 0;
+    // The playing video a source transaction paused. If the transaction ends
+    // without handing playback back, the video must not be left paused.
+    let interruptedPlayback = null;
+    // A person's own control, leaving the video, or any rule, setting or
+    // parent change keeps the pause; those paths re-decide playback themselves.
+    const KEEP_PAUSED_REASONS = new Set(['native_controls_changed', 'disabled', 'navigation', 'route_transition',
+        'admission_changed', 'direct_admission_changed', 'category_admission_changed', 'managed_route_denied',
+        'settings_changed', 'storage_changed', 'storage_settings_changed']);
+    function resumeInterruptedPlayback(interrupted) {
+        const node = interrupted?.node;
+        if (!node || videoId() !== interrupted.id || currentContext() !== interrupted.key
+            || document.getElementById('movie_player') !== interrupted.surface
+            || interrupted.surface.querySelector('video.html5-main-video') !== node
+            || node.paused !== true || node.ended === true) return;
+        // Same authority the transaction needed: rules, time limits and parent
+        // holds still decide. A refused lease leaves the video as it is.
+        const permit = gate?.issue();
+        if (!permit) return;
+        gate.invalidate('interrupted_playback_resumed');
+        setStatus('native_resumed_after_fallback');
+        try { Promise.resolve(node.play()).catch(() => {}); } catch (_) { }
+    }
     const pending = new Map();
     function videoId() {
         if (location.hostname !== 'www.youtube.com' || location.pathname !== '/watch') return '';
@@ -74,6 +96,9 @@
         }
     }
     function invalidate(reason = 'invalidated') {
+        const interrupted = controller && interruptedPlayback && !interruptedPlayback.userInteracted
+            && !KEEP_PAUSED_REASONS.has(reason) ? interruptedPlayback : null;
+        interruptedPlayback = null;
         generation++;
         busy = false;
         sourceAbort?.abort();
@@ -95,6 +120,7 @@
         controller = null;
         if (['settings_changed', 'storage_changed', 'storage_settings_changed'].includes(reason)) queueMicrotask(refresh);
         if (['direct_admission_changed', 'category_admission_changed'].includes(reason)) queueMicrotask(schedule);
+        if (interrupted) queueMicrotask(() => resumeInterruptedPlayback(interrupted));
     }
     function requestResponse(id, audioTrackId = '', stateOnly = false) {
         return new Promise(resolve => {
@@ -190,6 +216,7 @@
             const playbackKey = event.type === 'keydown' && !editable
                 && [' ', 'Spacebar', 'k', 'K', 'MediaPause', 'MediaPlayPause'].includes(event.key);
             if (event.isTrusted && busy && (surface.contains(target) || playbackKey)) {
+                if (interruptedPlayback) interruptedPlayback.userInteracted = true;
                 invalidate('native_controls_changed');
                 attemptedKey = key;
                 setStatus('native_controls_changed');
@@ -310,6 +337,8 @@
                 });
             }
         });
+        interruptedPlayback = original.paused === false
+            ? { node: original, surface, id, key, userInteracted: false } : null;
         const result = await controller.start({ mode: 'automatic', lease, videoId: id,
             playbackIntent: { videoId: id, nativeTimeline: originalIsContent() ? 'content' : 'unrelated',
                 durationSeconds: plan.video.durationSeconds, positionSeconds: originalIsContent() ? original.currentTime : 0,
@@ -320,6 +349,7 @@
         if (result?.status !== 'active' || result.handedOff !== true) { invalidate('player_fallback'); return; }
         // This is a one-shot admitted source transaction. The native engine
         // and the existing profile guards own ordinary playback afterward.
+        interruptedPlayback = null;
         controller.destroy();
         controller = null;
         if (heartbeat) clearInterval(heartbeat);

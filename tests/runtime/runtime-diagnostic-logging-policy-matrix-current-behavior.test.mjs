@@ -33,9 +33,9 @@ const sourceFingerprints = {
 
 const playbackSourceFingerprints = {
   "js/content/content_playback.js": [
-    374,
-    21770,
-    "728b8df9f41d39f86774f550788f22317dfd4edfe6f64b766905da6611b70b80"
+    404,
+    23801,
+    "e891edbe2067116d8f692976a5a95710982a7e266d2f2bf315d928f828a211ff"
   ],
   "js/content/content_playback_admission.js": [
     131,
