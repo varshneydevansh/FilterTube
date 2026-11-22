@@ -118,6 +118,19 @@ function StepCard({ number, where, title, mascot, children }) {
   );
 }
 
+function Steps({ children }) {
+  return <ol className="mt-3 list-decimal space-y-2 pl-6 marker:font-semibold marker:text-[var(--color-ink)]">{children}</ol>;
+}
+
+function IfYouSee({ title, children }) {
+  return (
+    <div className="mt-4 rounded-[1rem] border border-[#e4c766] bg-[#fdf5d8] p-4 text-sm leading-7 text-[#5b4a12]">
+      <p className="font-semibold">If you see: {title}</p>
+      <p className="mt-1">{children}</p>
+    </div>
+  );
+}
+
 const kritiWave = { src: "/mascots/kriti_wave.webp", alt: "Kriti waving", width: 176, height: 224 };
 const kritiThumbs = { src: "/mascots/kriti_thumbsup.webp", alt: "Kriti giving a thumbs up", width: 217, height: 300 };
 const uljhanHappy = { src: "/mascots/uljhan_happy.webp", alt: "", width: 225, height: 211 };
@@ -204,57 +217,93 @@ function InstallGuide() {
                 <h2 className="max-w-[22ch] text-balance font-display text-4xl tracking-[-0.06em] text-[var(--color-ink)] md:text-5xl">
                   Install steps
                 </h2>
+                <p className="mt-4 max-w-[62ch] text-base leading-8 text-[var(--color-muted)]">
+                  Do one small step at a time, in this order. If something
+                  looks different, the yellow box under that step says what
+                  to do. You only do steps 1 to 6 once.
+                </p>
               </div>
               <ol className="mt-8 grid gap-4">
-                <StepCard number="1" where="On your iPhone" title="Install LocalDevVPN, then turn it on" mascot={kritiWave}>
-                  <p className="mt-2">
-                    Get{" "}
-                    <TextLink href={localDevVpnHref}>LocalDevVPN from the App Store</TextLink>{" "}
-                    and switch it on. Tap Allow if it asks to add a VPN
-                    configuration.
-                  </p>
-                  <p className="mt-2 text-sm">
-                    Why? It&apos;s a local VPN that lives on your phone.
-                    SideStore uses it to install and refresh apps. Your
-                    traffic doesn&apos;t go anywhere.
-                  </p>
-                </StepCard>
-                <StepCard number="2" where="On your computer" title="Use iloader to put SideStore on your phone" mascot={kritiThumbs}>
-                  <p className="mt-2">
-                    Plug your iPhone into the computer with a cable that
-                    carries data (some charging cables don&apos;t), unlock it
-                    and tap Trust on the phone. Download iloader, open it,
-                    sign in with your Apple ID, pick your iPhone, then choose
-                    Install SideStore. iloader also puts SideStore&apos;s
-                    pairing file on the phone. If iloader shows &ldquo;No
-                    devices found&rdquo;, see the fixes below.
-                  </p>
-                  <div className="mt-3 flex flex-wrap gap-x-5 gap-y-2 text-sm">
-                    {iloaderLinks.map((item) => (
-                      <TextLink href={item.href} key={item.label}>
-                        {item.label}
-                      </TextLink>
-                    ))}
-                  </div>
-                </StepCard>
-                <StepCard number="3" where="On your iPhone" title="Trust it, then sign in to SideStore" mascot={kritiThumbs}>
-                  <p className="mt-2">
-                    In Settings &gt; General &gt; VPN &amp; Device Management,
-                    tap your Apple ID under Developer App and tap Trust. Then
-                    turn on Developer Mode in Settings &gt; Privacy &amp;
-                    Security; the phone restarts.
-                  </p>
-                  <p className="mt-2">
-                    With LocalDevVPN on, open SideStore and sign in with the
-                    same Apple ID you used in iloader.
+                <StepCard number="1" where="On your iPhone or iPad" title="Get LocalDevVPN and turn it on" mascot={kritiWave}>
+                  <Steps>
+                    <li>Install <TextLink href={localDevVpnHref}>LocalDevVPN from the App Store</TextLink> (free).</li>
+                    <li>Open it and tap Connect.</li>
+                    <li>If it asks to add a VPN configuration, tap Allow.</li>
+                  </Steps>
+                  <p className="mt-3 text-sm">
+                    It stays on your phone and your internet doesn&apos;t go
+                    through anyone. SideStore needs it on whenever it installs
+                    or refreshes an app.
                   </p>
                 </StepCard>
-                <StepCard number="4" where="On your iPhone" title={"Tap \u201cAdd to SideStore\u201d, then install FilterTube"} mascot={kritiWave}>
+                <StepCard number="2" where="On your computer" title="Get iloader and sign in" mascot={kritiThumbs}>
+                  <Steps>
+                    <li>
+                      Download iloader for your computer:{" "}
+                      {iloaderLinks.map((item, index) => (
+                        <span key={item.label}>
+                          {index ? ", " : ""}
+                          <TextLink href={item.href}>{item.label}</TextLink>
+                        </span>
+                      ))}
+                      .
+                    </li>
+                    <li>Open iloader and sign in with your Apple ID (your iCloud email and password).</li>
+                  </Steps>
+                </StepCard>
+                <StepCard number="3" where="Phone and computer" title="Connect the phone and put SideStore on it" mascot={kritiThumbs}>
+                  <Steps>
+                    <li>Plug the phone into the computer with a cable.</li>
+                    <li>Unlock the phone. When it asks &ldquo;Trust This Computer?&rdquo;, tap Trust and type your passcode.</li>
+                    <li>In iloader, click Refresh, then click your phone&apos;s name.</li>
+                    <li>Click SideStore (Stable) and wait until iloader says it&apos;s done.</li>
+                  </Steps>
+                  <IfYouSee title="iloader says “No devices found”">
+                    The cable may only charge. Try another cable, ideally an
+                    Apple one or one you&apos;ve used to sync a phone. Plug it
+                    straight into the computer, unlock the phone, tap Trust, then
+                    click Refresh. This first time needs a cable; Wi-Fi alone
+                    won&apos;t do.
+                  </IfYouSee>
+                </StepCard>
+                <StepCard number="4" where="On your iPhone or iPad" title="Allow SideStore to open" mascot={kritiWave}>
+                  <Steps>
+                    <li>Open Settings &gt; General &gt; VPN &amp; Device Management.</li>
+                    <li>Tap your email under Developer App, then tap Trust.</li>
+                    <li>Open Settings &gt; Privacy &amp; Security &gt; Developer Mode and turn it on.</li>
+                    <li>The phone asks to restart. Restart it, then tap Turn On when it asks.</li>
+                  </Steps>
+                </StepCard>
+                <StepCard number="5" where="In SideStore" title="Set up SideStore, then sign in" mascot={kritiThumbs}>
                   <p className="mt-2">
-                    Open this page on your phone and tap the button. SideStore
-                    adds the FilterTube source; open FilterTube there and tap
-                    Install.
+                    Since November 2026, Apple only accepts SideStore&apos;s
+                    sign-in after a short one-time setup. Open SideStore (with
+                    LocalDevVPN on), tap Settings at the bottom right, and go
+                    down this list:
                   </p>
+                  <Steps>
+                    <li>User Customizations: turn off On-Device Anisette.</li>
+                    <li>Close SideStore (swipe it away) and open it again.</li>
+                    <li>Anisette Servers: choose SideStore (New), and turn off Enable Auto Rotation.</li>
+                    <li>User Customizations: tap Reset adi.pb. If it asks, keep the header overrides.</li>
+                    <li>User Customizations &gt; Anisette Client Configuration &gt; Remote Server Sync: tap Fetch, then Save as Overrides.</li>
+                    <li>Close SideStore again, open it, and sign in with the same Apple ID as in iloader.</li>
+                  </Steps>
+                  <IfYouSee title="SideStore closes by itself when you sign in">
+                    On-Device Anisette is still on. Do the first two items
+                    above, then sign in again.
+                  </IfYouSee>
+                  <IfYouSee title="“Failed to Sign In” and “503 Service Temporarily Unavailable”">
+                    One item was skipped or done out of order. Go down the list
+                    again from the top; Reset adi.pb has to come before Fetch.
+                  </IfYouSee>
+                </StepCard>
+                <StepCard number="6" where="On your iPhone or iPad" title="Install FilterTube" mascot={kritiWave}>
+                  <Steps>
+                    <li>Open this page (filtertube.in/ios) on the phone and tap Add to SideStore below.</li>
+                    <li>In SideStore, open FilterTube (Direct) and tap Free (or Install).</li>
+                    <li>Keep the screen on and SideStore open until it finishes. It&apos;s about 100 MB.</li>
+                  </Steps>
                   <div className="mt-4 flex flex-col items-start gap-3">
                     {iosRelease.live ? (
                       <ActionLink href={iosRelease.sideStoreHref}>Add to SideStore</ActionLink>
@@ -267,21 +316,32 @@ function InstallGuide() {
                     paste{" "}
                     <code className="break-all font-mono text-[var(--color-ink)]">{SOURCE_JSON_URL}</code>
                   </p>
+                  <IfYouSee title="“SideStore.OperationError error 28”">
+                    SideStore isn&apos;t signed in yet. Finish step 5, then tap
+                    Free again.
+                  </IfYouSee>
+                  <IfYouSee title="The download stops, or “error -1001”">
+                    The download timed out. Try once more on good Wi-Fi with the
+                    screen on. If it stops again, use &ldquo;Install from the
+                    file instead&rdquo; just below.
+                  </IfYouSee>
                 </StepCard>
-                <StepCard number="5" where="Every week" title="Keep it fresh" mascot={uljhanHappy}>
-                  <p className="mt-2">
-                    On a free Apple ID, apps signed this way last 7 days.
-                    SideStore refreshes FilterTube right on your phone, in the
-                    background or when you tap the days counter in My Apps, as
-                    long as LocalDevVPN is on. Refresh at least once a week;
-                    you won&apos;t need the computer again.
+                <StepCard number="7" where="Once a week" title="Refresh FilterTube" mascot={uljhanHappy}>
+                  <Steps>
+                    <li>Turn LocalDevVPN on.</li>
+                    <li>Open SideStore, go to My Apps and tap the days counter next to FilterTube (or Refresh All).</li>
+                  </Steps>
+                  <p className="mt-3 text-sm">
+                    On a free Apple ID, apps installed this way last 7 days, so
+                    refresh at least once a week. You won&apos;t need the
+                    computer again. Your settings, profiles and PINs stay.
                   </p>
                 </StepCard>
               </ol>
 
               <details className="ft-disclosure mt-6 rounded-[1.2rem] border border-[color:var(--color-line)] p-5">
                 <summary className="cursor-pointer font-medium text-[var(--color-ink)]">
-                  Download stuck in SideStore? Install from the file instead
+                  Install from the file instead (if the download keeps stopping)
                 </summary>
                 <div className="mt-3 space-y-3 text-sm leading-7 text-[var(--color-muted)]">
                   <p>
@@ -323,7 +383,7 @@ function InstallGuide() {
                   <TextLink href={altStoreHref}>AltStore</TextLink> works too.
                   Install AltServer on your computer and use it to put AltStore
                   on your phone, then trust the developer and turn on Developer
-                  Mode as in step 3. Tap the button below (or add{" "}
+                  Mode as in step 4. Tap the button below (or add{" "}
                   <code className="break-all font-mono text-[var(--color-ink)]">{SOURCE_JSON_URL}</code>{" "}
                   under Sources) and install FilterTube. You can also download
                   the IPA from the GitHub release and open it with AltStore.
