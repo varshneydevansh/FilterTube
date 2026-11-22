@@ -44,6 +44,18 @@ export const iosStuck = [
     a: "The download timed out. FilterTube is a large download (around 100 MB), and SideStore gives up if it stalls. Try again on a fast Wi-Fi network with LocalDevVPN on. Still failing? Install from the file instead: download the .ipa from the latest release on GitHub (https://github.com/varshneydevansh/FilterTube/releases/latest) in Safari on the phone (keep the screen on), or on a computer and send it to the phone (AirDrop, Finder or iTunes file sharing, or a cloud drive). Then, with LocalDevVPN on, open SideStore > My Apps, tap + and choose the file. SideStore still refreshes it every week. iloader's Import IPA also installs the file from a computer, but then iloader, not SideStore, has to refresh it each week.",
   },
   {
+    q: "SideStore closes (crashes) when you sign in",
+    a: "Older iPhones and iPads run out of memory for one sign-in step. In SideStore, open Settings > User Customizations and turn off On-Device Anisette, then close SideStore (swipe it away), open it again and sign in.",
+  },
+  {
+    q: "\"Failed to Sign In\" with \"503 Service Temporarily Unavailable\"",
+    a: "Since 20 November 2026 Apple turns away SideStore's default sign-in details. Fix it once, in SideStore's Settings, in this order: (1) User Customizations: turn off On-Device Anisette. (2) Close SideStore and open it again. (3) Anisette Servers: choose SideStore (New), and turn off Enable Auto Rotation. (4) User Customizations: tap Reset adi.pb (keep the header overrides if it asks). (5) User Customizations > Anisette Client Configuration > Remote Server Sync: tap Fetch, then Save as Overrides. (6) Close SideStore, open it again and sign in. Do step 4 before step 5, or the reset undoes the fix.",
+  },
+  {
+    q: "\"SideStore.OperationError error 28\" when you install",
+    a: "SideStore isn't signed in to your Apple ID yet; signing in to iloader doesn't sign in SideStore. Open SideStore's Settings, sign in with the same Apple ID you used in iloader, then install FilterTube again.",
+  },
+  {
     q: "SideStore can't connect, or install and refresh fail",
     a: "Open LocalDevVPN and make sure it's connected. SideStore needs it on every time you install, update or refresh.",
   },
