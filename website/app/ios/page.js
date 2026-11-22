@@ -221,11 +221,13 @@ function InstallGuide() {
                 </StepCard>
                 <StepCard number="2" where="On your computer" title="Use iloader to put SideStore on your phone" mascot={kritiThumbs}>
                   <p className="mt-2">
-                    Plug your iPhone into the computer and tap Trust on the
-                    phone. Download iloader, open it, sign in with your Apple
-                    ID, pick your iPhone, then choose Install SideStore.
-                    iloader also puts SideStore&apos;s pairing file on the
-                    phone.
+                    Plug your iPhone into the computer with a cable that
+                    carries data (some charging cables don&apos;t), unlock it
+                    and tap Trust on the phone. Download iloader, open it,
+                    sign in with your Apple ID, pick your iPhone, then choose
+                    Install SideStore. iloader also puts SideStore&apos;s
+                    pairing file on the phone. If iloader shows &ldquo;No
+                    devices found&rdquo;, see the fixes below.
                   </p>
                   <div className="mt-3 flex flex-wrap gap-x-5 gap-y-2 text-sm">
                     {iloaderLinks.map((item) => (
