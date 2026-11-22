@@ -44,7 +44,7 @@ export const markdownPages = [
   { path: "/index.md", html: "/", title: "Home", note: "What FilterTube is, platforms, features and common questions" },
   { path: "/faq.md", html: "/faq", title: "FAQ", note: "Buyer questions: keyword blocking, kids, allow-only, study, ads, privacy" },
   { path: "/compare.md", html: "/compare", title: "Compare", note: "FilterTube next to BlockTube, Unhook, TubeBlock, YouTube Kids, uBlock Origin, AdGuard and Brave" },
-  { path: "/study.md", html: "/study", title: "Study mode", note: "How Study mode works and what 3.6.4 adds" },
+  { path: "/study.md", html: "/study", title: "Study mode", note: "How Study mode works, with the calendar-style timetable" },
   { path: "/ios.md", html: "/ios", title: "iPhone and iPad", note: "The native iOS app and the SideStore install guide" },
   { path: "/android.md", html: "/android", title: "Android, tablet and TV", note: "The Android app on Google Play, tablets and Android TV" },
   { path: "/extension.md", html: "/extension", title: "Browser extension", note: "Chrome, Firefox, Edge and Opera extension, open source (MIT)" },
@@ -99,7 +99,7 @@ function compareBlock(level = "##") {
 
 function studyBlock(level = "##") {
   const steps = studyFacts.steps.map((step, index) => `${index + 1}. **${step.title}.** ${step.body}`).join("\n");
-  return `${studyFacts.intro}\n\n${level} How it works\n\n${steps}\n\n${level} Also in Study\n\n${bullets(studyFacts.extras)}\n\n${level} Coming in ${release.next}\n\n${bullets(studyFacts.coming)}`;
+  return `${studyFacts.intro}\n\n${level} How it works\n\n${steps}\n\n${level} Also in Study\n\n${bullets(studyFacts.extras)}\n\n${level} Timetable, widget and calendar\n\n${bullets(studyFacts.timetable)}`;
 }
 
 function detailBlock(page) {
@@ -179,7 +179,7 @@ export function renderIndexMarkdown() {
   return `${header("FilterTube", "/")}
 ${summary}
 
-Current version: ${release.current} (${release.currentDate}). ${release.next} is coming soon.
+Current version: ${release.current} (${release.currentDate}).
 
 ## Get FilterTube
 
@@ -227,7 +227,7 @@ export function renderLlmsTxt() {
 
 > ${summary}
 
-Current version: ${release.current} (${release.currentDate}); ${release.next} is coming soon. FilterTube is independent and not affiliated with Google or YouTube.
+Current version: ${release.current} (${release.currentDate}). FilterTube is independent and not affiliated with Google or YouTube.
 
 ## Who it's for
 
@@ -267,7 +267,7 @@ export function renderLlmsFullTxt() {
 
 > ${summary}
 
-Current version: ${release.current} (${release.currentDate}); ${release.next} is coming soon. FilterTube is independent and not affiliated with Google or YouTube.
+Current version: ${release.current} (${release.currentDate}). FilterTube is independent and not affiliated with Google or YouTube.
 
 ## Who it's for
 

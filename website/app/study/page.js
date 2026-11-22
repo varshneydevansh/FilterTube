@@ -1,12 +1,12 @@
 import { Panel, SectionHeading } from "@/components/marketing-ui";
 import { Reveal } from "@/components/reveal";
 import { devices } from "@/data/screenshots";
-import { release, studyFacts } from "@/data/site-facts";
+import { studyFacts } from "@/data/site-facts";
 
 export const metadata = {
   title: "Study mode: study with only the channels you chose",
   description:
-    "FilterTube Study mode plans study rounds and breaks and shows only your plan's channels during each round. Packs for exams and school classes in 29 countries.",
+    "FilterTube Study mode plans study rounds and breaks and shows only your plan's channels during each round. A calendar-style timetable, and 415 packs for exams, school classes, degrees and interviews in 81 countries.",
   alternates: {
     canonical: "https://filtertube.in/study",
     types: { "text/markdown": "https://filtertube.in/study.md" },
@@ -66,9 +66,9 @@ export default function StudyPage() {
             </ul>
           </Panel>
           <Panel innerClassName="p-6 md:p-8">
-            <h2 className="font-display text-3xl tracking-[-0.05em] text-[var(--color-ink)]">Coming in {release.next}</h2>
+            <h2 className="font-display text-3xl tracking-[-0.05em] text-[var(--color-ink)]">Timetable, widget and calendar</h2>
             <ul className="mt-4 list-disc space-y-2 pl-5 text-sm leading-7 text-[var(--color-muted)]">
-              {studyFacts.coming.map((item) => (
+              {studyFacts.timetable.map((item) => (
                 <li key={item}>{item}</li>
               ))}
             </ul>

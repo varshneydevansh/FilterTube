@@ -300,7 +300,7 @@ function QuickGuideSection() {
                 </summary>
                 <div className="space-y-4 px-5 pb-5 text-sm leading-7 text-[var(--color-muted)]">
                   <p>Nearby devices are never trusted automatically. Both devices approve personal links.</p>
-                  <p>Direct sync needs FilterTube open and connected on both devices. Optional Home Pickup and
+                  <p>Parent updates reach a child's open FilterTube, or their browser with the extension, within seconds. Optional Home Pickup and
                     Internet Pickup separately deliver approved parent updates. Queued, received and applied are
                     different states, and background delivery is not guaranteed.</p>
                 </div>
@@ -386,8 +386,8 @@ export default function HomePage() {
               <div className="mx-auto w-full max-w-[42rem] lg:max-w-none">
                 <HeroShowcase />
                 <p className="ft-hero-status mx-auto mt-8 max-w-[34rem] rounded-2xl px-5 py-3 text-center text-sm font-medium leading-6 text-white md:px-6">
-                  Your devices and profiles stay in sync through verified,
-                  encrypted peer-to-peer sharing.
+                  Parent updates reach a child&apos;s device within seconds,
+                  through verified, encrypted peer-to-peer sharing.
                 </p>
               </div>
             </div>

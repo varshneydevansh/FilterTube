@@ -14,6 +14,16 @@
       "iconURL": "https://filtertube.in/brand/logo.png",
       "versions": [
         {
+          "version": "3.6.4",
+          "buildVersion": "30609.2611220907",
+          "date": "2026-11-22",
+          "localizedDescription": "Parent updates reach a child's device within seconds with a banner, a Study timetable that switches what you see by time of day, 415 study packs for 81 countries, a new day bar, a home-screen widget and calendar export.",
+          "downloadURL": "https://github.com/varshneydevansh/FilterTube/releases/download/v3.6.4/FilterTube-Direct-3.6.4.ipa",
+          "size": 117911747,
+          "sha256": "49772d76fffbff75c34379c2cb519314035bc970aae3eb140917bd51ef46f441",
+          "minOSVersion": "17.0"
+        },
+        {
           "version": "3.6.3",
           "buildVersion": "30608.2611201730",
           "date": "2026-11-20",

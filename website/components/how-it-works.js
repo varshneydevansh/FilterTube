@@ -59,7 +59,7 @@ export function HowItWorks() {
             </h2>
             <p className="mt-5 max-w-[56ch] text-pretty text-base leading-8 text-[var(--color-muted)] md:text-lg">
               Pick what you’re studying, plan your rounds and breaks, and FilterTube keeps to the plan.
-              Study mode is a Whitelist with a timer: while a round runs, only what’s in your plan shows up. In 3.6.4, a calendar-style timetable switches what you see by time of day.
+              Study mode is a Whitelist with a timer: while a round runs, only what’s in your plan shows up, and a calendar-style timetable switches what you see by time of day.
             </p>
             <div className="mt-7 grid gap-4 sm:grid-cols-2">
               <div>

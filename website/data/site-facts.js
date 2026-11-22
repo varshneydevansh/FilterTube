@@ -12,9 +12,8 @@ import { extensionInstallHref } from "@/components/site-shell-data";
 export const SITE_URL = "https://filtertube.in";
 
 export const release = {
-  current: "3.6.3",
-  currentDate: "20 November 2026",
-  next: "3.6.4",
+  current: "3.6.4",
+  currentDate: "22 November 2026",
 };
 
 export const links = {
@@ -39,7 +38,7 @@ export const oneLiner =
   "FilterTube is a free YouTube ad blocker and content blocker for iPhone, iPad, Android phones, tablets and TVs, and the Chrome, Firefox, Edge and Opera browsers.";
 
 export const summary =
-  "FilterTube is a free YouTube ad blocker and content blocker for iPhone, iPad, Android phones, tablets and TVs, and the Chrome, Firefox, Edge and Opera browsers. It works on YouTube, YouTube Kids and YouTube Music. Block ads, keywords, channels and Shorts, or switch to allow-only mode so only the channels you trust appear. Families get Kids profiles with PINs and can send rule changes from a parent's phone to a child's device. Students get Study mode, which shows only the channels in their study plan during each round; 3.6.4 adds a calendar-style timetable that switches what you see by time of day. There is no FilterTube account, your rules stay on your devices, and every feature is free.";
+  "FilterTube is a free YouTube ad blocker and content blocker for iPhone, iPad, Android phones, tablets and TVs, and the Chrome, Firefox, Edge and Opera browsers. It works on YouTube, YouTube Kids and YouTube Music. Block ads, keywords, channels and Shorts, or switch to allow-only mode so only the channels you trust appear. Families get Kids profiles with PINs and can send rule changes from a parent's phone to a child's device, where they arrive within seconds with a \"Parent sent an update\" note. Students get Study mode, which shows only the channels in their study plan during each round, with a calendar-style timetable that switches what you see by time of day. There is no FilterTube account, your rules stay on your devices, and every feature is free.";
 
 // Which video sites each platform covers. Checked in code on 22 November 2026: the extension's
 // manifest matches *.youtube.com (including music.youtube.com) and *.youtubekids.com; the 3.6.3 apps
@@ -55,11 +54,11 @@ export const coverage = [
 export const audiences = [
   {
     title: "Families and parents",
-    body: "Give each child their own Kids profile with a PIN, block channels and words, or allow only channels you approve. Change a child's rules from your own phone and send the update to their device.",
+    body: "Give each child their own Kids profile with a PIN, block channels and words, or allow only channels you approve. Change a child's rules from your own phone; the update reaches their device within seconds.",
   },
   {
     title: "Students",
-    body: "Study mode shows only the channels in your study plan while a round runs, then gives you a real break. Ready-made packs cover exams and school classes in 29 countries.",
+    body: "Study mode shows only the channels in your study plan while a round runs, then gives you a real break. Ready-made packs cover exams, school classes, degrees and interviews in 81 countries, and a timetable can start and stop Study on its own.",
   },
   {
     title: "Anyone who wants a calmer feed",
@@ -111,12 +110,12 @@ export const features = [
   {
     id: "study",
     title: "Study mode",
-    body: "Plan study rounds and breaks. During a round only the channels in your plan appear, search looks only in those channels, and comments stay off. Ready-made packs cover exams, school classes and skills: 175 packs and about 2,000 channels across 29 countries. In 3.6.4: a calendar-style timetable that switches what you see by time of day, 415 packs for 81 countries including 53 degree and 27 interview tracks, and calendar export.",
+    body: "Plan study rounds and breaks. During a round only the channels in your plan appear, search looks only in those channels, and comments stay off. A calendar-style timetable switches what you see by time of day, with a home-screen widget and Add to my calendar. Ready-made packs cover exams, school classes, degrees and interviews: 415 packs with more than 3,000 channels across 81 countries, including 53 degree tracks and 27 interview tracks.",
   },
   {
     id: "parent-sync",
     title: "Parent updates synced to a child's device",
-    body: "Pair devices with a code or QR, compare the safety phrase, then send rule, time and access changes from a parent's device to a child's. Transfers are end-to-end encrypted and go straight between your devices.",
+    body: "Pair devices with a code or QR, compare the safety phrase, then send rule, time and access changes from a parent's device to a child's. Transfers are end-to-end encrypted and go straight between your devices. A child's open FilterTube, or their browser with the extension, picks the change up within seconds, shows \"Parent sent an update\" and applies it with no reload.",
   },
   {
     id: "backups",
@@ -178,7 +177,7 @@ export const studyFacts = {
   steps: [
     {
       title: "Pick what you're studying",
-      body: "Start with your country, then choose ready-made packs for exams, school classes and skills (175 packs, about 2,000 channels across 29 countries), or add your own channels.",
+      body: "Start with your country, then choose ready-made packs for exams, school classes and skills (415 packs with more than 3,000 channels across 81 countries, including 53 degree tracks and 27 interview tracks), or add your own channels.",
       screen: "phone-study",
     },
     {
@@ -207,10 +206,13 @@ export const studyFacts = {
     "In the browser extension, a child can ask a parent for 10, 20 or 30 more minutes during Study.",
     "Study works in the browser extension and in the Android and iPhone/iPad apps.",
   ],
-  coming: [
-    "A calendar-style weekly timetable that switches what you see by time of day: give each day its periods, such as maths 5 to 6 pm, and Study starts and ends on its own.",
-    "Add to my calendar saves the week for your calendar app. Tablets and iPad show the whole week as a grid, Android TV shows today's plan, and a home-screen widget names the day.",
-    "A bigger catalog: 415 packs for 81 countries, including 53 degree tracks and 27 interview tracks.",
+  timetable: [
+    "A calendar-style weekly timetable switches what you see by time of day: give each day its periods, such as maths 5 to 6 pm, in 15-minute steps, and Study starts and ends on its own.",
+    "Copy this day to… fills other days at once, and you can hide Clips and comments during periods. A parent sets a child's timetable; the child sees it read-only.",
+    "Add to my calendar saves the week as a calendar file that repeats every week. FilterTube asks for no calendar permission and reads nothing back.",
+    "Tablets and iPad show the whole week as a grid, and Android TV shows today's periods, edited with the remote.",
+    "A home-screen widget shows the study period now and the next one, and a long press on the FilterTube icon lists the week's busiest study lanes.",
+    "The catalog has 415 packs with more than 3,000 channels for 81 countries: exams, school classes, 53 degree tracks and 27 interview tracks, with local channels first.",
   ],
 };
 
@@ -294,7 +296,7 @@ export const faqGroups = [
       },
       {
         q: "Can I change my child's rules from my own phone?",
-        a: "Yes. Pair your device with your child's using a code or QR, compare the safety phrase on both screens, then send approved rule, time and access changes. Updates are end-to-end encrypted and travel straight between your devices. Direct sync needs both devices open and connected; optional pickup can deliver an update when the child's device opens later.",
+        a: "Yes. Pair your device with your child's using a code or QR, compare the safety phrase on both screens, then send approved rule, time and access changes. Updates are end-to-end encrypted and travel straight between your devices. When you tap Send, a child's open FilterTube (or their browser, with the extension) picks the change up within seconds, shows \"Parent sent an update\" and applies it with no reload; the video playing keeps playing unless the new rules block it. Optional pickup can deliver an update when the child's device opens later.",
       },
       {
         q: "How is FilterTube different from the YouTube Kids app?",
@@ -308,12 +310,12 @@ export const faqGroups = [
     items: [
       {
         q: "Is there a YouTube study mode?",
-        a: "Yes. FilterTube's Study mode plans rounds and breaks. While a round runs, only the channels in your study plan appear, search looks only in those channels, and comments stay off. Ready-made packs cover exams, school classes and skills in 29 countries. In 3.6.4, a calendar-style timetable that switches what you see by time of day arrives, with 415 packs for 81 countries.",
+        a: "Yes. FilterTube's Study mode plans rounds and breaks. While a round runs, only the channels in your study plan appear, search looks only in those channels, and comments stay off. A calendar-style timetable switches what you see by time of day. Ready-made packs cover exams, school classes, degrees and interviews: 415 packs for 81 countries.",
         links: [{ label: "How Study mode works", href: `${SITE_URL}/study` }],
       },
       {
         q: "Can FilterTube change what I see by time of day?",
-        a: "Yes, from 3.6.4. Study mode gets a calendar-style timetable: give each day its periods, such as maths 5 to 6 pm, and Study starts and ends on its own, so what you see switches with the time of day. Add to my calendar saves the week for your calendar app. In 3.6.3 you plan the day's rounds and breaks yourself.",
+        a: "Yes. Study mode has a calendar-style timetable: give each day its periods, such as maths 5 to 6 pm, and Study starts and ends on its own, so what you see switches with the time of day. Add to my calendar saves the week for your calendar app.",
       },
       {
         q: "Can I stop myself from turning the filters off while studying?",
@@ -355,7 +357,7 @@ export const faqGroups = [
       },
       {
         q: "What is the current version?",
-        a: `FilterTube ${release.current} came out on ${release.currentDate} for the apps and the extension. ${release.next} is coming soon with a calendar-style Study timetable, calendar export and 415 Study packs for 81 countries.`,
+        a: `FilterTube ${release.current} came out on ${release.currentDate} for iPhone, iPad, Android, Android TV and the browser extension. It brings parent updates that arrive within seconds, a calendar-style Study timetable with a widget and calendar export, and 415 Study packs for 81 countries.`,
       },
       {
         q: "Is FilterTube made by YouTube or Google?",
@@ -472,8 +474,8 @@ export const featureMatrix = [
   { group: "Family and focus", feature: "Allow-only (whitelist) mode", cells: ["Yes", "No, listed as future work", ND, ND, "Yes, approve content yourself"] },
   { group: "Family and focus", feature: "Kids profiles with PINs", cells: ["Yes", "Options password only", ND, ND, "Up to 8 profiles, parent passcode"] },
   { group: "Family and focus", feature: "Study mode", cells: ["Yes", ND, ND, ND, ND] },
-  { group: "Family and focus", feature: "Calendar-style timetable", cells: ["Coming in 3.6.4", ND, ND, ND, ND] },
-  { group: "Family and focus", feature: "Parent-to-child sync", cells: ["Yes, encrypted, device to device", "No, cloud sync listed as future work", ND, "Same-user browser sync only", ND] },
+  { group: "Family and focus", feature: "Calendar-style timetable", cells: ["Yes, with calendar export", ND, ND, ND, ND] },
+  { group: "Family and focus", feature: "Parent-to-child sync", cells: ["Yes, encrypted, arrives within seconds", "No, cloud sync listed as future work", ND, "Same-user browser sync only", ND] },
   { group: "Family and focus", feature: "Backup and import", cells: ["Yes, including BlockTube import", ND, ND, "Export and import", ND] },
   { group: "Sites", feature: "YouTube Kids", cells: ["Yes: extension and the apps' Kids view", ND, ND, "No", "Yes, it is YouTube Kids"] },
   { group: "Sites", feature: "YouTube Music", cells: ["Yes: extension and Sangeet in the phone and tablet apps", ND, ND, "No", ND] },
@@ -487,7 +489,7 @@ export const featureMatrix = [
 ];
 
 export const matrixHeadline =
-  "BlockTube's keyword, channel, video and comment blocking, plus allow-only mode, Kids profiles, Study mode (with a calendar-style timetable in 3.6.4), date and length filters, YouTube Kids and YouTube Music, and apps for iPhone, iPad, Android and Android TV.";
+  "BlockTube's keyword, channel, video and comment blocking, plus allow-only mode, Kids profiles, Study mode with a calendar-style timetable, date and length filters, YouTube Kids and YouTube Music, and apps for iPhone, iPad, Android and Android TV.";
 
 export const matrixNote =
   "Facts about other tools come from their own READMEs, store pages and help pages, checked on 22 November 2026. \"Not documented\" means we couldn't find it in those sources, not that the tool can't do it.";

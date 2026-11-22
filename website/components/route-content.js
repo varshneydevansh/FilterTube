@@ -181,7 +181,7 @@ export const homeCapabilityCards = [
       "Pair and verify devices before sharing updates. Keep local backups and review imported rules without handing control to a central FilterTube account.",
     points: [
       "Use a code or QR, compare the safety phrase, then choose the profile and update.",
-      "Opt-in Auto-sync keeps approved devices up to date. Direct sync needs both devices open and connected.",
+      "Opt-in Auto-sync keeps approved devices up to date. Parent updates reach a child's open FilterTube within seconds, with no reload.",
       "Connection services may help devices meet or relay encrypted updates. PINs, ownership, and device permissions stay local.",
     ],
     span: "xl:col-span-7",
@@ -558,7 +558,7 @@ export const detailPages = {
         points: [
           "Pair with a code or QR and compare the safety phrase before trusting a device. Choose a one-time personal profile copy or approved parent updates; receiving an update is different from applying it.",
           "Opt-in Auto-sync uses approved parent connections or separately approved personal profile links. Personal links can choose supported settings, filter rules, and saved Notes; conflict review remains part of the process.",
-          "Direct sync needs both Accounts & Sync pages open and connected. Offline changes wait locally for a supported connection; background checks do not turn the extension into an always-on delivery service.",
+          "Parent updates reach the child's browser in the background within seconds, with a \"Parent sent an update\" note on the open page and no reload, on the Kids site too. Offline changes wait locally for a supported connection.",
           "Nearby discovery needs the optional helper. Home Pickup and Internet Pickup are separately configured delivery choices for approved managed updates, not automatic trust from sharing Wi-Fi or guaranteed delivery whenever any device comes online.",
           "PINs, ownership, and device permissions stay local. Verified transfers are encrypted; connection, relay, and optional encrypted pickup services can still be involved.",
         ],
@@ -860,7 +860,7 @@ export const detailPages = {
       {
         id: "android-tv",
         title: "Android TV",
-        body: "Home, Search, Following, You and Watch built for the remote, with profiles, PINs, Kids controls, filters, Accounts & Sync and FilterTube Controls on the big screen. Install from the same Google Play listing or the TV APK on GitHub. Study on the big screen comes in 3.6.4, and Fire TV compatibility is planned separately.",
+        body: "Home, Search, Following, You and Watch built for the remote, with profiles, PINs, Kids controls, filters, Accounts & Sync and FilterTube Controls on the big screen. Install from the same Google Play listing or the TV APK on GitHub. Study's timetable shows today's periods on the big screen, edited with the remote. Fire TV compatibility is planned separately.",
       },
     ],
     exploreTitle: "Explore the full app",
@@ -915,7 +915,7 @@ export const detailPages = {
           "Separate profiles, PIN gates, and parent-managed protected time keep child access distinct from parent editing authority. A child switching PIN does not unlock parent settings.",
           "Review rule-list imports and keep backups when moving an existing setup. Profile scope stays separate from the Main/Kids rule space.",
           "Daily viewing limits, a player sleep timer and timed Self-Control or Hard Timer Whitelist sessions serve different needs. Reviewed focus sessions hold the selected rules and cannot be cancelled inside the app once started.",
-          "Profiles, PINs, Kids controls and filters work on Android TV too. Study on TV comes in 3.6.4; Ask a parent on TV comes in a later update.",
+          "Profiles, PINs, Kids controls, filters and Study work on Android TV too, with today's timetable on the big screen. Ask a parent on TV comes in a later update.",
         ],
       },
       {
@@ -933,9 +933,9 @@ export const detailPages = {
         summary: "A Study planner built around Your study day, in the app since 3.6.2.",
         points: [
           "Your study day plans rounds and breaks, and while a round runs only the channels in your plan show up. Search during study looks only in those channels.",
-          "Setup starts with your country, then offers ready-made packs for exams and school classes in 29 countries, or lets you add your own channels.",
+          "Setup starts with your country, then offers 415 ready-made packs for exams, school classes, degrees and interviews in 81 countries, or lets you add your own channels.",
           "Study and focus sits in FilterTube Controls. Kids learning by age fills the Kids space with age-picked lessons during study.",
-          "Coming in 3.6.4: degree and interview tracks, and a weekly timetable with a week grid on tablets, today's plan on Android TV and a home-screen widget.",
+          "A calendar-style timetable starts and ends Study on its own, with a week grid on tablets, today's periods on Android TV, a home-screen widget and Add to my calendar.",
         ],
       },
       {
@@ -965,7 +965,7 @@ export const detailPages = {
         points: [
           "Pair with a code or QR, compare the safety phrase, and choose the profile and update. Being on the same network does not automatically make a device trusted.",
           "Parents can send approved updates to protected profiles. Personal Auto-sync uses approved profile links and lets you choose supported settings, filter rules, and Notes.",
-          "Offline changes wait locally for a supported connection. Direct sync needs the devices open and connected; optional pickup has separate delivery settings.",
+          "Parent updates reach an open FilterTube on the child's device within seconds, with no reload, and the playing video keeps playing unless the new rules block it. Offline changes wait locally; optional pickup has separate delivery settings.",
         ],
         link: { label: "How peer-to-peer syncing works", href: "/#device-sync" },
       },
@@ -978,7 +978,7 @@ export const detailPages = {
       "Sangeet, Notes, Auto-sync and Offline Media are in the current app.",
       "Android TV: on the same Google Play listing, with a TV APK on every GitHub release.",
       "In the app since 3.6.2: Kriti and Uljhan, the rebuilt Study planner, Ask a parent, and the Sangeet, Clips, Following and Saved names in every language.",
-      "Coming in 3.6.4: Study degree and interview tracks, a weekly timetable, and Study on Android TV.",
+      "New in 3.6.4: parent updates within seconds, the Study timetable with widget and calendar export, Study on Android TV, and 415 Study packs for 81 countries.",
       "Offline video saving: direct GitHub build only, encrypted and expiring after 30 days. Google Play builds do not download videos.",
       "Fire TV compatibility is planned.",
       "The separate direct APK has a simpler frontend than the Google Play app.",
@@ -1010,7 +1010,7 @@ export const detailPages = {
     featureCards: [
       {
         title: "Main and Kids on the big screen",
-        body: "Browse, search and watch Main and Kids, with profiles, PINs, Kids controls and your filters. Study on TV comes in 3.6.4; Ask a parent on TV comes in a later update.",
+        body: "Browse, search and watch Main and Kids, with profiles, PINs, Kids controls and your filters. Study works on TV too, with today's timetable. Ask a parent on TV comes in a later update.",
       },
       {
         title: "Made for the remote",
@@ -1076,7 +1076,7 @@ export const detailPages = {
       "Android TV runs the same FilterTube app as phones and tablets.",
     milestones: [
       "Install from Google Play on Android TV and Google TV, or use the TV APK on every GitHub release.",
-      "Coming in 3.6.4: Study on the big screen. Ask a parent on TV comes in a later update.",
+      "Study is on the big screen, with today's timetable edited by remote. Ask a parent on TV comes in a later update.",
       "Amazon Fire TV compatibility is planned separately.",
     ],
     related: ["tv", "fire-tv"],
@@ -1172,7 +1172,7 @@ export const detailPages = {
       },
       {
         title: "Share approved changes with their device",
-        body: "Pair with a code or QR, compare the safety phrase, then send an approved update to the chosen child profile. Direct peer-to-peer sync needs supported devices open and connected. Opt-in Auto-sync and optional delivery services have separate setup and release availability.",
+        body: "Pair with a code or QR, compare the safety phrase, then send an approved update to the chosen child profile. The child's open FilterTube, or their browser with the extension, applies it within seconds and shows “Parent sent an update”. Opt-in Auto-sync and optional delivery services have separate setup and release availability.",
       },
     ],
     screenshotsTitle: "Kids Viewing on every screen",
