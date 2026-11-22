@@ -305,6 +305,11 @@ const faq = [
 
 const changeLog = [
   {
+    title: "22 November 2026",
+    detail:
+      "The website section now says that we count AI crawler visits by bot name, page and day only.",
+  },
+  {
     title: "19 November 2026",
     detail:
       "Rewritten to match the current apps and extension: the native player, Offline Media, the supporter subscription, Ask a parent, iOS camera, microphone, speech and local-network use, every optional service and what it receives (the PipePipe decoder is on by default, including in Kids profiles), the update check, Internet Pickup, all extension permissions including Google Search, and a clearer children's section.",
@@ -403,7 +408,7 @@ export default function PrivacyPage() {
               Privacy policy
             </h1>
             <p className="mt-6 max-w-[72ch] text-base leading-8 text-[var(--color-muted)] md:text-lg">
-              Last updated: 19 November 2026. This policy covers the FilterTube
+              Last updated: 22 November 2026. This policy covers the FilterTube
               browser extension, the Android app for phone, tablet and TV, the
               iPhone and iPad app, the website, and optional Nanah sync.
             </p>
@@ -616,6 +621,12 @@ export default function PrivacyPage() {
                 Analytics for counts of page views. It does not use Google
                 Analytics, ad pixels, session replay or cross-site tracking.
                 Vercel keeps normal server logs as part of hosting.
+              </p>
+              <p>
+                We count visits from AI crawlers, such as GPTBot, ClaudeBot and
+                PerplexityBot, by bot name, page and day only. That count keeps
+                no IP address, no cookies and nothing about people visiting the
+                site.
               </p>
             </PolicySection>
 
