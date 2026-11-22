@@ -1,4 +1,18 @@
 {
+  "3.6.4": {
+    "headline": "Eltern-Updates in Sekunden, ein Lernen-Stundenplan und ein viel größerer Lernen-Katalog",
+    "summary": "FilterTube 3.6.4 bringt Änderungen der Eltern innerhalb von Sekunden im Hintergrund in den Browser des Kindes, mit einem kurzen Hinweis „Eltern-Update erhalten“ auf der offenen Seite und ohne Neuladen. Lernen bekommt einen Wochenstundenplan mit Kalenderexport, eine Tagesleiste, die sich ihrer Breite anpasst, den heutigen Plan im Popup und einen Katalog mit 415 Paketen für 81 Länder.",
+    "bannerSummary": "Eltern-Updates in Sekunden, ein Lernen-Stundenplan mit Kalenderexport und 415 Lernen-Pakete für 81 Länder.",
+    "ctaLabel": "Neuigkeiten ansehen",
+    "highlights": [
+      "Eltern-Updates kommen in Sekunden an: Tippt ein Elternteil auf Senden, holt der Browser des Kindes die Änderung im Hintergrund ab, die offene Seite zeigt „Eltern-Update erhalten“ und die neuen Regeln gelten sofort, ohne Neuladen. Das laufende Video läuft weiter, es sei denn, die neuen Regeln sperren es, auch auf der Kinder-Seite.",
+      "Lernen-Stundenplan: In den Lernen-Einstellungen bekommt jeder Wochentag seine Stunden, etwa Mathe von 17 bis 18 Uhr. Lernen startet und endet von selbst, die Stunden des Tages liegen auf der Leiste des Plans, die Woche erscheint als Raster, und Zu meinem Kalender hinzufügen speichert die Woche für deine Kalender-App.",
+      "Der Lernen-Katalog hat jetzt 415 Pakete für 81 Länder: Prüfungen nach Stufe und Kategorie, Schulklassen, 53 Studienrichtungen und 27 Vorstellungsgespräch-Tracks, mit lokalen Kanälen zuerst. Die Liste für Indien beginnt mit UPSC und dem PSC deines Bundesstaats.",
+      "Die neue Tagesleiste passt sich ihrer Breite an, ohne seitliches Scrollen, und ein einziger Plan-Editor ersetzt den Längen-Regler. Das Popup zeigt den heutigen Plan, mit Im Dashboard bearbeiten.",
+      "Die Synchronisierung ist stabiler: Das erste Senden nach dem Koppeln kommt wieder gleich beim ersten Mal an, jedes Senden zeigt seinen eigenen Status, ein abgelehntes Update nennt den Grund, und beim Wiederherstellen eines Backups kommt auch seine Lernen-Sperre zurück, wie in den Apps.",
+      "Eine geöffnete FilterTube-Seite übernimmt die Sprache, die du auf einer anderen Seite wählst."
+    ]
+  },
   "3.6.3": {
     "headline": "Nur erlaubt und Lernen auf jeder Seite, Autoplay zum nächsten erlaubten Video und Backups mit Manipulationsprüfung",
     "summary": "FilterTube 3.6.3 sorgt dafür, dass Nur erlaubt und Lernen die ganze Seite eingrenzen: Start, Suche, Watch, Kanalseiten und die linke Leiste zeigen nur, was deine Liste oder dein Plan erlaubt, und sagen, was wartet. Autoplay und Playlists gehen zum nächsten erlaubten Video weiter, Backups werden auf Änderungen außerhalb von FilterTube geprüft, und mehrere ältere Fehler sind behoben.",

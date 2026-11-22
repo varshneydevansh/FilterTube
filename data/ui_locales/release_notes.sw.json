@@ -1,4 +1,18 @@
 {
+  "3.6.4": {
+    "headline": "Masasisho ya wazazi ndani ya sekunde, ratiba ya Masomo na orodha kubwa zaidi ya Masomo",
+    "summary": "FilterTube 3.6.4 inafikisha mabadiliko ya mzazi kwenye kivinjari cha mtoto ndani ya sekunde, chinichini, ikiwa na ujumbe mfupi \"Mzazi ametuma sasisho\" kwenye ukurasa uliofunguliwa na bila kupakia upya. Masomo yanapata ratiba ya kila wiki inayoweza kuhamishiwa kwenye kalenda, upau wa siku unaolingana na upana wake, mpango wa leo kwenye dirisha ibukizi, na orodha ya vifurushi 415 kwa nchi 81.",
+    "bannerSummary": "Masasisho ya wazazi ndani ya sekunde, ratiba ya Masomo inayohamishiwa kwenye kalenda, na vifurushi 415 vya Masomo kwa nchi 81.",
+    "ctaLabel": "Angalia mapya",
+    "highlights": [
+      "Masasisho ya wazazi hufika ndani ya sekunde: mzazi akigusa Tuma, kivinjari cha mtoto huchukua mabadiliko chinichini, ukurasa uliofunguliwa unaonyesha \"Mzazi ametuma sasisho\" na sheria mpya zinatumika papo hapo, bila kupakia upya. Video inayochezwa inaendelea, isipokuwa sheria mpya ziizuie, hata kwenye tovuti ya Watoto.",
+      "Ratiba ya Masomo: kwenye mipangilio ya Masomo, mpe kila siku ya wiki vipindi vyake, kama hesabu saa 11 hadi saa 12 jioni. Masomo huanza na kuisha yenyewe, vipindi vya siku vinakaa kwenye upau wa mpango, wiki inaonekana kama gridi, na Ongeza kwenye kalenda yangu huhifadhi wiki kwa programu yako ya kalenda.",
+      "Orodha ya Masomo sasa ina vifurushi 415 kwa nchi 81: mitihani kwa ngazi na kategoria, madarasa ya shule, njia 53 za shahada na njia 27 za usaili, huku chaneli za hapa nchini zikitangulia. Orodha ya India hufunguka na UPSC na PSC ya jimbo lako.",
+      "Upau mpya wa siku unalingana na upana wake bila kusogeza pembeni, na kihariri kimoja cha mpango kinachukua nafasi ya kitelezi cha muda. Dirisha ibukizi linaonyesha mpango wa leo, pamoja na Hariri kwenye dashibodi.",
+      "Usawazishaji ni thabiti zaidi: Tuma ya kwanza baada ya kuoanisha inafika tena mara ya kwanza, kila Tuma ina hali yake, sasisho lililokataliwa linasema kwa nini, na kurejesha nakala rudufu kunarudisha kufuli yake ya Masomo, kama kwenye programu.",
+      "Ukurasa wa FilterTube ulio wazi unafuata lugha unayochagua kwenye ukurasa mwingine."
+    ]
+  },
   "3.6.3": {
     "headline": "Vinavyoruhusiwa tu na Masomo kwenye kila ukurasa, uchezaji wa kiotomatiki hadi video inayofuata iliyoruhusiwa, na nakala rudufu zinazokaguliwa dhidi ya mabadiliko",
     "summary": "FilterTube 3.6.3 inafanya Vinavyoruhusiwa tu na Masomo yabane ukurasa mzima: Nyumbani, utafutaji, Kutazama, kurasa za vituo na kidirisha cha kushoto vinaonyesha tu kile orodha au mpango wako unachoruhusu, na vinasema nini kinasubiri. Kuendelea kiotomatiki na orodha za kucheza huhamia video inayofuata iliyoruhusiwa, nakala rudufu hukaguliwa kwa mabadiliko yaliyofanywa nje ya FilterTube, na hitilafu kadhaa za zamani zimerekebishwa.",

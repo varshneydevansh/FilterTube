@@ -1,4 +1,18 @@
 {
+  "3.6.4": {
+    "headline": "Parent update wey reach for seconds, Study timetable and bigger Study catalog",
+    "summary": "FilterTube 3.6.4 dey carry wetin parent change go pikin browser for seconds, for background, wit short \"Your parent don send update\" note for di page wey open and no reload. Study get weekly timetable wey you fit put for calendar, day bar wey fit im width, today plan for popup, and catalog of 415 packs for 81 countries.",
+    "bannerSummary": "Parent update wey reach for seconds, Study timetable wey fit enter calendar, and 415 Study packs for 81 countries.",
+    "ctaLabel": "See Wetin New",
+    "highlights": [
+      "Parent update dey reach for seconds: as parent tap Send, pikin browser go pick di change for background, di page wey open go show \"Your parent don send update\" and di new rules go work for there, no reload. Di video wey dey play go keep playing, except di new rules block am, even for di Pikin site.",
+      "Study timetable: for Study settings, give each day for di week im periods, like maths 5 to 6 pm. Study go start and end by itself, di day periods dey for di plan bar, di week show as grid, and Add am to my calendar go save di week for your calendar app.",
+      "Di Study catalog now get 415 packs for 81 countries: exams by level and category, school classes, 53 degree tracks and 27 interview tracks, wit local channels first. India list dey open wit UPSC and your state PSC.",
+      "Di new day bar fit im width, no side scroll, and one plan editor replace di length slider. Di popup dey show today plan, wit Change am for dashboard.",
+      "Sync steady pass: di first Send after pairing don dey reach for di first time again, each Send get im own status, update wey dem reject go tell why, and if you restore backup, im Study lock go come back, just like for di apps.",
+      "FilterTube page wey open go follow di language wey you choose for another page."
+    ]
+  },
   "3.6.3": {
     "headline": "Allowed only and Study for every page, auto-next go di next allowed video, and backups wey dem check say nobody change dem",
     "summary": "FilterTube 3.6.3 make Allowed only and Study narrow di whole page: Home, search, Watch, channel pages and di left pane dey show only wetin your list or plan allow, and dem go tell you wetin dey wait. Auto-next and playlists dey move go di next allowed video, dem dey check backups for changes wey dem make outside FilterTube, and dem don fix some old bugs.",

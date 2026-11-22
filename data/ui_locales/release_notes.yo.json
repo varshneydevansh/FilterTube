@@ -1,4 +1,18 @@
 {
+  "3.6.4": {
+    "headline": "Àwọn àtúnṣe òbí láàrín ìṣẹ́jú-àáyá, àkókò ẹ̀kọ́ àti àtòjọ Ẹ̀kọ́ tó tóbi púpọ̀",
+    "summary": "FilterTube 3.6.4 máa ń gbé àwọn àyípadà òbí lọ sí aṣàwákiri ọmọ láàrín ìṣẹ́jú-àáyá díẹ̀, ní ẹ̀yìn ìkànnì, pẹ̀lú ìkìlọ̀ kúkúrú \"Òbí fi àtúnṣe ránṣẹ́\" lórí ojú-ìwé tó ṣí, láìsí títún-gbé e. Ẹ̀kọ́ gba àkókò ọ̀sẹ̀-ọ̀sẹ̀ tí a lè kó lọ sí kàlẹ́ńdà, ìlà ọjọ́ tó bá fífẹ̀ rẹ̀ mu, ètò òní nínú popup, àti àtòjọ ìdìpọ̀ 415 fún orílẹ̀-èdè 81.",
+    "bannerSummary": "Àwọn àtúnṣe òbí láàrín ìṣẹ́jú-àáyá, àkókò Ẹ̀kọ́ tí a lè kó lọ sí kàlẹ́ńdà, àti ìdìpọ̀ Ẹ̀kọ́ 415 fún orílẹ̀-èdè 81.",
+    "ctaLabel": "Wo ohun tuntun",
+    "highlights": [
+      "Àwọn àtúnṣe òbí máa ń dé láàrín ìṣẹ́jú-àáyá: nígbà tí òbí bá tẹ Fi ránṣẹ́, aṣàwákiri ọmọ á gba àyípadà náà ní ẹ̀yìn ìkànnì, ojú-ìwé tó ṣí á fi \"Òbí fi àtúnṣe ránṣẹ́\" hàn, àwọn òfin tuntun á sì ṣiṣẹ́ níbẹ̀ náà láìsí títún-gbé e. Fídíò tó ń ṣiṣẹ́ á máa lọ, àfi bí àwọn òfin tuntun bá dí i, bẹ́ẹ̀ náà ni lórí ojúlé Ọmọdé.",
+      "Àkókò ẹ̀kọ́: nínú ètò Ẹ̀kọ́, fún ọjọ́ kọ̀ọ̀kan nínú ọ̀sẹ̀ ní àwọn àkókò rẹ̀, bíi ìṣirò láti aago 5 sí 6 ìrọ̀lẹ́. Ẹ̀kọ́ máa ń bẹ̀rẹ̀ ó sì máa ń parí fúnra rẹ̀, àwọn àkókò ọjọ́ náà wà lórí ìlà ètò, ọ̀sẹ̀ náà hàn bí tábìlì, \"Fi kún kàlẹ́ńdà mi\" sì máa fi ọ̀sẹ̀ náà pamọ́ fún ohun èlò kàlẹ́ńdà rẹ.",
+      "Àtòjọ Ẹ̀kọ́ ní ìdìpọ̀ 415 báyìí fún orílẹ̀-èdè 81: àwọn ìdánwò ní ìbámu pẹ̀lú ipele àti ẹ̀ka, àwọn kíláàsì ilé-ẹ̀kọ́, ọ̀nà ìwé-ẹ̀rí 53 àti ọ̀nà ìfọ̀rọ̀wánilẹ́nuwò 27, pẹ̀lú àwọn ikanni agbègbè ní iwájú. Àtòjọ India ṣí pẹ̀lú UPSC àti PSC ìpínlẹ̀ rẹ.",
+      "Ìlà ọjọ́ tuntun bá fífẹ̀ rẹ̀ mu láìsí yíyí sí ẹ̀gbẹ́, olóòtú ètò kan sì rọ́pò ìyọ́kúrò gígùn. Popup fi ètò òní hàn, pẹ̀lú \"Ṣàtúnṣe nínú dashboard\".",
+      "Ìṣọ̀kan dúró ṣinṣin jù: Fi ránṣẹ́ àkọ́kọ́ lẹ́yìn ìsopọ̀ tún dé ní ìgbà àkọ́kọ́, ìfiránṣẹ́ kọ̀ọ̀kan ní ipò tirẹ̀, àtúnṣe tí a kọ̀ sọ ìdí rẹ̀, àti dídá ẹ̀dà ìpamọ́ padà tún dá ìdè Ẹ̀kọ́ rẹ̀ padà, bíi ti àwọn ohun èlò.",
+      "Ojú-ìwé FilterTube tó ṣí máa ń tẹ̀lé èdè tí o yàn ní ojú-ìwé mìíràn."
+    ]
+  },
   "3.6.3": {
     "headline": "Àwọn tí a gbà nìkan àti Ẹ̀kọ́ lórí gbogbo ojúewé, ìṣiṣẹ́ aládàáṣe sí fídíò tí a gbà tó kàn, àti àwọn ìpamọ́ tí a ṣàyẹ̀wò fún ìyípadà",
     "summary": "FilterTube 3.6.3 mú kí Àwọn tí a gbà nìkan àti Ẹ̀kọ́ dín gbogbo ojúewé kù: Ilé, ìwádìí, Watch, àwọn ojúewé ikanni àti pánẹ́ẹ̀lì òsì ń fi ohun tí àkójọ tàbí ètò rẹ gbà nìkan hàn, wọ́n sì ń sọ ohun tó ń dúró. Ìṣiṣẹ́ aládàáṣe àti àwọn àkójọ orin ń lọ sí fídíò tí a gbà tó kàn, a ń ṣàyẹ̀wò àwọn ìpamọ́ fún àwọn ìyípadà tí a ṣe lóde FilterTube, a sì ti tún àwọn àṣìṣe àtijọ́ kan ṣe.",

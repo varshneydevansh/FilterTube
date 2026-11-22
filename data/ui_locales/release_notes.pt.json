@@ -1,4 +1,18 @@
 {
+  "3.6.4": {
+    "headline": "Atualizações dos pais em segundos, um horário de Estudo e um catálogo de Estudo bem maior",
+    "summary": "O FilterTube 3.6.4 leva as mudanças de um responsável ao navegador da criança em segundos, em segundo plano, com um aviso curto de «Os pais enviaram uma atualização» na página aberta e sem recarregar. O Estudo ganha um horário semanal com exportação para o calendário, uma barra do dia que se ajusta à largura, o plano de hoje no pop-up e um catálogo de 415 pacotes para 81 países.",
+    "bannerSummary": "Atualizações dos pais em segundos, um horário de Estudo com exportação para o calendário e 415 pacotes de Estudo para 81 países.",
+    "ctaLabel": "Ver novidades",
+    "highlights": [
+      "As atualizações dos pais chegam em segundos: quando um responsável toca em Enviar, o navegador da criança recebe a mudança em segundo plano, a página aberta mostra «Os pais enviaram uma atualização» e as novas regras valem na hora, sem recarregar. O vídeo que está tocando continua, a menos que as novas regras o bloqueiem, também no site Infantil.",
+      "Horário de Estudo: nas configurações de Estudo, dê a cada dia da semana as suas aulas, como matemática das 17h às 18h. O Estudo começa e termina sozinho, as aulas do dia aparecem na barra do plano, a semana aparece em grade e Adicionar à minha agenda salva a semana para o seu app de calendário.",
+      "O catálogo de Estudo agora tem 415 pacotes para 81 países: provas por nível e categoria, séries escolares, 53 trilhas de graduação e 27 de entrevista, com os canais locais primeiro. A lista da Índia abre com UPSC e o PSC do seu estado.",
+      "A nova barra do dia se ajusta à largura, sem rolagem lateral, e um único editor de plano substitui o controle deslizante de duração. O pop-up mostra o plano de hoje, com Editar no painel.",
+      "A sincronização está mais estável: o primeiro Enviar depois de parear volta a chegar de primeira, cada envio mostra o próprio status, uma atualização recusada diz o motivo, e restaurar um backup traz de volta o bloqueio de Estudo, como nos apps.",
+      "Uma página aberta do FilterTube acompanha o idioma que você escolhe em outra página."
+    ]
+  },
   "3.6.3": {
     "headline": "Só permitidos e Estudo em todas as páginas, reprodução automática para o próximo vídeo permitido e backups com verificação de alterações",
     "summary": "O FilterTube 3.6.3 faz com que Só permitidos e Estudo restrinjam a página inteira: Início, pesquisa, a página de reprodução, páginas de canal e o painel esquerdo mostram apenas o que sua lista ou seu plano permite e dizem o que está aguardando. A reprodução automática e as playlists passam para o próximo vídeo permitido, os backups são verificados quanto a alterações feitas fora do FilterTube e vários bugs antigos foram corrigidos.",

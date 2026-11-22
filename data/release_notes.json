@@ -3,6 +3,21 @@
     "_comment": "Shared release notes source for the dashboard What's New tab and the YouTube release banner. Keep entries sorted newest-first by version."
   },
   {
+    "version": "3.6.4",
+    "headline": "Parent updates in seconds, a Study timetable and a much bigger Study catalog",
+    "summary": "FilterTube 3.6.4 brings a parent's changes to a child's browser within seconds, in the background, with a short \"Parent sent an update\" note on the open page and no reload. Study gets a weekly timetable with calendar export, a day bar that fits its width, today's plan in the popup, and a catalog of 415 packs for 81 countries.",
+    "bannerSummary": "Parent updates in seconds, a Study timetable with calendar export, and 415 Study packs for 81 countries.",
+    "highlights": [
+      "Parent updates arrive in seconds: when a parent taps Send, the child's browser picks the change up in the background, the open page shows \"Parent sent an update\" and the new rules apply in place, with no reload. The video that is playing keeps playing, unless the new rules block it, on the Kids site too.",
+      "Study timetable: in Study settings, give each day of the week its periods, such as maths 5 to 6 pm. Study starts and ends on its own, the day's periods sit on the plan's bar, the week shows as a grid, and Add to my calendar saves the week for your calendar app.",
+      "The Study catalog now has 415 packs for 81 countries: exams by level and category, school classes, 53 degree tracks and 27 interview tracks, with local channels first. India's list opens on UPSC and your state PSC.",
+      "The new day bar fits its width with no sideways scrolling, and one plan editor replaces the length slider. The popup shows today's plan, with Edit in dashboard.",
+      "Sync is steadier: the first Send after pairing again arrives the first time, each Send shows its own status, a rejected update says why, and restoring a backup brings back its Study lock, as in the apps.",
+      "An open FilterTube page follows a language you choose in another page."
+    ],
+    "detailsUrl": "https://github.com/varshneydevansh/FilterTube/releases/tag/v3.6.4"
+  },
+  {
     "version": "3.6.3",
     "headline": "Allowed only and Study across every page, auto-next to the next allowed video, and tamper-checked backups",
     "summary": "FilterTube 3.6.3 makes Allowed only and Study narrow the whole page: Home, search, Watch, channel pages and the left pane show only what your list or plan allows, and say what waits. Auto-next and playlists move on to the next allowed video, backups are checked for changes made outside FilterTube, and several older bugs are fixed.",

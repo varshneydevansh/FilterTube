@@ -1,4 +1,18 @@
 {
+  "3.6.4": {
+    "headline": "Saniyeler içinde ebeveyn güncellemeleri, bir Ders programı ve çok daha büyük bir Ders kataloğu",
+    "summary": "FilterTube 3.6.4, ebeveynin değişikliklerini saniyeler içinde, arka planda çocuğun tarayıcısına ulaştırır; açık sayfada kısa bir “Ebeveynin bir güncelleme gönderdi” notu görünür ve yeniden yükleme gerekmez. Ders bölümüne takvime aktarılabilen haftalık program, genişliğine sığan bir gün çubuğu, açılır pencerede bugünün planı ve 81 ülke için 415 paketlik bir katalog geldi.",
+    "bannerSummary": "Saniyeler içinde ebeveyn güncellemeleri, takvime aktarılabilen bir Ders programı ve 81 ülke için 415 Ders paketi.",
+    "ctaLabel": "Yenilikleri Gör",
+    "highlights": [
+      "Ebeveyn güncellemeleri saniyeler içinde ulaşır: ebeveyn Gönder’e dokunduğunda çocuğun tarayıcısı değişikliği arka planda alır, açık sayfada “Ebeveynin bir güncelleme gönderdi” görünür ve yeni kurallar yeniden yüklemeden olduğu yerde uygulanır. Oynayan video, yeni kurallar engellemedikçe oynamaya devam eder; Çocuk sitesinde de böyle.",
+      "Ders programı: Ders ayarlarında haftanın her gününe derslerini verin, örneğin matematik 17.00 ile 18.00 arası. Ders kendiliğinden başlar ve biter, günün dersleri planın çubuğunda durur, hafta bir ızgara olarak görünür ve Takvimime ekle haftayı takvim uygulamanız için kaydeder.",
+      "Ders kataloğunda artık 81 ülke için 415 paket var: düzey ve kategoriye göre sınavlar, okul sınıfları, 53 diploma yolu ve 27 mülakat yolu; yerel kanallar önde. Hindistan listesi UPSC ve eyaletinizin PSC’siyle açılır.",
+      "Yeni gün çubuğu genişliğine sığar, yana kaydırma gerekmez ve tek bir plan düzenleyici süre kaydırıcısının yerini alır. Açılır pencere bugünün planını Panelde düzenle ile birlikte gösterir.",
+      "Eşitleme daha kararlı: eşleştirmeden sonraki ilk Gönder yine ilk seferde ulaşır, her Gönder’in kendi durumu görünür, reddedilen bir güncelleme nedenini söyler ve yedeği geri yüklemek Ders kilidini de geri getirir, uygulamalardaki gibi.",
+      "Açık bir FilterTube sayfası, başka bir sayfada seçtiğiniz dili izler."
+    ]
+  },
   "3.6.3": {
     "headline": "Yalnızca izin verilenler ve Ders her sayfada, bir sonraki izinli videoya otomatik geçiş ve değişikliğe karşı denetlenen yedekler",
     "summary": "FilterTube 3.6.3, Yalnızca izin verilenler ve Ders modlarının tüm sayfayı daraltmasını sağlar: Ana sayfa, arama, izleme, kanal sayfaları ve sol bölme yalnızca listenizin veya planınızın izin verdiğini gösterir ve nelerin beklediğini söyler. Otomatik geçiş ve oynatma listeleri bir sonraki izinli videoya geçer, yedekler FilterTube dışında yapılan değişiklikler için denetlenir ve birkaç eski hata düzeltildi.",

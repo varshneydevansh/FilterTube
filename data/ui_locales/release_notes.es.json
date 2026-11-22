@@ -1,4 +1,18 @@
 {
+  "3.6.4": {
+    "headline": "Actualizaciones de los padres en segundos, un horario de Estudio y un catálogo de Estudio mucho más grande",
+    "summary": "FilterTube 3.6.4 hace que los cambios de un padre lleguen al navegador de su hijo en cuestión de segundos, en segundo plano, con un aviso breve de «Llegó una actualización parental» en la página abierta y sin recargar. Estudio estrena un horario semanal con exportación al calendario, una barra del día que se ajusta a su ancho, el plan de hoy en la ventana emergente y un catálogo de 415 paquetes para 81 países.",
+    "bannerSummary": "Actualizaciones de los padres en segundos, un horario de Estudio con exportación al calendario y 415 paquetes de Estudio para 81 países.",
+    "ctaLabel": "Ver novedades",
+    "highlights": [
+      "Las actualizaciones de los padres llegan en segundos: cuando un padre toca Enviar, el navegador del hijo recoge el cambio en segundo plano, la página abierta muestra «Llegó una actualización parental» y las nuevas reglas se aplican al instante, sin recargar. El vídeo que se está reproduciendo sigue, salvo que las nuevas reglas lo bloqueen, también en el sitio Infantil.",
+      "Horario de Estudio: en los ajustes de Estudio, da a cada día de la semana sus clases, por ejemplo matemáticas de 5 a 6 de la tarde. Estudio empieza y termina solo, las clases del día aparecen en la barra del plan, la semana se ve en una cuadrícula y Añadir a mi calendario guarda la semana para tu app de calendario.",
+      "El catálogo de Estudio ahora tiene 415 paquetes para 81 países: exámenes por nivel y categoría, cursos escolares, 53 itinerarios de grado y 27 de entrevistas, con los canales locales primero. La lista de India se abre con UPSC y el PSC de tu estado.",
+      "La nueva barra del día se ajusta a su ancho, sin desplazamiento lateral, y un único editor de plan sustituye al control deslizante de duración. La ventana emergente muestra el plan de hoy, con Editar en el panel.",
+      "La sincronización es más estable: el primer Enviar tras emparejar vuelve a llegar a la primera, cada envío muestra su propio estado, una actualización rechazada explica por qué, y restaurar una copia de seguridad recupera su bloqueo de Estudio, como en las apps.",
+      "Una página abierta de FilterTube sigue el idioma que elijas en otra página."
+    ]
+  },
   "3.6.3": {
     "headline": "Solo permitidos y Estudio en todas las páginas, reproducción automática hacia el siguiente vídeo permitido y copias de seguridad con comprobación de alteraciones",
     "summary": "FilterTube 3.6.3 hace que Solo permitidos y Estudio acoten toda la página: Inicio, la búsqueda, la página de reproducción, las páginas de canal y el panel izquierdo muestran solo lo que permite tu lista o tu plan, e indican qué queda en espera. La reproducción automática y las listas de reproducción pasan al siguiente vídeo permitido, las copias de seguridad se comprueban por si se cambiaron fuera de FilterTube y se corrigen varios errores antiguos.",

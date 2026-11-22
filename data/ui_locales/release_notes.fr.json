@@ -1,4 +1,18 @@
 {
+  "3.6.4": {
+    "headline": "Mises à jour parentales en quelques secondes, un emploi du temps Études et un catalogue Études bien plus grand",
+    "summary": "FilterTube 3.6.4 fait arriver les changements d'un parent dans le navigateur de l'enfant en quelques secondes, en arrière-plan, avec une courte note « Mise à jour parentale reçue » sur la page ouverte et sans rechargement. Études gagne un emploi du temps hebdomadaire exportable vers l'agenda, une barre du jour qui s'adapte à sa largeur, le plan du jour dans la fenêtre contextuelle et un catalogue de 415 packs pour 81 pays.",
+    "bannerSummary": "Mises à jour parentales en quelques secondes, un emploi du temps Études exportable vers l'agenda et 415 packs Études pour 81 pays.",
+    "ctaLabel": "Voir les nouveautés",
+    "highlights": [
+      "Les mises à jour parentales arrivent en quelques secondes : quand un parent touche Envoyer, le navigateur de l'enfant récupère le changement en arrière-plan, la page ouverte affiche « Mise à jour parentale reçue » et les nouvelles règles s'appliquent sur place, sans rechargement. La vidéo en cours continue, sauf si les nouvelles règles la bloquent, y compris sur le site Enfant.",
+      "Emploi du temps Études : dans les réglages Études, donnez à chaque jour de la semaine ses séances, par exemple maths de 17 h à 18 h. Études démarre et s'arrête toute seule, les séances du jour apparaissent sur la barre du plan, la semaine s'affiche en grille, et Ajouter à mon agenda enregistre la semaine pour votre application d'agenda.",
+      "Le catalogue Études compte désormais 415 packs pour 81 pays : examens par niveau et par catégorie, classes scolaires, 53 filières de diplôme et 27 filières d'entretien, avec les chaînes locales en premier. La liste de l'Inde s'ouvre sur UPSC et le PSC de votre État.",
+      "La nouvelle barre du jour s'adapte à sa largeur, sans défilement latéral, et un seul éditeur de plan remplace le curseur de durée. La fenêtre contextuelle affiche le plan du jour, avec Modifier dans le tableau de bord.",
+      "La synchronisation est plus fiable : le premier Envoyer après l'appairage arrive de nouveau du premier coup, chaque envoi affiche son propre statut, une mise à jour refusée en donne la raison, et la restauration d'une sauvegarde rétablit son verrou Études, comme dans les applis.",
+      "Une page FilterTube ouverte suit la langue que vous choisissez dans une autre page."
+    ]
+  },
   "3.6.3": {
     "headline": "Autorisés seulement et Études sur chaque page, lecture automatique vers la prochaine vidéo autorisée et sauvegardes vérifiées contre toute modification",
     "summary": "FilterTube 3.6.3 fait en sorte qu'Autorisés seulement et Études restreignent toute la page : l'accueil, la recherche, la page de lecture, les pages de chaîne et le volet de gauche n'affichent que ce que votre liste ou votre plan autorise, et indiquent ce qui est en attente. La lecture automatique et les playlists passent à la prochaine vidéo autorisée, les sauvegardes sont vérifiées pour détecter toute modification faite hors de FilterTube, et plusieurs anciens bogues sont corrigés.",

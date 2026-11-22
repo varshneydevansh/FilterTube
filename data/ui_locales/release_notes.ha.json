@@ -1,4 +1,18 @@
 {
+  "3.6.4": {
+    "headline": "Sabuntawar iyaye cikin daƙiƙu, jadawalin Karatu da babban jerin Karatu",
+    "summary": "FilterTube 3.6.4 yana kai sauye-sauyen iyaye zuwa burauzar yaro cikin daƙiƙu, a bayan fage, tare da ɗan taƙaitaccen saƙon \"Iyaye sun aiko da sabuntawa\" a shafin da ke buɗe, ba tare da sake lodawa ba. Karatu ya sami jadawalin mako-mako da za a iya fitarwa zuwa kalanda, sandar rana da ta dace da faɗinta, tsarin yau a popup, da jerin fakiti 415 na ƙasashe 81.",
+    "bannerSummary": "Sabuntawar iyaye cikin daƙiƙu, jadawalin Karatu da za a fitar zuwa kalanda, da fakitin Karatu 415 na ƙasashe 81.",
+    "ctaLabel": "Duba sababbin abubuwa",
+    "highlights": [
+      "Sabuntawar iyaye na isa cikin daƙiƙu: da zarar iyaye sun taɓa Aika, burauzar yaro tana ɗaukar canjin a bayan fage, shafin da ke buɗe yana nuna \"Iyaye sun aiko da sabuntawa\", sababbin dokoki kuma suna aiki nan take, ba tare da sake lodawa ba. Bidiyon da ake kunnawa yana ci gaba, sai dai idan sababbin dokokin sun toshe shi, haka ma a shafin Yara.",
+      "Jadawalin Karatu: a saitunan Karatu, ba kowace rana ta mako lokutan karatunta, kamar lissafi daga ƙarfe 5 zuwa 6 na yamma. Karatu yana farawa yana ƙarewa da kansa, lokutan ranar suna kan sandar tsari, ana ganin mako a cikin tebur, kuma Ƙara zuwa kalandata yana adana makon don manhajar kalandarka.",
+      "Jerin Karatu yanzu yana da fakiti 415 na ƙasashe 81: jarrabawa ta mataki da rukuni, ajujuwan makaranta, hanyoyin digiri 53 da hanyoyin hira 27, tashoshin gida a gaba. Jerin Indiya yana buɗewa da UPSC da PSC na jiharka.",
+      "Sabuwar sandar rana tana dacewa da faɗinta ba tare da gungurawa gefe ba, kuma editan tsari ɗaya ya maye gurbin silaidar tsawon lokaci. Popup yana nuna tsarin yau, tare da Gyara a dashboard.",
+      "Aiki tare ya fi tsayawa: Aika na farko bayan haɗawa yana sake isa a karon farko, kowanne Aika yana da matsayinsa, sabuntawar da aka ƙi tana faɗin dalili, kuma dawo da ajiya yana dawo da makullin Karatunsa, kamar a manhajoji.",
+      "Shafin FilterTube da ke buɗe yana bin harshen da ka zaɓa a wani shafi."
+    ]
+  },
   "3.6.3": {
     "headline": "Waɗanda aka yarda kawai da Karatu a kowane shafi, tafiya kai tsaye zuwa bidiyo na gaba da aka yarda, da madadin da ake bincika don gano sauyi",
     "summary": "FilterTube 3.6.3 yana sa Waɗanda aka yarda kawai da Karatu su taƙaita shafin gaba ɗaya: Gida, bincike, Kallo, shafukan tasha da sashen hagu suna nuna abin da jerinka ko tsarinka ya yarda kawai, kuma suna faɗin abin da ke jira. Tafiya kai tsaye da jerin waƙa suna ci gaba zuwa bidiyo na gaba da aka yarda, ana bincika madadin don gano sauye-sauyen da aka yi a wajen FilterTube, kuma an gyara wasu tsofaffin kurakurai.",

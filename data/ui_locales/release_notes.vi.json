@@ -1,4 +1,18 @@
 {
+  "3.6.4": {
+    "headline": "Cập nhật của phụ huynh trong vài giây, thời khóa biểu Học tập và danh mục Học tập lớn hơn nhiều",
+    "summary": "FilterTube 3.6.4 đưa thay đổi của phụ huynh đến trình duyệt của con trong vài giây, chạy nền, với một dòng ngắn “Phụ huynh đã gửi bản cập nhật” trên trang đang mở và không cần tải lại. Học tập có thêm thời khóa biểu theo tuần có thể xuất sang lịch, thanh ngày vừa khít chiều rộng, kế hoạch hôm nay trong cửa sổ bật lên và danh mục 415 gói cho 81 quốc gia.",
+    "bannerSummary": "Cập nhật của phụ huynh trong vài giây, thời khóa biểu Học tập có xuất sang lịch và 415 gói Học tập cho 81 quốc gia.",
+    "ctaLabel": "Xem điểm mới",
+    "highlights": [
+      "Cập nhật của phụ huynh đến trong vài giây: khi phụ huynh chạm Gửi, trình duyệt của con nhận thay đổi ở chế độ nền, trang đang mở hiện “Phụ huynh đã gửi bản cập nhật” và quy tắc mới áp dụng ngay tại chỗ, không cần tải lại. Video đang phát vẫn tiếp tục, trừ khi quy tắc mới chặn nó, kể cả trên trang Trẻ em.",
+      "Thời khóa biểu Học tập: trong cài đặt Học tập, hãy gán tiết học cho từng ngày trong tuần, ví dụ môn toán từ 5 đến 6 giờ chiều. Học tập tự bắt đầu và tự kết thúc, các tiết trong ngày nằm trên thanh kế hoạch, cả tuần hiển thị dạng lưới, và Thêm vào lịch của tôi sẽ lưu cả tuần cho ứng dụng lịch của bạn.",
+      "Danh mục Học tập giờ có 415 gói cho 81 quốc gia: kỳ thi theo cấp và nhóm, các lớp phổ thông, 53 lộ trình học vị và 27 lộ trình phỏng vấn, kênh địa phương xếp trước. Danh sách của Ấn Độ mở đầu bằng UPSC và PSC của bang bạn.",
+      "Thanh ngày mới vừa khít chiều rộng, không phải cuộn ngang, và một trình sửa kế hoạch duy nhất thay cho thanh trượt thời lượng. Cửa sổ bật lên hiển thị kế hoạch hôm nay, kèm Sửa trong bảng điều khiển.",
+      "Đồng bộ ổn định hơn: lần Gửi đầu tiên sau khi ghép đôi lại đến ngay lần đầu, mỗi lần Gửi có trạng thái riêng, bản cập nhật bị từ chối sẽ nêu lý do, và khôi phục bản sao lưu cũng khôi phục khóa Học tập của nó, như trong các ứng dụng.",
+      "Trang FilterTube đang mở sẽ theo ngôn ngữ bạn chọn ở trang khác."
+    ]
+  },
   "3.6.3": {
     "headline": "Chỉ được phép và Học tập trên mọi trang, tự chuyển sang video được phép tiếp theo, và bản sao lưu được kiểm tra xem có bị can thiệp",
     "summary": "FilterTube 3.6.3 giúp Chỉ được phép và Học tập thu hẹp toàn bộ trang: Trang chủ, tìm kiếm, trang Xem, trang kênh và ngăn bên trái chỉ hiện những gì danh sách hoặc kế hoạch của bạn cho phép, và cho biết còn gì đang chờ. Tự chuyển tiếp và danh sách phát sẽ sang video được phép tiếp theo, bản sao lưu được kiểm tra xem có bị thay đổi bên ngoài FilterTube không, và nhiều lỗi cũ đã được sửa.",

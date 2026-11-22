@@ -1,4 +1,18 @@
 {
+  "3.6.4": {
+    "headline": "Aggiornamenti dei genitori in pochi secondi, un orario di Studio e un catalogo di Studio molto più grande",
+    "summary": "FilterTube 3.6.4 porta le modifiche di un genitore al browser del figlio in pochi secondi, in background, con una breve nota «Il genitore ha inviato un aggiornamento» sulla pagina aperta e senza ricaricare. Studio ottiene un orario settimanale con esportazione nel calendario, una barra del giorno che si adatta alla larghezza, il piano di oggi nel popup e un catalogo di 415 pacchetti per 81 paesi.",
+    "bannerSummary": "Aggiornamenti dei genitori in pochi secondi, un orario di Studio con esportazione nel calendario e 415 pacchetti Studio per 81 paesi.",
+    "ctaLabel": "Scopri le novità",
+    "highlights": [
+      "Gli aggiornamenti dei genitori arrivano in pochi secondi: quando un genitore tocca Invia, il browser del figlio preleva la modifica in background, la pagina aperta mostra «Il genitore ha inviato un aggiornamento» e le nuove regole si applicano sul posto, senza ricaricare. Il video in riproduzione continua, a meno che le nuove regole lo blocchino, anche sul sito Bambini.",
+      "Orario di Studio: nelle impostazioni di Studio, dai a ogni giorno della settimana le sue ore, per esempio matematica dalle 17 alle 18. Studio parte e finisce da solo, le ore del giorno stanno sulla barra del piano, la settimana appare in una griglia e Aggiungi al mio calendario salva la settimana per la tua app di calendario.",
+      "Il catalogo di Studio ora ha 415 pacchetti per 81 paesi: esami per livello e categoria, classi scolastiche, 53 percorsi di laurea e 27 percorsi di colloquio, con i canali locali per primi. L'elenco dell'India si apre con UPSC e il PSC del tuo stato.",
+      "La nuova barra del giorno si adatta alla larghezza, senza scorrimento laterale, e un unico editor del piano sostituisce il cursore della durata. Il popup mostra il piano di oggi, con Modifica nella dashboard.",
+      "La sincronizzazione è più stabile: il primo Invia dopo l'abbinamento arriva di nuovo al primo colpo, ogni invio mostra il proprio stato, un aggiornamento rifiutato ne spiega il motivo e ripristinare un backup riporta anche il suo blocco di Studio, come nelle app.",
+      "Una pagina FilterTube aperta segue la lingua che scegli in un'altra pagina."
+    ]
+  },
   "3.6.3": {
     "headline": "Solo consentiti e Studio in ogni pagina, riproduzione automatica verso il prossimo video consentito e backup con controllo delle modifiche",
     "summary": "FilterTube 3.6.3 fa sì che Solo consentiti e Studio restringano l'intera pagina: Home, ricerca, Watch, pagine dei canali e riquadro a sinistra mostrano solo ciò che la tua lista o il tuo piano consente, e dicono cosa è in attesa. La riproduzione automatica e le playlist passano al prossimo video consentito, i backup vengono controllati per rilevare modifiche fatte fuori da FilterTube e sono stati corretti diversi vecchi bug.",

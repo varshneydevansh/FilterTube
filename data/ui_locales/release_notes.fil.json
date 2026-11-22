@@ -1,4 +1,18 @@
 {
+  "3.6.4": {
+    "headline": "Update ng magulang sa loob ng ilang segundo, timetable ng Pag-aaral, at mas malaking catalog ng Pag-aaral",
+    "summary": "Dinadala ng FilterTube 3.6.4 ang mga pagbabago ng magulang sa browser ng bata sa loob ng ilang segundo, sa background, na may maikling paalala na \"Nagpadala ng update ang magulang\" sa bukas na page at walang reload. May lingguhang iskedyul na ang Pag-aaral na puwedeng i-export sa calendar, day bar na kasya sa lapad nito, plano ngayong araw sa popup, at catalog na 415 pack para sa 81 bansa.",
+    "bannerSummary": "Update ng magulang sa loob ng ilang segundo, iskedyul ng Pag-aaral na puwedeng i-export sa calendar, at 415 pack ng Pag-aaral para sa 81 bansa.",
+    "ctaLabel": "Tingnan ang mga bago",
+    "highlights": [
+      "Dumarating sa loob ng ilang segundo ang mga update ng magulang: kapag pinindot ng magulang ang Ipadala, kinukuha ng browser ng bata ang pagbabago sa background, ipinapakita ng bukas na page ang \"Nagpadala ng update ang magulang\", at agad na umiiral ang mga bagong patakaran, walang reload. Tuloy ang video na pinapanood, maliban kung i-block ito ng mga bagong patakaran, pati sa site ng Bata.",
+      "Iskedyul ng Pag-aaral: sa mga setting ng Pag-aaral, bigyan ang bawat araw ng linggo ng mga oras ng klase, tulad ng math mula 5 hanggang 6 ng hapon. Kusang nagsisimula at natatapos ang Pag-aaral, nasa bar ng plano ang mga oras ng araw, grid ang itsura ng linggo, at ise-save ng Idagdag sa calendar ko ang linggo para sa calendar app mo.",
+      "May 415 pack na ang catalog ng Pag-aaral para sa 81 bansa: mga pagsusulit ayon sa antas at kategorya, mga baitang sa paaralan, 53 track ng degree at 27 track ng interview, at nauuna ang mga lokal na channel. Nagbubukas ang listahan ng India sa UPSC at PSC ng estado mo.",
+      "Kasya sa lapad nito ang bagong day bar, walang pag-scroll pagilid, at isang editor ng plano ang pumalit sa slider ng haba. Ipinapakita ng popup ang plano ngayong araw, kasama ang I-edit sa dashboard.",
+      "Mas steady na ang sync: dumarating na ulit agad ang unang Ipadala pagkatapos ng pairing, may sariling status ang bawat Ipadala, sinasabi ng tinanggihang update kung bakit, at ibinabalik ng pag-restore ng backup ang lock nito sa Pag-aaral, tulad sa mga app.",
+      "Sinusunod ng bukas na FilterTube page ang wikang pinili mo sa ibang page."
+    ]
+  },
   "3.6.3": {
     "headline": "Allowed only at Study sa bawat page, auto-next sa susunod na pinapayagang video, at mga backup na sinusuri laban sa pakikialam",
     "summary": "Ginagawa ng FilterTube 3.6.3 na pinapaliit ng Allowed only at Study ang buong page: ang Home, search, Watch, mga page ng channel at kaliwang pane ay nagpapakita lang ng pinapayagan ng listahan o plano mo, at sinasabi kung ano ang naghihintay. Lumilipat ang auto-next at mga playlist sa susunod na pinapayagang video, sinusuri ang mga backup para sa mga pagbabagong ginawa sa labas ng FilterTube, at naayos ang ilang lumang bug.",

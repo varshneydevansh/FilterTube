@@ -1,4 +1,18 @@
 {
+  "3.6.4": {
+    "headline": "Pembaruan dari orang tua dalam hitungan detik, jadwal Belajar, dan katalog Belajar yang jauh lebih besar",
+    "summary": "FilterTube 3.6.4 membawa perubahan dari orang tua ke browser anak dalam hitungan detik, di latar belakang, dengan catatan singkat \"Orang tua mengirim pembaruan\" di halaman yang terbuka dan tanpa muat ulang. Belajar mendapat jadwal mingguan dengan ekspor ke kalender, bilah hari yang menyesuaikan lebarnya, rencana hari ini di popup, dan katalog 415 paket untuk 81 negara.",
+    "bannerSummary": "Pembaruan dari orang tua dalam hitungan detik, jadwal Belajar dengan ekspor ke kalender, dan 415 paket Belajar untuk 81 negara.",
+    "ctaLabel": "Lihat Yang Baru",
+    "highlights": [
+      "Pembaruan dari orang tua tiba dalam hitungan detik: saat orang tua mengetuk Kirim, browser anak mengambil perubahannya di latar belakang, halaman yang terbuka menampilkan \"Orang tua mengirim pembaruan\" dan aturan baru langsung berlaku di tempat, tanpa muat ulang. Video yang sedang diputar tetap berjalan, kecuali aturan baru memblokirnya, termasuk di situs Anak.",
+      "Jadwal Belajar: di pengaturan Belajar, beri setiap hari dalam seminggu jam pelajarannya, misalnya matematika pukul 17.00 sampai 18.00. Belajar mulai dan berhenti sendiri, jam pelajaran hari itu tampil di bilah rencana, satu minggu tampil sebagai kisi, dan Tambahkan ke kalender saya menyimpan satu minggu untuk aplikasi kalender Anda.",
+      "Katalog Belajar kini punya 415 paket untuk 81 negara: ujian menurut jenjang dan kategori, kelas sekolah, 53 jalur gelar, dan 27 jalur wawancara, dengan kanal lokal di urutan pertama. Daftar India dibuka dengan UPSC dan PSC negara bagian Anda.",
+      "Bilah hari yang baru menyesuaikan lebarnya tanpa geser ke samping, dan satu editor rencana menggantikan penggeser durasi. Popup menampilkan rencana hari ini, dengan Ubah di dasbor.",
+      "Sinkronisasi lebih stabil: Kirim pertama setelah penyandingan kembali tiba di percobaan pertama, setiap pengiriman punya status sendiri, pembaruan yang ditolak menyebutkan alasannya, dan memulihkan cadangan mengembalikan kunci Belajar-nya, seperti di aplikasi.",
+      "Halaman FilterTube yang terbuka mengikuti bahasa yang Anda pilih di halaman lain."
+    ]
+  },
   "3.6.3": {
     "headline": "Hanya yang diizinkan dan Study di setiap halaman, putar otomatis ke video diizinkan berikutnya, dan cadangan yang diperiksa dari perubahan",
     "summary": "FilterTube 3.6.3 membuat Hanya yang diizinkan dan Study mempersempit seluruh halaman: Beranda, pencarian, Watch, halaman channel, dan panel kiri hanya menampilkan apa yang diizinkan daftar atau rencana Anda, dan memberi tahu apa yang menunggu. Putar otomatis berikutnya dan playlist berlanjut ke video diizinkan berikutnya, cadangan diperiksa apakah diubah di luar FilterTube, dan beberapa bug lama diperbaiki.",

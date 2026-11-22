@@ -1,4 +1,18 @@
 {
+  "3.6.4": {
+    "headline": "Pembaruan wong tuwa ing sawetara detik, jadwal Sinau, lan katalog Sinau sing luwih gedhe banget",
+    "summary": "FilterTube 3.6.4 nggawa owah-owahan saka wong tuwa menyang browser bocah ing sawetara detik, ing latar mburi, kanthi cathetan cekak \"Wong tuwa ngirim pembaruan\" ing kaca sing mbukak lan tanpa muat ulang. Sinau entuk jadwal saben minggu sing bisa dikirim menyang kalender, bilah dina sing pas karo jembaré, rencana dina iki ing popup, lan katalog 415 paket kanggo 81 negara.",
+    "bannerSummary": "Pembaruan wong tuwa ing sawetara detik, jadwal Sinau sing bisa dikirim menyang kalender, lan 415 paket Sinau kanggo 81 negara.",
+    "ctaLabel": "Deleng Sing Anyar",
+    "highlights": [
+      "Pembaruan wong tuwa teka ing sawetara detik: yen wong tuwa ngetutul Kirim, browser bocah njupuk owah-owahan ing latar mburi, kaca sing mbukak nuduhake \"Wong tuwa ngirim pembaruan\" lan aturan anyar langsung mlaku ing kono, tanpa muat ulang. Video sing lagi diputer terus mlaku, kajaba aturan anyar mblokir, uga ing situs Bocah.",
+      "Jadwal Sinau: ing pengaturan Sinau, wènèhana saben dina ing minggu jam pelajarané, kayata matématika jam 5 nganti 6 sore. Sinau miwiti lan rampung dhewe, jam pelajaran dina kuwi ana ing bilah rencana, minggu katon minangka kothak, lan Tambah menyang kalenderku nyimpen sak minggu kanggo aplikasi kalendermu.",
+      "Katalog Sinau saiki duwé 415 paket kanggo 81 negara: ujian miturut jenjang lan kategori, kelas sekolah, 53 jalur gelar lan 27 jalur wawancara, kanthi kanal lokal ing ngarep. Dhaptar India dibukak karo UPSC lan PSC negara bagianmu.",
+      "Bilah dina anyar pas karo jembaré tanpa nggulung menyang sisih, lan siji editor rencana ngganti penggeser dawa. Popup nuduhake rencana dina iki, karo Owahi ing dasbor.",
+      "Sinkronisasi luwih mantep: Kirim sing pisanan sawisé dipasangaké teka maneh ing wektu sing pisanan, saben Kirim nduwé status dhewe, pembaruan sing ditolak ngandhani sebabé, lan mulihaké cadangan uga mulihaké kunci Sinau, kaya ing aplikasi.",
+      "Kaca FilterTube sing mbukak nuruti basa sing kok pilih ing kaca liyane."
+    ]
+  },
   "3.6.3": {
     "headline": "Mung sing diidinake lan Study ing saben kaca, otomatis menyang video sing diidinake sabanjure, lan serep sing dipriksa saka owah-owahan",
     "summary": "FilterTube 3.6.3 gawe Mung sing diidinake lan Study nyempitake kabeh kaca: Ngarep, panelusuran, Watch, kaca channel lan panel kiwa mung nuduhake apa sing diidinake dhaptar utawa rencana sampeyan, lan menehi weruh apa sing lagi ngenteni. Puter otomatis sabanjure lan playlist terus menyang video sing diidinake sabanjure, serep dipriksa apa diowahi ing njaba FilterTube, lan sawetara bug lawas didandani.",

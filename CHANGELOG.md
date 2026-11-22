@@ -2,7 +2,57 @@
 
 ## Unreleased
 
-No additional changes recorded after the 3.6.3 release.
+No additional changes recorded after the 3.6.4 release.
+
+## Version 3.6.4 — Parent Updates In Seconds, The Study Timetable And A Bigger Catalog
+
+Prepared November 22, 2026. Extension changes since v3.6.3, released together
+with the FilterTube 3.6.4 apps.
+
+What was checked: the automated test lanes (`npm test`, with the same 15 known
+audit-pin failures as 3.6.3) and `node build.js`. The extension's sync and
+Study work was checked against the Android and iOS apps' tests while it was
+built. Not yet checked: a parent-to-child Send between two real browsers on
+different networks, the timetable and calendar file in Firefox and Opera, and
+the store builds. The new What's New text in every language is
+machine-drafted; yo, ha, jv, bho, apd, apc, wuu-Hans, pa-Arab, am and pcm want
+a native read.
+
+### Parent updates in seconds
+
+- **Background delivery.** When a parent taps Send, the child's browser picks
+  the change up in the background within seconds, from a short doorbell ring
+  and a courier connection, without the dashboard being open.
+- **No reload.** The open page shows "Parent sent an update" and applies the
+  new rules in place. The video that is playing keeps playing unless the new
+  rules block it, on the Kids site too.
+- **Steadier Send.** The first Send after pairing again is delivered on the
+  first try, each Send shows its own delivery status, a rejected update says
+  why, and acknowledgements and announcements are signed with the link's key.
+  A Send seals every area the link allows. Study plans travel over managed
+  sync, staying within what the child's device accepts.
+
+### Study
+
+- **Timetable.** Study settings has a Timetable: periods for each day of the
+  week, a week grid, day chips, period handles, Copy this day, Hide Clips and
+  comments during periods, and Add to my calendar (a weekly repeating
+  calendar file). Study's state follows the timetable.
+- **Day bar.** The plan's day bar fits its width with no sideways scrolling,
+  one plan editor replaces the length slider, and the steppers follow the
+  apps' rules.
+- **Catalog.** 415 packs for 81 countries: exams by level and category behind
+  More, school classes, 53 degree tracks and 27 interview tracks under three
+  tiles, with local channels first. India's list opens on UPSC and your state
+  PSC. The catalog matches the apps' byte for byte.
+- **Popup.** The popup shows today's plan with Edit in dashboard.
+
+### Backups and language
+
+- **Study lock on restore.** Restoring a backup brings back its Study lock, as
+  in the apps; a sync still leaves the running lock out.
+- **One language everywhere.** An open FilterTube page follows a language you
+  choose in another page.
 
 ## Version 3.6.3 — Allowed Only And Study On Every Page, Auto-Next And Tamper-Checked Backups
 
