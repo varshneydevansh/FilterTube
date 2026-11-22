@@ -1,4 +1,14 @@
 {
+  "3.6.5": {
+    "headline": "Os vídeos voltam a começar e a retomar com confiança",
+    "summary": "O FilterTube 3.6.5 corrige os vídeos que travavam ou abriam pausados ao passar de um vídeo para o seguinte com o bloqueio de anúncios ativado. Um vídeo travado agora recomeça sozinho em cerca de um segundo, e um vídeo que o FilterTube pausou durante a preparação volta a ser reproduzido.",
+    "bannerSummary": "Corrige os vídeos que travavam ou abriam pausados ao passar entre vídeos com o bloqueio de anúncios ativado.",
+    "ctaLabel": "Ver novidades",
+    "highlights": [
+      "Um vídeo aberto pelas recomendações ou por um link do site podia travar logo no início: aparecia como em reprodução, nunca carregava, e Reproduzir e Pausar não faziam nada até a página ser recarregada. Agora o FilterTube percebe isso e reinicia o vídeo sozinho, em geral em um ou dois segundos, com os anúncios continuando bloqueados.",
+      "Com a reprodução instantânea ativada, um vídeo podia abrir pausado ou parar depois de um instante quando a preparação do próprio FilterTube não terminava. Agora o vídeo volta a tocar, a menos que você mesmo o tenha pausado, saído dele ou que uma regra, um limite de tempo ou uma configuração dos responsáveis o esteja segurando."
+    ]
+  },
   "3.6.4": {
     "headline": "Atualizações dos pais em segundos, um horário de Estudo e um catálogo de Estudo bem maior",
     "summary": "O FilterTube 3.6.4 leva as mudanças de um responsável ao navegador da criança em segundos, em segundo plano, com um aviso curto de «Os pais enviaram uma atualização» na página aberta e sem recarregar. O Estudo ganha um horário semanal com exportação para o calendário, uma barra do dia que se ajusta à largura, o plano de hoje no pop-up e um catálogo de 415 pacotes para 81 países.",

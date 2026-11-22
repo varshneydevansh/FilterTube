@@ -1,4 +1,14 @@
 {
+  "3.6.5": {
+    "headline": "Videolar yeniden güvenle başlıyor ve devam ediyor",
+    "summary": "FilterTube 3.6.5, reklam engelleme açıkken bir videodan diğerine geçerken donan veya duraklatılmış açılan videoları düzeltir. Takılan bir video artık yaklaşık bir saniye içinde kendiliğinden yeniden başlar ve FilterTube'un hazırlarken duraklattığı video yeniden oynatılır.",
+    "bannerSummary": "Reklam engelleme açıkken videolar arasında geçerken donan veya duraklatılmış açılan videolar düzeltildi.",
+    "ctaLabel": "Yenilikleri Gör",
+    "highlights": [
+      "Önerilerden veya sitedeki bir bağlantıdan açılan video en başta donabiliyordu: oynuyor gibi görünüyor ama hiç yüklenmiyor, sayfa yeniden yüklenene kadar Oynat ve Duraklat düğmeleri hiçbir şey yapmıyordu. FilterTube artık bunu fark edip videoyu kendiliğinden yeniden başlatıyor, genellikle bir iki saniye içinde, reklamlar ise engelli kalıyor.",
+      "Anında oynatma açıkken, FilterTube'un kendi hazırlığı bitmezse video duraklatılmış açılabiliyor ya da kısa süre sonra durabiliyordu. Video artık yeniden oynuyor; ancak siz kendiniz duraklattıysanız, videodan çıktıysanız veya bir kural, süre sınırı ya da ebeveyn ayarı onu tutuyorsa oynamaz."
+    ]
+  },
   "3.6.4": {
     "headline": "Saniyeler içinde ebeveyn güncellemeleri, bir Ders programı ve çok daha büyük bir Ders kataloğu",
     "summary": "FilterTube 3.6.4, ebeveynin değişikliklerini saniyeler içinde, arka planda çocuğun tarayıcısına ulaştırır; açık sayfada kısa bir “Ebeveynin bir güncelleme gönderdi” notu görünür ve yeniden yükleme gerekmez. Ders bölümüne takvime aktarılabilen haftalık program, genişliğine sığan bir gün çubuğu, açılır pencerede bugünün planı ve 81 ülke için 415 paketlik bir katalog geldi.",

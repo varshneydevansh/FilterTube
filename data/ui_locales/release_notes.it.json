@@ -1,4 +1,14 @@
 {
+  "3.6.5": {
+    "headline": "I video tornano a partire e a riprendere in modo affidabile",
+    "summary": "FilterTube 3.6.5 corregge i video che si bloccavano o si aprivano in pausa passando da un video al successivo con il blocco delle pubblicità attivo. Un video bloccato ora riparte da solo in circa un secondo, e un video che FilterTube aveva messo in pausa durante la preparazione viene riprodotto di nuovo.",
+    "bannerSummary": "Corregge i video che si bloccavano o si aprivano in pausa passando da un video all'altro con il blocco delle pubblicità attivo.",
+    "ctaLabel": "Scopri le novità",
+    "highlights": [
+      "Un video aperto dai consigli o da un link del sito poteva bloccarsi all'inizio: sembrava in riproduzione, non si caricava mai, e Riproduci e Pausa non facevano nulla finché la pagina non veniva ricaricata. Ora FilterTube se ne accorge e fa ripartire il video da solo, di solito in uno o due secondi, mentre le pubblicità restano bloccate.",
+      "Con la riproduzione istantanea attiva, un video poteva aprirsi in pausa o fermarsi dopo un momento quando la preparazione di FilterTube non si completava. Ora il video riparte, a meno che tu non l'abbia messo in pausa, non sia uscito, o una regola, un limite di tempo o un'impostazione dei genitori lo trattenga."
+    ]
+  },
   "3.6.4": {
     "headline": "Aggiornamenti dei genitori in pochi secondi, un orario di Studio e un catalogo di Studio molto più grande",
     "summary": "FilterTube 3.6.4 porta le modifiche di un genitore al browser del figlio in pochi secondi, in background, con una breve nota «Il genitore ha inviato un aggiornamento» sulla pagina aperta e senza ricaricare. Studio ottiene un orario settimanale con esportazione nel calendario, una barra del giorno che si adatta alla larghezza, il piano di oggi nel popup e un catalogo di 415 pacchetti per 81 paesi.",

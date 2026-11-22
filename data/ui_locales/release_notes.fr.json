@@ -1,4 +1,14 @@
 {
+  "3.6.5": {
+    "headline": "Les vidéos démarrent et reprennent de nouveau de façon fiable",
+    "summary": "FilterTube 3.6.5 corrige les vidéos qui se figeaient ou s'ouvraient en pause quand on passait d'une vidéo à la suivante avec le blocage des publicités activé. Une vidéo bloquée redémarre maintenant toute seule en une seconde environ, et une vidéo que FilterTube avait mise en pause pendant sa préparation est relancée.",
+    "bannerSummary": "Corrige les vidéos qui se figeaient ou s'ouvraient en pause en passant d'une vidéo à l'autre avec le blocage des publicités activé.",
+    "ctaLabel": "Voir les nouveautés",
+    "highlights": [
+      "Une vidéo ouverte depuis les recommandations ou un lien du site pouvait se figer dès le début : elle semblait en lecture, ne se chargeait jamais, et Lecture et Pause ne faisaient rien tant que la page n'était pas rechargée. FilterTube le repère maintenant et relance la vidéo tout seul, en général en une ou deux secondes, pendant que les publicités restent bloquées.",
+      "Avec la lecture instantanée activée, une vidéo pouvait s'ouvrir en pause ou s'arrêter après un instant quand la préparation propre à FilterTube ne se terminait pas. La vidéo se lance de nouveau, sauf si vous l'avez mise en pause vous-même, quittée, ou si une règle, une limite de temps ou un réglage parental la retient."
+    ]
+  },
   "3.6.4": {
     "headline": "Mises à jour parentales en quelques secondes, un emploi du temps Études et un catalogue Études bien plus grand",
     "summary": "FilterTube 3.6.4 fait arriver les changements d'un parent dans le navigateur de l'enfant en quelques secondes, en arrière-plan, avec une courte note « Mise à jour parentale reçue » sur la page ouverte et sans rechargement. Études gagne un emploi du temps hebdomadaire exportable vers l'agenda, une barre du jour qui s'adapte à sa largeur, le plan du jour dans la fenêtre contextuelle et un catalogue de 415 packs pour 81 pays.",

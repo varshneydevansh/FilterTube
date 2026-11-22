@@ -1,4 +1,14 @@
 {
+  "3.6.5": {
+    "headline": "Muling maaasahan ang pagsisimula at pagpapatuloy ng mga video",
+    "summary": "Inaayos ng FilterTube 3.6.5 ang mga video na nag-freeze o nagbukas na naka-pause kapag lumilipat mula sa isang video papunta sa susunod na may naka-on na pag-block ng advert. Kusa nang nagsisimula muli ang natigil na video sa loob ng humigit-kumulang isang segundo, at muling pini-play ang video na ipinause ng FilterTube habang inihahanda ito.",
+    "bannerSummary": "Inaayos ang mga video na nag-freeze o nagbukas na naka-pause kapag lumilipat sa pagitan ng mga video na may naka-on na pag-block ng advert.",
+    "ctaLabel": "Tingnan ang mga bago",
+    "highlights": [
+      "Ang video na binuksan mula sa mga rekomendasyon o isang link sa site ay maaaring mag-freeze sa simula: mukhang pini-play, hindi kailanman nagloload, at walang ginagawa ang Play at Pause hanggang sa i-reload ang page. Napapansin na ito ngayon ng FilterTube at kusa nitong sinisimulan muli ang video, kadalasan sa loob ng isa o dalawang segundo, habang nananatiling naka-block ang mga advert.",
+      "Kapag naka-on ang instant play, maaaring magbukas ang video na naka-pause, o huminto pagkaraan ng ilang sandali, kapag hindi natapos ang sariling paghahanda ng FilterTube sa video. Pini-play na ulit ang video ngayon, maliban kung ikaw mismo ang nag-pause, umalis dito, o pinipigilan ito ng isang patakaran, limitasyon sa oras o setting ng magulang."
+    ]
+  },
   "3.6.4": {
     "headline": "Update ng magulang sa loob ng ilang segundo, timetable ng Pag-aaral, at mas malaking catalog ng Pag-aaral",
     "summary": "Dinadala ng FilterTube 3.6.4 ang mga pagbabago ng magulang sa browser ng bata sa loob ng ilang segundo, sa background, na may maikling paalala na \"Nagpadala ng update ang magulang\" sa bukas na page at walang reload. May lingguhang iskedyul na ang Pag-aaral na puwedeng i-export sa calendar, day bar na kasya sa lapad nito, plano ngayong araw sa popup, at catalog na 415 pack para sa 81 bansa.",

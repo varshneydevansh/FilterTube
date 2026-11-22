@@ -1,4 +1,14 @@
 {
+  "3.6.5": {
+    "headline": "Video lại bắt đầu và tiếp tục phát ổn định",
+    "summary": "FilterTube 3.6.5 sửa lỗi video bị đứng hoặc mở ra ở trạng thái tạm dừng khi chuyển từ video này sang video khác lúc đang bật chặn quảng cáo. Video bị kẹt giờ tự bắt đầu lại trong khoảng một giây, và video mà FilterTube đã tạm dừng khi đang chuẩn bị sẽ được phát lại.",
+    "bannerSummary": "Sửa lỗi video bị đứng hoặc mở ra ở trạng thái tạm dừng khi chuyển giữa các video lúc đang bật chặn quảng cáo.",
+    "ctaLabel": "Xem điểm mới",
+    "highlights": [
+      "Video mở từ phần đề xuất hoặc một liên kết trên trang có thể bị đứng ngay từ đầu: trông như đang phát nhưng không bao giờ tải, và nút Phát và Tạm dừng không làm gì cho đến khi tải lại trang. Giờ FilterTube nhận ra điều này và tự bắt đầu lại video, thường trong một hai giây, trong khi quảng cáo vẫn bị chặn.",
+      "Khi bật phát tức thì, video có thể mở ra ở trạng thái tạm dừng, hoặc dừng sau một lúc, khi phần chuẩn bị video của chính FilterTube chưa hoàn tất. Giờ video phát lại, trừ khi bạn tự tạm dừng, rời khỏi video, hoặc có quy tắc, giới hạn thời gian hay cài đặt của phụ huynh đang giữ lại."
+    ]
+  },
   "3.6.4": {
     "headline": "Cập nhật của phụ huynh trong vài giây, thời khóa biểu Học tập và danh mục Học tập lớn hơn nhiều",
     "summary": "FilterTube 3.6.4 đưa thay đổi của phụ huynh đến trình duyệt của con trong vài giây, chạy nền, với một dòng ngắn “Phụ huynh đã gửi bản cập nhật” trên trang đang mở và không cần tải lại. Học tập có thêm thời khóa biểu theo tuần có thể xuất sang lịch, thanh ngày vừa khít chiều rộng, kế hoạch hôm nay trong cửa sổ bật lên và danh mục 415 gói cho 81 quốc gia.",

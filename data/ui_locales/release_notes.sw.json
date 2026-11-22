@@ -1,4 +1,14 @@
 {
+  "3.6.5": {
+    "headline": "Video zinaanza na kuendelea kwa uhakika tena",
+    "summary": "FilterTube 3.6.5 inarekebisha video zilizokwama au kufunguka zikiwa zimesitishwa unapohama kutoka video moja hadi nyingine huku kizuia matangazo kikiwa kimewashwa. Video iliyokwama sasa huanza tena yenyewe ndani ya takriban sekunde moja, na video ambayo FilterTube iliisitisha wakati wa kuiandaa huchezwa tena.",
+    "bannerSummary": "Inarekebisha video zilizokwama au kufunguka zikiwa zimesitishwa wakati wa kuhama kati ya video huku kizuia matangazo kikiwa kimewashwa.",
+    "ctaLabel": "Angalia mapya",
+    "highlights": [
+      "Video iliyofunguliwa kutoka kwenye mapendekezo au kiungo cha tovuti inaweza kukwama mwanzoni: ilionekana inacheza, haikupakia kamwe, na vitufe vya Cheza na Sitisha havikufanya kitu hadi ukurasa upakiwe upya. Sasa FilterTube huligundua hili na kuanza video tena yenyewe, kwa kawaida ndani ya sekunde moja au mbili, huku matangazo yakiendelea kuzuiwa.",
+      "Kukiwa na kucheza papo hapo kumewashwa, video ingeweza kufunguka ikiwa imesitishwa, au kusimama baada ya muda mfupi, wakati maandalizi ya FilterTube yenyewe ya video hayakukamilika. Sasa video huchezwa tena, isipokuwa wewe mwenyewe uliisitisha, ulitoka kwenye video, au sheria, kikomo cha muda au mpangilio wa mzazi inaizuia."
+    ]
+  },
   "3.6.4": {
     "headline": "Masasisho ya wazazi ndani ya sekunde, ratiba ya Masomo na orodha kubwa zaidi ya Masomo",
     "summary": "FilterTube 3.6.4 inafikisha mabadiliko ya mzazi kwenye kivinjari cha mtoto ndani ya sekunde, chinichini, ikiwa na ujumbe mfupi \"Mzazi ametuma sasisho\" kwenye ukurasa uliofunguliwa na bila kupakia upya. Masomo yanapata ratiba ya kila wiki inayoweza kuhamishiwa kwenye kalenda, upau wa siku unaolingana na upana wake, mpango wa leo kwenye dirisha ibukizi, na orodha ya vifurushi 415 kwa nchi 81.",

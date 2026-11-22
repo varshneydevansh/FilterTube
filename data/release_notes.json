@@ -3,6 +3,17 @@
     "_comment": "Shared release notes source for the dashboard What's New tab and the YouTube release banner. Keep entries sorted newest-first by version."
   },
   {
+    "version": "3.6.5",
+    "headline": "Videos start and resume reliably again",
+    "summary": "FilterTube 3.6.5 fixes videos that froze or opened paused when you moved from one video to the next with advert blocking on. A stuck video now starts again on its own within about a second, and a video that FilterTube paused while preparing it is played again.",
+    "bannerSummary": "Fixes videos that froze or opened paused when moving between videos with advert blocking on.",
+    "highlights": [
+      "A video opened from the recommendations or a link on the site could freeze at the start: it showed as playing, never loaded, and Play and Pause did nothing until the page was reloaded. FilterTube now notices this and starts the video again on its own, usually within a second or two, while adverts stay blocked.",
+      "With instant play on, a video could open paused, or stop after a moment, when FilterTube's own preparation of the video did not finish. The video now plays again, unless you paused it yourself, left it, or a rule, time limit or parent setting is holding it."
+    ],
+    "detailsUrl": "https://github.com/varshneydevansh/FilterTube/releases/tag/v3.6.5"
+  },
+  {
     "version": "3.6.4",
     "headline": "Parent updates in seconds, a Study timetable and a much bigger Study catalog",
     "summary": "FilterTube 3.6.4 brings a parent's changes to a child's browser within seconds, in the background, with a short \"Parent sent an update\" note on the open page and no reload. Study gets a weekly timetable with calendar export, a day bar that fits its width, today's plan in the popup, and a catalog of 415 packs for 81 countries.",

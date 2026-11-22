@@ -1,4 +1,14 @@
 {
+  "3.6.5": {
+    "headline": "Video bisa miwiti lan nerusake kanthi dipercaya maneh",
+    "summary": "FilterTube 3.6.5 mbenerake video sing macet utawa kebukak ing kahanan kajeda nalika pindhah saka siji video menyang video sabanjure kanthi pamblokir iklan aktif. Video sing macet saiki miwiti maneh dhewe ing kira-kira sak detik, lan video sing dijeda FilterTube nalika disiapake dimainake maneh.",
+    "bannerSummary": "Mbenerake video sing macet utawa kebukak ing kahanan kajeda nalika pindhah antarvideo kanthi pamblokir iklan aktif.",
+    "ctaLabel": "Deleng Sing Anyar",
+    "highlights": [
+      "Video sing dibukak saka rekomendasi utawa pranala ing situs bisa macet ing wiwitan: katon lagi dimainake, ora tau dimuat, lan tombol Puter lan Jeda ora nindakake apa-apa nganti kaca dimuat ulang. FilterTube saiki ngerti bab iki lan miwiti video maneh dhewe, biasane ing sedetik utawa rong detik, dene iklan tetep diblokir.",
+      "Nalika puter cepet urip, video bisa kebukak ing kahanan kajeda, utawa mandheg sakwise sedhela, yen persiapan video dening FilterTube dhewe ora rampung. Video saiki dimainake maneh, kejaba yen sampeyan dhewe sing njeda, metu saka video kuwi, utawa ana aturan, watesan wektu, utawa setelan wong tuwa sing nahan."
+    ]
+  },
   "3.6.4": {
     "headline": "Pembaruan wong tuwa ing sawetara detik, jadwal Sinau, lan katalog Sinau sing luwih gedhe banget",
     "summary": "FilterTube 3.6.4 nggawa owah-owahan saka wong tuwa menyang browser bocah ing sawetara detik, ing latar mburi, kanthi cathetan cekak \"Wong tuwa ngirim pembaruan\" ing kaca sing mbukak lan tanpa muat ulang. Sinau entuk jadwal saben minggu sing bisa dikirim menyang kalender, bilah dina sing pas karo jembaré, rencana dina iki ing popup, lan katalog 415 paket kanggo 81 negara.",

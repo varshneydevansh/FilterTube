@@ -1,4 +1,14 @@
 {
+  "3.6.5": {
+    "headline": "Videos starten und laufen wieder zuverlässig weiter",
+    "summary": "FilterTube 3.6.5 behebt Videos, die beim Wechsel von einem Video zum nächsten bei aktiviertem Werbeblocker einfroren oder pausiert öffneten. Ein hängendes Video startet jetzt nach etwa einer Sekunde von selbst neu, und ein Video, das FilterTube bei der Vorbereitung angehalten hat, wird wieder abgespielt.",
+    "bannerSummary": "Behebt Videos, die beim Wechsel zwischen Videos mit aktiviertem Werbeblocker einfroren oder pausiert öffneten.",
+    "ctaLabel": "Neuigkeiten ansehen",
+    "highlights": [
+      "Ein Video, das aus den Empfehlungen oder über einen Link auf der Seite geöffnet wurde, konnte gleich am Anfang einfrieren: Es wirkte, als würde es laufen, lud aber nie, und Wiedergabe und Pause taten nichts, bis die Seite neu geladen wurde. FilterTube erkennt das jetzt und startet das Video von selbst neu, meist nach ein bis zwei Sekunden, und Werbung bleibt blockiert.",
+      "Bei aktivem Sofortstart konnte ein Video pausiert öffnen oder nach einem Moment stoppen, wenn die eigene Vorbereitung von FilterTube nicht abgeschlossen wurde. Das Video läuft jetzt wieder, es sei denn, du hast es selbst angehalten, verlassen oder eine Regel, ein Zeitlimit oder eine Einstellung der Eltern hält es auf."
+    ]
+  },
   "3.6.4": {
     "headline": "Eltern-Updates in Sekunden, ein Lernen-Stundenplan und ein viel größerer Lernen-Katalog",
     "summary": "FilterTube 3.6.4 bringt Änderungen der Eltern innerhalb von Sekunden im Hintergrund in den Browser des Kindes, mit einem kurzen Hinweis „Eltern-Update erhalten“ auf der offenen Seite und ohne Neuladen. Lernen bekommt einen Wochenstundenplan mit Kalenderexport, eine Tagesleiste, die sich ihrer Breite anpasst, den heutigen Plan im Popup und einen Katalog mit 415 Paketen für 81 Länder.",

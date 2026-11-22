@@ -1,4 +1,14 @@
 {
+  "3.6.5": {
+    "headline": "Àwọn fídíò tún bẹ̀rẹ̀ àti tẹ̀síwájú ní ọ̀nà tó ṣeé gbẹ́kẹ̀lé",
+    "summary": "FilterTube 3.6.5 ń ṣàtúnṣe àwọn fídíò tó ń dídì tàbí tó ń ṣí ní ìdúró nígbà tí o bá ń lọ láti fídíò kan sí òmíràn pẹ̀lú ìdènà ìpolówó tó wà ní títàn. Fídíò tó dì báyìí máa ń tún bẹ̀rẹ̀ fúnrarẹ̀ láàrín bí ìṣẹ́jú-àáyá kan, àti fídíò tí FilterTube dá dúró nígbà tó ń ṣètò rẹ̀ máa ń tún ṣiṣẹ́.",
+    "bannerSummary": "Ó ṣàtúnṣe àwọn fídíò tó ń dídì tàbí tó ń ṣí ní ìdúró nígbà tí a bá ń lọ láàrín fídíò pẹ̀lú ìdènà ìpolówó tó wà ní títàn.",
+    "ctaLabel": "Wo ohun tuntun",
+    "highlights": [
+      "Fídíò tí a ṣí láti àwọn ìmọ̀ràn tàbí ìsopọ̀ lórí ìkànnì lè dídì ní ìbẹ̀rẹ̀: ó máa ń fi hàn bí ẹni pé ó ń ṣiṣẹ́, kò sì ní kún rárá, bọ́tìnì Ṣiṣẹ́ àti Dúró kò sì ní ṣe nǹkan kan títí a ó fi tún ojú-ìwé kún. FilterTube báyìí ń kíyèsí èyí, ó sì ń tún fídíò bẹ̀rẹ̀ fúnrarẹ̀, ní gbogbo ìgbà láàrín ìṣẹ́jú-àáyá kan tàbí méjì, nígbà tí àwọn ìpolówó ṣì ń wà ní dídènà.",
+      "Pẹ̀lú ṣíṣiṣẹ́ lẹ́sẹ̀kẹsẹ̀ tó wà ní títàn, fídíò lè ṣí ní ìdúró, tàbí dúró lẹ́yìn ìgbà díẹ̀, nígbà tí ìṣètò fídíò tí FilterTube fúnrarẹ̀ ń ṣe kò parí. Fídíò báyìí tún ń ṣiṣẹ́, àyàfi tí o bá dá a dúró fúnrarẹ̀, o jáde kúrò nínú rẹ̀, tàbí òfin kan, ààlà àkókò tàbí ètò òbí ń dá a dúró."
+    ]
+  },
   "3.6.4": {
     "headline": "Àwọn àtúnṣe òbí láàrín ìṣẹ́jú-àáyá, àkókò ẹ̀kọ́ àti àtòjọ Ẹ̀kọ́ tó tóbi púpọ̀",
     "summary": "FilterTube 3.6.4 máa ń gbé àwọn àyípadà òbí lọ sí aṣàwákiri ọmọ láàrín ìṣẹ́jú-àáyá díẹ̀, ní ẹ̀yìn ìkànnì, pẹ̀lú ìkìlọ̀ kúkúrú \"Òbí fi àtúnṣe ránṣẹ́\" lórí ojú-ìwé tó ṣí, láìsí títún-gbé e. Ẹ̀kọ́ gba àkókò ọ̀sẹ̀-ọ̀sẹ̀ tí a lè kó lọ sí kàlẹ́ńdà, ìlà ọjọ́ tó bá fífẹ̀ rẹ̀ mu, ètò òní nínú popup, àti àtòjọ ìdìpọ̀ 415 fún orílẹ̀-èdè 81.",

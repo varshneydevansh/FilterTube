@@ -1,4 +1,14 @@
 {
+  "3.6.5": {
+    "headline": "Los vídeos vuelven a empezar y a reanudarse con fiabilidad",
+    "summary": "FilterTube 3.6.5 arregla los vídeos que se congelaban o se abrían en pausa al pasar de un vídeo al siguiente con el bloqueo de anuncios activado. Un vídeo atascado ahora vuelve a empezar solo en un segundo aproximadamente, y un vídeo que FilterTube pausó mientras lo preparaba vuelve a reproducirse.",
+    "bannerSummary": "Arregla los vídeos que se congelaban o se abrían en pausa al pasar entre vídeos con el bloqueo de anuncios activado.",
+    "ctaLabel": "Ver novedades",
+    "highlights": [
+      "Un vídeo abierto desde las recomendaciones o desde un enlace del sitio podía congelarse al empezar: aparecía como en reproducción, nunca cargaba, y Reproducir y Pausa no hacían nada hasta recargar la página. Ahora FilterTube lo detecta y vuelve a iniciar el vídeo solo, normalmente en un segundo o dos, mientras los anuncios siguen bloqueados.",
+      "Con la reproducción instantánea activada, un vídeo podía abrirse en pausa o detenerse al cabo de un momento cuando la preparación propia de FilterTube no terminaba. Ahora el vídeo se reproduce de nuevo, salvo que lo hayas pausado tú, hayas salido de él o lo retenga una regla, un límite de tiempo o un ajuste de los padres."
+    ]
+  },
   "3.6.4": {
     "headline": "Actualizaciones de los padres en segundos, un horario de Estudio y un catálogo de Estudio mucho más grande",
     "summary": "FilterTube 3.6.4 hace que los cambios de un padre lleguen al navegador de su hijo en cuestión de segundos, en segundo plano, con un aviso breve de «Llegó una actualización parental» en la página abierta y sin recargar. Estudio estrena un horario semanal con exportación al calendario, una barra del día que se ajusta a su ancho, el plan de hoy en la ventana emergente y un catálogo de 415 paquetes para 81 países.",

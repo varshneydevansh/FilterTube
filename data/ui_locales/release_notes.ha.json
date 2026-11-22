@@ -1,4 +1,14 @@
 {
+  "3.6.5": {
+    "headline": "Bidiyo na sake farawa da ci gaba da dogaro",
+    "summary": "FilterTube 3.6.5 yana gyara bidiyon da ke daskarewa ko buɗewa a dakatar lokacin da kake wucewa daga bidiyo ɗaya zuwa na gaba tare da toshe tallace-tallace a kunne. Bidiyon da ya makale yanzu yana sake farawa da kansa cikin kusan daƙiƙa ɗaya, kuma bidiyon da FilterTube ya dakatar yayin shirya shi ana sake kunna shi.",
+    "bannerSummary": "Yana gyara bidiyon da ke daskarewa ko buɗewa a dakatar lokacin wucewa tsakanin bidiyo tare da toshe tallace-tallace a kunne.",
+    "ctaLabel": "Duba sababbin abubuwa",
+    "highlights": [
+      "Bidiyon da aka buɗe daga shawarwari ko hanyar haɗi a shafin na iya daskarewa a farko: yana nuna kamar ana kunna shi, bai taɓa lodawa ba, kuma maɓallan Kunna da Dakatar ba sa yin komai har sai an sake lodin shafin. Yanzu FilterTube yana lura da wannan kuma yana sake fara bidiyon da kansa, yawanci cikin daƙiƙa ɗaya ko biyu, tallace-tallace kuwa suna ci gaba da kasancewa a toshe.",
+      "Tare da kunna kai-tsaye a kunne, bidiyo na iya buɗewa a dakatar, ko tsayawa bayan ɗan lokaci, idan shirya bidiyon da FilterTube da kansa yake yi bai kammala ba. Yanzu bidiyon yana sake kunnawa, sai dai idan kai da kanka ka dakatar da shi, ka bar shi, ko wata doka, iyakar lokaci ko saitin iyaye na riƙe shi."
+    ]
+  },
   "3.6.4": {
     "headline": "Sabuntawar iyaye cikin daƙiƙu, jadawalin Karatu da babban jerin Karatu",
     "summary": "FilterTube 3.6.4 yana kai sauye-sauyen iyaye zuwa burauzar yaro cikin daƙiƙu, a bayan fage, tare da ɗan taƙaitaccen saƙon \"Iyaye sun aiko da sabuntawa\" a shafin da ke buɗe, ba tare da sake lodawa ba. Karatu ya sami jadawalin mako-mako da za a iya fitarwa zuwa kalanda, sandar rana da ta dace da faɗinta, tsarin yau a popup, da jerin fakiti 415 na ƙasashe 81.",

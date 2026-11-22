@@ -2,7 +2,36 @@
 
 ## Unreleased
 
-No additional changes recorded after the 3.6.4 release.
+No additional changes recorded after the 3.6.5 release.
+
+## Version 3.6.5 — Videos Start And Resume Reliably Again
+
+Prepared November 22, 2026. An extension-only fix release; the apps stay at
+3.6.4.
+
+What was checked: the automated test lanes (`npm test`, with the same 16 known
+audit-pin failures as before these changes), `node build.js`, and repeated
+runs in Chromium with the built extension, moving between a dozen videos at a
+time with advert blocking and instant play on: every video started and none was
+left paused (before: about 5 in 6 froze, and 2 in 12 were left paused). Not yet
+checked: Firefox and Opera, and the store builds. The What's New text in every
+language is machine-drafted.
+
+### Playback
+
+- **Frozen videos start again.** With advert blocking on, the site's player
+  sometimes left a video opened from the recommendations unstarted: it showed
+  as playing, never loaded, and Play and Pause did nothing until a reload,
+  which also affected every following video (Firefox reviews). FilterTube now
+  notices that exact state after 1.5 seconds and reloads the same video through
+  the player's own controls, at most three times, from the link's start time.
+  It checks only after navigation and media events, so healthy pages carry no
+  extra timers.
+- **No more videos left paused by instant play.** Instant play pauses a video
+  while it prepares its own playback. When that preparation was cancelled or
+  fell back, nothing played the video again. It now plays the video again once,
+  unless you paused it yourself, left it, turned instant play off, or a rule,
+  time limit or parent setting is holding it.
 
 ## Version 3.6.4 — Parent Updates In Seconds, The Study Timetable And A Bigger Catalog
 

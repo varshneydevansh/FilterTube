@@ -1,4 +1,14 @@
 {
+  "3.6.5": {
+    "headline": "Video kembali mulai dan lanjut dengan andal",
+    "summary": "FilterTube 3.6.5 memperbaiki video yang macet atau terbuka dalam keadaan terjeda saat berpindah dari satu video ke video berikutnya dengan pemblokir iklan aktif. Video yang macet kini mulai lagi sendiri dalam sekitar satu detik, dan video yang dijeda FilterTube saat disiapkan diputar kembali.",
+    "bannerSummary": "Memperbaiki video yang macet atau terbuka dalam keadaan terjeda saat berpindah antarvideo dengan pemblokir iklan aktif.",
+    "ctaLabel": "Lihat Yang Baru",
+    "highlights": [
+      "Video yang dibuka dari rekomendasi atau tautan di situs bisa macet di awal: tampak sedang diputar, tidak pernah dimuat, dan Putar serta Jeda tidak berfungsi sampai halaman dimuat ulang. FilterTube kini menyadarinya dan memulai video lagi sendiri, biasanya dalam satu atau dua detik, sementara iklan tetap diblokir.",
+      "Dengan putar instan aktif, video bisa terbuka dalam keadaan terjeda, atau berhenti sesaat kemudian, saat persiapan video oleh FilterTube sendiri tidak selesai. Video kini diputar lagi, kecuali Anda sendiri yang menjedanya, keluar darinya, atau ada aturan, batas waktu, atau pengaturan orang tua yang menahannya."
+    ]
+  },
   "3.6.4": {
     "headline": "Pembaruan dari orang tua dalam hitungan detik, jadwal Belajar, dan katalog Belajar yang jauh lebih besar",
     "summary": "FilterTube 3.6.4 membawa perubahan dari orang tua ke browser anak dalam hitungan detik, di latar belakang, dengan catatan singkat \"Orang tua mengirim pembaruan\" di halaman yang terbuka dan tanpa muat ulang. Belajar mendapat jadwal mingguan dengan ekspor ke kalender, bilah hari yang menyesuaikan lebarnya, rencana hari ini di popup, dan katalog 415 paket untuk 81 negara.",

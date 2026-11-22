@@ -1,4 +1,14 @@
 {
+  "3.6.5": {
+    "headline": "Videos don start and resume well again",
+    "summary": "FilterTube 3.6.5 dey fix videos wey dey freeze or open paused as you dey move from one video go anoda wit advert blocking on. Video wey stuck go now start again by itself within about one second, and video wey FilterTube pause as e dey prepare am go play again.",
+    "bannerSummary": "E dey fix videos wey dey freeze or open paused as you dey move between videos wit advert blocking on.",
+    "ctaLabel": "See Wetin New",
+    "highlights": [
+      "Video wey you open from di recommendations or one link for di site fit freeze for start: e go show as e dey play, e no go ever load, and Play and Pause no go do anything until you reload di page. FilterTube now dey notice dis one and e dey start di video again by itself, mostly within one or two seconds, while adverts still dey blocked.",
+      "Wit instant play on, video fit open paused, or stop after small time, if FilterTube own preparation of di video no finish. Di video now dey play again, except you pause am yourself, leave am, or one rule, time limit or parent setting dey hold am."
+    ]
+  },
   "3.6.4": {
     "headline": "Parent update wey reach for seconds, Study timetable and bigger Study catalog",
     "summary": "FilterTube 3.6.4 dey carry wetin parent change go pikin browser for seconds, for background, wit short \"Your parent don send update\" note for di page wey open and no reload. Study get weekly timetable wey you fit put for calendar, day bar wey fit im width, today plan for popup, and catalog of 415 packs for 81 countries.",
