@@ -6,7 +6,7 @@ import { JsonLd, faqPageJsonLd } from "@/lib/structured-data";
 export const metadata = {
   title: "FAQ: YouTube ad blocker and content blocker",
   description:
-    "Answers about FilterTube: block YouTube ads, keywords, channels and Shorts on iPhone, Android, TV and in your browser, allow only trusted channels, Kids profiles, Study mode and privacy.",
+    "Answers about FilterTube: block YouTube ads, keywords, channels and Shorts on iPhone, Android, TV and in Chrome, Firefox, Edge and Opera, allow only trusted channels, Kids profiles, Study mode and privacy.",
   alternates: {
     canonical: "https://filtertube.in/faq",
     types: { "text/markdown": "https://filtertube.in/faq.md" },

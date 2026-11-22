@@ -3,8 +3,8 @@
 // and AI assistants read the same words. Checked against the extension, the apps and the privacy
 // policy on 22 November 2026. Update the release fields here when a version ships.
 //
-// Wording rules: the apps are not open source (only the extension is, under MIT). No "best" claim in
-// our own voice; say what FilterTube does. iOS installs with SideStore, AltStore second; the App Store
+// Wording rules: "open source" is said only about the browser extension (MIT), never in any
+// sentence about the apps. No "best" claim in our own voice; say what FilterTube does. iOS installs with SideStore, AltStore second; the App Store
 // version is delayed by trouble on Apple's side.
 
 import { extensionInstallHref } from "@/components/site-shell-data";
@@ -36,10 +36,10 @@ export const links = {
 };
 
 export const oneLiner =
-  "FilterTube is a free YouTube ad blocker and content blocker for iPhone, iPad, Android phones, tablets and TVs, and the Chrome, Firefox and Edge browsers.";
+  "FilterTube is a free YouTube ad blocker and content blocker for iPhone, iPad, Android phones, tablets and TVs, and the Chrome, Firefox, Edge and Opera browsers.";
 
 export const summary =
-  "FilterTube is a free YouTube ad blocker and content blocker for iPhone, iPad, Android phones, tablets and TVs, and the Chrome, Firefox and Edge browsers. Block ads, keywords, channels and Shorts, or switch to allow-only mode so only the channels you trust appear. Families get Kids profiles with PINs and can send rule changes from a parent's phone to a child's device. Students get Study mode, which shows only the channels in their study plan during each round. There is no FilterTube account, your rules stay on your devices, and every feature is free.";
+  "FilterTube is a free YouTube ad blocker and content blocker for iPhone, iPad, Android phones, tablets and TVs, and the Chrome, Firefox, Edge and Opera browsers. Block ads, keywords, channels and Shorts, or switch to allow-only mode so only the channels you trust appear. Families get Kids profiles with PINs and can send rule changes from a parent's phone to a child's device. Students get Study mode, which shows only the channels in their study plan during each round. There is no FilterTube account, your rules stay on your devices, and every feature is free.";
 
 export const audiences = [
   {
@@ -137,11 +137,12 @@ export const platforms = [
   {
     id: "extension",
     name: "Browser extension",
-    detail: "Chrome, Firefox and Edge, plus Brave, Vivaldi, Opera and other Chromium browsers through the Chrome Web Store. Works on YouTube, YouTube Music and YouTube Kids in the browser. Open source under the MIT licence.",
+    detail: "Chrome, Firefox, Edge and Opera, plus Brave, Vivaldi and other Chromium browsers through the Chrome Web Store. Opera uses the filtertube-opera ZIP from each GitHub release. Works on YouTube, YouTube Music and YouTube Kids in the browser. The extension is open source (MIT) on GitHub.",
     installs: [
       { label: "Chrome Web Store", href: links.chrome },
       { label: "Firefox Add-ons", href: links.firefox },
       { label: "Edge Add-ons", href: links.edge },
+      { label: "Opera (ZIP on GitHub)", href: links.githubReleases },
     ],
   },
 ];
@@ -152,7 +153,7 @@ export const privacyPoints = [
   "Device sync is end-to-end encrypted and goes between your own devices. A relay only helps them find each other.",
   "No ad SDKs, analytics SDKs or tracking identifiers in the apps or the extension.",
   "Every feature is free. Optional support (Ko-fi, or a supporter subscription on Google Play) changes no feature.",
-  "Only the browser extension is open source (MIT). The apps are free to use but not open source.",
+  "The browser extension is open source (MIT) on GitHub.",
 ];
 
 export const studyFacts = {
@@ -209,7 +210,7 @@ export const faqGroups = [
       },
       {
         q: "What's the best YouTube ad blocker and content blocker?",
-        a: "It depends on what you need. For ads and trackers on every website, a general blocker such as uBlock Origin does that job well. If you want to block YouTube ads and also choose what appears (block keywords, channels and Shorts, allow only trusted channels, set up Kids profiles or study without distractions), FilterTube is built for that. It runs on iPhone, iPad, Android phones, tablets and TVs and in Chrome, Firefox and Edge, needs no account, and is free.",
+        a: "It depends on what you need. For ads and trackers on every website, a general blocker such as uBlock Origin does that job well. If you want to block YouTube ads and also choose what appears (block keywords, channels and Shorts, allow only trusted channels, set up Kids profiles or study without distractions), FilterTube is built for that. It runs on iPhone, iPad, Android phones, tablets and TVs and in Chrome, Firefox, Edge and Opera, needs no account, and is free.",
         links: [{ label: "Compare FilterTube with other tools", href: `${SITE_URL}/compare` }],
       },
       {
@@ -305,7 +306,7 @@ export const faqGroups = [
     items: [
       {
         q: "Which devices does FilterTube run on?",
-        a: "iPhone and iPad (iOS and iPadOS 17 or later), Android phones and tablets, Android TV and Google TV, and the Chrome, Firefox and Edge browsers (plus Brave, Vivaldi, Opera and other Chromium browsers). Fire TV support is planned.",
+        a: "iPhone and iPad (iOS and iPadOS 17 or later), Android phones and tablets, Android TV and Google TV, and the Chrome, Firefox, Edge and Opera browsers (plus Brave, Vivaldi and other Chromium browsers). Fire TV support is planned.",
         links: [{ label: "All downloads", href: links.downloads }],
       },
       {
@@ -319,8 +320,8 @@ export const faqGroups = [
         links: [{ label: "Privacy policy", href: links.privacy }],
       },
       {
-        q: "Is FilterTube open source?",
-        a: "The browser extension is open source under the MIT licence, on GitHub. The Android and iPhone/iPad apps are free to use but are not open source.",
+        q: "Is the FilterTube extension open source?",
+        a: "Yes. The browser extension is open source under the MIT licence, on GitHub.",
         links: [{ label: "Extension source on GitHub", href: links.github }],
       },
       {
@@ -404,6 +405,6 @@ export const comparisons = [
 export const filterTubeRow = {
   name: "FilterTube",
   madeFor: "Blocking YouTube ads and choosing what appears",
-  runsOn: "iPhone, iPad, Android phones, tablets and TVs, Chrome, Firefox and Edge",
-  price: "Free, no account (extension is MIT open source)",
+  runsOn: "iPhone, iPad, Android phones, tablets and TVs, Chrome, Firefox, Edge and Opera",
+  price: "Free, no account",
 };

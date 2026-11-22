@@ -24,7 +24,7 @@ comment and email below is the owner's own action. Say you are the developer in 
   - r/FilterTubeApp, which we own and should keep active, because answers there are citable.
 - **Name collisions.** Unrelated tools share the name: a Chrome extension "FilterTube – YouTube Shorts, Recommendation Blocker & Keyword Filter", one called "FilterTube: Youtube Home Filter", and filter-tube.com. Every listing should link `filtertube.in` and `github.com/varshneydevansh/FilterTube`.
 - **Stale descriptions.** One search snippet still said "iPhone and iPad in development". Update the Chrome Web Store, Firefox Add-ons, Edge and GitHub descriptions with the line from `website/data/site-facts.js` (`oneLiner`).
-- **Open source wording.** Only the extension is MIT. In open-source categories, list the extension only.
+- **Open source wording.** Say "open source" only about the browser extension (MIT), and never in any sentence about the apps. In open-source categories, list the extension alone.
 
 ## Top 20
 
@@ -49,11 +49,11 @@ comment and email below is the owner's own action. Say you are the developer in 
 | 17 | [VidCove: Best Chrome extensions to block YouTube Shorts](https://vidcove.io/blog/youtube-shorts-chrome-extensions-parents) | Vendor article (3 Aug 2026) | Ranks for "block YouTube Shorts". The author says he isn't affiliated with the extensions listed | Same email as #16. The Shorts switch plus Kids profiles fit this list |
 | 18 | [TubeBlock: How to block keywords on YouTube](https://tubeblock.net/block-keywords-on-youtube/) | Competitor article (4 Nov 2026) | A direct hit for "block YouTube videos by keyword" | Competitor. Skip. Our FAQ answers the same question for each platform, including iPhone |
 | 19 | [Chrome Web Store: YouTube Allowlist](https://chromewebstore.google.com/detail/youtube-allowlist/fnjffmgppllebdjdknidlbcogjjgamcl) | Store listing (743 users, free tier limited to 5 items) | A direct hit for "YouTube whitelist extension" | Nothing to submit. Add "allowlist" and "whitelist" to our own store listing and FAQ wording |
-| 20 | [Awesome-Parental-Controls-Software](https://github.com/ishandutta2007/Awesome-Parental-Controls-Software) | GitHub awesome list (updated Oct 2026, low stars) | The only awesome list for parental controls that search turned up. It has no YouTube-specific tool | Open a PR adding the FilterTube extension to the open-source table (MIT). Mention the apps as free but not open source. Follow its four contribution steps |
+| 20 | [Awesome-Parental-Controls-Software](https://github.com/ishandutta2007/Awesome-Parental-Controls-Software) | GitHub awesome list (updated Oct 2026, low stars) | The only awesome list for parental controls that search turned up. It has no YouTube-specific tool | Open a PR adding the FilterTube extension to the open-source table (MIT). Follow its four contribution steps |
 
 ## Also worth a look
 
-- **[pluja/awesome-privacy](https://github.com/pluja/awesome-privacy)** (20k stars). Its YouTube section covers frontends and anti-tracking tools. There's no content-filter category, so read CONTRIBUTING first. A PR would list the MIT extension only.
+- **[pluja/awesome-privacy](https://github.com/pluja/awesome-privacy)** (20k stars). Its YouTube section covers frontends and anti-tracking tools. There's no content-filter category, so read CONTRIBUTING first. A PR would list the MIT extension alone.
 - **MakeUseOf's YouTube extension roundups.** These cover focus tools (Unhook, SponsorBlock), so pitch FilterTube to the author on Study mode.
 - **[LibHunt: BlockTube](https://www.libhunt.com/r/blocktube)** and **[Lemmy: "Top extensions to make YouTube bearable"](https://lemmy.world/post/1642651)**. Both appeared in search but couldn't be opened. Check them by hand.
 - **Our own listings.** Chrome Web Store, Firefox Add-ons, Edge Add-ons, Google Play and the GitHub README are pages AI already trusts. Their first lines should match `oneLiner` and link filtertube.in/llms.txt.

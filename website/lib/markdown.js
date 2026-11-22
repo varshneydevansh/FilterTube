@@ -42,7 +42,7 @@ export const markdownPages = [
   { path: "/study.md", html: "/study", title: "Study mode", note: "How Study mode works and what 3.6.4 adds" },
   { path: "/ios.md", html: "/ios", title: "iPhone and iPad", note: "The native iOS app and the SideStore install guide" },
   { path: "/android.md", html: "/android", title: "Android, tablet and TV", note: "The Android app on Google Play, tablets and Android TV" },
-  { path: "/extension.md", html: "/extension", title: "Browser extension", note: "Chrome, Firefox and Edge extension (MIT open source)" },
+  { path: "/extension.md", html: "/extension", title: "Browser extension", note: "Chrome, Firefox, Edge and Opera extension, open source (MIT)" },
   { path: "/kids.md", html: "/kids", title: "Kids", note: "Kids profiles, PINs, allow-only and parent controls" },
 ];
 
@@ -113,6 +113,7 @@ const installLinks = {
     { label: "Chrome Web Store", href: links.chrome },
     { label: "Firefox Add-ons", href: links.firefox },
     { label: "Edge Add-ons", href: links.edge },
+    { label: "Opera (ZIP on GitHub)", href: links.githubReleases },
   ],
   kids: [{ label: "Google Play", href: links.googlePlay }, { label: "iPhone and iPad", href: links.ios }, { label: "Browser extension", href: links.downloads }],
 };
@@ -214,7 +215,7 @@ export function renderLlmsTxt() {
 
 > ${summary}
 
-Current version: ${release.current} (${release.currentDate}); ${release.next} is coming soon. Only the browser extension is open source (MIT); the Android and iPhone/iPad apps are free but not open source. FilterTube is independent and not affiliated with Google or YouTube.
+Current version: ${release.current} (${release.currentDate}); ${release.next} is coming soon. FilterTube is independent and not affiliated with Google or YouTube.
 
 ## Who it's for
 
@@ -250,7 +251,7 @@ export function renderLlmsFullTxt() {
 
 > ${summary}
 
-Current version: ${release.current} (${release.currentDate}); ${release.next} is coming soon. Only the browser extension is open source (MIT); the apps are free but not open source. FilterTube is independent and not affiliated with Google or YouTube.
+Current version: ${release.current} (${release.currentDate}); ${release.next} is coming soon. FilterTube is independent and not affiliated with Google or YouTube.
 
 ## Who it's for
 

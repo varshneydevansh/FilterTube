@@ -83,7 +83,7 @@ export const desktopExtensionBrowsers = [
   { title: "Edge", src: "/browsers/edge.png", href: "https://microsoftedge.microsoft.com/addons/detail/filtertube/lgeflbmplcmljnhffmoghkoccflhlbem", note: "Edge Add-ons" },
   { title: "Brave", src: "/browsers/brave.png", href: extensionInstallHref, note: "Chrome Web Store" },
   { title: "Vivaldi", src: "/browsers/vivaldi.png", href: extensionInstallHref, note: "Chrome Web Store" },
-  { title: "Opera", src: "/browsers/opera.png", href: extensionInstallHref, note: "Chrome Web Store" },
+  { title: "Opera", src: "/browsers/opera.png", href: `${githubHref}/releases/latest`, note: "Opera ZIP on GitHub" },
   { title: "Waterfox", src: "/browsers/waterfox.png", href: "https://addons.mozilla.org/en-US/firefox/addon/filtertube/", note: "Firefox Add-ons" },
   { title: "Zen", src: "/browsers/zen.svg", href: "https://addons.mozilla.org/en-US/firefox/addon/filtertube/", note: "Firefox Add-ons" },
   { title: "Floorp", src: "/browsers/floorp.svg", href: extensionInstallHref, note: "Chrome extensions" },
@@ -390,7 +390,7 @@ export const homeTechnicalFeatures = [
   {
     title: "Local-first design",
     description:
-      "Filtering uses local rules. The browser extension source is public, while native app source availability differs.",
+      "Filtering uses local rules on your device. The browser extension is open source (MIT) on GitHub.",
     detail:
       "Device transfers are a choice; connection metadata and optional encrypted pickup have their own privacy boundaries.",
   },
@@ -824,7 +824,7 @@ export const detailPages = {
     },
     appPreview: {
       title: "See the custom viewing experience.",
-      body: "A look at FilterTube on phone and tablet. Features coming in the next update are labelled below.",
+      body: "A look at FilterTube on phone and tablet.",
       embedHref: "https://www.youtube-nocookie.com/embed/SHvSICSMHL4?rel=0",
       watchHref: appDemoVideoHref,
     },
@@ -860,7 +860,7 @@ export const detailPages = {
       {
         id: "android-tv",
         title: "Android TV",
-        body: "Home, Search, Following, You and Watch built for the remote, with profiles, PINs, Kids controls, filters, Accounts & Sync and FilterTube Controls on the big screen. Install from the same Google Play listing or the TV APK on GitHub. Study on the big screen comes in the next update, and Fire TV compatibility is planned separately.",
+        body: "Home, Search, Following, You and Watch built for the remote, with profiles, PINs, Kids controls, filters, Accounts & Sync and FilterTube Controls on the big screen. Install from the same Google Play listing or the TV APK on GitHub. Study on the big screen comes in 3.6.4, and Fire TV compatibility is planned separately.",
       },
     ],
     exploreTitle: "Explore the full app",
@@ -915,13 +915,13 @@ export const detailPages = {
           "Separate profiles, PIN gates, and parent-managed protected time keep child access distinct from parent editing authority. A child switching PIN does not unlock parent settings.",
           "Review rule-list imports and keep backups when moving an existing setup. Profile scope stays separate from the Main/Kids rule space.",
           "Daily viewing limits, a player sleep timer and timed Self-Control or Hard Timer Whitelist sessions serve different needs. Reviewed focus sessions hold the selected rules and cannot be cancelled inside the app once started.",
-          "Profiles, PINs, Kids controls and filters work on Android TV too. Ask a parent and Study on TV come in the next update.",
+          "Profiles, PINs, Kids controls and filters work on Android TV too. Study on TV comes in 3.6.4; Ask a parent on TV comes in a later update.",
         ],
       },
       {
         id: "android-ask-parent",
         title: "Ask a parent",
-        summary: "Coming in the next update: a child can ask instead of hitting a wall.",
+        summary: "A child can ask instead of hitting a wall.",
         points: [
           "When a video or channel is blocked, a child can ask to watch that video or allow that channel. The parent sees the request and answers it.",
           "Parent mode opens a parent session inside a Kids profile, with one clear way back out. A child's switching PIN never opens it.",
@@ -930,17 +930,18 @@ export const detailPages = {
       {
         id: "android-study",
         title: "Study and focus",
-        summary: "Coming in the next update: a rebuilt Study planner around Your study day.",
+        summary: "A Study planner built around Your study day, in the app since 3.6.2.",
         points: [
           "Your study day plans rounds and breaks, and while a round runs only the channels in your plan show up. Search during study looks only in those channels.",
           "Setup starts with your country, then offers ready-made packs for exams and school classes in 29 countries, or lets you add your own channels.",
           "Study and focus sits in FilterTube Controls. Kids learning by age fills the Kids space with age-picked lessons during study.",
+          "Coming in 3.6.4: degree and interview tracks, and a weekly timetable with a week grid on tablets, today's plan on Android TV and a home-screen widget.",
         ],
       },
       {
         id: "android-mascots",
         title: "Kriti and Uljhan",
-        summary: "Coming in the next update: two characters who keep you company.",
+        summary: "Two characters who keep you company.",
         points: [
           "Kriti looks after your feed. Uljhan is the clutter you'd rather not see: not something to hate, just not what you want right now. They appear while pages load, when a list is empty, when you're offline and when something is blocked.",
           "Pick an app icon with Kriti, Uljhan or both, or keep the classic funnel.",
@@ -976,7 +977,8 @@ export const detailPages = {
       "Phone and tablet: public on Google Play. No invitation or email needed.",
       "Sangeet, Notes, Auto-sync and Offline Media are in the current app.",
       "Android TV: on the same Google Play listing, with a TV APK on every GitHub release.",
-      "Coming in the next update: Kriti and Uljhan, the rebuilt Study planner, Ask a parent, and the Sangeet, Clips, Following and Saved names in every language.",
+      "In the app since 3.6.2: Kriti and Uljhan, the rebuilt Study planner, Ask a parent, and the Sangeet, Clips, Following and Saved names in every language.",
+      "Coming in 3.6.4: Study degree and interview tracks, a weekly timetable, and Study on Android TV.",
       "Offline video saving: direct GitHub build only, encrypted and expiring after 30 days. Google Play builds do not download videos.",
       "Fire TV compatibility is planned.",
       "The separate direct APK has a simpler frontend than the Google Play app.",
@@ -1008,7 +1010,7 @@ export const detailPages = {
     featureCards: [
       {
         title: "Main and Kids on the big screen",
-        body: "Browse, search and watch Main and Kids, with profiles, PINs, Kids controls and your filters. Ask a parent and Study on TV come in the next update.",
+        body: "Browse, search and watch Main and Kids, with profiles, PINs, Kids controls and your filters. Study on TV comes in 3.6.4; Ask a parent on TV comes in a later update.",
       },
       {
         title: "Made for the remote",
@@ -1074,7 +1076,7 @@ export const detailPages = {
       "Android TV runs the same FilterTube app as phones and tablets.",
     milestones: [
       "Install from Google Play on Android TV and Google TV, or use the TV APK on every GitHub release.",
-      "Coming in the next update: Study on the big screen and Ask a parent on TV.",
+      "Coming in 3.6.4: Study on the big screen. Ask a parent on TV comes in a later update.",
       "Amazon Fire TV compatibility is planned separately.",
     ],
     related: ["tv", "fire-tv"],
@@ -1162,8 +1164,7 @@ export const detailPages = {
       },
       {
         title: "Ask a parent",
-        status: "Next update",
-        body: "When a video or channel is blocked, a child can ask to watch that video or allow that channel, and the parent answers. Coming to the apps in the next update.",
+        body: "When a video or channel is blocked, a child can ask to watch that video or allow that channel, and the parent answers. In the phone and tablet apps and the browser extension.",
       },
       {
         title: "Make room for a stopping point",
@@ -1187,7 +1188,7 @@ export const detailPages = {
       "Android phones and tablets: the custom Main and Kids app is on Google Play. No invitation or email is needed.",
       "Browser extension: adds filtering to supported Kids pages. Use the full settings page to manage profiles and Kids rules.",
       "iPhone and iPad: Kids viewing and family controls are included. Trouble on Apple's side delays the App Store version; until then, install with SideStore, or AltStore.",
-      "Android TV: Kids viewing, profiles, PINs and Kids controls, on the same Google Play listing. Ask a parent on TV comes in the next update. Fire TV compatibility is planned.",
+      "Android TV: Kids viewing, profiles, PINs and Kids controls, on the same Google Play listing. Ask a parent on TV comes in a later update. Fire TV compatibility is planned.",
       "Rules stay local. Optional verified device sharing is encrypted; helpers or relay services may be involved. Filters support parent decisions, rather than replacing review of what a child watches.",
     ],
     related: ["android", "ios", "extension"],

@@ -22,7 +22,7 @@ const apps = [
   },
   {
     name: "FilterTube browser extension",
-    operatingSystem: "Chrome, Firefox, Edge",
+    operatingSystem: "Chrome, Firefox, Edge, Opera",
     applicationCategory: "BrowserApplication",
     url: `${SITE_URL}/extension`,
     downloadUrl: links.chrome,

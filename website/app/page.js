@@ -347,7 +347,7 @@ export default function HomePage() {
                     FilterTube is a free YouTube ad blocker and content blocker
                   </span>{" "}
                   for iPhone, iPad, Android phones, tablets and TVs, and the
-                  Chrome, Firefox and Edge browsers.{" "}
+                  Chrome, Firefox, Edge and Opera browsers.{" "}
                   <span className="ft-hero-support-emphasis">
                     Block ads, keywords, channels and Shorts,
                   </span>{" "}

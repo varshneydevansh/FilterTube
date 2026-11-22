@@ -46,7 +46,7 @@ export const metadata = {
     template: "%s | FilterTube",
   },
   description:
-    "FilterTube is a free YouTube ad blocker and content blocker for iPhone, iPad, Android phones, tablets and TVs, and Chrome, Firefox and Edge. Block ads, keywords, channels and Shorts, or allow only channels you trust. Kids profiles, Study mode, no account.",
+    "FilterTube is a free YouTube ad blocker and content blocker for iPhone, iPad, Android phones, tablets and TVs, and Chrome, Firefox, Edge and Opera. Block ads, keywords, channels and Shorts, or allow only channels you trust. Kids profiles, Study mode, no account.",
   openGraph: {
     title: "FilterTube",
     description:

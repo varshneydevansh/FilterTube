@@ -92,12 +92,11 @@ const androidMarkets = [
   },
   {
     title: "IzzyOnDroid",
-    detail: "Needs public source and release APKs.",
+    detail: "Not listed there yet.",
   },
   {
     title: "F-Droid",
-    detail:
-      "Requires a buildable FLOSS source path and compatible dependencies.",
+    detail: "Not listed there yet.",
   },
   {
     title: "Accrescent",
