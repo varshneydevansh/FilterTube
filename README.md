@@ -3,7 +3,7 @@
   <h1>FilterTube</h1>
   <p>Calmer viewing. Your devices. Your rules.</p>
 
-[![Latest release](https://img.shields.io/github/v/release/varshneydevansh/FilterTube)](https://github.com/varshneydevansh/FilterTube/releases/latest) [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE) [![Ask DeepWiki](https://deepwiki.com/badge.svg)](https://deepwiki.com/varshneydevansh/FilterTube) ![Lines of Code](https://img.shields.io/badge/total%20lines-1026.1k-brightgreen.svg) ![JavaScript LoC](https://img.shields.io/badge/javascript-155.5k%20lines-yellow.svg) ![Top Language](https://img.shields.io/github/languages/top/varshneydevansh/FilterTube?color=f1e05a) ![Repo Size](https://img.shields.io/github/repo-size/varshneydevansh/FilterTube?color=orange)
+[![Latest release](https://img.shields.io/github/v/release/varshneydevansh/FilterTube)](https://github.com/varshneydevansh/FilterTube/releases/latest) [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE) [![Ask DeepWiki](https://deepwiki.com/badge.svg)](https://deepwiki.com/varshneydevansh/FilterTube) ![Lines of Code](https://img.shields.io/badge/total%20lines-1077.2k-brightgreen.svg) ![JavaScript LoC](https://img.shields.io/badge/javascript-164.0k%20lines-yellow.svg) ![Top Language](https://img.shields.io/github/languages/top/varshneydevansh/FilterTube?color=f1e05a) ![Repo Size](https://img.shields.io/github/repo-size/varshneydevansh/FilterTube?color=orange)
 
 [Get it on iPhone and iPad](https://filtertube.in/ios) · [Get the Android app](https://play.google.com/store/apps/details?id=com.filtertube.app) · [Get the browser extension](https://filtertube.in/downloads) · [Explore the website](https://filtertube.in)
 </div>
@@ -185,7 +185,7 @@ An unmanaged browser or device owner can disable or uninstall the extension, and
 
 This repository contains the **extension runtime and the website**. The apps have their own implementations and release checks; a passing extension test or build is not proof that the apps match.
 
-![Extension source version](https://img.shields.io/badge/version-3.6.4-blue.svg)
+![Extension source version](https://img.shields.io/badge/version-3.6.5-blue.svg)
 
 ```bash
 npm install
