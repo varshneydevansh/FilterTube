@@ -101,9 +101,12 @@ export const footerLinks = {
     { label: "Browser extension", href: "/extension" },
     { label: "Peer-to-peer device sync", href: "/#device-sync" },
     { label: "Kids", href: "/kids" },
+    { label: "Study mode", href: "/study" },
     { label: "ML & AI", href: "/ml-ai" },
   ],
   resources: [
+    { label: "FAQ", href: "/faq" },
+    { label: "Compare with other tools", href: "/compare" },
     { label: "Discord community", href: discordHref, external: true },
     { label: "Reddit community", href: redditHref, external: true },
     { label: "Instagram", href: instagramHref, external: true },
@@ -262,6 +265,55 @@ export const homeFaqItems = [
   },
 ];
 
+export const homeAppCards = [
+  {
+    title: "Your videos, on Android.",
+    body: "A custom Main and Kids app, with filters and family profiles, plus Sangeet for music, video Notes and Offline Media. Install from Google Play. No invitation or email needed.",
+    image: "/apps/android.png",
+    imageAlt: "FilterTube Android app artwork",
+    action: "Explore Android",
+    href: "/android",
+    platform: "android",
+  },
+  {
+    title: "iPhone and iPad, together.",
+    body: "A native app for smaller screens and a wider iPad workspace. Trouble on Apple's side delays the App Store version; until then, install with SideStore, or AltStore.",
+    image: "/apps/app-store-transparent.png",
+    imageAlt: "FilterTube iPhone and iPad app artwork",
+    action: "Install on iPhone or iPad",
+    href: "/ios",
+    platform: "ios",
+  },
+  {
+    title: "Keep watching in your browser.",
+    body: "Use FilterTube on the pages you already visit, with a quick popup, full settings, and channel controls in the video menu. Choose Chrome, Firefox, Edge or another supported browser.",
+    image: "/apps/firefox.png",
+    imageAlt: "Firefox browser artwork for the FilterTube extension",
+    action: "Explore the extension",
+    href: "/extension",
+    platform: "extension",
+    imageClass: "ft-app-release-art--browser",
+  },
+];
+
+export const homeQuickSteps = [
+  [
+    "1",
+    "Install and open FilterTube",
+    "Install on iPhone or iPad with SideStore, get the Android app from Google Play, or add the extension to your browser.",
+  ],
+  [
+    "2",
+    "Block one thing",
+    "Choose your profile, add one channel or keyword, then open Main or Kids. In the extension, refresh the page to check the result.",
+  ],
+  [
+    "3",
+    "Add only what you need",
+    "Add family profiles, viewing limits, Whitelist rules, imports or device sharing when you need them. You can adjust the rules at any time.",
+  ],
+];
+
 export const homeTechnicalFeatures = [
   {
     title: "Ad-free playback",
@@ -417,6 +469,7 @@ export const platformOrder = platformSlugs;
 export const detailPages = {
   extension: {
     slug: "extension",
+    seoTitle: "Browser extension: block YouTube ads, keywords, channels and Shorts",
     tone: "lilac",
     status: "Available for browsers",
     navTitle: "Browser extension",
@@ -535,6 +588,7 @@ export const detailPages = {
   },
   mobile: {
     slug: "mobile",
+    seoTitle: "Mobile apps for Android, iPhone and iPad",
     tone: "sage",
     status: "Available on Google Play",
     navTitle: "Mobile overview",
@@ -737,6 +791,7 @@ export const detailPages = {
   },
   android: {
     slug: "android",
+    seoTitle: "Android app: block YouTube ads, keywords and channels on phone, tablet and TV",
     tone: "forest",
     status: "Phone, tablet + TV",
     navTitle: "Android",
@@ -930,6 +985,7 @@ export const detailPages = {
   },
   tv: {
     slug: "tv",
+    seoTitle: "TV: FilterTube on Android TV and Google TV",
     tone: "sunset",
     status: "Android TV available",
     navTitle: "TV overview",
@@ -974,6 +1030,7 @@ export const detailPages = {
   },
   "android-tv": {
     slug: "android-tv",
+    seoTitle: "Android TV: block YouTube ads, channels and keywords on the big screen",
     tone: "sky",
     status: "Google Play + TV APK",
     navTitle: "Android TV",
@@ -1064,6 +1121,7 @@ export const detailPages = {
   },
   kids: {
     slug: "kids",
+    seoTitle: "Kids: YouTube parental controls with PIN-protected profiles",
     tone: "rose",
     status: "Android, iOS, TV + extension",
     navTitle: "Kids",

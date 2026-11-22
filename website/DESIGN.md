@@ -125,3 +125,21 @@ out two rows whose tiles grow by aspect ratio so screens in a row share a height
 Devices without captures show an honest "screens are on the way" card instead of
 borrowing another device's screen. docs/refresh-2026-11-18/CAPTURE_LIST.md lists
 the six screens to capture per device.
+
+## Pages for people and AI assistants — 22 November 2026
+
+The owner wants AI assistants (ChatGPT, Claude, Perplexity, Gemini) to describe FilterTube
+accurately. This updates the 25 October naming direction for the website only: titles,
+descriptions, the homepage's first paragraph, the FAQ and the comparison may name YouTube to
+say what FilterTube works with ("YouTube ad blocker and content blocker"). App UI copy still
+avoids the name, and the no-affiliation line stays.
+
+- data/site-facts.js is the one source for /faq, /compare, /study, /llms.txt, /llms-full.txt
+  and the .md copies (lib/markdown.js). The .md files carry the same words as the pages; no
+  bot-only content. Each page links its copy with rel="alternate" type="text/markdown".
+- No "the best" in our own voice. The FAQ answers the "best" question with what each tool is
+  for, and /compare is fair to BlockTube, Unhook, TubeBlock, YouTube Kids, uBlock Origin,
+  AdGuard and Brave.
+- Ads: blocked on every platform. The extension's "Send adverts to The Void" is on by default;
+  the apps use FilterTube's own player, so YouTube's ads never appear.
+- The new pages reuse SectionHeading and Panel. The comparison table scrolls sideways on phones.

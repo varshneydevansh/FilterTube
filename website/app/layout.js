@@ -42,11 +42,11 @@ const monoFont = localFont({
 export const metadata = {
   metadataBase: new URL("https://filtertube.in"),
   title: {
-    default: "FilterTube",
+    default: "FilterTube: YouTube ad blocker and content blocker for iPhone, Android, TV and browsers",
     template: "%s | FilterTube",
   },
   description:
-    "Calmer viewing on Android and in your browser. Explore family profiles, local filtering, verified peer-to-peer sharing, a direct iPhone and iPad install, and TV development.",
+    "FilterTube is a free YouTube ad blocker and content blocker for iPhone, iPad, Android phones, tablets and TVs, and Chrome, Firefox and Edge. Block ads, keywords, channels and Shorts, or allow only channels you trust. Kids profiles, Study mode, no account.",
   openGraph: {
     title: "FilterTube",
     description:

@@ -26,12 +26,23 @@ import {
   githubHref,
   heroVideoUrl,
   homeCapabilityCards,
+  homeAppCards,
   homeFaqItems,
+  homeQuickSteps,
   homeStoryNotes,
   homeTechnicalFeatures,
   homeUserVoices,
 } from "@/components/route-content";
 import { getTonePreset } from "@/components/scenic-tones";
+import { release } from "@/data/site-facts";
+import { JsonLd, softwareApplicationsJsonLd } from "@/lib/structured-data";
+
+export const metadata = {
+  alternates: {
+    canonical: "https://filtertube.in",
+    types: { "text/markdown": "https://filtertube.in/index.md" },
+  },
+};
 
 const featuredSpans = [
   "xl:col-span-6",
@@ -142,43 +153,13 @@ function ShortcutCard({ page }) {
 }
 
 function AppReleaseStatusSection() {
-  const appCards = [
-    {
-      title: "Your videos, on Android.",
-      body: "A custom Main and Kids app, with filters and family profiles, plus Sangeet for music, video Notes and Offline Media. Install from Google Play. No invitation or email needed.",
-      image: "/apps/android.png",
-      imageAlt: "FilterTube Android app artwork",
-      action: "Explore Android",
-      href: "/android",
-      platform: "android",
-    },
-    {
-      title: "iPhone and iPad, together.",
-      body: "A native app for smaller screens and a wider iPad workspace. Trouble on Apple's side delays the App Store version; until then, install with SideStore, or AltStore.",
-      image: "/apps/app-store-transparent.png",
-      imageAlt: "FilterTube iPhone and iPad app artwork",
-      action: "Install on iPhone or iPad",
-      href: "/ios",
-      platform: "ios",
-    },
-    {
-      title: "Keep watching in your browser.",
-      body: "Use FilterTube on the pages you already visit, with a quick popup, full settings, and channel controls in the video menu. Choose Chrome, Firefox, Edge or another supported browser.",
-      image: "/apps/firefox.png",
-      imageAlt: "Firefox browser artwork for the FilterTube extension",
-      action: "Explore the extension",
-      href: "/extension",
-      platform: "extension",
-      imageClass: "ft-app-release-art--browser",
-    },
-  ];
 
   return (
     <section className="px-4 py-10 md:px-6 md:py-14">
       <div className="mx-auto max-w-[1400px]">
         <Reveal>
           <div className="grid gap-5 lg:grid-cols-2 xl:grid-cols-3">
-            {appCards.map((card) => {
+            {homeAppCards.map((card) => {
               return (
                 <article
                   className="ft-app-release-card ft-platform-theme ft-platform-surface relative isolate min-h-[22rem] overflow-hidden rounded-[2rem] border p-6 shadow-[var(--shadow-diffuse)] md:p-7"
@@ -229,23 +210,7 @@ function QuickGuideSection() {
         </Reveal>
 
         <ol className="mt-12 grid gap-4 md:grid-cols-3">
-          {[
-            [
-              "1",
-              "Install and open FilterTube",
-              "Install the Android app from Google Play or add the extension to your browser.",
-            ],
-            [
-              "2",
-              "Block one thing",
-              "Choose your profile, add one channel or keyword, then open Main or Kids. In the extension, refresh the page to check the result.",
-            ],
-            [
-              "3",
-              "Add only what you need",
-              "Add family profiles, viewing limits, Whitelist rules, imports or device sharing when you need them. You can adjust the rules at any time.",
-            ],
-          ].map(([number, title, body]) => (
+          {homeQuickSteps.map(([number, title, body]) => (
             <li className="ft-shell flex h-full flex-col rounded-[1.6rem] border border-[color:var(--color-line)] p-2" key={number}>
               <div className="ft-inset flex h-full flex-col rounded-[1.2rem] bg-[var(--color-surface)] p-5 md:p-6">
                 <span className="flex h-10 w-10 items-center justify-center rounded-full bg-[var(--color-accent)] font-mono text-sm font-bold text-[#fff8f1]">
@@ -351,6 +316,7 @@ function QuickGuideSection() {
 export default function HomePage() {
   return (
     <>
+      <JsonLd data={softwareApplicationsJsonLd()} />
       <section className="relative min-h-[100dvh] overflow-hidden px-4 pb-12 pt-28 md:px-6 md:pb-20 md:pt-36">
         <HeroVideo showControls src={heroVideoUrl} />
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(255,255,255,0.18),transparent_28%),linear-gradient(180deg,rgba(255,255,255,0.08),rgba(255,255,255,0.02)_30%,rgba(18,16,20,0.12)_100%)]" />
@@ -362,8 +328,8 @@ export default function HomePage() {
               <div className="flex flex-col items-center text-center lg:items-start lg:text-left">
                 <div className="inline-flex min-h-11 items-center gap-3 rounded-full border border-white/30 bg-[rgba(13,18,27,0.2)] px-4 py-2 text-sm font-medium text-[#fffaf4] shadow-[inset_0_1px_0_rgba(255,255,255,0.18)] backdrop-blur-xl">
                   <span className="text-pretty">
-                    Desktop extensions and the Android app are live. Find
-                    FilterTube on Google Play.
+                    Now on iPhone, iPad, Android, Android TV and in your
+                    browser. Version {release.current}.
                   </span>
                 </div>
 
@@ -378,13 +344,14 @@ export default function HomePage() {
 
                 <p className="ft-hero-support-copy relative mt-7 max-w-[760px] text-pretty rounded-[1.6rem] px-6 py-4 text-[16px] font-medium leading-7 md:px-8 md:text-[18px] md:leading-8 lg:max-w-[36rem] lg:px-6">
                   <span className="font-semibold text-white">
-                    Block what you don&apos;t want, or allow only what you trust.
+                    FilterTube is a free YouTube ad blocker and content blocker
                   </span>{" "}
-                  Control{" "}
+                  for iPhone, iPad, Android phones, tablets and TVs, and the
+                  Chrome, Firefox and Edge browsers.{" "}
                   <span className="ft-hero-support-emphasis">
-                    channels, keywords, Shorts, comments, categories, languages,
-                    and more.
-                  </span>
+                    Block ads, keywords, channels and Shorts,
+                  </span>{" "}
+                  or allow only the channels you trust.
                 </p>
 
                 <div className="mt-9 flex flex-col items-center gap-4 sm:flex-row lg:items-start">

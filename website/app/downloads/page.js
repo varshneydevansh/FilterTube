@@ -14,7 +14,7 @@ import {
 } from "@/components/route-content";
 
 export const metadata = {
-  title: "Downloads",
+  title: "Downloads: FilterTube for iPhone, iPad, Android, Android TV and browsers",
   description:
     "Download FilterTube for browsers, install the public Android app from Google Play, or install the iPhone and iPad app directly with SideStore.",
 };

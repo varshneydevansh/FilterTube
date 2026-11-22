@@ -8,6 +8,7 @@ import { ScenicDetailPage } from "@/components/scenic-detail-page";
 // The direct release (source URL, release page, SHA-256) comes from public/ios/source.json, which
 // the app repository's release script fills. Until then the page says the install link is coming.
 import { SOURCE_JSON_URL, iosRelease } from "@/data/ios-release";
+import { iosChecklist, iosFaqs, iosPromises, iosSafetyPoints, iosStuck } from "@/data/ios-guide";
 
 // Set VIDEO_URL (a direct video file or embeddable URL) to show the
 // "Watch the 2-minute walkthrough" slot. While it is a placeholder it hides.
@@ -38,6 +39,7 @@ export const metadata = {
     "Apple is having trouble on their end, so the App Store version will take a while. Until then, install FilterTube on iPhone and iPad with SideStore, or AltStore. Free, no ads, nothing locked, no FilterTube sign-up.",
   alternates: {
     canonical: "https://filtertube.in/ios",
+    types: { "text/markdown": "https://filtertube.in/ios.md" },
   },
   openGraph: {
     title: "FilterTube for iPhone and iPad",
@@ -52,89 +54,10 @@ export const metadata = {
   },
 };
 
-const promises = [
-  "Free, with no ads",
-  "Nothing locked behind a payment",
-  "No FilterTube sign-up, just like the extension",
-  "No FilterTube server keeps your rules or history",
-];
 
-const checklist = [
-  { text: "An iPhone or iPad with a passcode, on iOS or iPadOS 17 or newer (FilterTube needs 17)" },
-  { text: "A computer (Mac, Windows, Linux or a recent Chromebook) and a USB cable, only for the first install" },
-  { text: "An Apple Account (Apple ID). A spare free one works fine" },
-  { text: "Wi-Fi. Mobile data won't work for the setup" },
-  { text: "About 15 minutes" },
-];
 
-const safetyPoints = [
-  {
-    title: "It uses Apple's own signing",
-    body: "SideStore signs the app with your Apple ID, using Apple's free developer signing. Developers do the same thing when they run an app on their own phone.",
-  },
-  {
-    title: "Nothing is jailbroken",
-    body: "Your iPhone or iPad isn't modified. FilterTube runs in iOS's normal sandbox, like any App Store app.",
-  },
-  {
-    title: "Skip paid signing services",
-    body: "Avoid sites that sell \"signing\" with enterprise certificates. Apple revokes those often.",
-  },
-  {
-    title: "Cautious? Use a spare Apple ID",
-    body: "Any Apple ID works. You can make a separate free one just for this.",
-  },
-];
 
-const stuck = [
-  {
-    q: "SideStore can't connect, or install and refresh fail",
-    a: "Open LocalDevVPN and make sure it's connected. SideStore needs it on every time you install, update or refresh.",
-  },
-  {
-    q: "SideStore says the pairing file is invalid or missing",
-    a: "The pairing file can expire after an iOS update, a reset, or sometimes for no clear reason. Connect the phone to the computer, open iloader, choose Manage Pairing File and tap Place next to SideStore.",
-  },
-  {
-    q: "\"Untrusted Developer\", or the app won't open at all",
-    a: "On the phone, open Settings > General > VPN & Device Management, tap your Apple ID under Developer App and tap Trust. Also check that Developer Mode is on in Settings > Privacy & Security.",
-  },
-  {
-    q: "\"Maximum number of apps\"",
-    a: "A free Apple ID allows only 3 sideloaded apps at once, and SideStore counts as one. It also allows 10 new App IDs per week; FilterTube uses one. Remove an app you don't need in SideStore, then try again.",
-  },
-  {
-    q: "A provisioning error, like 0xe8008024",
-    a: "Some free Apple IDs hit this. Sign in with a fresh free Apple ID instead. Creating one just for SideStore is fine.",
-  },
-  {
-    q: "FilterTube won't open after a week",
-    a: "Its 7-day signing ran out. Turn LocalDevVPN on, open SideStore, go to My Apps and tap the days counter next to FilterTube (or Refresh All). Your settings are kept.",
-  },
-  {
-    q: "Setup stops partway",
-    a: "Check that your phone and computer are on Wi-Fi (not mobile data), then run iloader again.",
-  },
-];
 
-const faqs = [
-  {
-    q: "Will I lose my settings when the app refreshes?",
-    a: "No. A refresh only renews the signature. Your rules, profiles and PINs stay on the device.",
-  },
-  {
-    q: "Does it work on iPad?",
-    a: "Yes. The same install works on iPhone and iPad. FilterTube itself needs iOS or iPadOS 17 or later.",
-  },
-  {
-    q: "How do updates work?",
-    a: "FilterTube's source lists every new version, so SideStore shows it in My Apps. Turn LocalDevVPN on and tap Update.",
-  },
-  {
-    q: "Can I move to the App Store version later?",
-    a: "Yes. Export a backup from FilterTube's settings, install the App Store version when it's live, then import the backup there.",
-  },
-];
 
 function ComingNote({ children = "Coming with the first iPhone release" }) {
   return (
@@ -228,7 +151,7 @@ function InstallGuide() {
                     Apple ID if you prefer.
                   </p>
                   <ul className="mt-7 grid gap-3 sm:grid-cols-2">
-                    {promises.map((item) => (
+                    {iosPromises.map((item) => (
                       <li className="flex gap-3 text-sm leading-7 text-[var(--color-ink)]" key={item}>
                         <CheckCircle
                           aria-hidden="true"
@@ -263,7 +186,7 @@ function InstallGuide() {
                 Before you start
               </h2>
               <ul className="mt-8 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-                {checklist.map(({ text }) => (
+                {iosChecklist.map(({ text }) => (
                   <li
                     className="flex items-start gap-4 rounded-[1.2rem] border border-[color:var(--color-line)] bg-[color:var(--color-soft-panel)] p-5"
                     key={text}
@@ -428,7 +351,7 @@ function InstallGuide() {
                 Quick fixes if you get stuck
               </h2>
               <div className="mt-8 grid gap-3">
-                {stuck.map((item) => (
+                {iosStuck.map((item) => (
                   <details
                     className="ft-disclosure rounded-[1.2rem] border border-[color:var(--color-line)] p-5"
                     key={item.q}
@@ -458,7 +381,7 @@ function InstallGuide() {
                 Yes, it&apos;s legal and safe
               </h2>
               <div className="mt-8 grid gap-3 sm:grid-cols-2">
-                {safetyPoints.map((point) => (
+                {iosSafetyPoints.map((point) => (
                   <div
                     className="rounded-[1.2rem] border border-[color:var(--color-line)] bg-[color:var(--color-soft-panel)] p-5"
                     key={point.title}
@@ -546,7 +469,7 @@ function InstallGuide() {
                 Questions
               </h2>
               <div className="mt-8 grid gap-3">
-                {faqs.map((item) => (
+                {iosFaqs.map((item) => (
                   <details
                     className="ft-disclosure rounded-[1.2rem] border border-[color:var(--color-line)] p-5"
                     key={item.q}

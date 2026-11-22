@@ -8,6 +8,9 @@ import { ScenicDetailPage } from "@/components/scenic-detail-page";
 
 export const dynamicParams = false;
 
+// Pages with a Markdown copy at /<slug>.md (see lib/markdown.js).
+const markdownSlugs = new Set(["android", "extension", "kids"]);
+
 export function generateStaticParams() {
   // /ios has its own route (app/ios/page.js) with the direct-install guide.
   return platformOrder
@@ -24,10 +27,11 @@ export async function generateMetadata({ params }) {
   }
 
   return {
-    title: page.navTitle,
+    title: page.seoTitle ?? page.navTitle,
     description: page.description,
     alternates: {
       canonical: `https://filtertube.in/${slug}`,
+      ...(markdownSlugs.has(slug) ? { types: { "text/markdown": `https://filtertube.in/${slug}.md` } } : {}),
     },
     openGraph: {
       title: `FilterTube ${page.navTitle}`,
