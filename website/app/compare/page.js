@@ -1,11 +1,19 @@
 import { Panel, SectionHeading } from "@/components/marketing-ui";
 import { Reveal } from "@/components/reveal";
-import { comparisonIntro, comparisons, filterTubeRow } from "@/data/site-facts";
+import {
+  comparisonIntro,
+  comparisons,
+  featureMatrix,
+  filterTubeRow,
+  matrixHeadline,
+  matrixNote,
+  matrixTools,
+} from "@/data/site-facts";
 
 export const metadata = {
   title: "Compare: FilterTube, BlockTube, Unhook, uBlock Origin and more",
   description:
-    "A fair comparison of FilterTube with BlockTube, Unhook, TubeBlock, the YouTube Kids app, uBlock Origin, AdGuard and Brave: what each is for and what FilterTube adds.",
+    "Feature by feature: FilterTube vs BlockTube, Unhook, TubeBlock and the YouTube Kids app, from keyword and channel blocking to allow-only mode, Kids profiles, Study, YouTube Kids, YouTube Music and every platform. Plus uBlock Origin, AdGuard and Brave.",
   alternates: {
     canonical: "https://filtertube.in/compare",
     types: { "text/markdown": "https://filtertube.in/compare.md" },
@@ -29,7 +37,47 @@ export default function ComparePage() {
         </Reveal>
 
         <Reveal className="mt-10" delay={80}>
-          <Panel innerClassName="p-2 md:p-4">
+          <h2 className="max-w-[40ch] text-balance font-display text-2xl font-semibold tracking-[-0.045em] text-[var(--color-ink)] md:text-3xl">
+            {matrixHeadline}
+          </h2>
+          <Panel className="mt-6" innerClassName="p-2 md:p-4">
+            <div className="overflow-x-auto" role="region" aria-label="Feature-by-feature comparison" tabIndex={0}>
+              <table className="w-full min-w-[56rem] border-collapse text-left text-sm leading-6">
+                <caption className="sr-only">Feature by feature: FilterTube, BlockTube, Unhook, TubeBlock and the YouTube Kids app</caption>
+                <thead>
+                  <tr className="text-[0.72rem] uppercase tracking-[0.18em] text-[var(--color-muted)]">
+                    <th className="px-4 py-3 font-medium" scope="col">Feature</th>
+                    {matrixTools.map((tool, index) => (
+                      <th className={`px-4 py-3 font-medium ${index === 0 ? "text-[var(--color-ink)]" : ""}`} key={tool} scope="col">{tool}</th>
+                    ))}
+                  </tr>
+                </thead>
+                <tbody>
+                  {featureMatrix.map((row) => (
+                    <tr className="border-t border-[color:var(--color-line)] align-top" key={row.feature}>
+                      <th className="px-4 py-3 font-semibold text-[var(--color-ink)]" scope="row">{row.feature}</th>
+                      {row.cells.map((value, index) => (
+                        <td
+                          className={`px-4 py-3 ${index === 0 ? "bg-[color:var(--color-soft-panel)] font-medium text-[var(--color-ink)]" : value === "Not documented" ? "text-[var(--color-muted)] opacity-70" : "text-[var(--color-muted)]"}`}
+                          key={matrixTools[index]}
+                        >
+                          {value}
+                        </td>
+                      ))}
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </Panel>
+          <p className="mt-4 max-w-[70ch] text-sm leading-7 text-[var(--color-muted)]">{matrixNote}</p>
+        </Reveal>
+
+        <Reveal className="mt-16" delay={80}>
+          <h2 className="font-display text-3xl font-semibold tracking-[-0.05em] text-[var(--color-ink)] md:text-4xl">
+            What each tool is for
+          </h2>
+          <Panel className="mt-6" innerClassName="p-2 md:p-4">
             {/* Scrolls sideways on phones instead of squeezing the columns. */}
             <div className="overflow-x-auto" role="region" aria-label="Comparison table" tabIndex={0}>
               <table className="w-full min-w-[44rem] border-collapse text-left text-sm leading-6">

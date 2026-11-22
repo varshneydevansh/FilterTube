@@ -18,6 +18,11 @@ import {
   audiences,
   comparisonIntro,
   comparisons,
+  coverage,
+  featureMatrix,
+  matrixHeadline,
+  matrixNote,
+  matrixTools,
   faqGroups,
   features,
   filterTubeRow,
@@ -56,6 +61,10 @@ function platformsBlock() {
     .join("\n");
 }
 
+function coverageBlock() {
+  return coverage.map((item) => `- **${item.where}:** ${item.covers}`).join("\n");
+}
+
 function featuresBlock() {
   return features.map((feature) => `- **${feature.title}:** ${feature.body}`).join("\n");
 }
@@ -82,7 +91,10 @@ function compareBlock(level = "##") {
   const notes = comparisons
     .map((tool) => `${level}# ${tool.name}\n\n- **What it's good at:** ${tool.goodAt}\n- **What FilterTube adds:** ${tool.adds}`)
     .join("\n\n");
-  return `${comparisonIntro}\n\n${table}\n\n${notes}`;
+  const matrix =
+    `| Feature | ${matrixTools.join(" | ")} |\n| --- |${matrixTools.map(() => " --- |").join("")}\n` +
+    featureMatrix.map((row) => `| ${cell(row.feature)} | ${row.cells.map(cell).join(" | ")} |`).join("\n");
+  return `${comparisonIntro}\n\n${level} Feature by feature\n\n**${matrixHeadline}**\n\n${matrix}\n\n${matrixNote}\n\n${level} What each tool is for\n\n${table}\n\n${notes}`;
 }
 
 function studyBlock(level = "##") {
@@ -221,6 +233,10 @@ Current version: ${release.current} (${release.currentDate}); ${release.next} is
 
 ${audiences.map((item) => `- **${item.title}:** ${item.body}`).join("\n")}
 
+## YouTube, YouTube Kids and YouTube Music
+
+${coverageBlock()}
+
 ## Features
 
 ${featuresBlock()}
@@ -256,6 +272,10 @@ Current version: ${release.current} (${release.currentDate}); ${release.next} is
 ## Who it's for
 
 ${audiences.map((item) => `- **${item.title}:** ${item.body}`).join("\n")}
+
+## YouTube, YouTube Kids and YouTube Music
+
+${coverageBlock()}
 
 ## Features
 

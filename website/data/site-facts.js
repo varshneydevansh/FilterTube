@@ -39,7 +39,18 @@ export const oneLiner =
   "FilterTube is a free YouTube ad blocker and content blocker for iPhone, iPad, Android phones, tablets and TVs, and the Chrome, Firefox, Edge and Opera browsers.";
 
 export const summary =
-  "FilterTube is a free YouTube ad blocker and content blocker for iPhone, iPad, Android phones, tablets and TVs, and the Chrome, Firefox, Edge and Opera browsers. Block ads, keywords, channels and Shorts, or switch to allow-only mode so only the channels you trust appear. Families get Kids profiles with PINs and can send rule changes from a parent's phone to a child's device. Students get Study mode, which shows only the channels in their study plan during each round. There is no FilterTube account, your rules stay on your devices, and every feature is free.";
+  "FilterTube is a free YouTube ad blocker and content blocker for iPhone, iPad, Android phones, tablets and TVs, and the Chrome, Firefox, Edge and Opera browsers. It works on YouTube, YouTube Kids and YouTube Music. Block ads, keywords, channels and Shorts, or switch to allow-only mode so only the channels you trust appear. Families get Kids profiles with PINs and can send rule changes from a parent's phone to a child's device. Students get Study mode, which shows only the channels in their study plan during each round; 3.6.4 adds a calendar-style timetable that switches what you see by time of day. There is no FilterTube account, your rules stay on your devices, and every feature is free.";
+
+// Which video sites each platform covers. Checked in code on 22 November 2026: the extension's
+// manifest matches *.youtube.com (including music.youtube.com) and *.youtubekids.com; the 3.6.3 apps
+// have Main, a Kids view (YouTube Kids content) and Sangeet (YouTube Music) on phones and tablets;
+// Android TV has Main and Kids, with no Sangeet yet.
+export const coverage = [
+  { where: "Browser extension", covers: "YouTube (youtube.com), YouTube Music (music.youtube.com) and YouTube Kids (youtubekids.com), plus embedded players." },
+  { where: "Android phones and tablets", covers: "YouTube in Main, YouTube Kids in the Kids view, and YouTube Music in the Sangeet music space." },
+  { where: "iPhone and iPad", covers: "YouTube in Main, YouTube Kids in the Kids view, and YouTube Music in the Sangeet music space." },
+  { where: "Android TV and Google TV", covers: "YouTube in Main and YouTube Kids in the Kids view. Sangeet isn't on TV yet." },
+];
 
 export const audiences = [
   {
@@ -57,6 +68,11 @@ export const audiences = [
 ];
 
 export const features = [
+  {
+    id: "sites",
+    title: "YouTube, YouTube Kids and YouTube Music",
+    body: "The browser extension filters youtube.com, youtubekids.com and music.youtube.com. The apps cover YouTube in Main, YouTube Kids in the Kids view and YouTube Music in Sangeet (Sangeet is on phones and tablets, not yet on Android TV).",
+  },
   {
     id: "ads",
     title: "No YouTube ads",
@@ -95,7 +111,7 @@ export const features = [
   {
     id: "study",
     title: "Study mode",
-    body: "Plan study rounds and breaks. During a round only the channels in your plan appear, search looks only in those channels, and comments stay off. Ready-made packs cover exams, school classes and skills: 175 packs and about 2,000 channels across 29 countries. Degree and interview tracks and a weekly timetable come in 3.6.4.",
+    body: "Plan study rounds and breaks. During a round only the channels in your plan appear, search looks only in those channels, and comments stay off. Ready-made packs cover exams, school classes and skills: 175 packs and about 2,000 channels across 29 countries. In 3.6.4: a calendar-style timetable that switches what you see by time of day, 415 packs for 81 countries including 53 degree and 27 interview tracks, and calendar export.",
   },
   {
     id: "parent-sync",
@@ -192,9 +208,9 @@ export const studyFacts = {
     "Study works in the browser extension and in the Android and iPhone/iPad apps.",
   ],
   coming: [
-    "Degree tracks (engineering, health, design, arts, education, public policy and more).",
-    "Interview preparation tracks.",
-    "A weekly timetable: a week grid on tablets and iPad, today's plan on Android TV, and a home-screen widget that names the day.",
+    "A calendar-style weekly timetable that switches what you see by time of day: give each day its periods, such as maths 5 to 6 pm, and Study starts and ends on its own.",
+    "Add to my calendar saves the week for your calendar app. Tablets and iPad show the whole week as a grid, Android TV shows today's plan, and a home-screen widget names the day.",
+    "A bigger catalog: 415 packs for 81 countries, including 53 degree tracks and 27 interview tracks.",
   ],
 };
 
@@ -292,8 +308,12 @@ export const faqGroups = [
     items: [
       {
         q: "Is there a YouTube study mode?",
-        a: "Yes. FilterTube's Study mode plans rounds and breaks. While a round runs, only the channels in your study plan appear, search looks only in those channels, and comments stay off. Ready-made packs cover exams, school classes and skills in 29 countries. Degree and interview tracks and a weekly timetable come in 3.6.4.",
+        a: "Yes. FilterTube's Study mode plans rounds and breaks. While a round runs, only the channels in your study plan appear, search looks only in those channels, and comments stay off. Ready-made packs cover exams, school classes and skills in 29 countries. In 3.6.4, a calendar-style timetable that switches what you see by time of day arrives, with 415 packs for 81 countries.",
         links: [{ label: "How Study mode works", href: `${SITE_URL}/study` }],
+      },
+      {
+        q: "Can FilterTube change what I see by time of day?",
+        a: "Yes, from 3.6.4. Study mode gets a calendar-style timetable: give each day its periods, such as maths 5 to 6 pm, and Study starts and ends on its own, so what you see switches with the time of day. Add to my calendar saves the week for your calendar app. In 3.6.3 you plan the day's rounds and breaks yourself.",
       },
       {
         q: "Can I stop myself from turning the filters off while studying?",
@@ -308,6 +328,15 @@ export const faqGroups = [
         q: "Which devices does FilterTube run on?",
         a: "iPhone and iPad (iOS and iPadOS 17 or later), Android phones and tablets, Android TV and Google TV, and the Chrome, Firefox, Edge and Opera browsers (plus Brave, Vivaldi and other Chromium browsers). Fire TV support is planned.",
         links: [{ label: "All downloads", href: links.downloads }],
+      },
+      {
+        q: "Does it work on YouTube Kids?",
+        a: "Yes. The browser extension filters youtubekids.com, and the Android, iPhone, iPad and Android TV apps have a Kids view with YouTube Kids content. Kids rules are kept apart from Main, and changing them asks for the parent PIN.",
+        links: [{ label: "FilterTube for Kids", href: `${SITE_URL}/kids` }],
+      },
+      {
+        q: "Does it work on YouTube Music?",
+        a: "Yes. The browser extension filters music.youtube.com, and the Android and iPhone/iPad apps have Sangeet, a music space with its own player, queue and lyrics. Your filters apply to music too. Sangeet isn't on Android TV yet.",
       },
       {
         q: "Why isn't FilterTube on the App Store?",
@@ -326,7 +355,7 @@ export const faqGroups = [
       },
       {
         q: "What is the current version?",
-        a: `FilterTube ${release.current} came out on ${release.currentDate} for the apps and the extension. ${release.next} is coming soon with Study degree and interview tracks and a weekly timetable.`,
+        a: `FilterTube ${release.current} came out on ${release.currentDate} for the apps and the extension. ${release.next} is coming soon with a calendar-style Study timetable, calendar export and 415 Study packs for 81 countries.`,
       },
       {
         q: "Is FilterTube made by YouTube or Google?",
@@ -349,8 +378,8 @@ export const comparisons = [
     madeFor: "Blocking YouTube channels, keywords, videos and comments by rules",
     runsOn: "Chrome and Firefox extension",
     price: "Free, open source (GPL-3.0)",
-    goodAt: "Powerful rules, including regular expressions, video IDs, comment filters and a password lock for its options.",
-    adds: "Allow-only mode, Kids profiles, Study mode, parent updates to a child's device, ad blocking, and apps for iPhone, iPad, Android and Android TV. FilterTube imports BlockTube exports and exports compatible rules back.",
+    goodAt: "Powerful rules, including regular expressions, video IDs, comment filters, a custom JavaScript filter function and a password lock for its options. It also runs on m.youtube.com in Firefox for Android.",
+    adds: "Allow-only mode, Kids profiles, Study mode, parent updates to a child's device, ad blocking, and apps for iPhone, iPad, Android and Android TV. FilterTube imports BlockTube exports and exports compatible rules back; it doesn't run BlockTube's custom JavaScript filters.",
   },
   {
     name: "Unhook",
@@ -373,7 +402,7 @@ export const comparisons = [
     madeFor: "A separate YouTube app for children, from Google",
     runsOn: "Android, iPhone, iPad, smart TVs and the web",
     price: "Free",
-    goodAt: "Age-based content levels, an approved-content-only mode, a timer and Google's own content review.",
+    goodAt: "Age-based content levels, an approved-content-only mode, up to eight child profiles with a parent passcode, a timer and Google's own content review.",
     adds: "Keyword blocking you control, profiles for each child with PINs, Study mode, parent updates sent from your phone, no ads, and filters for Main viewing too, not only Kids.",
   },
   {
@@ -408,3 +437,57 @@ export const filterTubeRow = {
   runsOn: "iPhone, iPad, Android phones, tablets and TVs, Chrome, Firefox, Edge and Opera",
   price: "Free, no account",
 };
+
+// Feature-by-feature table for /compare and compare.md. Competitor cells were checked on their own
+// pages on 22 November 2026. "No" is used only when the source says so (or lists the feature as
+// future work); anything else is "Not documented". Sources:
+//   BlockTube  README https://github.com/amitbl/blocktube ("Whitelist mode" and "Sync options to cloud
+//              provider" are under future work; password lock; m.youtube.com on Firefox for Android)
+//              Chrome Web Store https://chromewebstore.google.com/detail/blocktube/bbeaicapbccfllodepmimpkgecanonai
+//              ("Hiding YouTube Shorts", "Filtering videos by runtime")
+//              Advanced Blocking wiki https://github.com/amitbl/blocktube/wiki/Advanced-Blocking
+//   Unhook     https://unhook.app/ and its Chrome Web Store listing (toggles that hide feeds,
+//              comments, Shorts and more; Chrome, Firefox, Edge; m.youtube.com in Firefox for Android)
+//   TubeBlock  https://tubeblock.net/, /help/, /block-keywords-on-youtube/, /refund-policy/
+//              ("does not run on m.youtube.com, music.youtube.com or YouTube Kids"; keywords match
+//              titles and channel names; not in the iPhone, iPad, Android or TV apps; Export/Import;
+//              browser sync storage; free; no account)
+//   YouTube Kids  support.google.com/youtubekids answers 7178746 (block video/channel), 6172308
+//              (Approve content yourself), 6130561 (up to eight profiles, passcode, no sign-in
+//              needed), 6130558 (timer), 6130541 (limited ads; Premium removes them)
+export const matrixTools = ["FilterTube", "BlockTube", "Unhook", "TubeBlock", "YouTube Kids app"];
+
+const ND = "Not documented";
+
+export const featureMatrix = [
+  { group: "Blocking", feature: "Keyword blocking", cells: ["Yes", "Yes, including regex", ND, "Yes, titles and channel names", ND] },
+  { group: "Blocking", feature: "Channel blocking", cells: ["Yes", "Yes", ND, "Yes", "Yes"] },
+  { group: "Blocking", feature: "Single video blocking", cells: ["Yes", "Yes", ND, ND, "Yes"] },
+  { group: "Blocking", feature: "Comments", cells: ["Hide all, or filter by word or commenter", "Filter by user or text", "Hide", "No, keywords skip comments", ND] },
+  { group: "Blocking", feature: "Shorts", cells: ["Hide, or filter by your rules", "Hide", "Hide", "Hide", ND] },
+  { group: "Filters", feature: "Category filter", cells: ["Yes, 15 categories", ND, ND, ND, "Age levels instead"] },
+  { group: "Filters", feature: "Language filter", cells: ["Yes (experimental)", ND, ND, ND, ND] },
+  { group: "Filters", feature: "Upload-date and length filters", cells: ["Both", "Length only", ND, ND, ND] },
+  { group: "Family and focus", feature: "Time limits", cells: ["Daily per profile, plus locked focus sessions", ND, ND, ND, "Session timer"] },
+  { group: "Family and focus", feature: "Allow-only (whitelist) mode", cells: ["Yes", "No, listed as future work", ND, ND, "Yes, approve content yourself"] },
+  { group: "Family and focus", feature: "Kids profiles with PINs", cells: ["Yes", "Options password only", ND, ND, "Up to 8 profiles, parent passcode"] },
+  { group: "Family and focus", feature: "Study mode", cells: ["Yes", ND, ND, ND, ND] },
+  { group: "Family and focus", feature: "Calendar-style timetable", cells: ["Coming in 3.6.4", ND, ND, ND, ND] },
+  { group: "Family and focus", feature: "Parent-to-child sync", cells: ["Yes, encrypted, device to device", "No, cloud sync listed as future work", ND, "Same-user browser sync only", ND] },
+  { group: "Family and focus", feature: "Backup and import", cells: ["Yes, including BlockTube import", ND, ND, "Export and import", ND] },
+  { group: "Sites", feature: "YouTube Kids", cells: ["Yes: extension and the apps' Kids view", ND, ND, "No", "Yes, it is YouTube Kids"] },
+  { group: "Sites", feature: "YouTube Music", cells: ["Yes: extension and Sangeet in the phone and tablet apps", ND, ND, "No", ND] },
+  { group: "Platforms", feature: "iPhone and iPad", cells: ["App (SideStore)", ND, ND, "No", "App"] },
+  { group: "Platforms", feature: "Android", cells: ["App (Google Play)", "Firefox for Android", "Firefox for Android", "No", "App"] },
+  { group: "Platforms", feature: "Android TV", cells: ["App (Google Play)", ND, ND, "No", "TV app and casting"] },
+  { group: "Platforms", feature: "Desktop browsers", cells: ["Chrome, Firefox, Edge, Opera", "Chrome, Firefox", "Chrome, Firefox, Edge", "Chrome, Edge, Brave, Opera", "youtubekids.com"] },
+  { group: "Basics", feature: "Ads", cells: ["Blocked on every platform", ND, ND, ND, "Shows limited ads; YouTube Premium removes them"] },
+  { group: "Basics", feature: "Account needed", cells: ["No", ND, ND, "No", "No to watch; blocking needs sign-in"] },
+  { group: "Basics", feature: "Price", cells: ["Free", "Free", ND, "Free", "Free"] },
+];
+
+export const matrixHeadline =
+  "BlockTube's keyword, channel, video and comment blocking, plus allow-only mode, Kids profiles, Study mode (with a calendar-style timetable in 3.6.4), date and length filters, YouTube Kids and YouTube Music, and apps for iPhone, iPad, Android and Android TV.";
+
+export const matrixNote =
+  "Facts about other tools come from their own READMEs, store pages and help pages, checked on 22 November 2026. \"Not documented\" means we couldn't find it in those sources, not that the tool can't do it.";
