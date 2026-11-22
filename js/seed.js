@@ -2759,7 +2759,111 @@
         adVoidState.navigating = false;
         syncAdVoidRuntime();
     });
-    
+
+    // With the advert plan removed, YouTube's desktop player sometimes leaves a
+    // video opened inside the app "unstarted": it reports playing, never loads
+    // media, and Play/Pause cannot wake it until the page is reloaded. Reloading
+    // the same video through the player's own API starts it at once. Only that
+    // exact state qualifies (no media, not paused by anyone, no advert showing),
+    // so rule guards, which pause the element, and real adverts are untouched.
+    const WATCH_STALL_GRACE_MS = 1500;
+    const WATCH_STALL_MAX_RELOADS = 3;
+    const WATCH_STALL_RESUME_WINDOW_MS = 6000;
+    const watchStall = { videoId: '', since: 0, reloads: 0, resumeUntil: 0, resumed: false };
+    function watchRouteStartSeconds() {
+        // The player's own clock may still describe the previous video here,
+        // so only the link's explicit start time is carried over.
+        const raw = new URLSearchParams(document.location.search || '').get('t') || '';
+        const match = /^(?:(\d+)h)?(?:(\d+)m)?(?:(\d+)s?)?$/.exec(raw.trim());
+        if (!raw || !match) return 0;
+        const seconds = (Number(match[1] || 0) * 3600) + (Number(match[2] || 0) * 60) + Number(match[3] || 0);
+        return Number.isFinite(seconds) && seconds > 0 ? seconds : 0;
+    }
+    function recoverStalledWatchPlayer() {
+        const videoId = adVoidCurrentVideoId();
+        if (!videoId || !isNativeContentPlaybackRoute() || !isAdVoidEnabled() || document.hidden) {
+            watchStall.since = 0;
+            return;
+        }
+        if (watchStall.videoId !== videoId) {
+            watchStall.videoId = videoId;
+            watchStall.since = 0;
+            watchStall.reloads = 0;
+            watchStall.resumeUntil = 0;
+            watchStall.resumed = false;
+        }
+        const player = document.getElementById('movie_player');
+        const video = player?.querySelector?.('video.html5-main-video');
+        const className = String(player?.className || '');
+        const advertShowing = className.includes('ad-showing') || className.includes('ad-interrupting');
+        let state = null;
+        try { state = player?.getPlayerState?.(); } catch (e) {}
+        const now = Date.now();
+        // A reloaded video can come back cued but paused. The person had asked
+        // for it to play, so start it once; a later pause is theirs.
+        if (watchStall.resumeUntil && now < watchStall.resumeUntil && !watchStall.resumed
+            && video?.paused === true && !advertShowing && className.includes('unstarted-mode')
+            && (state === -1 || state === 5) && typeof player?.playVideo === 'function') {
+            watchStall.resumed = true;
+            try { player.playVideo(); } catch (e) {}
+            adVoidTrace('stalled-watch-player-resumed', { videoId });
+            return;
+        }
+        const stalled = Boolean(video)
+            && video.readyState === 0
+            && video.paused === false
+            && className.includes('unstarted-mode')
+            && !advertShowing
+            && (state === 3 || state === -1);
+        if (!stalled) {
+            watchStall.since = 0;
+            return;
+        }
+        if (!watchStall.since) {
+            watchStall.since = now;
+            return;
+        }
+        if (now - watchStall.since < WATCH_STALL_GRACE_MS) return;
+        if (watchStall.reloads >= WATCH_STALL_MAX_RELOADS || typeof player.loadVideoById !== 'function') return;
+        watchStall.reloads += 1;
+        watchStall.since = 0;
+        watchStall.resumeUntil = now + WATCH_STALL_RESUME_WINDOW_MS;
+        watchStall.resumed = false;
+        const startSeconds = watchRouteStartSeconds();
+        try {
+            player.loadVideoById({ videoId, startSeconds });
+            adVoidTrace('stalled-watch-player-reloaded', { videoId, attempt: watchStall.reloads, startSeconds });
+        } catch (e) {
+        }
+    }
+    // Event-driven: a timer exists only while a stall or a post-reload resume
+    // is actually pending, so healthy Watch pages carry no FilterTube timers.
+    let watchStallTimer = 0;
+    let watchStallWatchUntil = 0;
+    const WATCH_STALL_WATCH_MS = 8000;
+    function watchForStalledPlayer() {
+        watchStallWatchUntil = Date.now() + WATCH_STALL_WATCH_MS;
+        checkStalledWatchPlayer();
+    }
+    function checkStalledWatchPlayer() {
+        if (watchStallTimer) {
+            try { window.clearTimeout(watchStallTimer); } catch (e) {}
+            watchStallTimer = 0;
+        }
+        recoverStalledWatchPlayer();
+        const pending = watchStall.since > 0
+            || (watchStall.resumeUntil > Date.now() && !watchStall.resumed)
+            || (watchStallWatchUntil > Date.now() && isNativeContentPlaybackRoute() && isAdVoidEnabled());
+        if (pending && typeof window.setTimeout === 'function') {
+            watchStallTimer = window.setTimeout(checkStalledWatchPlayer, 1000);
+        }
+    }
+    try {
+        document.addEventListener('yt-navigate-finish', watchForStalledPlayer, true);
+        for (const type of ['play', 'loadstart', 'emptied']) document.addEventListener(type, watchForStalledPlayer, true);
+    } catch (e) {
+    }
+
     // Mark as ready and dispatch event
     window.ftSeedInitialized = true;
     
