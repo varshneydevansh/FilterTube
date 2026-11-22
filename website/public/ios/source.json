@@ -2,7 +2,7 @@
   "name": "FilterTube",
   "identifier": "com.filtertube.source",
   "subtitle": "Calmer, safer video on iPhone and iPad",
-  "iconURL": "https://filtertube.in/brand/logo.png",
+  "iconURL": "https://filtertube.in/brand/app-icon-uljhan-peek.png",
   "website": "https://filtertube.in/ios",
   "apps": [
     {
@@ -11,8 +11,18 @@
       "developerName": "Devansh Varshney",
       "subtitle": "Filters, profiles and offline saving",
       "localizedDescription": "FilterTube helps you decide what shows up in your feed. Hide channels and words you don't want, set up profiles for the family, and save videos to watch offline. Free, no ads, no sign-up.",
-      "iconURL": "https://filtertube.in/brand/logo.png",
+      "iconURL": "https://filtertube.in/brand/app-icon-uljhan-peek.png",
       "versions": [
+        {
+          "version": "3.6.5",
+          "buildVersion": "30610.2611221528",
+          "date": "2026-11-22",
+          "localizedDescription": "Uljhan peeking is the new app icon (Kriti waving stays in Settings), and FilterTube is a much smaller download: about 91 MB instead of 118 MB, so SideStore installs and updates finish faster.",
+          "downloadURL": "https://github.com/varshneydevansh/FilterTube/releases/download/v3.6.5/FilterTube-Direct-3.6.5.ipa",
+          "size": 91260099,
+          "sha256": "a99dd87124671e8174eaee9aec9c97045c9e51a8992aca598512b4dba17a8f42",
+          "minOSVersion": "17.0"
+        },
         {
           "version": "3.6.4",
           "buildVersion": "30609.2611220907",

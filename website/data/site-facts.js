@@ -12,7 +12,7 @@ import { extensionInstallHref } from "@/components/site-shell-data";
 export const SITE_URL = "https://filtertube.in";
 
 export const release = {
-  current: "3.6.4",
+  current: "3.6.5",
   currentDate: "22 November 2026",
 };
 
@@ -357,7 +357,7 @@ export const faqGroups = [
       },
       {
         q: "What is the current version?",
-        a: `FilterTube ${release.current} came out on ${release.currentDate} for iPhone, iPad, Android, Android TV and the browser extension. It brings parent updates that arrive within seconds, a calendar-style Study timetable with a widget and calendar export, and 415 Study packs for 81 countries.`,
+        a: `FilterTube ${release.current} came out on ${release.currentDate} for iPhone, iPad, Android, Android TV and the browser extension. It gives the apps a new icon, Uljhan peeking, makes the iPhone and iPad download much smaller, and fixes videos that froze or opened paused in the browser extension. The release before, 3.6.4, brought parent updates that arrive within seconds, a calendar-style Study timetable with a widget and calendar export, and 415 Study packs for 81 countries.`,
       },
       {
         q: "Is FilterTube made by YouTube or Google?",
