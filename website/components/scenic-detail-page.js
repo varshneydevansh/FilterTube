@@ -142,15 +142,19 @@ export function ScenicDetailPage({ page, relatedPages, children = null }) {
                     {page.status}
                   </span>
                 </div>
-                <p
-                  className={`mt-8 text-pretty font-display text-[clamp(2.75rem,5.3vw,5.4rem)] font-medium tracking-[-0.07em] ${headingText}`}
-                >
-                  {page.titleLead}
-                </p>
-                <h1
-                  className={`mt-2 text-balance font-editorial text-[clamp(4rem,9.6vw,7.4rem)] leading-[0.92] ${tone.accentText}`}
-                >
-                  {page.titleDisplay}
+                {/* One h1 holds the whole headline ("Your viewing, your rules on Android"), so the
+                    heading names the page; the two spans keep the two-line look. */}
+                <h1 className="mt-8">
+                  <span
+                    className={`block text-pretty font-display text-[clamp(2.75rem,5.3vw,5.4rem)] font-medium tracking-[-0.07em] ${headingText}`}
+                  >
+                    {page.titleLead}
+                  </span>{" "}
+                  <span
+                    className={`mt-2 block text-balance font-editorial text-[clamp(4rem,9.6vw,7.4rem)] leading-[0.92] ${tone.accentText}`}
+                  >
+                    {page.titleDisplay}
+                  </span>
                 </h1>
                 <p className={`mt-6 max-w-[44rem] text-base leading-8 md:text-lg ${mutedText}`}>
                   {page.description}

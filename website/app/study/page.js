@@ -25,7 +25,7 @@ export default function StudyPage() {
     <section className="px-4 pb-24 pt-32 md:px-6 md:pb-32 md:pt-40">
       <div className="mx-auto max-w-[1200px]">
         <Reveal>
-          <SectionHeading title="Study with only the channels you chose." description={studyFacts.intro} />
+          <SectionHeading as="h1" title="Study with only the channels you chose." description={studyFacts.intro} />
         </Reveal>
 
         <ol className="mt-12 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">

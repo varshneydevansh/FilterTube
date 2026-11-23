@@ -3,6 +3,11 @@ import Link from "next/link";
 import { ActionLink, Panel } from "@/components/marketing-ui";
 import { MascotSprite } from "@/components/mascot-sprite";
 
+export const metadata = {
+  title: "Page not found",
+  robots: { index: false },
+};
+
 export default function NotFound() {
   return (
     <section className="px-4 pb-24 pt-32 md:px-6 md:pb-32 md:pt-40">

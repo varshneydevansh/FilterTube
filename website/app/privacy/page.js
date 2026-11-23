@@ -6,6 +6,7 @@ export const metadata = {
   title: "Privacy policy",
   description:
     "FilterTube privacy policy for the browser extension, the Android phone, tablet and TV app, the iPhone and iPad app, the website, and optional Nanah sync.",
+  alternates: { canonical: "https://filtertube.in/privacy" },
 };
 
 const summaryCards = [

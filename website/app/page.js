@@ -35,7 +35,7 @@ import {
 } from "@/components/route-content";
 import { getTonePreset } from "@/components/scenic-tones";
 import { release } from "@/data/site-facts";
-import { JsonLd, softwareApplicationsJsonLd } from "@/lib/structured-data";
+import { JsonLd, softwareApplicationsJsonLd, webSiteJsonLd } from "@/lib/structured-data";
 
 export const metadata = {
   alternates: {
@@ -316,6 +316,7 @@ function QuickGuideSection() {
 export default function HomePage() {
   return (
     <>
+      <JsonLd data={webSiteJsonLd()} />
       <JsonLd data={softwareApplicationsJsonLd()} />
       <section className="relative min-h-[100dvh] overflow-hidden px-4 pb-12 pt-28 md:px-6 md:pb-20 md:pt-36">
         <HeroVideo showControls src={heroVideoUrl} />
@@ -334,11 +335,14 @@ export default function HomePage() {
                 </div>
 
                 <div className="mt-9">
-                  <p className="text-balance font-display text-[clamp(2.7rem,6.8vw,5.8rem)] font-medium tracking-[-0.09em] text-[#fffdf8] drop-shadow-[0_16px_36px_rgba(0,0,0,0.3)] lg:text-[clamp(3rem,4.3vw,4.4rem)]">
-                    Calmer, <span className="whitespace-nowrap">ad-free</span> viewing
-                  </p>
-                  <h1 className="mt-3 text-balance font-editorial text-[clamp(4.2rem,11vw,9.1rem)] leading-[0.88] text-[#fffdf8] drop-shadow-[0_18px_40px_rgba(0,0,0,0.3)] lg:text-[clamp(5rem,7.4vw,7.6rem)]">
-                    Your feed, your rules
+                  {/* One h1 for both lines, so the page heading says what FilterTube is for. */}
+                  <h1>
+                    <span className="block text-balance font-display text-[clamp(2.7rem,6.8vw,5.8rem)] font-medium tracking-[-0.09em] text-[#fffdf8] drop-shadow-[0_16px_36px_rgba(0,0,0,0.3)] lg:text-[clamp(3rem,4.3vw,4.4rem)]">
+                      Calmer, <span className="whitespace-nowrap">ad-free</span> viewing
+                    </span>{" "}
+                    <span className="mt-3 block text-balance font-editorial text-[clamp(4.2rem,11vw,9.1rem)] leading-[0.88] text-[#fffdf8] drop-shadow-[0_18px_40px_rgba(0,0,0,0.3)] lg:text-[clamp(5rem,7.4vw,7.6rem)]">
+                      Your feed, your rules
+                    </span>
                   </h1>
                 </div>
 
@@ -436,7 +440,7 @@ export default function HomePage() {
           <Reveal>
             <SectionHeading
               title="A calmer place for what you choose to watch."
-              description="FilterTube is for parents, students, and everyday users who need clear controls: add words, block channels, hide Shorts, set stricter profiles, and keep the setup local."
+              description="FilterTube is a YouTube content filter for parents, students, and everyday users who need clear controls: add words, block channels, hide Shorts, set stricter profiles, and keep the setup local."
             />
             <div className="mt-8 space-y-4">
               {homeStoryNotes.map((note) => (
@@ -523,8 +527,8 @@ export default function HomePage() {
         <div className="mx-auto max-w-[1400px]">
           <Reveal>
             <SectionHeading
-              title="The main controls are simple: block, allow, hide, or protect."
-              description="Most people can start with a Blocklist. Families can add profiles, PINs, Whitelist mode, and device updates as the setup grows."
+              title="Block channels, videos and Shorts, or allow only what you trust."
+              description="Most people can start with a Blocklist; YouTube ads are blocked from the start. Families can add profiles, PINs, Whitelist mode, and send rule changes to a child's device as the setup grows."
             />
           </Reveal>
           <div className="mt-12 grid auto-rows-fr gap-5 xl:grid-cols-12">

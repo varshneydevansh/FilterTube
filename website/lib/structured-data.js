@@ -1,26 +1,40 @@
-// Modest JSON-LD: one SoftwareApplication per platform on the homepage and a FAQPage on /faq.
-// No ratings or review counts; we don't have verified ones to cite.
+// Modest JSON-LD: a SoftwareApplication for each FilterTube app on the pages about it (all three on
+// the homepage, Kids and Downloads), a WebSite entry on the homepage, and a FAQPage on /faq.
+// No ratings or review counts; we don't have verified ones to cite. featureList says only what
+// ships today (checked against site-facts.js `features`): ads are blocked on YouTube, YouTube Kids
+// and YouTube Music, not on other websites.
 import { SITE_URL, faqItems, links, oneLiner, release } from "@/data/site-facts";
 
 const free = { "@type": "Offer", price: "0", priceCurrency: "USD" };
 const publisher = { "@type": "Person", name: "Devansh Varshney", url: SITE_URL };
 
-const apps = [
-  {
+const featureList = [
+  "Blocks YouTube ads",
+  "Block YouTube channels and keywords",
+  "Hide YouTube Shorts and comments",
+  "Allow-only (Whitelist) mode for trusted channels",
+  "Kids profiles with PINs and viewing limits",
+  "Study mode",
+  "Works on YouTube, YouTube Kids and YouTube Music",
+  "No account; rules stay on your devices",
+];
+
+const apps = {
+  ios: {
     name: "FilterTube for iPhone and iPad",
     operatingSystem: "iOS 17, iPadOS 17",
     applicationCategory: "UtilitiesApplication",
     url: `${SITE_URL}/ios`,
     downloadUrl: links.ios,
   },
-  {
+  android: {
     name: "FilterTube for Android, tablets and Android TV",
     operatingSystem: "Android, Android TV",
     applicationCategory: "UtilitiesApplication",
     url: `${SITE_URL}/android`,
     downloadUrl: links.googlePlay,
   },
-  {
+  extension: {
     name: "FilterTube browser extension",
     operatingSystem: "Chrome, Firefox, Edge, Opera",
     applicationCategory: "BrowserApplication",
@@ -28,19 +42,35 @@ const apps = [
     downloadUrl: links.chrome,
     license: "https://opensource.org/licenses/MIT",
   },
-];
+};
 
-export function softwareApplicationsJsonLd() {
+export const allApps = Object.keys(apps);
+
+// `keys`: which apps the page is about, e.g. ["android"]; defaults to all three.
+export function softwareApplicationsJsonLd(keys = allApps) {
   return {
     "@context": "https://schema.org",
-    "@graph": apps.map((app) => ({
+    "@graph": keys.map((key) => ({
       "@type": "SoftwareApplication",
-      ...app,
+      ...apps[key],
       description: oneLiner,
+      applicationSubCategory: "YouTube ad blocker and content filter",
+      featureList,
+      image: `${SITE_URL}/brand/logo.png`,
       softwareVersion: release.current,
       offers: free,
       author: publisher,
     })),
+  };
+}
+
+// Tells search engines the site's name, so results show "FilterTube" rather than the domain.
+export function webSiteJsonLd() {
+  return {
+    "@context": "https://schema.org",
+    "@type": "WebSite",
+    name: "FilterTube",
+    url: SITE_URL,
   };
 }
 

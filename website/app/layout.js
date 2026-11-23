@@ -42,11 +42,11 @@ const monoFont = localFont({
 export const metadata = {
   metadataBase: new URL("https://filtertube.in"),
   title: {
-    default: "FilterTube: YouTube ad blocker and content blocker for iPhone, Android, TV and browsers",
+    default: "FilterTube: YouTube ad blocker and content filter for iPhone, Android, TV and browsers",
     template: "%s | FilterTube",
   },
   description:
-    "FilterTube is a free YouTube ad blocker and content blocker for iPhone, iPad, Android phones, tablets and TVs, and Chrome, Firefox, Edge and Opera. Works on YouTube, YouTube Kids and YouTube Music. Block ads, keywords, channels and Shorts, or allow only channels you trust. Kids profiles, Study mode, no account.",
+    "Free YouTube ad blocker and content filter for iPhone, Android, TV and Chrome, Firefox, Edge and Opera. Block ads, channels, keywords and Shorts. No account.",
   openGraph: {
     title: "FilterTube",
     description:
@@ -71,9 +71,9 @@ export const metadata = {
       "Local-first video filtering for calmer feeds and safer family setups.",
     images: ["/brand/logo.png"],
   },
-  alternates: {
-    canonical: "https://filtertube.in",
-  },
+  // No site-wide canonical here: a canonical set in the root layout is inherited by every page
+  // that does not set its own, which told search engines those pages were copies of the homepage.
+  // Each page sets alternates.canonical to its own URL instead.
 };
 
 export default function RootLayout({ children }) {

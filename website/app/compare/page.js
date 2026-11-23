@@ -11,9 +11,9 @@ import {
 } from "@/data/site-facts";
 
 export const metadata = {
-  title: "Compare: FilterTube, BlockTube, Unhook, uBlock Origin and more",
+  title: "Compare YouTube blockers: FilterTube, BlockTube, Unhook, uBlock Origin and more",
   description:
-    "Feature by feature: FilterTube vs BlockTube, Unhook, TubeBlock and the YouTube Kids app, from keyword and channel blocking to allow-only mode, Kids profiles, Study, YouTube Kids, YouTube Music and every platform. Plus uBlock Origin, AdGuard and Brave.",
+    "Compare YouTube blockers: FilterTube vs BlockTube, Unhook, TubeBlock and the YouTube Kids app, and how it fits beside ad blockers such as uBlock Origin, AdGuard and Brave.",
   alternates: {
     canonical: "https://filtertube.in/compare",
     types: { "text/markdown": "https://filtertube.in/compare.md" },
@@ -33,7 +33,7 @@ export default function ComparePage() {
     <section className="px-4 pb-24 pt-32 md:px-6 md:pb-32 md:pt-40">
       <div className="mx-auto max-w-[1200px]">
         <Reveal>
-          <SectionHeading title="Pick the right tool, or use two" description={comparisonIntro} />
+          <SectionHeading as="h1" title="Pick the right YouTube blocker, or use two" description={comparisonIntro} />
         </Reveal>
 
         <Reveal className="mt-10" delay={80}>

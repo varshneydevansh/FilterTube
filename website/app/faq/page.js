@@ -4,9 +4,9 @@ import { faqGroups, oneLiner } from "@/data/site-facts";
 import { JsonLd, faqPageJsonLd } from "@/lib/structured-data";
 
 export const metadata = {
-  title: "FAQ: YouTube ad blocker and content blocker",
+  title: "FAQ: YouTube ad blocker, channel blocker and parental controls",
   description:
-    "Answers about FilterTube: block YouTube ads, keywords, channels and Shorts on iPhone, Android, TV and in Chrome, Firefox, Edge and Opera, allow only trusted channels, Kids profiles, Study mode and privacy.",
+    "FilterTube answers: blocking YouTube ads, channels, keywords and Shorts, allow-only mode, parental controls, Study mode, privacy, and what it does not do.",
   alternates: {
     canonical: "https://filtertube.in/faq",
     types: { "text/markdown": "https://filtertube.in/faq.md" },
@@ -35,7 +35,7 @@ export default function FaqPage() {
       <JsonLd data={faqPageJsonLd()} />
       <div className="mx-auto max-w-[1200px]">
         <Reveal>
-          <SectionHeading title="Questions, answered" description={oneLiner} />
+          <SectionHeading as="h1" title="FilterTube questions, answered" description={oneLiner} />
         </Reveal>
         <nav aria-label="FAQ topics" className="mt-8 flex flex-wrap gap-2">
           {faqGroups.map((group) => (

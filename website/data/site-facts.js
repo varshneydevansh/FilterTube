@@ -236,6 +236,11 @@ export const faqGroups = [
         a: "Yes, on every platform. In the browser extension, \"Send adverts to The Void\" is on by default and removes ads before the video plays. The Android, Android TV and iPhone/iPad apps play videos in FilterTube's own player, so YouTube's ads never appear.",
       },
       {
+        q: "Does FilterTube block ads on other websites?",
+        a: "No. FilterTube is an ad blocker for YouTube, YouTube Kids and YouTube Music only. It does not block ads or trackers on other websites or in other apps. For that, use a general ad blocker such as uBlock Origin alongside FilterTube; the two work together.",
+        links: [{ label: "Compare FilterTube with other tools", href: `${SITE_URL}/compare` }],
+      },
+      {
         q: "Is FilterTube a BlockTube alternative?",
         a: "Yes. Like BlockTube, it blocks channels, keywords and videos. It also adds allow-only mode, Kids profiles with PINs, Study mode, parent updates sent to a child's device, and apps for iPhone, iPad, Android and Android TV. You can import a BlockTube export, and export compatible rules back to BlockTube.",
       },
