@@ -469,7 +469,9 @@ export const platformOrder = platformSlugs;
 export const detailPages = {
   extension: {
     slug: "extension",
-    seoTitle: "Browser extension: block YouTube ads, keywords, channels and Shorts",
+    seoTitle: "YouTube ad blocker and filter extension for Chrome, Firefox, Edge and Opera",
+    seoDescription:
+      "Free browser extension that blocks YouTube ads and filters channels, keywords, Shorts and comments on YouTube, YouTube Kids and YouTube Music. Chrome, Firefox, Edge, Opera.",
     tone: "lilac",
     status: "Available for browsers",
     navTitle: "Browser extension",
@@ -478,7 +480,7 @@ export const detailPages = {
     titleLead: "Your familiar viewing, with",
     titleDisplay: "your rules",
     description:
-      "Filter channels, keywords, Shorts, comments, and supported content on the pages you already use. Use the popup for quick changes, the dashboard for deeper setup, and the video menu to block content as you browse.",
+      "Block YouTube ads, channels, keywords, Shorts and comments on the pages you already use. Use the popup for quick changes, the dashboard for deeper setup, and the video menu to block content as you browse.",
     heroScreensLayout: "popup",
     heroScreensLabel: "Extension preview",
     heroScreens: extensionScreens.hero,
@@ -588,7 +590,9 @@ export const detailPages = {
   },
   mobile: {
     slug: "mobile",
-    seoTitle: "Mobile apps for Android, iPhone and iPad",
+    seoTitle: "YouTube ad blocker and filter apps for Android, iPhone and iPad",
+    seoDescription:
+      "FilterTube's apps for Android phones and tablets (Google Play) and iPhone and iPad (SideStore): watch without YouTube ads and block channels, keywords and Shorts.",
     tone: "sage",
     status: "Available on Google Play",
     navTitle: "Mobile overview",
@@ -654,6 +658,7 @@ export const detailPages = {
   },
   ios: {
     slug: "ios",
+    seoTitle: "YouTube ad blocker and filter for iPhone and iPad",
     tone: "sky",
     status: "Install directly · App Store later",
     navTitle: "iPhone and iPad",
@@ -736,6 +741,9 @@ export const detailPages = {
   },
   ipados: {
     slug: "ipados",
+    seoTitle: "iPad app: YouTube ad blocker, filters and parental controls",
+    seoDescription:
+      "FilterTube on iPad: watch without YouTube ads, block channels, keywords and Shorts, and set up Kids profiles with PINs. Install with SideStore or AltStore.",
     tone: "sky",
     status: "Install directly · App Store later",
     navTitle: "iPadOS",
@@ -791,7 +799,9 @@ export const detailPages = {
   },
   android: {
     slug: "android",
-    seoTitle: "Android app: block YouTube ads, keywords and channels on phone, tablet and TV",
+    seoTitle: "Android app: YouTube ad blocker and channel blocker for phone, tablet and TV",
+    seoDescription:
+      "FilterTube for Android plays YouTube without ads and blocks channels, keywords and Shorts, with Kids profiles and parental controls. Phones, tablets and Android TV.",
     tone: "forest",
     status: "Phone, tablet + TV",
     navTitle: "Android",
@@ -800,7 +810,7 @@ export const detailPages = {
     titleLead: "Your viewing, your rules on",
     titleDisplay: "Android",
     description:
-      "Watch Main and Kids in FilterTube's custom Android app, with filters, profiles, parent controls, protected time and private peer-to-peer device sync. Phones, tablets and Android TV install from the same Google Play listing, and a TV APK is on every GitHub release.",
+      "Watch Main and Kids in FilterTube's custom Android app, without YouTube ads, with filters, profiles, parent controls, protected time and private peer-to-peer device sync. Phones, tablets and Android TV install from the same Google Play listing, and a TV APK is on every GitHub release.",
     heroVideo: {
       src: "/videos/android/android-contours.mp4",
       poster: "/videos/android/android-contours-poster.png",
@@ -988,7 +998,9 @@ export const detailPages = {
   },
   tv: {
     slug: "tv",
-    seoTitle: "TV: FilterTube on Android TV and Google TV",
+    seoTitle: "TV: YouTube without ads, with filters, on Android TV and Google TV",
+    seoDescription:
+      "FilterTube on Android TV and Google TV: watch without YouTube ads, with your channel and keyword blocks, Kids profiles and PINs. Fire TV support is planned.",
     tone: "sunset",
     status: "Android TV available",
     navTitle: "TV overview",
@@ -1034,6 +1046,8 @@ export const detailPages = {
   "android-tv": {
     slug: "android-tv",
     seoTitle: "Android TV: block YouTube ads, channels and keywords on the big screen",
+    seoDescription:
+      "FilterTube for Android TV and Google TV: watch without YouTube ads, block channels and keywords, and use Kids profiles with PINs, all with the remote. On Google Play.",
     tone: "sky",
     status: "Google Play + TV APK",
     navTitle: "Android TV",
@@ -1042,7 +1056,7 @@ export const detailPages = {
     titleLead: "Your rules, from the sofa, on",
     titleDisplay: "Android TV",
     description:
-      "FilterTube brings the custom app to Android TV and Google TV: browse, search and watch with the remote, with profiles, PINs, Kids controls and your filters on the big screen. Install it from Google Play or the TV APK on GitHub.",
+      "FilterTube brings the custom app to Android TV and Google TV: browse, search and watch without YouTube ads using the remote, with profiles, PINs, Kids controls and your filters on the big screen. Install it from Google Play or the TV APK on GitHub.",
     screenshotsTitle: "Every TV screen",
     screenshotsDescription: "Real screens from the latest FilterTube build on Android TV.",
     screenshotRails: [
@@ -1084,6 +1098,7 @@ export const detailPages = {
   },
   "fire-tv": {
     slug: "fire-tv",
+    seoTitle: "Amazon Fire TV: planned (use Android TV today)",
     tone: "amber",
     status: "Planned",
     navTitle: "Amazon Fire TV",
@@ -1124,7 +1139,9 @@ export const detailPages = {
   },
   kids: {
     slug: "kids",
-    seoTitle: "Kids: YouTube parental controls with PIN-protected profiles",
+    seoTitle: "Parental controls for YouTube and YouTube Kids, with PIN-protected profiles",
+    seoDescription:
+      "Parental controls for YouTube and YouTube Kids: block channels and words, or allow only channels you approve. Separate Kids profiles with PINs and viewing limits.",
     tone: "rose",
     status: "Android, iOS, TV + extension",
     navTitle: "Kids",
@@ -1133,7 +1150,7 @@ export const detailPages = {
     titleLead: "More say in what your",
     titleDisplay: "children watch",
     description:
-      "Block channels and words you do not want in Kids, or choose Whitelist to allow only the channels you approve. Give each child their own rules and viewing limits, with changes managed by their parent.",
+      "Parental controls for YouTube and YouTube Kids: block channels and words you do not want in Kids, or choose Whitelist to allow only the channels you approve. Give each child their own rules and viewing limits, with changes managed by their parent.",
     heroScreensLayout: "tv-phone",
     heroScreensLabel: "Kids Viewing on Android TV and iPhone",
     heroScreens: [
@@ -1196,6 +1213,7 @@ export const detailPages = {
   },
   "ml-ai": {
     slug: "ml-ai",
+    seoTitle: "ML and AI research: local, explainable YouTube filtering",
     tone: "ink",
     status: "Research direction",
     navTitle: "ML & AI",

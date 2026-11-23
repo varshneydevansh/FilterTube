@@ -5,6 +5,7 @@ export const metadata = {
   title: "Terms of use",
   description:
     "FilterTube terms of use for the website, the browser extension, the Android and iOS apps, and the optional supporter subscription.",
+  alternates: { canonical: "https://filtertube.in/terms" },
 };
 
 const sections = [
@@ -94,6 +95,7 @@ export default function TermsPage() {
       <div className="mx-auto max-w-[1100px]">
         <Reveal>
           <SectionHeading
+            as="h1"
             title="Terms of use"
             description="Last updated: 19 November 2026. These terms cover the FilterTube website, browser extension, Android app and iPhone and iPad app."
           />

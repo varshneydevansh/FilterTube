@@ -4,6 +4,7 @@ import Link from "next/link";
 
 import { LatestReleaseAssets } from "@/components/latest-release-assets";
 import { HeroVideo } from "@/components/hero-video";
+import { JsonLd, softwareApplicationsJsonLd } from "@/lib/structured-data";
 import { ActionLink, Panel } from "@/components/marketing-ui";
 import {
   androidPlayStoreHref,
@@ -14,9 +15,11 @@ import {
 } from "@/components/route-content";
 
 export const metadata = {
-  title: "Downloads: FilterTube for iPhone, iPad, Android, Android TV and browsers",
+  title: "Download FilterTube: YouTube ad blocker for iPhone, iPad, Android, Android TV and browsers",
   description:
-    "Download FilterTube for browsers, install the public Android app from Google Play, or install the iPhone and iPad app directly with SideStore.",
+    "Download FilterTube, the free YouTube ad blocker and content filter, for Chrome, Firefox, Edge and Opera, Android on Google Play, and iPhone and iPad via SideStore.",
+  alternates: { canonical: "https://filtertube.in/downloads" },
+  openGraph: { title: "Download FilterTube", url: "https://filtertube.in/downloads" },
 };
 
 const releaseHref = `${githubHref}/releases`;
@@ -166,6 +169,7 @@ function DownloadCard({ item }) {
 export default function DownloadsPage() {
   return (
     <div className="relative isolate overflow-hidden">
+      <JsonLd data={softwareApplicationsJsonLd()} />
       <HeroVideo
         className="fixed inset-0 -z-10 h-full w-full object-cover"
         fixedControls
@@ -180,7 +184,7 @@ export default function DownloadsPage() {
         <div className="mx-auto max-w-[1180px]">
           <div className="max-w-[820px]">
             <h1 className="text-balance font-display text-5xl font-semibold tracking-[-0.07em] text-[var(--color-ink)] md:text-7xl md:leading-[0.95]">
-              One stable place for every FilterTube build.
+              Download FilterTube for every screen.
             </h1>
             <p className="mt-6 max-w-[68ch] text-pretty text-base leading-8 text-[var(--color-muted)] md:text-lg">
               Browser releases are on GitHub and the browser stores. Android

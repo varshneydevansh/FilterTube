@@ -4,6 +4,7 @@ import { ActionLink, Panel } from "@/components/marketing-ui";
 import { Reveal } from "@/components/reveal";
 import { detailPages } from "@/components/route-content";
 import { ScenicDetailPage } from "@/components/scenic-detail-page";
+import { JsonLd, softwareApplicationsJsonLd } from "@/lib/structured-data";
 
 // The direct release (source URL, release page, SHA-256) comes from public/ios/source.json, which
 // the app repository's release script fills. Until then the page says the install link is coming.
@@ -34,9 +35,9 @@ const relatedPages = page.related
   .filter(Boolean);
 
 export const metadata = {
-  title: "Install on iPhone and iPad",
+  title: "YouTube ad blocker and filter for iPhone and iPad: install guide",
   description:
-    "Apple is having trouble on their end, so the App Store version will take a while. Until then, install FilterTube on iPhone and iPad with SideStore, or AltStore. Free, no ads, nothing locked, no FilterTube sign-up.",
+    "Watch YouTube without ads and block channels, keywords and Shorts on iPhone and iPad. Install FilterTube free with SideStore or AltStore while the App Store version is delayed.",
   alternates: {
     canonical: "https://filtertube.in/ios",
     types: { "text/markdown": "https://filtertube.in/ios.md" },
@@ -592,8 +593,11 @@ function InstallGuide() {
 
 export default function IosPage() {
   return (
-    <ScenicDetailPage page={page} relatedPages={relatedPages}>
-      <InstallGuide />
-    </ScenicDetailPage>
+    <>
+      <JsonLd data={softwareApplicationsJsonLd(["ios"])} />
+      <ScenicDetailPage page={page} relatedPages={relatedPages}>
+        <InstallGuide />
+      </ScenicDetailPage>
+    </>
   );
 }

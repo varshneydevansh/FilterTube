@@ -15,12 +15,13 @@ export function Panel({ children, className = "", innerClassName = "" }) {
   );
 }
 
-export function SectionHeading({ title, description }) {
+// `as="h1"` for the one heading at the top of a page; sections below it keep the default h2.
+export function SectionHeading({ title, description, as: Heading = "h2" }) {
   return (
     <div className="max-w-[58rem]">
-      <h2 className="max-w-[13ch] text-balance font-display text-4xl font-semibold tracking-[-0.06em] text-[var(--color-ink)] md:text-6xl md:leading-[0.98]">
+      <Heading className="max-w-[13ch] text-balance font-display text-4xl font-semibold tracking-[-0.06em] text-[var(--color-ink)] md:text-6xl md:leading-[0.98]">
         {title}
-      </h2>
+      </Heading>
       {description ? (
         <p className="mt-5 max-w-[62ch] text-pretty text-base leading-8 text-[var(--color-muted)] md:text-lg">
           {description}
