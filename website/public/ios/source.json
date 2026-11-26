@@ -14,6 +14,16 @@
       "iconURL": "https://filtertube.in/brand/app-icon-uljhan-peek.png",
       "versions": [
         {
+          "version": "3.6.6",
+          "buildVersion": "30611.2611251839",
+          "date": "2026-11-26",
+          "localizedDescription": "Videos that never started now play, scrolling is smoother on every page, Watch opens faster, Sangeet looks right in every orientation, and start-up no longer fails on slower iPhones and iPads.",
+          "downloadURL": "https://github.com/varshneydevansh/FilterTube/releases/download/v3.6.6/FilterTube-Direct-3.6.6.ipa",
+          "size": 102685091,
+          "sha256": "8da2c3d6cc152d29ff747bf7011d696b04b01e517955288803e38441723a340e",
+          "minOSVersion": "17.0"
+        },
+        {
           "version": "3.6.4",
           "buildVersion": "30609.2611220907",
           "date": "2026-11-22",
