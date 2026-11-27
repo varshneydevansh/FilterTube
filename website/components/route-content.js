@@ -8,7 +8,11 @@ import {
 
 export { extensionInstallHref, navigationLinks };
 
+// 720p re-encode (Nov 2026): WebM/VP9 0.9 MB first, H.264 MP4 1.4 MB fallback, WebP poster.
+// The old 1928px MP4 was 12.4 MB and every first visit downloaded it.
 export const heroVideoUrl = "/videos/homepage/day/homepage_hero_day.mp4";
+export const heroVideoWebmUrl = "/videos/homepage/day/homepage_hero_day.webm";
+export const heroVideoPoster = "/videos/homepage/day/homepage_hero_day-poster.webp";
 
 export const demoVideoHref = "https://www.youtube.com/watch?v=dmLUu3lm7dE";
 export const appDemoVideoHref = "https://www.youtube.com/watch?v=SHvSICSMHL4";
@@ -29,7 +33,7 @@ export const browserLinks = [
     name: "Android",
     note: "Google Play",
     href: androidPlayStoreHref,
-    logo: "/apps/android.png",
+    logo: "/apps/android.webp",
   },
   {
     name: "Chrome",
@@ -71,7 +75,7 @@ export const browserLinks = [
     name: "iOS",
     note: "Install directly",
     href: "/ios",
-    logo: "/apps/app-store-transparent.png",
+    logo: "/apps/app-store-transparent.webp",
     internal: true,
   },
 ];
@@ -269,7 +273,7 @@ export const homeAppCards = [
   {
     title: "Your videos, on Android.",
     body: "A custom Main and Kids app, with filters and family profiles, plus Sangeet for music, video Notes and Offline Media. Install from Google Play. No invitation or email needed.",
-    image: "/apps/android.png",
+    image: "/apps/android.webp",
     imageAlt: "FilterTube Android app artwork",
     action: "Explore Android",
     href: "/android",
@@ -278,7 +282,7 @@ export const homeAppCards = [
   {
     title: "iPhone and iPad, together.",
     body: "A native app for smaller screens and a wider iPad workspace. Trouble on Apple's side delays the App Store version; until then, install with SideStore, or AltStore.",
-    image: "/apps/app-store-transparent.png",
+    image: "/apps/app-store-transparent.webp",
     imageAlt: "FilterTube iPhone and iPad app artwork",
     action: "Install on iPhone or iPad",
     href: "/ios",
@@ -604,11 +608,11 @@ export const detailPages = {
       "The Android phone and tablet app is publicly available on Google Play. Trouble on Apple's side delays the App Store version of the native iPhone and iPad app; until then, install it with SideStore, or AltStore.",
     heroArtworks: [
       {
-        src: "/apps/android.png",
+        src: "/apps/android.webp",
         alt: "FilterTube Android app artwork",
       },
       {
-        src: "/apps/app-store-transparent.png",
+        src: "/apps/app-store-transparent.webp",
         alt: "FilterTube iPhone and iPad App Store artwork",
       },
     ],
@@ -710,6 +714,7 @@ export const detailPages = {
     },
     heroVideo: {
       src: "/videos/ios/ios_hero_slow_540.mp4",
+      poster: "/videos/ios/ios_hero_slow_540-poster.webp",
       label: "iPhone app preview",
       caption:
         "A short native iPhone preview of the current build.",
@@ -754,7 +759,7 @@ export const detailPages = {
     description:
       "The native iPad app ships alongside iPhone. Trouble on Apple's side delays the App Store version; until then, install it with SideStore, or AltStore.",
     heroArtwork: {
-      src: "/apps/app-store-transparent.png",
+      src: "/apps/app-store-transparent.webp",
       alt: "FilterTube iPad app artwork",
     },
     screenshotsTitle: "A closer look at iPhone and iPad",
@@ -813,7 +818,7 @@ export const detailPages = {
       "Watch Main and Kids in FilterTube's custom Android app, without YouTube ads, with filters, profiles, parent controls, protected time and private peer-to-peer device sync. Phones, tablets and Android TV install from the same Google Play listing, and a TV APK is on every GitHub release.",
     heroVideo: {
       src: "/videos/android/android-contours.mp4",
-      poster: "/videos/android/android-contours-poster.png",
+      poster: "/videos/android/android-contours-poster.webp",
       label: "Quiet Android background motion",
     },
     heroScreensLabel: "FilterTube on Android",
@@ -848,19 +853,19 @@ export const detailPages = {
     ],
     screenshots: [
       {
-        src: "/apps/screenshots/android-player-settings.png",
+        src: "/apps/screenshots/android-player-settings.webp",
         alt: "Playback settings in the Android app",
         title: "Player settings",
         caption: "Quality, captions, chapters, and viewing controls.",
       },
       {
-        src: "/apps/screenshots/android-music-player.png",
+        src: "/apps/screenshots/android-music-player.webp",
         alt: "The Sangeet player in the Android app",
         title: "Sangeet player",
         caption: "A dedicated listening view with queue, lyrics, and playback controls.",
       },
       {
-        src: "/apps/screenshots/android-notes-editor.png",
+        src: "/apps/screenshots/android-notes-editor.webp",
         alt: "Empty video Notes editor in the Android app",
         title: "Notes editor",
         caption: "An empty per-video editor with timestamp tools.",

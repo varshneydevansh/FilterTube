@@ -97,6 +97,7 @@ export function ScenicDetailPage({ page, relatedPages, children = null }) {
             poster={page.heroVideo.poster}
             showControls
             src={page.heroVideo.src}
+            webmSrc={page.heroVideo.webmSrc}
           />
         ) : null}
         <div

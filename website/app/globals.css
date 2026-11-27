@@ -643,8 +643,8 @@ html[data-theme="dark"] .ft-hero-support-emphasis {
   color: var(--platform-label);
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.7);
 }
-.ft-platform-icon img[src="/apps/android.png"] { transform: scale(2.2); }
-.ft-platform-icon img[src="/apps/app-store-transparent.png"] { transform: scale(1.8); }
+.ft-platform-icon img[src="/apps/android.webp"] { transform: scale(2.2); }
+.ft-platform-icon img[src="/apps/app-store-transparent.webp"] { transform: scale(1.8); }
 .ft-platform-label, .ft-platform-badge { color: var(--platform-label); }
 .ft-platform-badge {
   border-color: var(--platform-border);
@@ -827,8 +827,8 @@ html[data-theme="dark"] .ft-download-rail {
 
 /* Match the visible artwork bounds despite padding in the source app images. */
 .ft-browser-logo { display: inline-flex; align-items: center; justify-content: center; }
-.ft-browser-logo img[src="/apps/android.png"] { transform: scale(2.2); }
-.ft-browser-logo img[src="/apps/app-store-transparent.png"] { transform: scale(1.8); }
+.ft-browser-logo img[src="/apps/android.webp"] { transform: scale(2.2); }
+.ft-browser-logo img[src="/apps/app-store-transparent.webp"] { transform: scale(1.8); }
 
 .ft-screenshot-viewer { width: min(96vw, 1400px); max-width: none; max-height: 96dvh; margin: auto; padding: 0; overflow: auto; border: 1px solid var(--color-line); border-radius: 1.4rem; background: var(--color-panel); color: var(--color-ink); box-shadow: 0 24px 90px #0006; }
 .ft-screenshot-viewer::backdrop { background: rgb(8 12 20 / .82); }

@@ -11,7 +11,9 @@ import {
   detailPages,
   docsHref,
   githubHref,
+  heroVideoPoster,
   heroVideoUrl,
+  heroVideoWebmUrl,
 } from "@/components/route-content";
 
 export const metadata = {
@@ -173,8 +175,10 @@ export default function DownloadsPage() {
       <HeroVideo
         className="fixed inset-0 -z-10 h-full w-full object-cover"
         fixedControls
+        poster={heroVideoPoster}
         showControls
         src={heroVideoUrl}
+        webmSrc={heroVideoWebmUrl}
       />
       <div className="ft-download-scene fixed inset-0 -z-10">
         <div className="ft-download-scene-wash absolute inset-0 bg-[radial-gradient(circle_at_28%_16%,rgba(255,255,255,0.76),rgba(255,255,255,0.46)_35%,rgba(246,242,235,0.76)_72%),linear-gradient(180deg,rgba(246,242,235,0.64),rgba(246,242,235,0.9)_58%,rgba(246,242,235,0.96))]" />

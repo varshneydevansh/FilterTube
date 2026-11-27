@@ -2,8 +2,19 @@
 
 import { useEffect, useRef, useState } from "react";
 
+// Background motion that costs nothing until it plays. preload="none" plus a poster means the
+// video downloads only when it is about to play. It never autoplays with reduced motion; on
+// phone-width screens and Save-Data connections it starts paused, showing the poster, and the
+// "Play background motion" button starts it.
+const AUTOPLAY_OFF_QUERY = "(max-width: 767px)";
+
+function shouldStartPaused() {
+  return window.matchMedia(AUTOPLAY_OFF_QUERY).matches || navigator.connection?.saveData === true;
+}
+
 export function HeroVideo({
   src,
+  webmSrc,
   className = "absolute inset-0 h-full w-full object-cover",
   poster,
   showControls = false,
@@ -13,12 +24,22 @@ export function HeroVideo({
   const [userPaused, setUserPaused] = useState(false);
   const [reducedMotion, setReducedMotion] = useState(true);
   const [unavailable, setUnavailable] = useState(false);
+  const startDecided = useRef(false);
 
   useEffect(() => {
     const video = videoRef.current;
 
     if (!video) {
       return undefined;
+    }
+
+    if (!startDecided.current) {
+      startDecided.current = true;
+      if (shouldStartPaused()) {
+        // Re-runs this effect with userPaused set, before anything is downloaded.
+        setUserPaused(true);
+        return undefined;
+      }
     }
 
     let visible = false;
@@ -68,11 +89,14 @@ export function HeroVideo({
         loop
         muted
         playsInline
-        preload="metadata"
+        preload="none"
         poster={poster}
         onError={() => setUnavailable(true)}
-        src={src}
-      />
+      >
+        {webmSrc ? <source src={webmSrc} type="video/webm" /> : null}
+        {/* onError on <video> does not fire for <source> failures; the last source reports it. */}
+        <source src={src} type="video/mp4" onError={() => setUnavailable(true)} />
+      </video>
       {showControls && !reducedMotion && !unavailable ? (
         <button
           aria-pressed={userPaused}
